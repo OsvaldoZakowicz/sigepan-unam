@@ -6,10 +6,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Traits\HasRoles; // paquete de roles y permisos
 
 class User extends Authenticatable
 {
     use HasFactory, Notifiable;
+    /** paquete de roles y permisos, incluye la relacion entre modelos y tablas
+     * la relacion es polimorfica entre:
+     * users n:n model_has_roles
+     * users n:n model_has_permissions
+     */
+    use HasRoles;
 
     /**
      * The attributes that are mass assignable.
