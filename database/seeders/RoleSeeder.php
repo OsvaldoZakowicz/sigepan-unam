@@ -18,7 +18,7 @@ class RoleSeeder extends Seeder
     {
         DB::table('roles')->insert([
             ['name' => 'gerente',       'guard_name' => 'web', 'is_editable' => false, 'is_internal' => true, 'created_at' => now(env('APP_TIMEZONE'))],
-            ['name' => 'pandero',       'guard_name' => 'web', 'is_editable' => false, 'is_internal' => true, 'created_at' => now(env('APP_TIMEZONE'))],
+      ['name' => 'panadero',      'guard_name' => 'web', 'is_editable' => false, 'is_internal' => true, 'created_at' => now(env('APP_TIMEZONE'))],
             ['name' => 'vendedor',      'guard_name' => 'web', 'is_editable' => false, 'is_internal' => true, 'created_at' => now(env('APP_TIMEZONE'))],
             ['name' => 'repartidor',    'guard_name' => 'web', 'is_editable' => false, 'is_internal' => true, 'created_at' => now(env('APP_TIMEZONE'))],
             ['name' => 'proveedor',     'guard_name' => 'web', 'is_editable' => false, 'is_internal' => true, 'created_at' => now(env('APP_TIMEZONE'))],
