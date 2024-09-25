@@ -20,12 +20,8 @@ class CreateRole extends Component
 
   //* propiedades accesibles de la vista
   // de la vista:
-  //?validacion desde reglas de livewire!:
-  #[Rule('required')]
   public $role_name;
-  #[Rule('required', message: 'Este campo :attribute falta', as: 'descripcion corta')]
   public $role_short_description;
-  #[Rule('required')]
   public $role_permissions = []; // capturo nombres
 
   /**
@@ -49,20 +45,15 @@ class CreateRole extends Component
     ]); */
 
     //* validacion clasica
-    /* $this->validate([
+    $this->validate([
       'role_name' => 'required',
       'role_short_description' => 'required',
       'role_permissions' => 'required|array|min:1'
-    ], [
-      'role_name.required' => 'El nombre del rol es requerido'
-    ], [
+    ], [], [
       'role_name' => 'nombre',
       'role_short_description' => 'descripcion corta',
       'role_permissions' => 'permisos del rol'
-    ]); */
-
-    //?validaciones desde reglas de livewire
-    $this->validate();
+    ]);
 
     $new_role = Role::create([
       'name' => $this->role_name,
@@ -79,6 +70,8 @@ class CreateRole extends Component
 
     // refrescar los roles
     $this->roles = Role::all();
+
+    $this->redirectRoute('users-roles-index');
   }
 
   // renderiza el componente

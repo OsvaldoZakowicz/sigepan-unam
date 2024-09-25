@@ -32,7 +32,7 @@
                 <span class="text-red-400 text-xs">{{ $message }}</span>
               @enderror
             </span>
-            <textarea wire:model="role_short_description" name="role_short_description" cols="20" rows="5" class="w-full border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"></textarea>
+            <textarea wire:model="role_short_description" name="role_short_description" cols="10" rows="2" class="w-full border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"></textarea>
           </div>
         </fieldset>
          <!-- este es un grupo de inputs por tema -->
@@ -61,20 +61,11 @@
 
         <!-- botones del formulario -->
         <div class="flex justify-end">
-          <a href="#" class="flex justify-center items-center box-border w-fit h-6 m-2 p-1 border-solid border rounded border-neutral-600 bg-neutral-600 text-center text-neutral-100 uppercase text-xs">cancelar</a>
+          <a href="{{ route('users-roles-index') }}" class="flex justify-center items-center box-border w-fit h-6 m-2 p-1 border-solid border rounded border-neutral-600 bg-neutral-600 text-center text-neutral-100 uppercase text-xs">cancelar</a>
           <!-- en un formulario, un boton de envio debe ser: <input> o <button> tipo submit -->
           <button type="submit" class="flex justify-center items-center box-border w-fit h-6 m-2 p-1 border-solid border rounded border-emerald-600 bg-emerald-600 text-center text-neutral-100 uppercase text-xs">guardar</button>
         </div>
       </form>
-    </section>
-    <section class="w-full my-4">
-      <ul>
-        @forelse ($roles as $role)
-          <li>Rol:&nbsp;{{$role->name}},&nbsp;{{ count($role->permissions) }}</li>
-        @empty
-          <li>No hay roles!</li>
-        @endforelse
-      </ul>
     </section>
   </article>
 </div>
