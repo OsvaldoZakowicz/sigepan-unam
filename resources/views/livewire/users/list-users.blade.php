@@ -9,11 +9,15 @@
     </section>
     <section class="flex flex-col pt-2 px-1 text-sm capitalize bg-white">
       <!-- seccion de cabecera -->
-      {{-- <section class="flex items-center justify-between px-1 bg-neutral-200">
-        <span class="text-sm capitalize">titulo de seccion</span>
+      <section class="flex items-center justify-between gap-4 p-1 m-1 border rounded-sm bg-neutral-100">
+        <span class="text-sm capitalize">buscar usuario:</span>
+        {{-- formulario de busqueda --}}
+        <form class="grow">
+          <input type="text" name="search" placeholder="ingrese un id, o termino de busqueda" class="w-1/2 shrink text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
+        </form>
         <!-- grupo de botones -->
         <div class="flex"></div>
-      </section> --}}
+      </section>
       <!-- seccion de contenido -->
       <section class="flex mt-2 px-1">
         <!-- tabla -->
