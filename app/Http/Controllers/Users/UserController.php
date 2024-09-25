@@ -42,4 +42,12 @@ class UserController extends Controller
   {
     return view('users.roles-create');
   }
+
+  /**
+   * * crear un usuario interno
+   */
+  public function users_create(): view
+  {
+    return view('users.users-create');
+  }
 }

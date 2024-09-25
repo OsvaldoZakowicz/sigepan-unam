@@ -4,7 +4,7 @@
     <section class="flex items-center justify-between px-1 py-1 bg-neutral-200">
       <span class="text-sm capitalize">lista de usuarios</span>
       <div role="grupo-de-botones" class="flex">
-        <a href="#" class="flex justify-center items-center box-border w-fit h-6 m-1 p-1 border-solid border rounded border-blue-600 bg-blue-600 text-center text-neutral-100 uppercase text-xs">crear usuario interno</a>
+        <a wire:navigate href="{{ route('users-users-create') }}" class="flex justify-center items-center box-border w-fit h-6 m-1 p-1 border-solid border rounded border-blue-600 bg-blue-600 text-center text-neutral-100 uppercase text-xs">crear usuario interno</a>
       </div>
     </section>
     <section class="flex flex-col pt-2 px-1 text-sm capitalize bg-white">
