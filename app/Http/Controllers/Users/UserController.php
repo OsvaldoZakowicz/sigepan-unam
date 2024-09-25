@@ -28,6 +28,14 @@ class UserController extends Controller
   }
 
   /**
+   * * index principal al apartado de permisos
+   */
+  public function permissions_index(): View
+  {
+    return view('users.permissions-index');
+  }
+
+  /**
    * * crear un rol
    */
   public function roles_create(): View
