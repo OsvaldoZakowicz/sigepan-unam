@@ -9,6 +9,6 @@
 @endsection
 
 @section('view_content')
-{{-- incluir componente dinamico aqui --}}
-<p>index usuarios</p>
+  {{-- incluir componente dinamico aqui --}}
+  @livewire('users.list-users')
 @endsection

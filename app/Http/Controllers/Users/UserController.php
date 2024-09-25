@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
+/**
+ * * controlador del modulo de usuarios
+ */
 class UserController extends Controller
 {
   /**
