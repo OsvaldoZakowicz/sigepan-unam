@@ -11,7 +11,9 @@ class ListUsers extends Component
 
   public function mount()
   {
-    $this->users = User::all();
+    //* usuarios que no son clientes
+    //! solucion temporal, evitar el hardcoding
+    $this->users = User::withoutRole('cliente')->get();
   }
 
   public function render()

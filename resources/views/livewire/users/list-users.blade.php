@@ -28,6 +28,7 @@
               <th class="border text-left p-0.5">id</th>
               <th class="border text-left p-0.5">nombre de usuario</th>
               <th class="border text-left p-0.5">email</th>
+              <th class="border text-left p-0.5">rol</th>
               <th class="border text-left p-0.5">acciones</th>
             </tr>
           </thead>
@@ -37,7 +38,15 @@
                 <td class="border p-0.5">{{$user->id}}</td>
                 <td class="border p-0.5">{{$user->name}}</td>
                 <td class="border p-0.5">{{$user->email}}</td>
-                <td class="border p-0.5">acciones</td>
+                {{-- todo: conseguir una salida de nombre de rol mas limpia --}}
+                <td class="border p-0.5">{{$user->getRoleNames();}}</td>
+                <td class="border p-0.5">
+                  <div class="w-full inline-flex gap-2 justify-start items-center">
+                    <a href="#" class="flex justify-center items-center box-border w-fit h-6 p-1 border-solid border rounded border-neutral-200 bg-neutral-100 text-center text-neutral-600 uppercase text-xs">ver</a>
+                    <a href="#" class="flex justify-center items-center box-border w-fit h-6 p-1 border-solid border rounded border-neutral-200 bg-neutral-100 text-center text-neutral-600 uppercase text-xs">editar</a>
+                    <a href="#" class="flex justify-center items-center box-border w-fit h-6 p-1 border-solid border rounded border-red-600 bg-red-600 text-center text-neutral-100 uppercase text-xs">eliminar</a>
+                  </div>
+                </td>
             </tr>
             @empty
             <tr class="border">
