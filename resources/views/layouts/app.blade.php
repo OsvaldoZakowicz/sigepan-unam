@@ -27,10 +27,8 @@
 
     {{-- header de seccion --}}
     @if (isset($header))
-      <header class="mx-auto px-4 sm:px-6 lg:px-8 py-2 bg-white shadow text-md font-medium capitalize text-neutral-700">
-        <div class="w-full flex items-center justify-between h-8 px-1">
-          {{ $header }}
-        </div>
+      <header class="w-full px-8 h-10 sm:px-6 lg:px-8 flex justify-start items-center bg-white shadow">
+        {{ $header }}
       </header>
     @endif
 
