@@ -16,6 +16,7 @@ Route::view('profile', 'profile')
 //* modulo usuarios: usuarios
 Route::get('users', [UserController::class, 'users_index'])->name('users-users-index');
 Route::get('users/create', [UserController::class, 'users_create'])->name('users-users-create');
+Route::get('users/edit/{id}', [UserController::class, 'users_edit'])->name('users-users-edit');
 
 //* modulo usuarios: roles
 Route::get('users/roles', [UserController::class, 'roles_index'])->name('users-roles-index');

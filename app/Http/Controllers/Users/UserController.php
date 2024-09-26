@@ -50,4 +50,12 @@ class UserController extends Controller
   {
     return view('users.users-create');
   }
+
+  /**
+   * * editar un usuario interno
+   */
+  public function users_edit($id): View
+  {
+    return view('users.users-edit', ['id' => $id]);
+  }
 }

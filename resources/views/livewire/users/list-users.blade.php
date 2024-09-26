@@ -34,16 +34,15 @@
           </thead>
           <tbody class="border text-sm font-normal">
             @forelse ($users as $user)
-            <tr class="border">
+            <tr wire:key="{{$user->id}}" class="border">
                 <td class="border p-0.5">{{$user->id}}</td>
                 <td class="border p-0.5">{{$user->name}}</td>
                 <td class="border p-0.5">{{$user->email}}</td>
                 {{-- todo: conseguir una salida de nombre de rol mas limpia --}}
-                <td class="border p-0.5">{{$user->getRoleNames();}}</td>
+                <td class="border p-0.5">{{$user->getRoleNames()->first();}}</td>
                 <td class="border p-0.5">
                   <div class="w-full inline-flex gap-2 justify-start items-center">
-                    <a href="#" class="flex justify-center items-center box-border w-fit h-6 p-1 border-solid border rounded border-neutral-200 bg-neutral-100 text-center text-neutral-600 uppercase text-xs">ver</a>
-                    <a href="#" class="flex justify-center items-center box-border w-fit h-6 p-1 border-solid border rounded border-neutral-200 bg-neutral-100 text-center text-neutral-600 uppercase text-xs">editar</a>
+                    <a wire:navigate href="{{ route('users-users-edit', $user->id) }}" class="flex justify-center items-center box-border w-fit h-6 p-1 border-solid border rounded border-neutral-200 bg-neutral-100 text-center text-neutral-600 uppercase text-xs">editar</a>
                     {{-- boton delete con confirmacion --}}
                     <button wire:click="delete({{$user->id}})" wire:confirm="¿Desea borrar el registro?" type="button" class="flex justify-center items-center box-border w-fit h-6 p-1 border-solid border rounded border-red-600 bg-red-600 text-center text-neutral-100 uppercase text-xs">eliminar</button>
                   </div>
