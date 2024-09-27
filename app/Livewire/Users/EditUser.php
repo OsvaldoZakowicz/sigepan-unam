@@ -18,8 +18,6 @@ class EditUser extends Component
   // datos a editar en el formulario
   public $user_name;
   public $user_email;
-  public $user_password;
-  public $user_password_test;
   public $user_role;
 
   public function mount($user_id)
@@ -58,14 +56,10 @@ class EditUser extends Component
     $this->validate([
       'user_name' => 'required|max:60',
       'user_email' => ['required', 'email', Rule::unique('users', 'email')->ignore($this->user->id)],
-      'user_password' => 'nullable|min:8',
-      'user_password_test' => 'nullable|min:8|same:user_password',
       'user_role' => 'required',
     ], [], [
       'user_name' => 'nombre de usuario',
       'user_email' => 'email',
-      'user_password' => 'contraseña',
-      'user_password_test' => 'repetir contraseña',
       'user_role' => 'rol'
     ]);
 
@@ -75,12 +69,11 @@ class EditUser extends Component
     // cambio de rol (siempre usar sync, ya que se reemplazan)
     $this->user->syncRoles($this->user_role);
 
-    $this->reset(['user_name', 'user_email', 'user_password', 'user_password_test', 'user_role']);
+    $this->reset(['user_name', 'user_email', 'user_role']);
 
     //todo: si cambio email, notificar usuario
-    //todo: si cambio contraseña, notificar usuario
 
-    //todo: emitir un toast con mensaje de exito al retornar de exito
+    //todo: emitir un toast con mensaje de exito al editar con exito
     $this->redirectRoute('users-users-index');
   }
 

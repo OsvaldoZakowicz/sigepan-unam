@@ -29,6 +29,7 @@
               <th class="border text-left p-0.5">nombre de usuario</th>
               <th class="border text-left p-0.5">email</th>
               <th class="border text-left p-0.5">rol</th>
+              <th class="border text-left p-0.5">fecha de creacion</th>
               <th class="border text-left p-0.5">acciones</th>
             </tr>
           </thead>
@@ -38,8 +39,8 @@
                 <td class="border p-0.5">{{$user->id}}</td>
                 <td class="border p-0.5">{{$user->name}}</td>
                 <td class="border p-0.5">{{$user->email}}</td>
-                {{-- todo: conseguir una salida de nombre de rol mas limpia --}}
                 <td class="border p-0.5">{{$user->getRoleNames()->first();}}</td>
+                <td class="border p-0.5">{{Date::parse($user->created_at)->format('d-m-Y');}}</td>
                 <td class="border p-0.5">
                   <div class="w-full inline-flex gap-2 justify-start items-center">
                     <a wire:navigate href="{{ route('users-users-edit', $user->id) }}" class="flex justify-center items-center box-border w-fit h-6 p-1 border-solid border rounded border-neutral-200 bg-neutral-100 text-center text-neutral-600 uppercase text-xs">editar</a>
@@ -50,7 +51,7 @@
             </tr>
             @empty
             <tr class="border">
-              <td colspan="4">sin registros!</td>
+              <td colspan="6">sin registros!</td>
             </tr>
             @endforelse
           </tbody>
