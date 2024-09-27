@@ -20,17 +20,19 @@
             <tr class="border">
               <th class="border text-left p-0.5">id</th>
               <th class="border text-left p-0.5">permiso</th>
+              <th class="border text-left p-0.5">interno?</th>
               <th class="border text-left p-0.5">descripcion</th>
-              <th class="border text-left p-0.5">acciones</th>
+              <th class="border text-left p-0.5">fecha de creacion</th>
             </tr>
           </thead>
           <tbody class="border text-sm font-normal">
             @forelse ($permissions as $permission)
-            <tr class="border">
+            <tr wire:key="{{$permission->id}}" class="border">
                 <td class="border p-0.5">{{$permission->id}}</td>
                 <td class="border p-0.5">{{$permission->name}}</td>
+                <td class="border p-0.5">@if ($permission->is_internal) <span>si</span> @else <span>no</span> @endif</td>
                 <td class="border p-0.5">{{$permission->short_description}}</td>
-                <td class="border p-0.5">acciones</td>
+                <td class="border p-0.5">{{Date::parse($permission->created_at)->format('d-m-Y')}}</td>
             </tr>
             @empty
             <tr class="border">
