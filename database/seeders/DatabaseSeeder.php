@@ -15,17 +15,19 @@ class DatabaseSeeder extends Seeder
    */
   public function run(): void
   {
-    // usuario de pruebas, sin permisos ni roles
-    User::create([
-      'name' => 'test',
-      'email' => 'test@test.com',
-      'password' => bcrypt(12345678)
-    ]);
-
     // seeders
     $this->call([
       PermissionSeeder::class,
       RoleSeeder::class
     ]);
+
+    // usuario de pruebas
+    $user = User::create([
+      'name' => 'test',
+      'email' => 'test@test.com',
+      'password' => bcrypt(12345678)
+    ]);
+
+    $user->assignRole('administrador');
   }
 }
