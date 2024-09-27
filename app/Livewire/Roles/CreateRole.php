@@ -39,7 +39,7 @@ class CreateRole extends Component
     //* validacion clasica
     $this->validate([
       'role_name' => ['required', Rule::unique('roles', 'name')],
-      'role_short_description' => 'required',
+      'role_short_description' => 'required|min:15|max:150',
       'role_permissions' => 'required|array|min:1'
     ], [
       'role_name.unique' => 'Ya existe un rol con el :attribute registrado'
@@ -62,6 +62,7 @@ class CreateRole extends Component
     // limpiar propiedades
     $this->reset(['role_name', 'role_short_description', 'role_permissions']);
 
+    // todo: mensaje toast rol creado con exito
     $this->redirectRoute('users-roles-index');
   }
 

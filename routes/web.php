@@ -21,6 +21,7 @@ Route::get('users/edit/{id}', [UserController::class, 'users_edit'])->name('user
 //* modulo usuarios: roles
 Route::get('users/roles', [UserController::class, 'roles_index'])->name('users-roles-index');
 Route::get('users/role/create', [UserController::class, 'roles_create'])->name('users-roles-create');
+Route::get('users/role/edit/{id}', [UserController::class, 'roles_edit'])->name('users-roles-edit');
 
 //* modulo usuarios: permisos
 Route::get(
