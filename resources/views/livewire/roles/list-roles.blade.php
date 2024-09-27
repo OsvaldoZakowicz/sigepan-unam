@@ -23,7 +23,7 @@
             <tr class="border">
               <th class="border text-left p-0.5">id</th>
               <th class="border text-left p-0.5">nombre</th>
-              <th class="border text-left p-0.5">cantidad de permisos</th>
+              <th class="border text-left p-0.5">permisos</th>
               <th class="border text-left p-0.5">editable?</th>
               <th class="border text-left p-0.5">interno?</th>
               <th class="border text-left p-0.5">descripcion</th>
@@ -32,14 +32,24 @@
           </thead>
           <tbody class="border text-sm font-normal">
             @forelse ($roles as $role)
-            <tr class="border">
+            <tr wire:key="{{$role->id}}" class="border">
                 <td class="border p-0.5">{{$role->id}}</td>
                 <td class="border p-0.5">{{$role->name}}</td>
                 <td class="border p-0.5">{{count($role->permissions)}}</td>
-                <td class="border p-0.5">{{$role->is_editable}}</td>
-                <td class="border p-0.5">{{$role->is_internal}}</td>
+                <td class="border p-0.5">@if ($role->is_editable)<span>si</span>@else<span>no</span>@endif</td>
+                <td class="border p-0.5">@if ($role->is_internal)<span>si</span>@else<span>no</span>@endif</td>
                 <td class="border p-0.5">{{$role->short_description}}</td>
-                <td class="border p-0.5">acciones</td>
+                <td class="border p-0.5">
+                  @if ($role->is_editable)
+                  <div class="w-full inline-flex gap-2 justify-start items-center">
+                    <a wire:navigate href="#" class="flex justify-center items-center box-border w-fit h-6 p-1 border-solid border rounded border-neutral-200 bg-neutral-100 text-center text-neutral-600 uppercase text-xs">editar</a>
+                    {{-- boton delete con confirmacion --}}
+                    <button wire:click="" wire:confirm="¿Desea borrar el registro?" type="button" class="flex justify-center items-center box-border w-fit h-6 p-1 border-solid border rounded border-red-600 bg-red-600 text-center text-neutral-100 uppercase text-xs">eliminar</button>
+                  </div>
+                  @else
+                  <span>ninguna</span>
+                  @endif
+                </td>
             </tr>
             @empty
             <tr class="border">

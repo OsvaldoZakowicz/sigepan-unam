@@ -21,7 +21,7 @@
                 <span class="text-red-400 text-xs">{{ $message }}</span>
               @enderror
             </span>
-            <input wire:model="role_name" type="text" name="role_name" class="border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300" />
+            <input wire:model="role_name" type="text" name="role_name" class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300" />
           </div>
           {{-- descripcion --}}
           <div class="flex flex-col gap-1 p-2 min-w-1/3 grow">
@@ -32,7 +32,7 @@
                 <span class="text-red-400 text-xs">{{ $message }}</span>
               @enderror
             </span>
-            <textarea wire:model="role_short_description" name="role_short_description" cols="10" rows="2" class="w-full border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"></textarea>
+            <textarea wire:model="role_short_description" name="role_short_description" cols="10" rows="2" class="p-1 text-sm w-full border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"></textarea>
           </div>
         </fieldset>
          <!-- este es un grupo de inputs por tema -->

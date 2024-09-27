@@ -5,7 +5,7 @@ namespace App\Livewire\Roles;
 use Livewire\Component;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
-use Livewire\Attributes\Rule; // validaciones de livewire
+use Illuminate\Validation\Rule;
 
 /**
  * * clase CrearRol
@@ -16,7 +16,6 @@ class CreateRole extends Component
   //* propiedades accesibles
   // del modelo:
   public $permissions;
-  public $roles;
 
   //* propiedades accesibles de la vista
   // de la vista:
@@ -29,8 +28,7 @@ class CreateRole extends Component
    */
   public function mount()
   {
-    $this->permissions = Permission::all();
-    $this->roles = Role::all();
+    $this->permissions = Permission::where('is_internal', true)->get();
   }
 
   /**
@@ -38,18 +36,14 @@ class CreateRole extends Component
    */
   public function save()
   {
-    /* dd([
-      'rol' => $this->role_name,
-      'desc' => $this->role_short_description,
-      'permisos' => $this->role_permissions
-    ]); */
-
     //* validacion clasica
     $this->validate([
-      'role_name' => 'required',
+      'role_name' => ['required', Rule::unique('roles', 'name')],
       'role_short_description' => 'required',
       'role_permissions' => 'required|array|min:1'
-    ], [], [
+    ], [
+      'role_name.unique' => 'Ya existe un rol con el :attribute registrado'
+    ], [
       'role_name' => 'nombre',
       'role_short_description' => 'descripcion corta',
       'role_permissions' => 'permisos del rol'
@@ -67,9 +61,6 @@ class CreateRole extends Component
 
     // limpiar propiedades
     $this->reset(['role_name', 'role_short_description', 'role_permissions']);
-
-    // refrescar los roles
-    $this->roles = Role::all();
 
     $this->redirectRoute('users-roles-index');
   }
