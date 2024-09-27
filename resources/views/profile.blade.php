@@ -1,29 +1,27 @@
 <x-app-layout>
   {{-- perfil de usuario --}}
   <x-slot name="header">
-    <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-      {{ __('Profile') }}
-    </h2>
+    <div class="w-full flex gap-10 h-10 justify-start items-center text-sm font-medium capitalize text-neutral-700">
+      <span>mi perfil</span>
+    </div>
   </x-slot>
 
-  <div class="py-12">
-    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-      <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-        <div class="max-w-xl">
-          <livewire:profile.update-profile-information-form />
-        </div>
+  <div class="m-2">
+    <div class="sm:columns-1 md:columns-2 lg:columns-3 mx-auto space-y-4">
+      <div class="overflow-hidden p-4 sm:p-8 bg-white shadow rounded-sm">
+
       </div>
 
-      <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-        <div class="max-w-xl">
-          <livewire:profile.update-password-form />
-        </div>
+      <div class="overflow-hidden p-4 sm:p-8 bg-white shadow rounded-sm">
+        <livewire:profile.update-profile-information-form />
       </div>
 
-      <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-        <div class="max-w-xl">
-          <livewire:profile.delete-user-form />
-        </div>
+      <div class="overflow-hidden p-4 sm:p-8 bg-white shadow rounded-sm">
+        <livewire:profile.update-password-form />
+      </div>
+
+      <div class="overflow-hidden p-4 sm:p-8 bg-white shadow rounded-sm">
+        <livewire:profile.delete-user-form />
       </div>
     </div>
   </div>
