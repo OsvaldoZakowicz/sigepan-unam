@@ -7,20 +7,25 @@
   </x-slot>
 
   <div class="m-2">
-    <div class="sm:columns-1 md:columns-2 lg:columns-3 mx-auto space-y-4">
+    {{-- todo: layout --}}
+    <div class="space-y-4">
       <div class="overflow-hidden p-4 sm:p-8 bg-white shadow rounded-sm">
-
+        {{-- todo: tarjeta con informacion del usuario --}}
       </div>
 
       <div class="overflow-hidden p-4 sm:p-8 bg-white shadow rounded-sm">
+        @livewire('users.complete-profile')
+      </div>
+
+      <div class="p-4 sm:p-8 bg-white shadow rounded-sm">
         <livewire:profile.update-profile-information-form />
       </div>
 
-      <div class="overflow-hidden p-4 sm:p-8 bg-white shadow rounded-sm">
+      <div class="p-4 sm:p-8 bg-white shadow rounded-sm">
         <livewire:profile.update-password-form />
       </div>
 
-      <div class="overflow-hidden p-4 sm:p-8 bg-white shadow rounded-sm">
+      <div class="p-4 sm:p-8 bg-white shadow rounded-sm">
         <livewire:profile.delete-user-form />
       </div>
     </div>
