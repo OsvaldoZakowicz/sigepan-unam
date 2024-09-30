@@ -13,7 +13,7 @@
         @livewire('users.show-profile')
       </div>
 
-      <div class="flex flex-wrap items-stretch lg:flex-nowrap gap-8 w-full">
+      <div class="flex flex-wrap items-start lg:flex-nowrap gap-8 w-full">
         <div class="sm:w-full grow md:w-1/2 bg-white shadow rounded-sm">
           <livewire:profile.update-profile-information-form />
         </div>
@@ -21,11 +21,12 @@
         <div class="sm:w-full grow md:w-1/2 bg-white shadow rounded-sm">
           <livewire:profile.update-password-form />
         </div>
+
+        <div class="lg:w-1/3 bg-red-200 border border-red-400 shadow rounded-sm">
+          <livewire:profile.delete-user-form />
+        </div>
       </div>
 
-      <div class="w-full bg-red-200 border border-red-400 shadow rounded-sm">
-        <livewire:profile.delete-user-form />
-      </div>
     </div>
   </div>
 </x-app-layout>

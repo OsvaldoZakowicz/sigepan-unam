@@ -40,7 +40,8 @@ new class extends Component
 
         $user->save();
 
-        $this->dispatch('profile-updated', name: $user->name);
+        // enviamos un evento llamado 'profile-updated', envio el cambio en usuario
+        $this->dispatch('profile-updated', name: $user->name, email: $user->email);
     }
 
     /**
@@ -116,7 +117,7 @@ new class extends Component
     </div>
     <div class="flex items-center justify-end gap-4 mt-2 px-1">
       <x-action-message class="me-3" on="profile-updated">
-        <span class="capitalize">perfil actualizado</span>
+        <span class="capitalize">credenciales actualizadas</span>
       </x-action-message>
       <button type="submit" class="flex justify-center items-center box-border w-fit h-6 p-1 border-solid border rounded border-emerald-600 bg-emerald-600 text-center text-neutral-100 uppercase text-xs">guardar</button>
     </div>
