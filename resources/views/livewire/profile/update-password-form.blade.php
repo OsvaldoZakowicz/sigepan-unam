@@ -83,7 +83,7 @@ new class extends Component
       <x-text-input wire:model="password_confirmation" id="update_password_password_confirmation" name="password_confirmation" type="password" class="mt-1 block w-full" autocomplete="new-password" />
     </div>
 
-    <div class="flex items-center justify-end gap-4 mt-2">
+    <div class="flex items-center justify-end gap-4 mt-2 px-1">
       <x-action-message class="me-3" on="password-updated">
         <span class="capitalize">contraseña actualizada</span>
       </x-action-message>

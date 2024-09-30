@@ -52,4 +52,10 @@ class UserController extends Controller
   {
     return view('users.users-edit', ['id' => $id]);
   }
+
+  //* completar perfil de usuario
+  public function profile_complete()
+  {
+    return view('users.users-complete-profile');
+  }
 }

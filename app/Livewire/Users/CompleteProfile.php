@@ -181,6 +181,8 @@ class CompleteProfile extends Component
     );*/
 
     $this->dispatch('profile-updated');
+
+    $this->redirectRoute('users-profile');
   }
 
   public function render()

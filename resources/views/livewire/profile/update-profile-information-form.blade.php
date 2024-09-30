@@ -114,7 +114,7 @@ new class extends Component
           </div>
       @endif
     </div>
-    <div class="flex items-center justify-end gap-4 mt-2">
+    <div class="flex items-center justify-end gap-4 mt-2 px-1">
       <x-action-message class="me-3" on="profile-updated">
         <span class="capitalize">perfil actualizado</span>
       </x-action-message>
