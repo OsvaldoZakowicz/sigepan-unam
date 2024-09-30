@@ -23,8 +23,8 @@ new class extends Component
     }
 }; ?>
 
-<section class="space-y-6">
-    <header>
+<section class="m-2">
+    <header class="m-2">
         <h2 class="text-lg font-medium text-neutral-900">
             <span class="capitalize">{{ __('Delete Account') }}</span>
         </h2>
@@ -39,7 +39,9 @@ new class extends Component
         x-on:click.prevent="$dispatch('open-modal', 'confirm-user-deletion')"
     >{{ __('Delete Account') }}</x-danger-button> --}}
 
-    <button x-data="" x-on:click.prevent="$dispatch('open-modal', 'confirm-user-deletion')" type="submit" class="flex justify-center items-center box-border w-fit h-6 p-1 border-solid border rounded border-red-600 bg-red-600 text-center text-neutral-100 uppercase text-xs">borrar cuenta</button>
+    <div class="w-full flex items-center justify-end gap-8 py-2 px-1">
+      <button x-data="" x-on:click.prevent="$dispatch('open-modal', 'confirm-user-deletion')" type="submit" class="flex justify-center items-center box-border w-fit h-6 p-1 border-solid border rounded border-red-600 bg-red-600 text-center text-neutral-100 uppercase text-xs">borrar cuenta</button>
+    </div>
 
     <x-modal name="confirm-user-deletion" :show="$errors->isNotEmpty()" focusable>
         <form wire:submit="deleteUser" class="p-6">

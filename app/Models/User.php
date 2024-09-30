@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles; // paquete de roles y permisos
+use App\Models\Profile;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class User extends Authenticatable
 {
@@ -51,4 +53,11 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    //* un usuario tiene un perfil
+    public function profile(): HasOne
+    {
+      return $this->hasOne(Profile::class);
+    }
+
 }

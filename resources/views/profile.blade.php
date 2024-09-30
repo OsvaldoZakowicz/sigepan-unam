@@ -6,26 +6,29 @@
     </div>
   </x-slot>
 
-  <div class="m-2">
+  <div class="m-2 md:m-4 lg:m-8">
     {{-- todo: layout --}}
-    <div class="space-y-4">
-      <div class="overflow-hidden p-4 sm:p-8 bg-white shadow rounded-sm">
-        {{-- todo: tarjeta con informacion del usuario --}}
-      </div>
+    <div class="flex items-start gap-8 flex-wrap">
 
-      <div class="overflow-hidden p-4 sm:p-8 bg-white shadow rounded-sm">
+      {{-- todo: tarjeta con informacion del usuario --}}
+      {{-- <div class="overflow-hidden p-4 sm:p-8 bg-white shadow rounded-sm">
+      </div> --}}
+
+      <div class="w-full bg-white shadow rounded-sm">
         @livewire('users.complete-profile')
       </div>
 
-      <div class="p-4 sm:p-8 bg-white shadow rounded-sm">
-        <livewire:profile.update-profile-information-form />
+      <div class="flex flex-wrap items-stretch lg:flex-nowrap gap-8 w-full">
+        <div class="sm:w-full grow md:w-1/2 bg-white shadow rounded-sm">
+          <livewire:profile.update-profile-information-form />
+        </div>
+
+        <div class="sm:w-full grow md:w-1/2 bg-white shadow rounded-sm">
+          <livewire:profile.update-password-form />
+        </div>
       </div>
 
-      <div class="p-4 sm:p-8 bg-white shadow rounded-sm">
-        <livewire:profile.update-password-form />
-      </div>
-
-      <div class="p-4 sm:p-8 bg-white shadow rounded-sm">
+      <div class="w-full bg-red-200 border border-red-400 shadow rounded-sm">
         <livewire:profile.delete-user-form />
       </div>
     </div>

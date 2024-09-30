@@ -62,8 +62,8 @@ new class extends Component
     }
 }; ?>
 
-<section>
-  <header>
+<section class="m-2">
+  <header class="m-2">
       <h2 class="text-lg font-medium text-neutral-900">
           {{-- {{ __('Profile Information') }} --}}
           <span class="capitalize">credenciales de acceso</span>
@@ -74,19 +74,28 @@ new class extends Component
       </p>
   </header>
 
-  <form wire:submit="updateProfileInformation" class="mt-6 space-y-4">
+  <form wire:submit="updateProfileInformation" class="pt-2 px-1">
     {{-- nombre de usuario --}}
-    <div>
-      <x-input-label for="name" :value="'Nombre de usuario'" />
-      <x-text-input wire:model="name" id="name" name="name" type="text" class="mt-1 block w-full" required autofocus autocomplete="name" />
-      <x-input-error class="mt-2" :messages="$errors->get('name')" />
+    <div class="flex flex-col gap-1 w-full py-2 px-1">
+      <span>
+        <x-input-label for="name" class="capitalize max-w-fit" :value="'nombre de usuario'" />
+        <span class="text-red-600">*</span>
+        @error('name')
+          <span class="inline-block text-red-400 text-xs">{{ $message }}</span>
+        @enderror
+      </span>
+      <x-text-input wire:model="name" id="name" name="name" type="text" class="mt-1 block w-full" />
     </div>
-
-    <div>
-      <x-input-label for="email" :value="__('Email')" />
-      <x-text-input wire:model="email" id="email" name="email" type="email" class="mt-1 block w-full" required autocomplete="username" />
-      <x-input-error class="mt-2" :messages="$errors->get('email')" />
-
+    {{-- email --}}
+    <div class="flex flex-col gap-1 w-full py-2 px-1">
+      <span>
+        <x-input-label for="email" class="capitalize max-w-fit" :value="'correo electronico'" />
+        <span class="text-red-600">*</span>
+        @error('email')
+          <span class="inline-block text-red-400 text-xs">{{ $message }}</span>
+        @enderror
+      </span>
+      <x-text-input wire:model="email" id="email" name="email" type="email" class="mt-1 block w-full" />
       @if (auth()->user() instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! auth()->user()->hasVerifiedEmail())
           <div>
               <p class="text-sm mt-2 text-gray-800">
@@ -105,14 +114,11 @@ new class extends Component
           </div>
       @endif
     </div>
-
-    <div class="flex items-center gap-4">
-      {{-- <x-primary-button>{{ __('Save') }}</x-primary-button> --}}
-      <button type="submit" class="flex justify-center items-center box-border w-fit h-6 p-1 border-solid border rounded border-emerald-600 bg-emerald-600 text-center text-neutral-100 uppercase text-xs">guardar</button>
-
+    <div class="flex items-center justify-end gap-4 mt-2">
       <x-action-message class="me-3" on="profile-updated">
         <span class="capitalize">perfil actualizado</span>
       </x-action-message>
+      <button type="submit" class="flex justify-center items-center box-border w-fit h-6 p-1 border-solid border rounded border-emerald-600 bg-emerald-600 text-center text-neutral-100 uppercase text-xs">guardar</button>
     </div>
   </form>
 </section>
