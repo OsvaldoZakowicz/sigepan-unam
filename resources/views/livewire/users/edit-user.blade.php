@@ -21,7 +21,7 @@
                 <span class="text-red-400 text-xs">{{ $message }}</span>
               @enderror
             </span>
-            <input wire:model="user_name" type="text" name="user_name" class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300" />
+            <input disabled wire:model="user_name" type="text" name="user_name" class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300 bg-neutral-100" />
           </div>
           {{-- email --}}
           <div class="flex flex-col gap-1 p-2 w-1/2 shrink">
@@ -32,7 +32,7 @@
                 <span class="text-red-400 text-xs">{{ $message }}</span>
               @enderror
             </span>
-            <input wire:model="user_email" type="email" name="user_email" class="p-1 text-sm w-full border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"></input>
+            <input disabled wire:model="user_email" type="email" name="user_email" class="p-1 text-sm w-full border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300 bg-neutral-100"></input>
           </div>
         </fieldset>
          <!-- este es un grupo de inputs por tema -->
