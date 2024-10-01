@@ -3,7 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Users\UserController;
 
-Route::view('/', 'welcome');
+Route::view('/', 'welcome')
+    ->name('welcome');
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
