@@ -1,26 +1,39 @@
-<nav class="-mx-3 flex flex-1 justify-end">
-    @auth
-        <a
-            href="{{ url('/dashboard') }}"
-            class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
-        >
-            Dashboard
-        </a>
-    @else
-        <a
-            href="{{ route('login') }}"
-            class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
-        >
-            Log in
-        </a>
+<nav class="mx-3 flex flex-1 justify-end gap-4">
+  {{-- navegacion de la vista bienvenida --}}
+  @auth
+    {{-- una vez autenticados, mostrar segun rol dashboard o tienda --}}
 
-        @if (Route::has('register'))
-            <a
-                href="{{ route('register') }}"
-                class="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"
-            >
-                Register
-            </a>
-        @endif
-    @endauth
+    @can('panel')
+      <a wire:navigate href="{{ url('/dashboard') }}" class="capitalize">
+        {{__('Dashboard')}}
+      </a>
+    @endcan
+
+    @can('tienda')
+      <a wire:navigate href="#" class="capitalize">
+        <span>tienda</span>
+      </a>
+      <a wire:navigate href="#" class="capitalize">
+        <span>mi perfil</span>
+      </a>
+      {{-- logout manual del cliente --}}
+      <form action="{{ route('client-logout') }}">
+        @csrf
+        <button type="submit" class="capitalize">cerrar sesión</button>
+      </form>
+    @endcan
+
+  @else
+
+    <a wire:navigate href="{{ route('login') }}" class="capitalize">
+      {{__('Log in')}}
+    </a>
+
+    @if (Route::has('register'))
+      <a wire:navigate href="{{ route('register') }}" class="capitalize">
+        {{__('Register')}}
+      </a>
+    @endif
+
+  @endauth
 </nav>

@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Users\UserController;
+use App\Http\Controllers\Clients\ClientLogOutController;
 
 Route::view('/', 'welcome')
     ->name('welcome');
@@ -30,5 +31,8 @@ Route::get(
   'users/permissions',
   [UserController::class, 'permissions_index']
 )->name('users-permissions-index');
+
+//* clientes
+Route::get('client/logout', ClientLogOutController::class)->name('client-logout');
 
 require __DIR__.'/auth.php';

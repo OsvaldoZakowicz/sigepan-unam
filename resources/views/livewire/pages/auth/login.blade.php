@@ -7,21 +7,22 @@ use Livewire\Volt\Component;
 
 new #[Layout('layouts.guest')] class extends Component
 {
-    public LoginForm $form;
+  public LoginForm $form;
 
-    /**
-     * Handle an incoming authentication request.
-     */
-    public function login(): void
-    {
-        $this->validate();
+  /**
+   * Handle an incoming authentication request.
+   */
+  public function login(): void
+  {
+    $this->validate();
 
-        $this->form->authenticate();
+    $this->form->authenticate();
 
-        Session::regenerate();
+    Session::regenerate();
 
-        $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
-    }
+    /* redirigir a vista de bienvenida, pero ya autenticado */
+    $this->redirectIntended(default: route('welcome', absolute: false), navigate: true);
+  }
 }; ?>
 
 <div>
