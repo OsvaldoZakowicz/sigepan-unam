@@ -22,8 +22,9 @@
             x-text="email"
             x-on:profile-updated.window="email = $event.detail.email"
             class="text-sm font-semibold leading-6 text-blue-600"></p>
-          {{-- todo: mostrar rol --}}
-          {{-- <p class="text-sm font-semibold leading-6 text-neutral-600"></p> --}}
+          <span class="lowercase m-2 px-0.5 bg-neutral-100 border border-neutral-200 rounded-sm">
+            {{auth()->user()->getRoleNames()->first()}}
+          </span>
         </div>
       </div>
       @if ($user->profile)
@@ -82,7 +83,7 @@
       <div class="flex grow justify-center md:justify-start">
         <div class="flex flex-col gap-4">
           @if (!$user->profile)
-            <span class="capitalize text-sm text-red-600">¡aún no ha completado su perfil!</span>
+            <span class="capitalize text-sm text-red-400">¡aún no ha completado su perfil!</span>
             <a href="{{route('profile-complete')}}" class="flex justify-center items-center box-border w-fit h-6 p-1 border-solid border rounded border-blue-600 bg-blue-600 text-center text-neutral-100 uppercase text-xs">completar perfil</a>
           @else
             <a href="{{route('profile-complete')}}" class="flex justify-center items-center box-border w-fit h-6 p-1 border-solid border rounded border-neutral-200 bg-neutral-100 text-center text-neutral-600 uppercase text-xs">editar perfil</a>
