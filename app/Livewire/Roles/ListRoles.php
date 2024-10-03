@@ -15,17 +15,28 @@ class ListRoles extends Component
     $this->roles = Role::all();
   }
 
-  protected function canDelete($role_id)
+  /**
+   * * puedo borrar el rol?
+   * un rol tiene muchos usuarios asignados
+   * para poder borrar, debo verificar que no tenga usuarios asignados.
+   */
+  protected function haveUsers($role_id)
   {
-    // first devuelve la primera ocurrencia, me basta una, o devuelve null
+    // * veamos la tabla intermedia model_has_roles, las foreign key son "on delete restrict"
+    // si el rol aparece al menos una vez en la tabla intermedia, VERIFICA que tiene usuarios signados.
     $record = DB::table('model_has_roles')
-    ->select('role_id')->where('role_id', '=', $role_id)
-      ->first();
+      ->select('role_id')->where('role_id', '=', $role_id)->first();
 
-    // si es distinto de null, false (no puedo borrar), caso contrario true (puedo borrar)
-    return ($record !== null) ? false : true;
+    // si es distinto de null, haveUsers = true, haveUsers = false
+    return ($record !== null) ? true : false;
   }
 
+  /**
+   * * puedo borrar el rol?
+   * un rol tiene muchos permisos, y muchos usuarios asignados
+   * para poder borrar, debo verificar que no tenga usuarios asignados.
+   *
+   */
   public function delete($role_id)
   {
     $role = Role::findOrFail($role_id);
@@ -37,13 +48,20 @@ class ListRoles extends Component
       return;
     }
 
-    // no puedo borrar un rol asignado a usuarios
-    // si el id del rol figura en model_has_roles, no puedo borrarlo
-    if ($this->canDelete($role->id)) {
-      $role->syncPermissions([]); //quitar permisos
+    // * CONTROL: el rol no tiene usuarios
+    // haveUsers = false, puedo borrar el rol
+    if (!$this->haveUsers($role->id)) {
+
+      //* CONTROL: el rol no tiene permisos
+      // quitar permisos del rol
+      $role->syncPermissions([]);
+
+      // borrar rol de forma segura
       $role->delete();
+
       // refrescar lista de roles
       $this->roles = Role::all();
+
     } else {
       // todo: mensaje toast, no se puede eliminar un rol con usuarios asignados
     }

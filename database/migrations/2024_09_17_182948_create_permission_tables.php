@@ -51,6 +51,10 @@ return new class extends Migration
             }
         });
 
+        /**
+         * * un modelo tiene permisos
+         * tabla intermedia entre modelo y permisos
+         */
         Schema::create($tableNames['model_has_permissions'], function (Blueprint $table) use ($tableNames, $columnNames, $pivotPermission, $teams) {
             $table->unsignedBigInteger($pivotPermission);
 
@@ -58,10 +62,15 @@ return new class extends Migration
             $table->unsignedBigInteger($columnNames['model_morph_key']);
             $table->index([$columnNames['model_morph_key'], 'model_type'], 'model_has_permissions_model_id_model_type_index');
 
+            //* clave foranea permission_id
+            // restriccion, al borrar un permiso, si existe en esta tabla su id como foreign
+            // no permitir el borrado del permiso
             $table->foreign($pivotPermission)
                 ->references('id') // permission id
                 ->on($tableNames['permissions'])
-                ->onDelete('cascade');
+                ->restrictOnDelete();
+                /* ->onDelete('cascade'); */
+
             if ($teams) {
                 $table->unsignedBigInteger($columnNames['team_foreign_key']);
                 $table->index($columnNames['team_foreign_key'], 'model_has_permissions_team_foreign_key_index');
@@ -75,6 +84,10 @@ return new class extends Migration
 
         });
 
+        /**
+         * * un modelo tiene roles
+         * tabla intermedia entre un modelo y roles
+         */
         Schema::create($tableNames['model_has_roles'], function (Blueprint $table) use ($tableNames, $columnNames, $pivotRole, $teams) {
             $table->unsignedBigInteger($pivotRole);
 
@@ -82,10 +95,15 @@ return new class extends Migration
             $table->unsignedBigInteger($columnNames['model_morph_key']);
             $table->index([$columnNames['model_morph_key'], 'model_type'], 'model_has_roles_model_id_model_type_index');
 
+            //* clave foranea role_id
+            // restriccion, al borrar un rol, si existe en esta tabla su id como foreign
+            // no permitir el borrado del rol
             $table->foreign($pivotRole)
                 ->references('id') // role id
                 ->on($tableNames['roles'])
-                ->onDelete('cascade');
+                ->restrictOnDelete(); // restringir en borrado
+                /* ->onDelete('cascade'); */
+
             if ($teams) {
                 $table->unsignedBigInteger($columnNames['team_foreign_key']);
                 $table->index($columnNames['team_foreign_key'], 'model_has_roles_team_foreign_key_index');
@@ -98,19 +116,31 @@ return new class extends Migration
             }
         });
 
+        /**
+         * * los roles tienen permisos
+         * tabla intermedia entre roles y permisos
+         */
         Schema::create($tableNames['role_has_permissions'], function (Blueprint $table) use ($tableNames, $pivotRole, $pivotPermission) {
             $table->unsignedBigInteger($pivotPermission);
             $table->unsignedBigInteger($pivotRole);
 
+            // * clave foranea permission_id
+            // restriccion, al borrar un permiso, si existe en esta tabla su id como foreign
+            // no permitir el borrado del permiso
             $table->foreign($pivotPermission)
                 ->references('id') // permission id
                 ->on($tableNames['permissions'])
-                ->onDelete('cascade');
+                ->restrictOnDelete();
+                /* ->onDelete('cascade'); */
 
+            // * clave foranea role_id
+            // restriccion, al borrar un rol, si existe en esta tabla su id como foreign
+            // no permitir el borrado del rol
             $table->foreign($pivotRole)
                 ->references('id') // role id
                 ->on($tableNames['roles'])
-                ->onDelete('cascade');
+                ->restrictOnDelete();
+                /* ->onDelete('cascade'); */
 
             $table->primary([$pivotPermission, $pivotRole], 'role_has_permissions_permission_id_role_id_primary');
         });
