@@ -12,4 +12,10 @@ class AuditController extends Controller
   {
     return view('audits.audits-index');
   }
+
+  //* ver cambios en un registro individual
+  public function audits_show($id)
+  {
+    return view('audits.audits-show', ['id' => $id]);
+  }
 }

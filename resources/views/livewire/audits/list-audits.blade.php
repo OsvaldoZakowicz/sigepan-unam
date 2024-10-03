@@ -24,10 +24,10 @@
             <tr class="border">
               <th class="border text-left p-0.5">id</th>
               <th class="border text-left p-0.5">evento</th>
-              <th class="border text-left p-0.5 text-wrap">fecha del evento</th>
               <th class="border text-left p-0.5 text-wrap">tabla</th>
               <th class="border text-left p-0.5 text-wrap">id registro</th>
-              <th class="border text-left p-0.5">acciones</th>
+              <th class="border text-left p-0.5 text-wrap">fecha del evento</th>
+              <th class="border text-left p-0.5 text-wrap">acciones</th>
             </tr>
           </thead>
           <tbody class="border text-sm font-normal">
@@ -35,25 +35,19 @@
             <tr wire:key="{{$audit->id}}" class="border">
                 <td class="border p-0.5">{{$audit->id}}</td>
                 <td class="border p-0.5">{{$audit->event}}</td>
-                <td class="border p-0.5 text-wrap">
-                  {{-- fecha donde se creo el registro de auditoria --}}
-                  {{formatDateTime($audit->created_at)}}
-                </td>
-                <td class="border p-0.5 text-wrap lowercase">
-                  {{-- tabla sobre la que ocurrio el evento --}}
-                  {{-- plural a partir del path, traducido --}}
-                  {{englishPluralFromPath($audit->auditable_type)}}
-                </td>
+                <td class="border p-0.5 text-wrap lowercase">{{englishPluralFromPath($audit->auditable_type)}}</td>
                 <td class="border p-0.5 text-wrap">{{$audit->auditable_id}}</td>
-                <td class="border p-0.5">
+                <td class="border p-0.5 text-wrap">{{formatDateTime($audit->created_at)}}</td>
+                <td class="border p-0.5 text-wrap">
                   <div class="w-full inline-flex gap-2 justify-start items-center">
-                    <span>ninguna</span>
+                    <a href="{{route('audits-audits-show', $audit->id)}}" class="flex justify-center items-center box-border w-fit h-6 p-1 border-solid border rounded border-neutral-200 bg-neutral-100 text-center text-neutral-600 uppercase text-xs">ver</a>
+                    <a href="" class="flex justify-center items-center box-border w-fit h-6 p-1 border-solid border rounded border-neutral-200 bg-neutral-100 text-center text-neutral-600 uppercase text-xs">auditar tabla</a>
                   </div>
                 </td>
             </tr>
             @empty
             <tr class="border">
-              <td colspan="7">sin registros!</td>
+              <td colspan="6">sin registros!</td>
             </tr>
             @endforelse
           </tbody>

@@ -4,6 +4,7 @@ namespace App\Livewire\Audits;
 
 use Livewire\Component;
 use OwenIt\Auditing\Models\Audit;
+use Illuminate\Support\Facades\DB;
 
 class ListAudits extends Component
 {
