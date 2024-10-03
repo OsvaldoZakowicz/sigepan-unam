@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Users\UserController;
 use App\Http\Controllers\Clients\ClientLogOutController;
+use App\Http\Controllers\Audits\AuditController;
 
 //* layout publico
 Route::view('/', 'welcome')->name('welcome');
@@ -36,6 +37,13 @@ Route::middleware(['auth', 'verified', 'can:usuarios'])->group(function () {
 
   //* permisos
   Route::get('users/permissions', [UserController::class, 'permissions_index'])->name('users-permissions-index');
+
+});
+
+//* auditoria
+Route::middleware(['auth', 'verified', 'can:auditoria'])->group(function () {
+
+  Route::get('audits', [AuditController::class, 'audits_index'])->name('audits-audits-index');
 
 });
 

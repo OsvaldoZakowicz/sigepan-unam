@@ -9,8 +9,9 @@ use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles; // paquete de roles y permisos
 use App\Models\Profile;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable implements MustVerifyEmail, Auditable
 {
     use HasFactory;
     use Notifiable;
@@ -21,6 +22,18 @@ class User extends Authenticatable implements MustVerifyEmail
      * users n:n model_has_permissions
      */
     use HasRoles;
+
+    /** paquete de auditoria
+     */
+    use \OwenIt\Auditing\Auditable;
+
+    /**
+     * * excluir de auditoria
+     */
+    protected $auditExclude = [
+      'password',
+      'remember_token'
+    ];
 
     /**
      * The attributes that are mass assignable.

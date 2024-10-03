@@ -31,11 +31,14 @@ new class extends Component
                 <!-- Navigation Links -->
                 <div class="flex justify-start items-center ml-10 gap-8">
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" wire:navigate>
-                        {{ __('Dashboard') }}
+                      {{ __('Dashboard') }}
                     </x-nav-link>
                     <x-nav-link :href="route('users-users-index')" :active="request()->routeIs('users-*')" wire:navigate>
                       Usuarios
-                  </x-nav-link>
+                    </x-nav-link>
+                    <x-nav-link :href="route('audits-audits-index')" :active="request()->routeIs('audits-*')" wire:navigate>
+                      Auditoria
+                    </x-nav-link>
                 </div>
             </div>
 
