@@ -1,15 +1,16 @@
 <div>
   {{-- componente listar usuarios --}}
   <article class="m-2 border rounded-sm border-neutral-200">
-    <section class="flex items-center justify-between px-1 py-1 bg-neutral-200">
-      <span class="text-sm capitalize">lista de usuarios</span>
-      <div role="grupo-de-botones" class="flex">
-        <a wire:navigate href="{{ route('users-users-create') }}" class="flex justify-center items-center box-border w-fit h-6 m-1 p-1 border-solid border rounded border-blue-600 bg-blue-600 text-center text-neutral-100 uppercase text-xs">crear usuario interno</a>
-      </div>
-    </section>
-    <section class="flex flex-col pt-2 px-1 text-sm capitalize bg-white">
-      <!-- seccion de cabecera -->
-      <section class="flex items-center justify-between gap-4 p-1 m-1 border rounded-sm bg-neutral-100">
+
+    {{-- barra de titulo --}}
+    <x-title-section title="lista de usuarios">
+      <x-a-button wire:navigate href="{{ route('users-users-create') }}" class="mx-1">crear usuario interno</x-a-button>
+    </x-title-section>
+
+    {{-- cuerpo --}}
+    <x-content-section>
+
+      <x-slot:header>
         <span class="text-sm capitalize">buscar usuario:</span>
         {{-- formulario de busqueda --}}
         <form class="grow">
@@ -17,12 +18,10 @@
         </form>
         <!-- grupo de botones -->
         <div class="flex"></div>
-      </section>
-      <!-- seccion de contenido -->
-      <section class="flex mt-2 px-1">
-        <!-- tabla -->
-        <table
-          class="w-full table-auto border-collapse border rounded capitalize">
+      </x-slot:header>
+
+      <x-slot:content>
+        <table class="w-full table-auto border-collapse border rounded capitalize">
           <thead class="border text-sm font-medium">
             <tr class="border">
               <th class="border text-left p-0.5">id</th>
@@ -56,12 +55,14 @@
             @endforelse
           </tbody>
         </table>
-      </section>
-      <!-- seccion de pie -->
-      <section class="flex items-center justify-end mt-2 px-1 border-t">
+      </x-slot:content>
+
+      <x-slot:footer>
         <!-- grupo de botones -->
         <div class="flex"></div>
-      </section>
-    </section>
+      </x-slot:footer>
+
+    </x-content-section>
+
   </article>
 </div>
