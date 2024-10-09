@@ -7,5 +7,5 @@
 @endsection
 
 @section('view_content')
-  @livewire('audits.show-audits', ['id' => $id]);
+  @livewire('audits.show-audits', ['id' => $id])
 @endsection

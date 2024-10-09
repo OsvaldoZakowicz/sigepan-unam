@@ -2,7 +2,15 @@
   {{-- componente de auditoria individual de registro --}}
   <article class="m-2 border rounded-sm border-neutral-200">
 
-    <x-title-section title="auditoria individual"></x-title-section>
+    <x-title-section title="auditoria individual">
+      {{-- volver --}}
+      <x-a-button
+        wire:navigate href="{{ route('audits-audits-index') }}"
+        bg_color="neutral-600" border_color="neutral-600" text_color="neutral-100"
+        class="mr-2">volver</x-a-button>
+      {{-- nueva pestaña con reporte --}}
+      <x-a-button target="_blank" href="{{ route('audits-audits-report', $audit->id) }}">generar reporte</x-a-button>
+    </x-title-section>
 
     <x-content-section>
 
@@ -68,12 +76,12 @@
                   <div class="flex flex-col gap-1">
                     @foreach ($property_changes as $status => $value)
                       @if ($status === 'new')
-                        <span class="ml-2 p-1 bg-emerald-200">
+                        <span class="ml-2 p-1 border border-dashed rounded-sm border-emerald-400 bg-emerald-100">
                           <span class="font-medium">&plus;&nbsp;valor nuevo:</span>
                           <span>{{ $value }}</span>
                         </span>
                       @else
-                        <span class="ml-2 p-1 bg-red-200">
+                        <span class="ml-2 p-1 border border-dashed rounded-sm border-red-400 bg-red-100">
                           <span class="font-medium">&minus;&nbsp;valor anterior:</span>
                           <span>{{ $value }}</span>
                         </span>
@@ -90,6 +98,5 @@
       <x-slot:footer class="hidden"></x-slot:footer>
 
     </x-content-section>
-
   </article>
 </div>
