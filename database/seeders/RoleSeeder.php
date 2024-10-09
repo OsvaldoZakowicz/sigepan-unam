@@ -50,7 +50,7 @@ class RoleSeeder extends Seeder
     ]);
 
     $auditor->syncPermissions([
-      'auditoria'
+      'panel','auditoria'
     ]);
 
     //* roles no internos (is_internal = false)
