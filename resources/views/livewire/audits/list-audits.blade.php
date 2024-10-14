@@ -21,13 +21,13 @@
             </tr>
           </thead>
           <tbody class="border text-sm font-normal">
-            @forelse ($audits as $audit)
-            <tr wire:key="{{$audit->id}}" class="border">
-                <td class="border p-0.5">{{$audit->id}}</td>
-                <td class="border p-0.5">{{$audit->event}}</td>
-                <td class="border p-0.5 text-wrap lowercase">{{englishPluralFromPath($audit->auditable_type)}}</td>
-                <td class="border p-0.5 text-wrap">{{$audit->auditable_id}}</td>
-                <td class="border p-0.5 text-wrap">{{formatDateTime($audit->created_at)}}</td>
+            @forelse ( $audits as $audit )
+            <tr wire:key="{{ $audit->id }}" class="border">
+                <td class="border p-0.5">{{ $audit->id }}</td>
+                <td class="border p-0.5">{{ __( $audit->event ) }}</td>
+                <td class="border p-0.5 text-wrap lowercase">{{ __( englishPluralFromPath($audit->auditable_type)->value ) }}</td>
+                <td class="border p-0.5 text-wrap">{{ $audit->auditable_id }}</td>
+                <td class="border p-0.5 text-wrap">{{ formatDateTime($audit->created_at)}}</td>
                 <td class="border p-0.5 text-wrap w-1/5">
                   <div class="w-fit-content inline-flex gap-2 justify-start items-center">
 

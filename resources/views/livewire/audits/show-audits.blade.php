@@ -30,7 +30,7 @@
               </div>
               <div class="w-1/3">
                 <span class="font-semibold capitalize">evento:</span>
-                <span>{{ $audit_metadata['audit_event'] }}</span>
+                <span>{{ __( $audit_metadata['audit_event'] ) }}</span>
               </div>
               <div class="w-1/3">
                 <span class="font-semibold capitalize">fecha del evento:</span>
@@ -53,7 +53,7 @@
               </div>
               <div class="w-1/3">
                 <span class="font-semibold capitalize">tabla involucrada:</span>
-                <span>{{ englishPluralFromPath($audit->auditable_type) }}</span>
+                <span>{{ __( englishPluralFromPath($audit->auditable_type)->value ) }}</span>
               </div>
               <div class="w-1/3">
                 <span class="font-semibold capitalize">id de registro:</span>
@@ -68,10 +68,14 @@
             </header>
             <article class="flex flex-col gap-1 p-2">
               @foreach ($audit_modified_properties as $property_name => $property_changes)
+                {{-- vista de una propiedad modificada --}}
                 <div class="flex flex-col gap-1 p-2 border border-neutral-200 rounded-sm">
                   <span>
                     <span class="text-md font-medium">propiedad afectada:</span>
-                    <span class="italic">{{ $property_name }}</span>
+                    {{-- evitar problema de traduccion de el campo email debido al paquete lang --}}
+                    <span class="italic">
+                      @if ($property_name !== 'email') {{ __( $property_name ) }} @else correo electronico @endif
+                    </span>
                   </span>
                   <div class="flex flex-col gap-1">
                     @foreach ($property_changes as $status => $value)

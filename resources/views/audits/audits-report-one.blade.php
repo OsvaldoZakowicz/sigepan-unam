@@ -108,9 +108,10 @@
 <body>
   {{-- cabecera --}}
   <header>
-    {{-- todo: helper para obtener la fecha y hora actual --}}
-    <p class="date-text">fecha de emisión:&nbsp;<span>fecha.</span></p>
     <h1>Reporte de auditoría:</h1>
+    <p class="date-text">Fecha de emisión:&nbsp;
+      <span>{{ formatDateTime(now()) }}&nbsp;hrs</span>
+    </p>
     <p class="auditor">Auditor:&nbsp;</p>
     <ul>
       <li class="auditor-metadata">Nombre y Apellido:&nbsp;
@@ -130,7 +131,6 @@
     </ul>
     <h4>Detalle de auditoría: registro individual.</h4>
     {{-- tabla de detalle --}}
-    {{-- todo: traducir el evento al español --}}
     <table>
       <thead>
         <tr>
@@ -146,7 +146,7 @@
         </tr>
         <tr>
           <th scope="row">Evento registrado:</th>
-          <td class="data">{{ $audit_metadata['audit_event'] }}</td>
+          <td class="data">{{ __( $audit_metadata['audit_event'] ) }}</td>
         </tr>
         <tr>
           <th scope="row" class="metadata">Fecha del evento:</th>
@@ -158,11 +158,11 @@
         </tr>
         <tr>
           <th scope="row" class="metadata">Responsable del cambio:</th>
-          <td class="data">usuario:&nbsp;{{ $audit_metadata['user_name'] }},&nbsp;email:&nbsp;{{ $audit_metadata['user_email'] }}</td>
+          <td class="data">usuario:&nbsp;{{ $audit_metadata['user_name'] }},&nbsp;correo electrónico:&nbsp;{{ $audit_metadata['user_email'] }}</td>
         </tr>
         <tr>
           <th scope="row" class="metadata">Tabla modificada:</th>
-          <td class="data">{{ englishPluralFromPath($audit->auditable_type) }}</td>
+          <td class="data">{{ __( englishPluralFromPath($audit->auditable_type)->value ) }}</td>
         </tr>
         <tr>
           <th scope="row" class="metadata">Registro de tabla:</th>
@@ -180,9 +180,11 @@
         @foreach ($audit_modified_properties as $property_name => $property_changes)
           <tr>
             <th>
-              {{-- todo: traducir nombres de propiedades al español --}}
               <span class="metadata">propiedad afectada:</span>
-              <span class="data">{{ $property_name }}</span>
+              {{-- evitar problema de traduccion de el campo email debido al paquete lang --}}
+              <span class="italic">
+                @if ($property_name !== 'email') {{ __( $property_name ) }} @else correo electronico @endif
+              </span>
             </th>
             <td>
               @foreach ($property_changes as $status => $value)
