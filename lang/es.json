@@ -259,5 +259,56 @@
     "Yes": "Sí",
     "You are receiving this email because we received a password reset request for your account.": "Ha recibido este mensaje porque se solicitó un restablecimiento de contraseña para su cuenta.",
     "You're logged in!": "¡Usted está conectado!",
-    "Your email address is unverified.": "Su dirección de correo electrónico no está verificada."
+    "Your email address is unverified.": "Su dirección de correo electrónico no está verificada.",
+
+    "users": "usuarios",
+    "email_verified_at": "verificación de correo",
+    "remember_token": "token de 'recuérdame' en sesión",
+    "created_at": "fecha de creación",
+    "updated_at": "fecha de actualización",
+
+    "roles": "roles",
+    "role_id": "id de rol",
+    "short_description": "descripción corta",
+    "is_internal": "interno",
+    "is_editable": "editable",
+    "permissions": "permisos",
+    "permiddion_id": "id de permiso",
+    "model_type": "modelo",
+    "model_id": "id de registro",
+
+    "audits": "auditorías",
+    "user_type": "usuario responsable",
+    "event": "evento",
+    "created": "creado",
+    "updated": "actualizado",
+    "deleted": "borrado",
+    "auditable_type": "modelo auditado",
+    "auditable_id": "id de modelo auditado",
+    "old_values": "valores anteriores",
+    "new_values": "valores nuevos",
+    "url": "url",
+    "ip_address": "dirección ip",
+    "user_agent": "navegador",
+    "tags": "etiquetas",
+
+
+    "profiles": "perfiles",
+    "first_name": "nombres",
+    "last_name": "apellidos",
+    "dni": "dni",
+    "birthdate": "fecha de nacimiento",
+    "user_id": "id de usuario",
+    "gender_id": "id de genero",
+    "phone_number": "numero de telefono",
+
+    "genders": "generos",
+    "gender": "genero",
+
+    "addresses": "direcciones",
+    "street": "calle",
+    "number": "numero de calle",
+    "postal_code": "codigo postal",
+    "city": "ciudad",
+    "profile_id": "id de perfil"
 }
