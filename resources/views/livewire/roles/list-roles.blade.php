@@ -11,10 +11,21 @@
     <x-content-section>
 
       <x-slot:header>
-        <span class="text-sm capitalize">buscar usuario:</span>
+        <span class="text-sm capitalize">buscar rol:</span>
         {{-- formulario de busqueda --}}
-        <form class="grow">
-          <input type="text" name="search" placeholder="ingrese un id, o termino de busqueda" class="w-1/4 shrink text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
+        <form class="flex gap-1 grow">
+          {{-- termino de busqueda --}}
+          <input type="text" wire:model.live="search" wire:click="resetPagination()" name="search" placeholder="ingrese un id, o termino de busqueda" class="w-1/4 shrink text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300" />
+          {{-- es editable --}}
+          <div class="w-fit flex items-center gap-1 border rounded-sm p-1 mx-1">
+            <input type="checkbox" wire:model.live="editable" wire:click="resetPagination()" name="editable" id="editable" />
+            <label for="editable">editables</label>
+          </div>
+          {{-- es interno? --}}
+          <div class="w-fit flex items-center gap-1 border rounded-sm p-1 mx-1">
+            <input type="checkbox" wire:model.live="internal" wire:click="resetPagination()" name="internal" id="internal" />
+            <label for="internal">internos</label>
+          </div>
         </form>
         <!-- grupo de botones -->
         <div class="flex"></div>

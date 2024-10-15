@@ -5,12 +5,54 @@ namespace App\Livewire\Roles;
 use Livewire\Component;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\Url;
+use Livewire\Attributes\Validate;
 use Livewire\WithPagination;
 
 class ListRoles extends Component
 {
   // usamos paginacion
   use WithPagination;
+
+  // busqueda
+  #[Url]
+  public $search = '';
+  #[Url]
+  public $editable = ''; // 0 = false, 1 = true
+  #[Url]
+  public $internal = ''; // 0 = false, 1 = true
+
+  /**
+   * * reiniciar la paginacion al inicio
+   * permite que al buscar se inicie siempre desde el principio
+   * si busco desde la pagina 2, 3, ...n, retorna al principio y luego busca
+   */
+  public function resetPagination()
+  {
+    $this->resetPage();
+  }
+
+  /**
+   * * buscar roles
+   * busca todos los roles paginados
+   * filtra roles cuando los parametros de filtrado existen
+   */
+  public function searchRoles()
+  {
+    // roles paginados, incluyendo busqueda
+    return Role::orderBy('id', 'desc')
+      ->when($this->search, function ($query) {
+        $query->where('id', 'like', '%'.$this->search.'%')
+              ->orWhere('name', 'like', '%'.$this->search.'%');
+      })
+      ->when($this->editable, function ($query) {
+        $query->where('is_editable', '=', $this->editable);
+      })
+      ->when($this->internal, function ($query) {
+        $query->where('is_internal', '=', $this->internal);
+      })
+      ->paginate(10);
+  }
 
   /**
    * * el rol tiene usuarios?
@@ -63,8 +105,7 @@ class ListRoles extends Component
 
   public function render()
   {
-    // roles paginados
-    $roles = Role::orderBy('id', 'desc')->paginate(10);
+    $roles = $this->searchRoles();
 
     return view('livewire.roles.list-roles', compact('roles'));
   }
