@@ -47,7 +47,9 @@
         </table>
       </x-slot:content>
 
-      <x-slot:footer>
+      <x-slot:footer class="py-2">
+        {{-- paginacion --}}
+        {{ $audits->links() }}
         <!-- grupo de botones -->
         <div class="flex"></div>
       </x-slot:footer>
