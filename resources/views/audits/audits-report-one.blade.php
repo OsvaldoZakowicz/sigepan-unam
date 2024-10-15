@@ -158,7 +158,11 @@
         </tr>
         <tr>
           <th scope="row" class="metadata">Responsable del cambio:</th>
-          <td class="data">usuario:&nbsp;{{ $audit_metadata['user_name'] }},&nbsp;correo electrónico:&nbsp;{{ $audit_metadata['user_email'] }}</td>
+          <td class="data">
+            <span>usuario:&nbsp;{{ $user_resp->name }},&nbsp;</span>
+            <span>rol:&nbsp;{{ $user_resp->getRolenames()->first() }},&nbsp;</span>
+            <span>correo electrónico:&nbsp;{{ $user_resp->email }}</span>
+          </td>
         </tr>
         <tr>
           <th scope="row" class="metadata">Tabla modificada:</th>

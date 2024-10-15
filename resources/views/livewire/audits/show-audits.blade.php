@@ -44,11 +44,15 @@
                 <span class="font-semibold capitalize">responsable del cambio:</span>
                 <span class="ml-2">
                   <span class="font-semibold">usuario:&nbsp;</span>
-                  <span>{{ $audit_metadata['user_name'] }}</span>
+                  <span>{{ $user_resp->name }}</span>
+                </span>
+                <span class="ml-2">
+                  <span class="font-semibold">rol:&nbsp;</span>
+                  <span>{{ $user_resp->getRolenames()->first() }}</span>
                 </span>
                 <span class="ml-2">
                   <span class="font-semibold">email:&nbsp;</span>
-                  <span>{{ $audit_metadata['user_email'] }}</span>
+                  <span>{{ $user_resp->email }}</span>
                 </span>
               </div>
               <div class="w-1/3">
