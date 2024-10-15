@@ -43,7 +43,9 @@
         </table>
       </section>
       <!-- seccion de pie -->
-      <section class="flex items-center justify-end mt-2 px-1 border-t">
+      <section class="flex items-center justify-end mt-2 px-1 py-2">
+        {{-- paginacion --}}
+        {{ $permissions->links() }}
         <!-- grupo de botones -->
         <div class="flex"></div>
       </section>

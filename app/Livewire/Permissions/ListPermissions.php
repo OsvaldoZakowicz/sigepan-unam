@@ -3,19 +3,17 @@
 namespace App\Livewire\Permissions;
 
 use Livewire\Component;
+use Livewire\WithPagination;
 use Spatie\Permission\Models\Permission;
 
 class ListPermissions extends Component
 {
-  public $permissions;
-
-  public function mount()
-  {
-    $this->permissions = Permission::all();
-  }
+  use WithPagination;
 
   public function render()
   {
-    return view('livewire.permissions.list-permissions');
+    $permissions = Permission::orderBy('id', 'desc')->paginate(10);
+
+    return view('livewire.permissions.list-permissions', compact('permissions'));
   }
 }

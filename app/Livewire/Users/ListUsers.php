@@ -5,18 +5,11 @@ namespace App\Livewire\Users;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class ListUsers extends Component
 {
-  public $users;
-
-  //* obtener usuarios
-  // usuarios que no son clientes
-  //! solucion temporal, evitar el hardcoding
-  public function getUsers()
-  {
-    $this->users = User::withoutRole('cliente')->get();
-  }
+  use WithPagination;
 
   //* eliminar un usuario
   public function delete(User $user)
@@ -36,18 +29,14 @@ class ListUsers extends Component
     $user->syncPermissions([]);
 
     $user->delete();
-
-    // refrescar los usuarios listados
-    $this->getUsers();
-  }
-
-  public function mount()
-  {
-    $this->getUsers();
   }
 
   public function render()
   {
-    return view('livewire.users.list-users');
+    // obtener usuarios que no son clientes, paginados
+    $users = User::withoutRole('cliente')
+      ->orderBy('id', 'desc')->paginate(10);
+
+    return view('livewire.users.list-users', compact('users'));
   }
 }
