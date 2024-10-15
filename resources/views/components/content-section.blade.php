@@ -29,7 +29,7 @@
 
   {{-- footer --}}
   <section {{ $footer->attributes->merge([
-    'class' => 'flex items-center justify-end mt-2 px-1 border-t'
+    'class' => 'flex items-center justify-end mt-2 px-1'
   ]) }}>
 
     {{ $footer }}
