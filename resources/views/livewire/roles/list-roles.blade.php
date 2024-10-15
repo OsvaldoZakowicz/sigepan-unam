@@ -1,21 +1,26 @@
 <div>
   {{-- componente crear rol --}}
   <article class="m-2 border rounded-sm border-neutral-200">
-    <section class="flex items-center justify-between px-1 py-1 bg-neutral-200">
-      <span class="text-sm capitalize">lista de roles</span>
-      <div role="grupo-de-botones" class="flex">
-        <a href="{{ route('users-roles-create') }}" class="flex justify-center items-center box-border w-fit h-6 m-1 p-1 border-solid border rounded border-blue-600 bg-blue-600 text-center text-neutral-100 uppercase text-xs">crear rol</a>
-      </div>
-    </section>
-    <section class="flex flex-col pt-2 px-1 text-sm capitalize bg-white">
-      <!-- seccion de cabecera -->
-      {{-- <section class="flex items-center justify-between px-1 bg-neutral-200">
-        <span class="text-sm capitalize">titulo de seccion</span>
+
+    {{-- barra de titulo --}}
+    <x-title-section title="lista de roles">
+      <x-a-button wire:navigate href="{{ route('users-roles-create') }}" class="mx-1">crear rol</x-a-button>
+    </x-title-section>
+
+    {{-- cuerpo --}}
+    <x-content-section>
+
+      <x-slot:header>
+        <span class="text-sm capitalize">buscar usuario:</span>
+        {{-- formulario de busqueda --}}
+        <form class="grow">
+          <input type="text" name="search" placeholder="ingrese un id, o termino de busqueda" class="w-1/4 shrink text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
+        </form>
         <!-- grupo de botones -->
         <div class="flex"></div>
-      </section> --}}
-      <!-- seccion de contenido -->
-      <section class="flex mt-2 px-1">
+      </x-slot:header>
+
+      <x-slot:content>
         <!-- tabla -->
         <table
           class="w-full table-auto border-collapse border rounded capitalize">
@@ -60,12 +65,16 @@
             @endforelse
           </tbody>
         </table>
-      </section>
-      <!-- seccion de pie -->
-      <section class="flex items-center justify-end mt-2 px-1 border-t">
+      </x-slot:content>
+
+      <x-slot:footer class="py-2">
+        {{-- paginacion --}}
+        {{ $roles->links() }}
         <!-- grupo de botones -->
         <div class="flex"></div>
-      </section>
-    </section>
+      </x-slot:footer>
+
+    </x-content-section>
+
   </article>
 </div>

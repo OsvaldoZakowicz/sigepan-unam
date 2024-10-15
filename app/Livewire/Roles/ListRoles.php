@@ -5,18 +5,15 @@ namespace App\Livewire\Roles;
 use Livewire\Component;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\DB;
+use Livewire\WithPagination;
 
 class ListRoles extends Component
 {
-  public $roles;
-
-  public function mount()
-  {
-    $this->roles = Role::all();
-  }
+  // usamos paginacion
+  use WithPagination;
 
   /**
-   * * puedo borrar el rol?
+   * * el rol tiene usuarios?
    * un rol tiene muchos usuarios asignados
    * para poder borrar, debo verificar que no tenga usuarios asignados.
    */
@@ -59,9 +56,6 @@ class ListRoles extends Component
       // borrar rol de forma segura
       $role->delete();
 
-      // refrescar lista de roles
-      $this->roles = Role::all();
-
     } else {
       // todo: mensaje toast, no se puede eliminar un rol con usuarios asignados
     }
@@ -69,6 +63,9 @@ class ListRoles extends Component
 
   public function render()
   {
-    return view('livewire.roles.list-roles');
+    // roles paginados
+    $roles = Role::orderBy('id', 'desc')->paginate(10);
+
+    return view('livewire.roles.list-roles', compact('roles'));
   }
 }
