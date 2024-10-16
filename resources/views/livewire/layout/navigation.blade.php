@@ -33,6 +33,9 @@ new class extends Component
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" wire:navigate>
                       {{ __('Dashboard') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('suppliers-suppliers-index')" :active="request()->routeIs('suppliers-*')" wire:navigate>
+                      Proveedores
+                    </x-nav-link>
                     <x-nav-link :href="route('users-users-index')" :active="request()->routeIs('users-*')" wire:navigate>
                       Usuarios
                     </x-nav-link>
@@ -98,9 +101,15 @@ new class extends Component
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" wire:navigate>
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('suppliers-suppliers-index')" :active="request()->routeIs('suppliers-*')" wire:navigate>
+              Proveedores
+            </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('users-users-index')" :active="request()->routeIs('users-*')" wire:navigate>
               Usuarios
-          </x-responsive-nav-link>
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('audits-audits-index')" :active="request()->routeIs('audits-*')" wire:navigate>
+              Auditoria
+            </x-responsive-nav-link>
         </div>
 
         <!-- Responsive Settings Options -->

@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Users\UserController;
 use App\Http\Controllers\Clients\ClientLogOutController;
 use App\Http\Controllers\Audits\AuditController;
+use App\Http\Controllers\Suppliers\SupplierController;
 
 //* layout publico
 Route::view('/', 'welcome')->name('welcome');
@@ -51,5 +52,13 @@ Route::middleware(['auth', 'verified', 'can:auditoria'])->group(function () {
 
 //* clientes
 Route::get('client/logout', ClientLogOutController::class)->name('client-logout');
+
+//* proveedores
+Route::middleware(['auth', 'verified', 'can:proveedores'])->group(function () {
+
+  Route::get('suppliers', [SupplierController::class, 'suppliers_index'])->name('suppliers-suppliers-index');
+
+});
+
 
 require __DIR__.'/auth.php';
