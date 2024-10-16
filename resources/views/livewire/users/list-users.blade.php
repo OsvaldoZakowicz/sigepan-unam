@@ -14,7 +14,15 @@
         <span class="text-sm capitalize">buscar usuario:</span>
         {{-- formulario de busqueda --}}
         <form class="grow">
-          <input type="text" name="search" placeholder="ingrese un id, o termino de busqueda" class="w-1/2 shrink text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
+          {{-- termino de busqueda --}}
+          <input type="text" wire:model.live="search" wire:click="resetPagination()" name="search" placeholder="ingrese un id, o termino de busqueda" class="w-1/4 shrink text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
+          {{-- roles --}}
+          <select wire:model.live="role" wire:click="resetPagination()" name="role" id="role" class="w-1/4 shrink text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
+            <option value="" selected>filtrar por rol...</option>
+            @foreach ($role_names as $role_name)
+              <option value="{{$role_name}}">{{$role_name}}</option>
+            @endforeach
+          </select>
         </form>
         <!-- grupo de botones -->
         <div class="flex"></div>
@@ -65,6 +73,5 @@
       </x-slot:footer>
 
     </x-content-section>
-
   </article>
 </div>
