@@ -6,7 +6,21 @@
 
     <x-content-section>
 
-      <x-slot:header class="hidden"></x-slot:header>
+      <x-slot:header>
+        <span class="text-sm capitalize">buscar auditoria:</span>
+        {{-- formulario de busqueda --}}
+        <form class="grow">
+          {{-- termino de busqueda --}}
+          <input type="text" wire:model.live="search" wire:click="resetPagination()" name="search" id="search" placeholder="ingrese un id, o termino de busqueda" class="w-1/4 shrink text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
+          {{-- evento --}}
+          <select wire:model.live="event" wire:click="resetPagination()" name="event" id="event" class="w-1/4 shrink text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
+            <option value="" selected>filtrar por evento...</option>
+            <option value="created">creado</option>
+            <option value="updated">actualizado</option>
+            <option value="deleted">borrado</option>
+          </select>
+        </form>
+      </x-slot:header>
 
       <x-slot:content>
         <table class="w-full table-auto border-collapse border rounded capitalize">
