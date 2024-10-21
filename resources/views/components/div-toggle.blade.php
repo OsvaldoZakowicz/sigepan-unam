@@ -1,6 +1,7 @@
 @props([
   'title' => 'grupo',
-  'subtitle' => ''
+  'subtitle' => '',
+  'messages' => ''
 ])
 
 {{-- fieldset con accion de toggle --}}
@@ -32,6 +33,12 @@
   </legend>
 
   <span>{{ $subtitle }}</span>
+
+  {{-- mensajes en la seccion --}}
+  {{-- $mensajes es un slot con nombre --}}
+  <span class="mx-2">
+    {{ $messages }}
+  </span>
 
   {{-- content --}}
   <div x-show="open" class="w-full bg-white pt-2">
