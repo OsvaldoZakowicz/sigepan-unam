@@ -21,19 +21,22 @@
 {{-- layout raiz --}}
 
 <body class="font-sans antialiased">
-  <div class="min-h-screen bg-gray-100">
-    {{-- navegacion de livewire --}}
-    <livewire:layout.navigation />
+  <div class="relative min-h-screen bg-gray-100">
 
-    {{-- header de seccion --}}
-    @if (isset($header))
-      <header class="w-full px-8 h-10 sm:px-6 lg:px-8 flex justify-start items-center bg-white shadow">
-        {{ $header }}
-      </header>
-    @endif
+    <div class="fixed top-0 left-0 right-0">
+      {{-- navegacion de livewire --}}
+      <livewire:layout.navigation />
+
+      {{-- header de seccion --}}
+      @if (isset($header))
+        <header class="w-full px-8 h-10 sm:px-6 lg:px-8 flex justify-start items-center bg-white shadow">
+          {{ $header }}
+        </header>
+      @endif
+    </div>
 
     {{-- contendio de seccion --}}
-    <main class="w-full mb-2 flex flex-col items-center text-neutral-700">
+    <main class="w-full mb-2 flex flex-col items-center text-neutral-700 pt-28">
       {{ $slot }}
     </main>
   </div>
