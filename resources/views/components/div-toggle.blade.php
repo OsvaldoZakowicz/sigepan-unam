@@ -29,7 +29,7 @@
     </span>
 
     {{-- titulo o tema del grupo --}}
-    <span class="font-semibold">{{ $title }}</span>
+    <span class="font-semibold text-xs capitalize">{{ $title }}</span>
   </legend>
 
   <span>{{ $subtitle }}</span>
