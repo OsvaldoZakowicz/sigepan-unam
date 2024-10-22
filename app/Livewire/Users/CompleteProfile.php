@@ -37,12 +37,15 @@ class CompleteProfile extends Component
     $this->user = Auth::user();
     $this->genders = Gender::all();
 
-    //* si tiene perfil completo, mostrar
+    //* si tiene perfil completo, montar datos
     // si profile() no tiene registro, retorna null, evalua como false
     // false indica que no tiene perfil completo.
     if ($this->user->profile) {
-      // datos del perfil
+
+      // perfil
       $this->user_profile = $this->user->profile;
+
+      // datos del perfil
       $this->first_name   = $this->user_profile->first_name;
       $this->last_name    = $this->user_profile->last_name;
       $this->dni          = $this->user_profile->dni;
@@ -95,21 +98,21 @@ class CompleteProfile extends Component
 
       /* dd(['user_gender_update' => $this->user_gender]); */
 
-      // actualizar perfil
-      $this->user_profile->first_name   = $this->first_name;
-      $this->user_profile->last_name    = $this->last_name;
-      $this->user_profile->dni          = $this->dni;
-      $this->user_profile->birthdate    = $this->birthdate;
-      $this->user_profile->phone_number = $this->phone_number;
-      $this->user_profile->gender_id    = $this->user_gender_update;
-      $this->user_profile->save();
-
       // actualizar direccion
       $this->user_address->street       = $this->street;
       $this->user_address->number       = $this->number;
       $this->user_address->city         = $this->city;
       $this->user_address->postal_code  = $this->postal_code;
       $this->user_address->save();
+
+      // actualizar perfil
+      $this->user_profile->first_name   = $this->first_name;
+      $this->user_profile->last_name    = $this->last_name;
+      $this->user_profile->dni          = $this->dni;
+      $this->user_profile->birthdate    = $this->birthdate;
+      $this->user_profile->phone_number = $this->phone_number;
+      $this->user_profile->gender_id    = $this->user_gender_update; //id nuevo si cambia de genero
+      $this->user_profile->save();
 
     } else {
 
@@ -142,45 +145,27 @@ class CompleteProfile extends Component
 
       /* dd(['user_gender_save' => $this->user_gender]); */
 
+      // direccion
+      $new_address = Address::create([
+        'street' => $this->street,
+        'number' => $this->number,
+        'city' => $this->city,
+        'postal_code' => $this->postal_code
+      ]);
+
       // perfil
-      $new_profile = Profile::create([
+      Profile::create([
         'first_name' => $this->first_name,
         'last_name' => $this->last_name,
         'dni' => $this->dni,
         'birthdate' => $this->birthdate,
         'phone_number' => $this->phone_number,
         'gender_id' => $this->user_gender, // al guardar, viene como id string
+        'address_id' => $new_address->id, // direccion creada
         'user_id' => $this->user->id
       ]);
 
-      // direccion
-      $new_address = Address::create([
-        'street' => $this->street,
-        'number' => $this->number,
-        'city' => $this->city,
-        'postal_code' => $this->postal_code,
-        'profile_id' => $new_profile->id
-      ]);
     }
-
-    // limpiar propiedades
-    /* $this->reset(
-      [
-      'first_name',
-      'last_name',
-      'dni',
-      'birthdate',
-      'phone_number',
-      'user_gender',
-      'user_gender_update',
-      'street',
-      'number',
-      'city',
-      'postal_code'
-      ]
-    );*/
-
-    /* $this->dispatch('profile-updated'); */
 
     $this->redirectRoute('profile');
   }

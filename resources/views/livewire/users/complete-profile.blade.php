@@ -14,12 +14,13 @@
 
     <form wire:submit="save" class="pt-2 px-1">
       <div class="flex items-start flex-wrap lg:flex-nowrap gap-2">
-        <fieldset class="flex items-start flex-wrap w-full lg:w-1/2 mb-2 border rounded border-neutral-200">
-          <legend class="text-sm capitalize">datos personales</legend>
+
+        <x-fieldset-base tema="datos personales" class="w-full lg:w-1/2">
+
           {{-- nombres --}}
           <div class="flex flex-col gap-1 w-full md:w-1/2 lg:w-1/3 p-2">
             <span>
-              <x-input-label for="first_name" class="capitalize max-w-fit" :value="'nombres'" />
+              <label for="first_name" class="capitalize max-w-fit text-sm">nombres</label>
               <span class="text-red-600">*</span>
               @error('first_name')
                 <span class="inline-block text-red-400 text-xs">{{ $message }}</span>
@@ -30,7 +31,7 @@
           {{-- apellidos --}}
           <div class="flex flex-col gap-1 w-full md:w-1/2 lg:w-1/3 p-2">
             <span>
-              <x-input-label for="last_name" class="capitalize max-w-fit" :value="'apellidos'" />
+              <label for="last_name" class="capitalize max-w-fit text-sm">apellidos</label>
               <span class="text-red-600">*</span>
               @error('last_name')
                 <span class="inline-block text-red-400 text-xs">{{ $message }}</span>
@@ -41,7 +42,7 @@
           {{-- dni --}}
           <div class="flex flex-col gap-1 w-full md:w-1/2 lg:w-1/3 p-2">
             <span>
-              <x-input-label for="dni" class="capitalize max-w-fit" :value="'dni'" />
+              <label for="dni" class="capitalize max-w-fit text-sm">dni</label>
               <span class="text-red-600">*</span>
               @error('dni')
                 <span class="inline-block text-red-400 text-xs">{{ $message }}</span>
@@ -52,7 +53,7 @@
           {{-- fecha de nacimiento --}}
           <div class="flex flex-col gap-1 w-full md:w-1/2 lg:w-1/3 p-2">
             <span>
-              <x-input-label for="birthdate" class="capitalize max-w-fit" :value="'fecha de nacimiento'" />
+              <label for="birthdate" class="capitalize max-w-fit text-sm">fecha de nacimiento</label>
               <span class="text-red-600">*</span>
               @error('birthdate')
                 <span class="inline-block text-red-400 text-xs">{{ $message }}</span>
@@ -63,7 +64,7 @@
           {{-- telefono --}}
           <div class="flex flex-col gap-1 w-full md:w-1/2 lg:w-1/3 p-2">
             <span>
-              <x-input-label for="phone_number" class="capitalize max-w-fit" :value="'teléfono'" />
+              <label for="phone_number" class="capitalize max-w-fit text-sm">teléfono</label>
               <span class="text-red-600">*</span>
               @error('phone_number')
                 <span class="inline-block text-red-400 text-xs">{{ $message }}</span>
@@ -77,7 +78,7 @@
             {{-- si no tiene perfil, no tiene genero --}}
             @if ($user->profile)
               <span>
-                <x-input-label for="user_gender_update" class="capitalize max-w-fit" :value="'género'" />
+                <label for="user_gender_update" class="capitalize max-w-fit text-sm">género</label>
                 <span class="text-red-600">*</span>
                 @error('user_gender_update')
                   <span class="inline-block text-red-400 text-xs">{{ $message }}</span>
@@ -94,7 +95,7 @@
               </select>
               @else
               <span>
-                <x-input-label for="user_gender" class="capitalize max-w-fit" :value="'género'" />
+                <label for="user_gender" class="capitalize max-w-fit text-sm">género</label>
                 <span class="text-red-600">*</span>
                 @error('user_gender')
                   <span class="inline-block text-red-400 text-xs">{{ $message }}</span>
@@ -109,13 +110,15 @@
               </select>
               @endif
           </div>
-        </fieldset>
-        <fieldset class="flex items-start flex-wrap w-full lg:w-1/2 mb-2 border rounded border-neutral-200">
-          <legend class="text-sm capitalize">direccion</legend>
+
+        </x-fieldset-base>
+
+        <x-fieldset-base tema="direccion" class="w-full lg:w-1/2">
+
           {{-- calle --}}
           <div class="flex flex-col gap-1 w-full md:w-1/2 lg:w-1/3 p-2">
             <span>
-              <x-input-label for="street" class="capitalize max-w-fit" :value="'calle'" />
+              <label for="street" class="capitalize max-w-fit text-sm">calle</label>
               <span class="text-red-600">*</span>
               @error('street')
                 <span class="inline-block text-red-400 text-xs">{{ $message }}</span>
@@ -126,7 +129,7 @@
           {{-- numero de calle --}}
           <div class="flex flex-col gap-1 w-full md:w-1/2 lg:w-1/3 p-2">
             <span>
-              <x-input-label for="number" class="capitalize max-w-fit" :value="'numero de calle'" />
+              <label for="number" class="capitalize max-w-fit text-sm">número de calle</label>
               <span class="text-red-600">*</span>
               @error('number')
                 <span class="inline-block text-red-400 text-xs">{{ $message }}</span>
@@ -137,7 +140,7 @@
           {{-- ciudad--}}
           <div class="flex flex-col gap-1 w-full md:w-1/2 lg:w-1/3 p-2">
             <span>
-              <x-input-label for="city" class="capitalize max-w-fit" :value="'ciudad'" />
+              <label for="city" class="capitalize max-w-fit text-sm">ciudad</label>
               <span class="text-red-600">*</span>
               @error('city')
                 <span class="inline-block text-red-400 text-xs">{{ $message }}</span>
@@ -148,7 +151,7 @@
           {{-- codigo postal --}}
           <div class="flex flex-col gap-1 w-full md:w-1/2 lg:w-1/3 p-2">
             <span>
-              <x-input-label for="postal_code" class="capitalize max-w-fit" :value="'código postal'" />
+              <label for="postal_code" class="capitalize max-w-fit text-sm">código postal</label>
               <span class="text-red-600">*</span>
               @error('postal_code')
                 <span class="inline-block text-red-400 text-xs">{{ $message }}</span>
@@ -156,12 +159,17 @@
             </span>
             <x-text-input wire:model="postal_code" id="postal_code" name="postal_code" type="text" class="mt-1 block w-full" />
           </div>
-        </fieldset>
+
+        </x-fieldset-base>
+
       </div>
 
       <div class="flex items-center justify-end gap-4">
-        <a href="{{route('profile')}}" class="flex justify-center items-center box-border w-fit h-6 p-1 border-solid border rounded border-neutral-600 bg-neutral-600 text-center text-neutral-100 uppercase text-xs">cancelar</a>
-        <button type="submit" class="flex justify-center items-center box-border w-fit h-6 p-1 border-solid border rounded border-emerald-600 bg-emerald-600 text-center text-neutral-100 uppercase text-xs">guardar</button>
+
+        <x-a-button wire:navigate href="{{route('profile')}}" bg_color="neutral-600" border_color="neutral-600" >cancelar</x-a-button>
+
+        <x-btn-button>guardar</x-btn-button>
+
       </div>
     </form>
   </div>
