@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Profile;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use OwenIt\Auditing\Contracts\Auditable;
+use App\Models\Supplier;
 
 class Address extends Model implements Auditable
 {
@@ -26,6 +27,14 @@ class Address extends Model implements Auditable
   public function profile(): HasOne
   {
     return $this->hasOne(Profile::class);
+  }
+
+  //* una direccion tiene un proveedor asociado
+  // address 1 : 1 suppliers
+  // fk address_id en suppliers
+  public function supplier(): HasOne
+  {
+    return $this->hasOne(Supplier::class);
   }
 
 }
