@@ -4,24 +4,28 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Profile;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class Address extends Model
+class Address extends Model implements Auditable
 {
   use HasFactory;
+  // paquete de auditoria
+  use \OwenIt\Auditing\Auditable;
 
   protected $fillable = [
     'street',
     'number',
     'postal_code',
     'city',
-    'profile_id'
   ];
 
-  //* una direccion pertenece a un perfil
-  public function profile(): BelongsTo
+  //* una direccion tiene un perfil asociado
+  // address 1 : 1 profiles
+  public function profile(): HasOne
   {
-    return $this->belongsTo(Profile::class);
+    return $this->hasOne(Profile::class);
   }
+
 }

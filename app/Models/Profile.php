@@ -5,14 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use OwenIt\Auditing\Contracts\Auditable;
 use App\Models\User;
 use App\Models\Gender;
 use App\Models\Address;
 
-class Profile extends Model
+class Profile extends Model implements Auditable
 {
   use HasFactory;
+  // paquete de auditoria
+  use \OwenIt\Auditing\Auditable;
 
   protected $fillable = [
     'first_name',
@@ -21,24 +23,30 @@ class Profile extends Model
     'birthdate',
     'phone_number',
     'gender_id',
-    'user_id'
+    'user_id',
+    'address_id',
   ];
 
   //* un perfil pertenece a un usuario
+  // el usuario puede o no tener perfil
+  // profiles 0..1 : 1 users
   public function user(): BelongsTo
   {
     return $this->belongsTo(User::class);
   }
 
-  //* un perfil tiene un genero
+  //* muchos perfiles tienen un genero asociado
+  // profiles 0,1..n : 1 genders
   public function gender(): BelongsTo
   {
     return $this->belongsTo(Gender::class);
   }
 
-  //* un perfil tiene una relacion
-  public function address(): HasOne
+  //* a un perfil le pertenece una direccion
+  // profiles 1 : 1 addresses
+  public function address(): BelongsTo
   {
-    return $this->hasOne(Address::class);
+    return $this->belongsTo(Address::class);
   }
+
 }

@@ -69,7 +69,9 @@ class User extends Authenticatable implements MustVerifyEmail, Auditable
         ];
     }
 
-    //* un usuario tiene un perfil
+    //* un usuario tiene cero a un perfil asociado
+    // users 1 : 0..1 profiles
+    // fk user_id en profiles
     public function profile(): HasOne
     {
       return $this->hasOne(Profile::class);
