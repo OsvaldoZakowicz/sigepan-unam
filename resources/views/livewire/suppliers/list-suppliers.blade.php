@@ -28,7 +28,6 @@
               <th class="border text-left p-0.5">id</th>
               <th class="border text-left p-0.5">razón social</th>
               <th class="border text-left p-0.5">cuit</th>
-              <th class="border text-left p-0.5">iva</th>
               <th class="border text-left p-0.5">teléfono</th>
               <th class="border text-left p-0.5">correo</th>
               <th class="border text-left p-0.5">fecha de creacion</th>
@@ -41,17 +40,23 @@
                   <td class="border p-0.5">{{ $supplier->id }}</td>
                   <td class="border p-0.5">{{ $supplier->company_name }}</td>
                   <td class="border p-0.5">{{ $supplier->company_cuit }}</td>
-                  <td class="border p-0.5">{{ $supplier->iva_condition }}</td>
                   <td class="border p-0.5">{{ $supplier->phone_number }}</td>
                   <td class="border p-0.5">{{ $supplier->user->email }}</td>
                   <td class="border p-0.5">{{ formatDateTime($supplier->created_at, 'd-m-Y') }}</td>
                   <td class="border p-0.5">
-                    xd
+                    <div class="flex justify-start gap-1">
+                      {{-- todo: ver proveedor --}}
+                      <x-a-button wire:navigate href="#" bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600">ver</x-a-button>
+                      {{-- todo: editar proveedor --}}
+                      <x-a-button wire:navigate href="#" bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600">editar</x-a-button>
+                      {{-- todo: borrar proveedor --}}
+                      <x-btn-button btn_type="button" color="red" wire:click="delete({{ $supplier->id }})" >eliminar</x-btn-button>
+                    </div>
                   </td>
               </tr>
             @empty
               <tr class="border">
-                <td colspan="7">sin registros!</td>
+                <td colspan="6">sin registros!</td>
               </tr>
             @endforelse
           </tbody>
