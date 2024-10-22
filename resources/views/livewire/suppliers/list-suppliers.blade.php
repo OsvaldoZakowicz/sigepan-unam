@@ -26,24 +26,34 @@
           <thead class="border text-sm font-medium">
             <tr class="border">
               <th class="border text-left p-0.5">id</th>
-              <th class="border text-left p-0.5">proveedor</th>
               <th class="border text-left p-0.5">razón social</th>
+              <th class="border text-left p-0.5">cuit</th>
+              <th class="border text-left p-0.5">iva</th>
+              <th class="border text-left p-0.5">teléfono</th>
+              <th class="border text-left p-0.5">correo</th>
+              <th class="border text-left p-0.5">fecha de creacion</th>
               <th class="border text-left p-0.5">acciones</th>
             </tr>
           </thead>
           <tbody class="border text-sm font-normal">
-            {{-- @forelse (as)
-            <tr wire:key="" class="border">
-                <td class="border p-0.5"></td>
-                <td class="border p-0.5"></td>
-                <td class="border p-0.5"></td>
-                <td class="border p-0.5"></td>
-            </tr>
+            @forelse ($suppliers as $supplier)
+              <tr wire:key="{{ $supplier->id }}" class="border">
+                  <td class="border p-0.5">{{ $supplier->id }}</td>
+                  <td class="border p-0.5">{{ $supplier->company_name }}</td>
+                  <td class="border p-0.5">{{ $supplier->company_cuit }}</td>
+                  <td class="border p-0.5">{{ $supplier->iva_condition }}</td>
+                  <td class="border p-0.5">{{ $supplier->phone_number }}</td>
+                  <td class="border p-0.5">{{ $supplier->user->email }}</td>
+                  <td class="border p-0.5">{{ formatDateTime($supplier->created_at, 'd-m-Y') }}</td>
+                  <td class="border p-0.5">
+                    xd
+                  </td>
+              </tr>
             @empty
-            @endforelse --}}
-            <tr class="border">
-              <td colspan="4">sin registros!</td>
-            </tr>
+              <tr class="border">
+                <td colspan="7">sin registros!</td>
+              </tr>
+            @endforelse
           </tbody>
         </table>
       </x-slot:content>
