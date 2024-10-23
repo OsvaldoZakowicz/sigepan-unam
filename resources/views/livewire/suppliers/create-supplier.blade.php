@@ -201,9 +201,8 @@
 
         <!-- botones del formulario -->
         <div class="flex justify-end my-2 gap-2">
-          <x-a-button
-            href="{{ route('suppliers-suppliers-index') }}"
-            bg_color="neutral-600" border_color="neutral-600">cancelar</x-a-button>
+          <x-a-button wire:navigate href="{{ route('suppliers-suppliers-index') }}" bg_color="neutral-600" border_color="neutral-600">cancelar</x-a-button>
+
           <x-btn-button>guardar</x-btn-button>
         </div>
 
