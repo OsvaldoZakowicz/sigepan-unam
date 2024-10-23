@@ -49,8 +49,8 @@
                       <x-a-button wire:navigate href="#" bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600">ver</x-a-button>
                       {{-- todo: editar proveedor --}}
                       <x-a-button wire:navigate href="#" bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600">editar</x-a-button>
-                      {{-- todo: borrar proveedor --}}
-                      <x-btn-button btn_type="button" color="red" wire:click="delete({{ $supplier->id }})" >eliminar</x-btn-button>
+
+                      <x-btn-button btn_type="button" color="red" wire:click="delete({{ $supplier->id }})" wire:confirm="¿desea borrar el registro? esta accion es irreversible, se eliminara el proveedor y sus credenciales de acceso">eliminar</x-btn-button>
                     </div>
                   </td>
               </tr>
