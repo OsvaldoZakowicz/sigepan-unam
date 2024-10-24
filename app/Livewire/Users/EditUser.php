@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\Auth;
 
 class EditUser extends Component
 {
+  protected $ROLES_INTERNOS = 'is_internal';
+  protected $ROL_RESTRINGIDO = 'proveedor';
+
   // roles y usuario a editar
   public $roles;
   public $user;
@@ -31,8 +34,10 @@ class EditUser extends Component
       $this->redirectRoute('users-users-index');
     }
 
-    // conseguir los roles
-    $this->roles = Role::where('is_internal', true)->get();
+    // recuperar roles
+    $this->roles = Role::where($this->ROLES_INTERNOS, true)
+      ->where('name', '!=', $this->ROL_RESTRINGIDO)
+      ->get();
 
     // * completar propiedades a editar en el formulario a partir del usuario
     $this->user_name = $this->user->name;

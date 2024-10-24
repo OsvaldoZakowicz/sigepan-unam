@@ -13,6 +13,13 @@ class ListUsers extends Component
 {
   use WithPagination;
 
+  protected $EXTERNAL_ROLE = 'cliente';
+  protected $RESTRICTED_ROLE = 'proveedor';
+
+  public $external_r;
+  public $restricted_r;
+  public $current_user;
+
   #[Url]
   public $search = '';
   #[Url]
@@ -21,30 +28,69 @@ class ListUsers extends Component
   // roles disponibles
   public $role_names;
 
-  //* montar datos necesarios para iniciar
+  //* montar datos
   public function mount()
   {
-    $this->role_names = Role::whereNotIn('name', ['cliente'])->pluck('name');
+    // recuperar roles
+    $this->role_names = Role::whereNotIn('name', [$this->EXTERNAL_ROLE])
+      ->pluck('name');
+
+    // rol externo
+    $this->external_r = $this->getExternalRole();
+
+    // rol restringido
+    $this->restricted_r = $this->getRestrictedRole();
+
+    // usuario en sesion
+    $this->current_user = $this->getCurrentUser();
+
+  }
+
+  //* retornar nombre del rol restringido
+  public function getRestrictedRole()
+  {
+    return $this->RESTRICTED_ROLE;
+  }
+
+  //* retornar nombre del rol externo
+  public function getExternalRole()
+  {
+    return $this->EXTERNAL_ROLE;
+  }
+
+  //* retornar usuario en sesion
+  public function getCurrentUser()
+  {
+    return Auth::user();
   }
 
   //* eliminar un usuario
   public function delete(User $user)
   {
-    // Un usuario no puede eliminarse a si mismo.
-    if ($user->id === Auth::id()) {
+    // un usuario no puede eliminarse a si mismo
+    if ($user->id === $this->current_user->id) {
       // todo: mensaje toast con el error de eliminacion de mi propia cuenta
       return;
     }
 
-    //* CONTROL se quitan sus roles
+    // un usuario proveedor o cliente no puede eliminarse
+    $user_to_delete_role = $user->getRolenames()->first();
+    if ($user_to_delete_role === $this->RESTRICTED_ROLE || $user_to_delete_role === $this->EXTERNAL_ROLE) {
+      // todo: mensaje toast con el error de eliminacion de un proveedor o cliente
+      return;
+    }
+
+    //* se quitan sus roles
     // para ello sincronizo con array vacio
     $user->syncRoles([]);
 
-    //* CONTROL: se quitan sus permisos directos, si tuviere
+    //* se quitan sus permisos directos, si tuviere
     // para ello sincronizo con un array vacio
     $user->syncPermissions([]);
 
     $user->delete();
+
+    // todo: mensaje toast de exito al eliminar
   }
 
   /**
@@ -72,7 +118,7 @@ class ListUsers extends Component
           ->when($this->role, function ($query) {
             $query->role($this->role);
           }, function ($query) {
-            $query->withoutRole('cliente');
+            $query->withoutRole($this->EXTERNAL_ROLE);
           })
           ->orderBy('id', 'desc')
           ->paginate(10);

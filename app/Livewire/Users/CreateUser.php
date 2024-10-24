@@ -8,6 +8,9 @@ use App\Models\User;
 
 class CreateUser extends Component
 {
+  protected $ROLES_INTERNOS = 'is_internal';
+  protected $ROL_RESTRINGIDO = 'proveedor';
+
   public $roles;
   public $user_name;
   public $user_email;
@@ -15,22 +18,18 @@ class CreateUser extends Component
   public $user_password_test;
   public $user_role;
 
+  //* montar datos
   public function mount()
   {
-    // recuperar roles internos
-    $this->roles = Role::where('is_internal', true)->get();
+    // recuperar roles
+    $this->roles = Role::where($this->ROLES_INTERNOS, true)
+      ->where('name', '!=', $this->ROL_RESTRINGIDO)
+      ->get();
   }
 
+  //* crear usuario
   public function save()
   {
-    /* dd([
-      'name' => $this->user_name,
-      'emial' => $this->user_email,
-      'user_password' => $this->user_password,
-      'user_password_test' => $this->user_password_test,
-      'role' => $this->user_role
-    ]); */
-
     $this->validate([
       'user_name' => 'required|max:60',
       'user_email' => 'required|email|unique:users,email',

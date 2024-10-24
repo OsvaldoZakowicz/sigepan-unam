@@ -29,6 +29,7 @@
       </x-slot:header>
 
       <x-slot:content>
+
         <table class="w-full table-auto border-collapse border rounded capitalize">
           <thead class="border text-sm font-medium">
             <tr class="border">
@@ -43,17 +44,27 @@
           <tbody class="border text-sm font-normal">
             @forelse ($users as $user)
             <tr wire:key="{{$user->id}}" class="border">
-                <td class="border p-0.5">{{$user->id}}</td>
-                <td class="border p-0.5">{{$user->name}}</td>
-                <td class="border p-0.5">{{$user->email}}</td>
-                <td class="border p-0.5">{{$user->getRoleNames()->first();}}</td>
-                <td class="border p-0.5">{{Date::parse($user->created_at)->format('d-m-Y');}}</td>
+                <td class="border p-0.5">{{ $user->id }}</td>
+                <td class="border p-0.5">{{ $user->name }}</td>
+                <td class="border p-0.5">{{ $user->email }}</td>
+                <td class="border p-0.5">{{ $user->getRoleNames()->first(); }}</td>
+                <td class="border p-0.5">{{ formatDateTime($user->created_at, 'd-m-Y') }}</td>
                 <td class="border p-0.5">
+
                   <div class="w-full inline-flex gap-2 justify-start items-center">
-                    <a wire:navigate href="{{ route('users-users-edit', $user->id) }}" class="flex justify-center items-center box-border w-fit h-6 p-1 border-solid border rounded border-neutral-200 bg-neutral-100 text-center text-neutral-600 uppercase text-xs">editar</a>
-                    {{-- boton delete con confirmacion --}}
-                    <button wire:click="delete({{$user->id}})" wire:confirm="¿Desea borrar el registro?" type="button" class="flex justify-center items-center box-border w-fit h-6 p-1 border-solid border rounded border-red-600 bg-red-600 text-center text-neutral-100 uppercase text-xs">eliminar</button>
+                    @if ($user->getRoleNames()->first() !== $external_r and $user->getRoleNames()->first() !== $restricted_r and $user->id !== $current_user->id)
+
+                      <x-a-button wire:navigate href="{{ route('users-users-edit', $user->id) }}" bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600">editar</x-a-button>
+
+                      <x-btn-button type="button" wire:navigate wire:click="delete({{$user->id}})" wire:confirm="¿Desea borrar el registro?" color="red">eliminar</x-btn-button>
+
+                    @else
+
+                      <span title="el usuario no puede editarse o eliminarse si se trata de un proveedor, cliente o administrador en sesion actual" class="cursor-help">ninguna<span class="border rounded-full px-px my-px bg-neutral-100">&#65311;</span></span>
+
+                    @endif
                   </div>
+
                 </td>
             </tr>
             @empty
@@ -63,6 +74,7 @@
             @endforelse
           </tbody>
         </table>
+
       </x-slot:content>
 
       <x-slot:footer class="py-2">
