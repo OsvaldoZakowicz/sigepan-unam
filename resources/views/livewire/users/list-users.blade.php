@@ -60,7 +60,21 @@
 
                     @else
 
-                      <span title="el usuario no puede editarse o eliminarse si se trata de un proveedor, cliente o administrador en sesion actual" class="cursor-help">ninguna<span class="border rounded-full px-px my-px bg-neutral-100">&#65311;</span></span>
+                    <div x-data="{}">
+                      {{-- NOTA: enviar un array asociativo en js usa otro formato --}}
+                      <span
+                        x-on:click="$dispatch('toast-event', { toast_data:
+                          {
+                            'event_type': 'info',
+                            'title_toast': 'Información:',
+                            'descr_toast': 'Un usuario proveedor, cliente o administrador en sesión no puede eliminarse o editarse'
+                          }
+                        })"
+                        title="click para mas información!"
+                        class="cursor-pointer">ninguna
+                          <span class="border rounded-full px-px my-px bg-neutral-100">&#65311;</span>
+                      </span>
+                    </div>
 
                     @endif
                   </div>

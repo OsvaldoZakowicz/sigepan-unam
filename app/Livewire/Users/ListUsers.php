@@ -90,7 +90,11 @@ class ListUsers extends Component
 
     $user->delete();
 
-    // todo: mensaje toast de exito al eliminar
+    $this->dispatch('toast-event', toast_data: [
+      'event_type'  => 'success',
+      'title_toast' => 'Operación exitosa!',
+      'descr_toast' => 'El usuario se eliminó correctamente'
+    ]);
   }
 
   /**
