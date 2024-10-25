@@ -8,7 +8,7 @@
     <section class="flex flex-col pt-2 px-1 text-sm capitalize bg-white">
       {{-- formulario --}}
       <span class="mb-2 font-bold">formulario</span>
-      <form wire:submit="update" wire:confirm="¿editar registro?" class="w-full">
+      <form wire:submit="update" wire:confirm="¿editar registro?, tenga en cuenta que el usuario puede tener acceso a otras partes del sistema al cambiarle el rol" class="w-full">
         <!-- este es un grupo de inputs por tema -->
         <fieldset class="flex flex-wrap mb-2 border rounded border-neutral-200">
           <legend>datos del usuario</legend>
@@ -21,7 +21,7 @@
                 <span class="text-red-400 text-xs">{{ $message }}</span>
               @enderror
             </span>
-            <input disabled wire:model="user_name" type="text" name="user_name" class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300 bg-neutral-100" />
+            <input wire:model="user_name" type="text" name="user_name" class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300 bg-white" />
           </div>
           {{-- email --}}
           <div class="flex flex-col gap-1 p-2 w-1/2 shrink">

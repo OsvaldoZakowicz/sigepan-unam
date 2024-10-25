@@ -16,10 +16,6 @@ class ListUsers extends Component
   protected $EXTERNAL_ROLE = 'cliente';
   protected $RESTRICTED_ROLE = 'proveedor';
 
-  public $external_r;
-  public $restricted_r;
-  public $current_user;
-
   #[Url]
   public $search = '';
   #[Url]
@@ -34,49 +30,51 @@ class ListUsers extends Component
     // recuperar roles
     $this->role_names = Role::whereNotIn('name', [$this->EXTERNAL_ROLE])
       ->pluck('name');
-
-    // rol externo
-    $this->external_r = $this->getExternalRole();
-
-    // rol restringido
-    $this->restricted_r = $this->getRestrictedRole();
-
-    // usuario en sesion
-    $this->current_user = $this->getCurrentUser();
-
-  }
-
-  //* retornar nombre del rol restringido
-  public function getRestrictedRole()
-  {
-    return $this->RESTRICTED_ROLE;
-  }
-
-  //* retornar nombre del rol externo
-  public function getExternalRole()
-  {
-    return $this->EXTERNAL_ROLE;
-  }
-
-  //* retornar usuario en sesion
-  public function getCurrentUser()
-  {
-    return Auth::user();
   }
 
   //* eliminar un usuario
   public function delete(User $user)
   {
     // un usuario no puede eliminarse a si mismo
-    if ($user->id === $this->current_user->id) {
-      // todo: mensaje toast con el error de eliminacion de mi propia cuenta
+    if ($user->id === Auth::id()) {
+
+      $this->dispatch('toast-event', toast_data: [
+        'event_type'  => 'info',
+        'title_toast' => toastTitle('', true),
+        'descr_toast' => 'No puede eliminar su propia cuenta de usuario'
+      ]);
+
       return;
     }
 
-    // un usuario proveedor o cliente no puede eliminarse
     $user_to_delete_role = $user->getRolenames()->first();
-    if ($user_to_delete_role === $this->RESTRICTED_ROLE || $user_to_delete_role === $this->EXTERNAL_ROLE) {
-      // todo: mensaje toast con el error de eliminacion de un proveedor o cliente
+
+    // un usuario proveedor no puede eliminarse si tiene un proveedor asociado
+    if ($user_to_delete_role === $this->RESTRICTED_ROLE) {
+
+      if ($user->supplier->count() !== 0) {
+
+        $this->dispatch('toast-event', toast_data: [
+          'event_type'  => 'info',
+          'title_toast' => toastTitle('', true),
+          'descr_toast' => 'No puede eliminar el usuario proveedor: ' . $user->name . ', esta asociado a un proveedor existente'
+        ]);
+
+      }
+
+      return;
+    }
+
+    // un usuario cliente no puede eliminarse
+    // en caso de que por alguna razon se listen clientes
+    if ($user_to_delete_role === $this->EXTERNAL_ROLE) {
+
+      $this->dispatch('toast-event', toast_data: [
+        'event_type'  => 'info',
+        'title_toast' => toastTitle('', true),
+        'descr_toast' => 'No puede eliminar el usuario cliente: ' . $user->name . ', no es un usuario gestionable'
+      ]);
+
       return;
     }
 
@@ -92,9 +90,11 @@ class ListUsers extends Component
 
     $this->dispatch('toast-event', toast_data: [
       'event_type'  => 'success',
-      'title_toast' => 'Operación exitosa!',
-      'descr_toast' => 'El usuario se eliminó correctamente'
+      'title_toast' => toastTitle(),
+      'descr_toast' => toastSuccessBody('usuario', 'eliminado')
     ]);
+
+    return;
   }
 
   /**

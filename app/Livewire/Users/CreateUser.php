@@ -8,8 +8,8 @@ use App\Models\User;
 
 class CreateUser extends Component
 {
-  protected $ROLES_INTERNOS = 'is_internal';
-  protected $ROL_RESTRINGIDO = 'proveedor';
+  protected $INTERNAL_ROLE = 'is_internal';
+  protected $RESTRICTED_ROLE = 'proveedor';
 
   public $roles;
   public $user_name;
@@ -22,8 +22,8 @@ class CreateUser extends Component
   public function mount()
   {
     // recuperar roles
-    $this->roles = Role::where($this->ROLES_INTERNOS, true)
-      ->where('name', '!=', $this->ROL_RESTRINGIDO)
+    $this->roles = Role::where($this->INTERNAL_ROLE, true)
+      ->where('name', '!=', $this->RESTRICTED_ROLE)
       ->get();
   }
 
@@ -31,12 +31,14 @@ class CreateUser extends Component
   public function save()
   {
     $this->validate([
-      'user_name' => 'required|max:60',
+      'user_name' => 'required|max:50|regex:/^[a-zA-Z\s]+$/u',
       'user_email' => 'required|email|unique:users,email',
-      'user_password' => 'required|min:8',
-      'user_password_test' => 'required|min:8|same:user_password',
+      'user_password' => 'required|min:8|max:15',
+      'user_password_test' => 'required|min:8|max:15|same:user_password',
       'user_role' => 'required',
-    ], [], [
+    ], [
+      'user_name.regex' => 'El :attribute debe contener letras y espacios solamente',
+    ], [
       'user_name' => 'nombre de usuario',
       'user_email' => 'email',
       'user_password' => 'contraseña',
@@ -59,7 +61,8 @@ class CreateUser extends Component
 
     $this->reset(['user_name', 'user_email', 'user_password', 'user_password_test', 'user_role']);
 
-    //todo: emitir un toast con mensaje de exito al retornar de exito
+    session()->flash('operation-success', toastSuccessBody('usuario', 'creado'));
+
     $this->redirectRoute('users-users-index');
   }
 

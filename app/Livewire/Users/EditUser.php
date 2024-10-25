@@ -11,8 +11,9 @@ use Illuminate\Support\Facades\Auth;
 
 class EditUser extends Component
 {
-  protected $ROLES_INTERNOS = 'is_internal';
-  protected $ROL_RESTRINGIDO = 'proveedor';
+  protected $INTERNAL_ROLE = 'is_internal';
+  protected $EXTERNAL_ROLE = 'cliente';
+  protected $RESTRICTED_ROLE = 'proveedor';
 
   // roles y usuario a editar
   public $roles;
@@ -30,20 +31,38 @@ class EditUser extends Component
 
     // un usuario no puede editarse a si mismo
     if ($this->user->id === Auth::id()) {
-      //todo emitir un toast con mensaje de error
+
+      session()->flash('operation-info', 'No puede editar su propia cuenta de usuario');
+      $this->redirectRoute('users-users-index');
+    }
+
+    $user_to_edit_role = $this->user->getRolenames()->first();
+
+    // un usuario proveedor no puede editarse
+    if ($user_to_edit_role === $this->RESTRICTED_ROLE) {
+
+      session()->flash('operation-info', 'No puede editar un usuario proveedor, debe gestionarlo a traves de la seccion "proveedores"');
+      $this->redirectRoute('users-users-index');
+    }
+
+    // un usuario cliente no puede editarse
+    // en caso de que por alguna razon se listen clientes
+    if ($user_to_edit_role === $this->EXTERNAL_ROLE) {
+
+      session()->flash('operation-info', 'No puede editar un usuario cliente, no es gestionable');
       $this->redirectRoute('users-users-index');
     }
 
     // recuperar roles
-    $this->roles = Role::where($this->ROLES_INTERNOS, true)
-      ->where('name', '!=', $this->ROL_RESTRINGIDO)
+    $this->roles = Role::where($this->INTERNAL_ROLE, true)
+      ->where('name', '!=', $this->RESTRICTED_ROLE)
       ->get();
 
     // * completar propiedades a editar en el formulario a partir del usuario
     $this->user_name = $this->user->name;
     $this->user_email = $this->user->email;
 
-    //? conseguir rol especifico del usuario
+    //* conseguir rol especifico del usuario
     // busco por el nombre, que es unico
     // considerar que un usuario tiene un rol nada mas, o ninguno
     if ($this->user->hasAnyRole($this->roles->pluck('name')->toArray())) {
@@ -59,10 +78,12 @@ class EditUser extends Component
   public function update()
   {
     $this->validate([
-      'user_name' => 'required|max:60',
+      'user_name' => 'required|max:50|regex:/^[a-zA-Z\s]+$/u',
       'user_email' => ['required', 'email', Rule::unique('users', 'email')->ignore($this->user->id)],
       'user_role' => 'required',
-    ], [], [
+    ], [
+      'user_name.regex' => 'El :attribute debe contener letras y espacios solamente',
+    ], [
       'user_name' => 'nombre de usuario',
       'user_email' => 'email',
       'user_role' => 'rol'
@@ -76,9 +97,8 @@ class EditUser extends Component
 
     $this->reset(['user_name', 'user_email', 'user_role']);
 
-    //todo: si cambio email, notificar usuario
+    session()->flash('operation-success', toastSuccessBody('usuario', 'editado'));
 
-    //todo: emitir un toast con mensaje de exito al editar con exito
     $this->redirectRoute('users-users-index');
   }
 

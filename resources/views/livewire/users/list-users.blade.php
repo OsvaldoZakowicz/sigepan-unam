@@ -50,35 +50,10 @@
                 <td class="border p-0.5">{{ $user->getRoleNames()->first(); }}</td>
                 <td class="border p-0.5">{{ formatDateTime($user->created_at, 'd-m-Y') }}</td>
                 <td class="border p-0.5">
-
                   <div class="w-full inline-flex gap-2 justify-start items-center">
-                    @if ($user->getRoleNames()->first() !== $external_r and $user->getRoleNames()->first() !== $restricted_r and $user->id !== $current_user->id)
-
-                      <x-a-button wire:navigate href="{{ route('users-users-edit', $user->id) }}" bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600">editar</x-a-button>
-
-                      <x-btn-button type="button" wire:navigate wire:click="delete({{$user->id}})" wire:confirm="¿Desea borrar el registro?" color="red">eliminar</x-btn-button>
-
-                    @else
-
-                    <div x-data="{}">
-                      {{-- NOTA: enviar un array asociativo en js usa otro formato --}}
-                      <span
-                        x-on:click="$dispatch('toast-event', { toast_data:
-                          {
-                            'event_type': 'info',
-                            'title_toast': 'Información:',
-                            'descr_toast': 'Un usuario proveedor, cliente o administrador en sesión no puede eliminarse o editarse'
-                          }
-                        })"
-                        title="click para mas información!"
-                        class="cursor-pointer">ninguna
-                          <span class="border rounded-full px-px my-px bg-neutral-100">&#65311;</span>
-                      </span>
-                    </div>
-
-                    @endif
+                    <x-a-button wire:navigate href="{{ route('users-users-edit', $user->id) }}" bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600">editar</x-a-button>
+                    <x-btn-button type="button" wire:navigate wire:click="delete({{$user->id}})" wire:confirm="¿Desea borrar el registro?" color="red">eliminar</x-btn-button>
                   </div>
-
                 </td>
             </tr>
             @empty
