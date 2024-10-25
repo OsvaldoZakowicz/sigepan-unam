@@ -58,15 +58,11 @@
                 <td class="border p-0.5">{{$role->short_description}}</td>
                 <td class="border p-0.5">{{Date::parse($role->created_at)->format('d-m-Y');}}</td>
                 <td class="border p-0.5">
-                  @if ($role->is_editable)
                   <div class="w-full inline-flex gap-2 justify-start items-center">
                     <a wire:navigate href="{{route('users-roles-edit', $role->id)}}" class="flex justify-center items-center box-border w-fit h-6 p-1 border-solid border rounded border-neutral-200 bg-neutral-100 text-center text-neutral-600 uppercase text-xs">editar</a>
                     {{-- boton delete con confirmacion --}}
                     <button wire:click="delete({{$role->id}})" wire:confirm="¿Desea borrar el registro?" type="button" class="flex justify-center items-center box-border w-fit h-6 p-1 border-solid border rounded border-red-600 bg-red-600 text-center text-neutral-100 uppercase text-xs">eliminar</button>
                   </div>
-                  @else
-                  <span>ninguna</span>
-                  @endif
                 </td>
             </tr>
             @empty

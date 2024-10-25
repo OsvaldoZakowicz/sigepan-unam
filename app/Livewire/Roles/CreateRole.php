@@ -38,11 +38,12 @@ class CreateRole extends Component
   {
     //* validacion clasica
     $this->validate([
-      'role_name' => ['required', Rule::unique('roles', 'name')],
+      'role_name' => ['required', Rule::unique('roles', 'name'), 'regex:/^[a-zA-Z\s]+$/u'],
       'role_short_description' => 'required|min:15|max:150',
       'role_permissions' => 'required|array|min:1'
     ], [
-      'role_name.unique' => 'Ya existe un rol con el :attribute registrado'
+      'role_name.unique' => 'Ya existe un rol con el :attribute registrado',
+      'role_name.regex' => 'El :attribute debe contener letras o espacios solamente'
     ], [
       'role_name' => 'nombre',
       'role_short_description' => 'descripcion corta',
@@ -62,7 +63,8 @@ class CreateRole extends Component
     // limpiar propiedades
     $this->reset(['role_name', 'role_short_description', 'role_permissions']);
 
-    // todo: mensaje toast rol creado con exito
+    session()->flash('operation-success', toastSuccessBody('rol', 'creado'));
+
     $this->redirectRoute('users-roles-index');
   }
 

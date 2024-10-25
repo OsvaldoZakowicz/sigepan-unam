@@ -21,9 +21,10 @@ class EditRole extends Component
   {
     $this->role = Role::findOrFail($role_id);
 
+    // no puedo editar un rol cuando tiene is_editable = false
     if (!$this->role->is_editable) {
-      // todo: mensaje toast los roles no editables no se editan
-      return;
+      session()->flash('operation-info', 'Este rol no puede ser editado, es un rol interno del sistema');
+      $this->redirectRoute('users-roles-index');
     }
 
     $this->permissions = Permission::where('is_internal', true)->get();
@@ -37,22 +38,17 @@ class EditRole extends Component
   public function update()
   {
     $this->validate([
-      'role_name' => ['required', Rule::unique('roles', 'name')->ignore($this->role->id)],
+      'role_name' => ['required', Rule::unique('roles', 'name')->ignore($this->role->id), 'regex:/^[a-zA-Z\s]+$/u'],
       'role_short_description' => 'required|min:15|max:150',
       'role_permissions' => 'required|array|min:1'
     ], [
-      'role_name.unique' => 'Ya existe un rol con el :attribute registrado'
+      'role_name.unique' => 'Ya existe un rol con el :attribute registrado',
+      'role_name.regex' => 'El :attribute debe contener letras o espacios solamente'
     ], [
       'role_name' => 'nombre',
       'role_short_description' => 'descripcion corta',
       'role_permissions' => 'permisos del rol'
     ]);
-
-    /* dd([
-      'role' => $this->role_name,
-      'desc' => $this->role_short_description,
-      'perm' => $this->role_permissions
-    ]); */
 
     //actualizar
     $this->role->name = $this->role_name;
@@ -62,7 +58,7 @@ class EditRole extends Component
 
     $this->reset(['role_name', 'role_short_description', 'role_permissions']);
 
-    // todo: mensaje toast rol editado con exito
+    session()->flash('operation-success', toastSuccessBody('rol', 'editado'));
     $this->redirectRoute('users-roles-index');
   }
 

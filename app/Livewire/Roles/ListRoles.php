@@ -83,7 +83,13 @@ class ListRoles extends Component
     // solo puedo borrar roles editables
     // is_editable = false (0) pasa a ser true, y retorno
     if (!$role->is_editable) {
-      // todo: mensaje toast los roles no editables no se borran
+
+      $this->dispatch('toast-event', toast_data: [
+        'event_type' => 'info',
+        'title_toast' => toastTitle('', false),
+        'descr_toast' => 'Este rol no puede ser borrado, es un rol interno del sistema'
+      ]);
+
       return;
     }
 
@@ -91,15 +97,26 @@ class ListRoles extends Component
     // haveUsers = false, puedo borrar el rol
     if (!$this->haveUsers($role->id)) {
 
-      //* CONTROL: el rol no tiene permisos
       // quitar permisos del rol
       $role->syncPermissions([]);
 
       // borrar rol de forma segura
       $role->delete();
 
+      $this->dispatch('toast-event', toast_data: [
+        'event_type' => 'success',
+        'title_toast' => toastTitle('exitosa'),
+        'descr_toast' => toastSuccessBody('rol', 'eliminado')
+      ]);
+
     } else {
-      // todo: mensaje toast, no se puede eliminar un rol con usuarios asignados
+
+      $this->dispatch('toast-event', toast_data: [
+        'event_type' => 'info',
+        'title_toast' => toastTitle('', false),
+        'descr_toast' => 'Este rol no puede ser borrado, tiene usuarios asignados'
+      ]);
+
     }
   }
 

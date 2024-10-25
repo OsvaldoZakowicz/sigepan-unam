@@ -8,7 +8,7 @@
     <section class="flex flex-col pt-2 px-1 text-sm capitalize bg-white">
       {{-- formulario --}}
       <span class="mb-2 font-bold">formulario</span>
-      <form wire:submit="update" wire:confirm="¿editar registro?" class="w-full">
+      <form wire:submit="update" wire:confirm="¿editar registro?, tenga en cuenta que cambiar los permisos de un rol cambiara el nivel de acceso de los usuarios con este rol" class="w-full">
         <!-- este es un grupo de inputs por tema -->
         <fieldset class="flex flex-col mb-2 border rounded border-neutral-200">
           <legend>datos del rol</legend>
