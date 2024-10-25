@@ -38,4 +38,29 @@ function englishPluralFromPath($model_path)
     ->lower();
 }
 
-?>
+/**
+ * * retornar un titulo de mensaje para mensajes toast
+ * formato ejemplo: Operacion 'estado'!,
+ * formato default: Informacion:,
+ * estado: exitosa, fallida, otro.
+ */
+function toastTitle($estado = 'exitosa', $default = false )
+{
+  if($default) {
+    return 'Información:';
+  }
+
+  return 'Operacion ' . $estado . '!';
+}
+
+/**
+ * * retornar un cuerpo de mensaje de exito para mensajes toast
+ * formato ejemplo: El 'modelo' fue 'operacion' correctamente.
+ * modelo: usuario, rol, proveedor, ...
+ * operacion: creado, eliminado, editado, otro, ...
+ */
+function toastSuccessBody($modelo = 'modelo', $operacion = 'creado')
+{
+  return 'El ' . $modelo . ' fue ' . $operacion . ' correctamente';
+}
+
