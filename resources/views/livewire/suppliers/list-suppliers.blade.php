@@ -45,8 +45,7 @@
                   <td class="border p-0.5">{{ formatDateTime($supplier->created_at, 'd-m-Y') }}</td>
                   <td class="border p-0.5">
                     <div class="flex justify-start gap-1">
-                      {{-- todo: ver proveedor --}}
-                      <x-a-button wire:navigate href="#" bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600">ver</x-a-button>
+                      <x-a-button wire:navigate href="{{ route('suppliers-suppliers-show', $supplier->id) }}" bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600">ver</x-a-button>
                       {{-- todo: editar proveedor --}}
                       <x-a-button wire:navigate href="#" bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600">editar</x-a-button>
 

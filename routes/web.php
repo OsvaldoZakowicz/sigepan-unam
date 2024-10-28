@@ -58,6 +58,7 @@ Route::middleware(['auth', 'verified', 'can:proveedores'])->group(function () {
 
   Route::get('suppliers', [SupplierController::class, 'suppliers_index'])->name('suppliers-suppliers-index');
   Route::get('suppliers/create', [SupplierController::class, 'suppliers_create'])->name('suppliers-suppliers-create');
+  Route::get('supplier/show/{id}', [SupplierController::class, 'suppliers_show'])->name('suppliers-suppliers-show');
 
 });
 

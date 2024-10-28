@@ -19,4 +19,10 @@ class SupplierController extends Controller
   {
     return view('suppliers.suppliers-create');
   }
+
+  //* ver un proveedor
+  public function suppliers_show($id): View
+  {
+    return view('suppliers.suppliers-show', ['id' => $id]);
+  }
 }
