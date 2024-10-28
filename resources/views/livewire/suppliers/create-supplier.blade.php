@@ -176,13 +176,13 @@
             {{-- contrasenia --}}
             <div class="flex flex-col gap-1 p-2 w-full md:w-1/2 lg:w-1/4">
               <span>
-                <label for="user_passw">contraseña</label>
+                <label for="user_password">contraseña</label>
                 <span class="text-red-600">*</span>
-                @error('user_passw')
+                @error('user_password')
                   <span class="text-red-400 text-xs">{{ $message }}</span>
                 @enderror
               </span>
-              <input wire:model="user_passw" type="password" name="user_passw" class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300" />
+              <input wire:model="user_password" type="password" name="user_password" class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300" />
             </div>
             {{-- control de contrasenia --}}
             <div class="flex flex-col gap-1 p-2 w-full md:w-1/2 lg:w-1/4">

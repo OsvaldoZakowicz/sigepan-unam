@@ -3,27 +3,32 @@
 namespace App\Livewire\Suppliers;
 
 use App\Models\Supplier;
+use App\Services\Supplier\SupplierService;
 use Livewire\Component;
 
 class ListSuppliers extends Component
 {
-  /**
-   * * eliminar un proveedor
-   * si tiene asociado un usuario y direccion, eliminar
-   */
-  public function delete(Supplier $supplier)
+  //* eliminar proveedor
+  public function delete(SupplierService $supplier_service, Supplier $supplier)
   {
-    $supplier_user = $supplier->user;
-    $supplier_address = $supplier->address;
+    try {
 
-    $supplier->delete();
+      $supplier_service->deleteSupplier($supplier);
 
-    if ($supplier_user) {
-      $supplier_user->delete();
-    }
+      $this->dispatch('toast-event', toast_data: [
+        'event_type'  => 'success',
+        'title_toast' => toastTitle(),
+        'descr_toast' => toastSuccessBody('proveedor', 'eliminado')
+      ]);
 
-    if ($supplier_address) {
-      $supplier_address->delete();
+    } catch (\Exception $e) {
+
+      $this->dispatch('toast-event', toast_data: [
+        'event_type'  => 'error',
+        'title_toast' => toastTitle('fallida'),
+        'descr_toast' => 'error: ' . $e->getMessage() . ', contacte al Administrador'
+      ]);
+
     }
   }
 

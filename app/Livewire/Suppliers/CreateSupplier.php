@@ -3,9 +3,8 @@
 namespace App\Livewire\Suppliers;
 
 use Livewire\Component;
-use App\Models\Address;
-use App\Models\User;
-use App\Models\Supplier;
+use App\Services\Supplier\SupplierService;
+use App\Services\User\UserService;
 
 class CreateSupplier extends Component
 {
@@ -14,40 +13,43 @@ class CreateSupplier extends Component
   public $company_cuit;
   public $company_iva;
   public $company_phone;
-  public $company_short_desc = "sin descripcion"; // debido al campo nullable, inicializar
+  // debido al campo nullable, inicializar
+  public $company_short_desc = "sin descripcion";
 
   // proveedor direccion
   public $company_street;
-  public $company_number = "s/n"; // debido al campo nullable, inicializar
+  // debido al campo nullable, inicializar
+  public $company_number = "s/n";
   public $company_city;
   public $company_postal_code;
 
   // proveedor credenciales
   public $user_name;
   public $user_email;
-  public $user_passw;
+  public $user_password;
   public $user_passw_test;
 
-  //* parametros
   // posibles condiciones de iva
-  public $iva_condition_params = [
-    'responsable inscripto',
-    'monotributista',
-    'iva excento'
-  ];
+  public $iva_condition_params = [];
 
-  //* guardar un proveedor con direccion y usuario
-  public function save()
+  //* montar datos
+  public function mount(SupplierService $supplier_service)
+  {
+    $this->iva_condition_params = $supplier_service->getSuppilerIvaConditions();
+  }
+
+  //* crear un proveedor
+  public function save(SupplierService $supplier_service, UserService $user_service)
   {
 
     // validar proveedor, direccion y credenciales de usuario
     // todo: validacion corecta del cuit, formato adecuado.
-    $this->validate([
+    $validated = $this->validate([
 
       'user_name'       => 'required|regex:/^[\p{L}\p{N}\s]+$/u|max:50',
       'user_email'      => 'required|unique:users,email|max:90',
-      'user_passw'      => 'required|min:8|max:20',
-      'user_passw_test' => 'required|min:8|max:20|same:user_passw',
+      'user_password'   => 'required|min:8|max:20',
+      'user_passw_test' => 'required|min:8|max:20|same:user_password',
 
       'company_name'  => 'required|regex:/^[\p{L}\p{N}\s]+$/u|unique:suppliers,company_name|max:50',
       'company_cuit'  => 'required|unique:suppliers,company_cuit|size:11',
@@ -71,7 +73,7 @@ class CreateSupplier extends Component
 
       'user_name'       => 'nombre de usuario',
       'user_email'      => 'correo electronico',
-      'user_passw'      => 'contraseña',
+      'user_password'      => 'contraseña',
       'user_passw_test' => 'repetir contraseña',
 
       'company_name'  => 'razon social',
@@ -87,42 +89,25 @@ class CreateSupplier extends Component
 
     ]);
 
-    // todo: manejo de errores, transaccion para crear todo o abortar
+    try {
 
-    // crear direccion
-    $supplier_address = Address::create([
-      'street'      => $this->company_street,
-      'number'      => $this->company_number,
-      'postal_code' => $this->company_postal_code,
-      'city'        => $this->company_city,
-    ]);
+      // necesito el rol proveedor
+      $validated += ['user_role' => $supplier_service->getSupplierRolename()];
 
-    // crear usuario
-    // todo: usar razon social como nombre de usuario, formato slug
-    // todo: generar contrasenia aleatoria
-    $supplier_user = User::create([
-      'name'      => $this->user_name,
-      'email'     => $this->user_email,
-      'password'  => bcrypt($this->user_passw),
-    ]);
+      $supplier_user = $user_service->createInternalUser($validated);
+      $supplier = $supplier_service->createSupplier($supplier_user, $validated);
 
-    // asignar rol de proveedor
-    $supplier_user->assignRole('proveedor');
+      $this->reset();
 
-    // crear proveedor
-    Supplier::create([
-      'company_name'        => $this->company_name,
-      'company_cuit'        => $this->company_cuit,
-      'iva_condition'       => $this->company_iva,
-      'phone_number'        => $this->company_phone,
-      'short_description'   => $this->company_short_desc,
-      'user_id'             => $supplier_user->id,
-      'address_id'          => $supplier_address->id
-    ]);
+      session()->flash('operation-success', toastSuccessBody('proveedor', 'creado'));
+      $this->redirectRoute('suppliers-suppliers-index');
 
-    $this->reset(['company_name', 'company_cuit', 'company_iva', 'company_phone', 'company_short_desc', 'company_street', 'company_number', 'company_city', 'company_postal_code', 'user_name', 'user_email', 'user_passw', 'user_passw_test']);
+    } catch (\Exception $e) {
 
-    $this->redirectRoute('suppliers-suppliers-index');
+      session()->flash('operation-error', 'error: ' . $e->getMessage() . ', contacte al Administrador');
+      $this->redirectRoute('suppliers-suppliers-index');
+
+    }
   }
 
   public function render()
