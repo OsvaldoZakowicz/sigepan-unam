@@ -4,17 +4,17 @@ namespace App\Livewire\Users;
 
 use App\Models\User;
 use Spatie\Permission\Models\Role;
-use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
+use App\Services\User\UserService;
 
 class ListUsers extends Component
 {
   use WithPagination;
 
-  protected $EXTERNAL_ROLE = 'cliente';
-  protected $RESTRICTED_ROLE = 'proveedor';
+  // variable necesaria para la busqueda
+  protected $EXTERNAL_ROLE;
 
   #[Url]
   public $search = '';
@@ -25,18 +25,18 @@ class ListUsers extends Component
   public $role_names;
 
   //* montar datos
-  public function mount()
+  public function mount(UserService $user_service)
   {
-    // recuperar roles
-    $this->role_names = Role::whereNotIn('name', [$this->EXTERNAL_ROLE])
+    // recuperar roles para el filtrado en la busqueda
+    $this->role_names = Role::whereNotIn('name', [$user_service->getExternalRole()])
       ->pluck('name');
   }
 
   //* eliminar un usuario
-  public function delete(User $user)
+  public function delete(UserService $user_service, User $user)
   {
     // un usuario no puede eliminarse a si mismo
-    if ($user->id === Auth::id()) {
+    if ($user_service->isUserOnSession($user)) {
 
       $this->dispatch('toast-event', toast_data: [
         'event_type'  => 'info',
@@ -44,30 +44,24 @@ class ListUsers extends Component
         'descr_toast' => 'No puede eliminar su propia cuenta de usuario'
       ]);
 
-      return;
+      return; // detener borrado
     }
 
-    $user_to_delete_role = $user->getRolenames()->first();
-
     // un usuario proveedor no puede eliminarse si tiene un proveedor asociado
-    if ($user_to_delete_role === $this->RESTRICTED_ROLE) {
+    if ($user_service->isSupplierUserWithSupplier($user)) {
 
-      if ($user->supplier->count() !== 0) {
+      $this->dispatch('toast-event', toast_data: [
+        'event_type'  => 'info',
+        'title_toast' => toastTitle('', true),
+        'descr_toast' => 'No puede eliminar el usuario proveedor: ' . $user->name . ', esta asociado a un proveedor existente'
+      ]);
 
-        $this->dispatch('toast-event', toast_data: [
-          'event_type'  => 'info',
-          'title_toast' => toastTitle('', true),
-          'descr_toast' => 'No puede eliminar el usuario proveedor: ' . $user->name . ', esta asociado a un proveedor existente'
-        ]);
-
-      }
-
-      return;
+      return; // detener borrado
     }
 
     // un usuario cliente no puede eliminarse
     // en caso de que por alguna razon se listen clientes
-    if ($user_to_delete_role === $this->EXTERNAL_ROLE) {
+    if ($user_service->isClientUser($user)) {
 
       $this->dispatch('toast-event', toast_data: [
         'event_type'  => 'info',
@@ -75,26 +69,35 @@ class ListUsers extends Component
         'descr_toast' => 'No puede eliminar el usuario cliente: ' . $user->name . ', no es un usuario gestionable'
       ]);
 
-      return;
+      return; // detener borrado;
     }
 
-    //* se quitan sus roles
-    // para ello sincronizo con array vacio
-    $user->syncRoles([]);
+    //* eliminar usuario
+    try {
 
-    //* se quitan sus permisos directos, si tuviere
-    // para ello sincronizo con un array vacio
-    $user->syncPermissions([]);
+      // capturo el rol, en caso de que el borrado falle
+      $user_role = $user->getRolenames()->first();
 
-    $user->delete();
+      $user_service->deleteInternalUser($user);
 
-    $this->dispatch('toast-event', toast_data: [
-      'event_type'  => 'success',
-      'title_toast' => toastTitle(),
-      'descr_toast' => toastSuccessBody('usuario', 'eliminado')
-    ]);
+      $this->dispatch('toast-event', toast_data: [
+        'event_type'  => 'success',
+        'title_toast' => toastTitle(),
+        'descr_toast' => toastSuccessBody('usuario', 'eliminado')
+      ]);
 
-    return;
+    } catch (\Exception $e) {
+
+      // devolver rol al usuario
+      $user->assignRole($user_role);
+
+      $this->dispatch('toast-event', toast_data: [
+        'event_type'  => 'error',
+        'title_toast' => toastTitle('fallida'),
+        'descr_toast' => 'error: ' . $e->getMessage() . ' Contacte con el Administrador'
+      ]);
+
+    }
   }
 
   /**
@@ -128,8 +131,11 @@ class ListUsers extends Component
           ->paginate(10);
   }
 
-  public function render()
+  public function render(UserService $user_service)
   {
+    // rol externo, necesario por que condiciona la busqueda
+    $this->EXTERNAL_ROLE = $user_service->getExternalRole();
+
     $users = $this->searchUsers();
 
     return view('livewire.users.list-users', compact('users'));

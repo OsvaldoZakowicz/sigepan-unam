@@ -4,13 +4,10 @@ namespace App\Livewire\Users;
 
 use Livewire\Component;
 use Spatie\Permission\Models\Role;
-use App\Models\User;
+use App\Services\User\UserService;
 
 class CreateUser extends Component
 {
-  protected $INTERNAL_ROLE = 'is_internal';
-  protected $RESTRICTED_ROLE = 'proveedor';
-
   public $roles;
   public $user_name;
   public $user_email;
@@ -19,18 +16,19 @@ class CreateUser extends Component
   public $user_role;
 
   //* montar datos
-  public function mount()
+  public function mount(UserService $user_service)
   {
-    // recuperar roles
-    $this->roles = Role::where($this->INTERNAL_ROLE, true)
-      ->where('name', '!=', $this->RESTRICTED_ROLE)
+    // recuperar roles para el checkbox
+    $this->roles = Role::where($user_service->getInternalRoleAttribute(), true)
+      ->where('name', '!=', $user_service->getRestrictedRole())
       ->get();
   }
 
   //* crear usuario
-  public function save()
+  //* usar inyeccion de dependencia de laravel para traer una instancia del servicio
+  public function save(UserService $user_service)
   {
-    $this->validate([
+    $validated = $this->validate([
       'user_name' => 'required|max:50|regex:/^[a-zA-Z\s]+$/u',
       'user_email' => 'required|email|unique:users,email',
       'user_password' => 'required|min:8|max:15',
@@ -46,24 +44,27 @@ class CreateUser extends Component
       'user_role' => 'rol'
     ]);
 
-    //todo: try-catch?
-    // - asegurar que se cree el usuario y asigne el rol, o fallar
-    $new_user = User::create([
-      'name' => $this->user_name,
-      'email' => $this->user_email,
-      'password' => bcrypt($this->user_password),
-    ]);
+    try {
 
-    $new_user->assignRole($this->user_role);
+      $user_service->createInternalUser($validated);
 
-    //todo: si la creacion es correcta:
-    // - enviar acceso via email al nuevo usuario
+      //todo: si la creacion es correcta:
+      // - enviar acceso via email al nuevo usuario
 
-    $this->reset(['user_name', 'user_email', 'user_password', 'user_password_test', 'user_role']);
+      $this->reset();
 
-    session()->flash('operation-success', toastSuccessBody('usuario', 'creado'));
+      session()->flash('operation-success', toastSuccessBody('usuario', 'creado'));
 
-    $this->redirectRoute('users-users-index');
+      $this->redirectRoute('users-users-index');
+
+    } catch (\Exception $e) {
+
+      session()->flash('operation-error', 'error: ' . $e->getMessage() . ', contacte con el Administrador');
+
+      $this->redirectRoute('users-users-index');
+
+    }
+
   }
 
   public function render()

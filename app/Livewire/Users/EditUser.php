@@ -8,13 +8,10 @@ use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
+use App\Services\User\UserService;
 
 class EditUser extends Component
 {
-  protected $INTERNAL_ROLE = 'is_internal';
-  protected $EXTERNAL_ROLE = 'cliente';
-  protected $RESTRICTED_ROLE = 'proveedor';
-
   // roles y usuario a editar
   public $roles;
   public $user;
@@ -24,22 +21,21 @@ class EditUser extends Component
   public $user_email;
   public $user_role;
 
-  public function mount($user_id)
+  //* montar datos
+  public function mount(UserService $user_service, $user_id)
   {
     // conseguir usuario
     $this->user = User::findOrFail($user_id);
 
     // un usuario no puede editarse a si mismo
-    if ($this->user->id === Auth::id()) {
+    if ($user_service->isUserOnSession($this->user)) {
 
       session()->flash('operation-info', 'No puede editar su propia cuenta de usuario');
       $this->redirectRoute('users-users-index');
     }
 
-    $user_to_edit_role = $this->user->getRolenames()->first();
-
     // un usuario proveedor no puede editarse
-    if ($user_to_edit_role === $this->RESTRICTED_ROLE) {
+    if ($user_service->isSupplierUserWithSupplier($this->user)) {
 
       session()->flash('operation-info', 'No puede editar un usuario proveedor, debe gestionarlo a traves de la seccion "proveedores"');
       $this->redirectRoute('users-users-index');
@@ -47,15 +43,15 @@ class EditUser extends Component
 
     // un usuario cliente no puede editarse
     // en caso de que por alguna razon se listen clientes
-    if ($user_to_edit_role === $this->EXTERNAL_ROLE) {
+    if ($user_service->isClientUser($this->user)) {
 
       session()->flash('operation-info', 'No puede editar un usuario cliente, no es gestionable');
       $this->redirectRoute('users-users-index');
     }
 
     // recuperar roles
-    $this->roles = Role::where($this->INTERNAL_ROLE, true)
-      ->where('name', '!=', $this->RESTRICTED_ROLE)
+    $this->roles = Role::where($user_service->getInternalRoleAttribute(), true)
+      ->where('name', '!=', $user_service->getRestrictedRole())
       ->get();
 
     // * completar propiedades a editar en el formulario a partir del usuario
@@ -75,9 +71,9 @@ class EditUser extends Component
    * * actualizar el usuario
    * * asignarle las propiedades del formulario al usuario
    */
-  public function update()
+  public function update(UserService $user_service)
   {
-    $this->validate([
+    $validated = $this->validate([
       'user_name' => 'required|max:50|regex:/^[a-zA-Z\s]+$/u',
       'user_email' => ['required', 'email', Rule::unique('users', 'email')->ignore($this->user->id)],
       'user_role' => 'required',
@@ -89,17 +85,24 @@ class EditUser extends Component
       'user_role' => 'rol'
     ]);
 
-    $this->user->name = $this->user_name;
-    $this->user->email = $this->user_email;
-    $this->user->save();
-    // cambio de rol (siempre usar sync, ya que se reemplazan)
-    $this->user->syncRoles($this->user_role);
+    try {
 
-    $this->reset(['user_name', 'user_email', 'user_role']);
+      $user_service->editInternalUser($this->user, $validated);
 
-    session()->flash('operation-success', toastSuccessBody('usuario', 'editado'));
+      $this->reset();
 
-    $this->redirectRoute('users-users-index');
+      session()->flash('operation-success', toastSuccessBody('usuario', 'editado'));
+
+      $this->redirectRoute('users-users-index');
+
+    } catch (\Exception $e) {
+
+      session()->flash('operation-error', 'error: ' . $e->getMessage() . ', contacte al Administrador');
+
+      $this->redirectRoute('users-users-index');
+
+    }
+
   }
 
   public function render()
