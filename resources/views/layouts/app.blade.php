@@ -23,7 +23,7 @@
 <body class="font-sans antialiased">
   <div class="relative min-h-screen bg-gray-100">
 
-    <div class="fixed top-0 left-0 right-0">
+    <div class="fixed z-50 top-0 left-0 right-0">
       {{-- navegacion de livewire --}}
       <livewire:layout.navigation />
 
