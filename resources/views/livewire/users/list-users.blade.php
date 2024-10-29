@@ -30,39 +30,39 @@
 
       <x-slot:content>
 
-        <table class="w-full table-auto border-collapse border rounded capitalize">
-          <thead class="border text-sm font-medium">
-            <tr class="border">
-              <th class="border text-left p-0.5">id</th>
-              <th class="border text-left p-0.5">nombre de usuario</th>
-              <th class="border text-left p-0.5">email</th>
-              <th class="border text-left p-0.5">rol</th>
-              <th class="border text-left p-0.5">fecha de creacion</th>
-              <th class="border text-left p-0.5">acciones</th>
+        <x-table-base>
+          <x-slot:tablehead>
+            <tr class="border bg-neutral-100">
+              <x-table-th>id</x-table-th>
+              <x-table-th>nombre de usuario</x-table-th>
+              <x-table-th>correo</x-table-th>
+              <x-table-th>rol</x-table-th>
+              <x-table-th>fecha de creación</x-table-th>
+              <x-table-th>acciones</x-table-th>
             </tr>
-          </thead>
-          <tbody class="border text-sm font-normal">
+          </x-slot:tablehead>
+          <x-slot:tablebody>
             @forelse ($users as $user)
             <tr wire:key="{{$user->id}}" class="border">
-                <td class="border p-0.5">{{ $user->id }}</td>
-                <td class="border p-0.5">{{ $user->name }}</td>
-                <td class="border p-0.5">{{ $user->email }}</td>
-                <td class="border p-0.5">{{ $user->getRoleNames()->first(); }}</td>
-                <td class="border p-0.5">{{ formatDateTime($user->created_at, 'd-m-Y') }}</td>
-                <td class="border p-0.5">
+                <x-table-td>{{ $user->id }}</x-table-td>
+                <x-table-td>{{ $user->name }}</x-table-td>
+                <x-table-td>{{ $user->email }}</x-table-td>
+                <x-table-td>{{ $user->getRoleNames()->first(); }}</x-table-td>
+                <x-table-td>{{ formatDateTime($user->created_at, 'd-m-Y') }}</x-table-td>
+                <x-table-td>
                   <div class="w-full inline-flex gap-2 justify-start items-center">
                     <x-a-button wire:navigate href="{{ route('users-users-edit', $user->id) }}" bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600">editar</x-a-button>
                     <x-btn-button type="button" wire:navigate wire:click="delete({{$user->id}})" wire:confirm="¿Desea borrar el registro?" color="red">eliminar</x-btn-button>
                   </div>
-                </td>
+                </x-table-td>
             </tr>
             @empty
             <tr class="border">
               <td colspan="6">sin registros!</td>
             </tr>
             @endforelse
-          </tbody>
-        </table>
+          </x-slot:tablebody>
+        </x-table-base>
 
       </x-slot:content>
 

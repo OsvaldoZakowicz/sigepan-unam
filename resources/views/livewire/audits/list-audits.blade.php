@@ -23,42 +23,40 @@
       </x-slot:header>
 
       <x-slot:content>
-        <table class="w-full table-auto border-collapse border rounded capitalize">
-          <thead class="border text-sm font-medium">
-            <tr class="border">
-              <th class="border text-left p-0.5">id</th>
-              <th class="border text-left p-0.5">evento</th>
-              <th class="border text-left p-0.5 text-wrap">tabla</th>
-              <th class="border text-left p-0.5 text-wrap">id registro</th>
-              <th class="border text-left p-0.5 text-wrap">fecha del evento</th>
-              <th class="border text-left p-0.5 text-wrap">acciones</th>
+
+        <x-table-base>
+          <x-slot:tablehead>
+            <tr class="border bg-neutral-100">
+              <x-table-th>id</x-table-th>
+              <x-table-th>evento</x-table-th>
+              <x-table-th>tabla</x-table-th>
+              <x-table-th>registro</x-table-th>
+              <x-table-th>fecha del evento</x-table-th>
+              <x-table-th>acciones</x-table-th>
             </tr>
-          </thead>
-          <tbody class="border text-sm font-normal">
+          </x-slot:tablehead>
+          <x-slot:tablebody>
             @forelse ( $audits as $audit )
             <tr wire:key="{{ $audit->id }}" class="border">
-                <td class="border p-0.5">{{ $audit->id }}</td>
-                <td class="border p-0.5">{{ __( $audit->event ) }}</td>
-                <td class="border p-0.5 text-wrap lowercase">{{ __( englishPluralFromPath($audit->auditable_type)->value ) }}</td>
-                <td class="border p-0.5 text-wrap">{{ $audit->auditable_id }}</td>
-                <td class="border p-0.5 text-wrap">{{ formatDateTime($audit->created_at)}}</td>
-                <td class="border p-0.5 text-wrap w-1/5">
+                <x-table-td>{{ $audit->id }}</x-table-td>
+                <x-table-td>{{ __( $audit->event ) }}</x-table-td>
+                <x-table-td>{{ __( englishPluralFromPath($audit->auditable_type)->value ) }}</x-table-td>
+                <x-table-td>{{ $audit->auditable_id }}</x-table-td>
+                <x-table-td>{{ formatDateTime($audit->created_at)}}</x-table-td>
+                <x-table-td>
                   <div class="w-fit-content inline-flex gap-2 justify-start items-center">
-
                     <x-a-button wire:navigate href="{{route('audits-audits-show', $audit->id)}}" bg_color="neutral-100" border_color="neutral-200" text_color="neutral_600">auditar registro</x-a-button>
-
-                    {{-- <x-a-button wire:navigate href="#" bg_color="neutral-100" border_color="neutral-200" text_color="neutral_600">auditar tabla</x-a-button> --}}
-
                   </div>
-                </td>
+                </x-table-td>
             </tr>
             @empty
             <tr class="border">
               <td colspan="6">sin registros!</td>
             </tr>
             @endforelse
-          </tbody>
-        </table>
+          </x-slot:tablebody>
+        </x-table-base>
+
       </x-slot:content>
 
       <x-slot:footer class="py-2">

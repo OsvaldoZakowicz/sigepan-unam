@@ -22,44 +22,44 @@
       </x-slot:header>
 
       <x-slot:content>
-        <table class="w-full table-auto border-collapse border rounded capitalize">
-          <thead class="border text-sm font-medium">
-            <tr class="border">
-              <th class="border text-left p-0.5">id</th>
-              <th class="border text-left p-0.5">razón social</th>
-              <th class="border text-left p-0.5">cuit</th>
-              <th class="border text-left p-0.5">teléfono</th>
-              <th class="border text-left p-0.5">correo</th>
-              <th class="border text-left p-0.5">fecha de creacion</th>
-              <th class="border text-left p-0.5">acciones</th>
+
+        <x-table-base>
+          <x-slot:tablehead>
+            <tr class="border bg-neutral-100">
+              <x-table-th>id</x-table-th>
+              <x-table-th>razón social</x-table-th>
+              <x-table-th>cuit</x-table-th>
+              <x-table-th>teléfono</x-table-th>
+              <x-table-th>correo</x-table-th>
+              <x-table-th>fecha de creación</x-table-th>
+              <x-table-th>acciones</x-table-th>
             </tr>
-          </thead>
-          <tbody class="border text-sm font-normal">
+          </x-slot:tablehead>
+          <x-slot:tablebody>
             @forelse ($suppliers as $supplier)
               <tr wire:key="{{ $supplier->id }}" class="border">
-                  <td class="border p-0.5">{{ $supplier->id }}</td>
-                  <td class="border p-0.5">{{ $supplier->company_name }}</td>
-                  <td class="border p-0.5">{{ $supplier->company_cuit }}</td>
-                  <td class="border p-0.5">{{ $supplier->phone_number }}</td>
-                  <td class="border p-0.5">{{ $supplier->user->email }}</td>
-                  <td class="border p-0.5">{{ formatDateTime($supplier->created_at, 'd-m-Y') }}</td>
-                  <td class="border p-0.5">
-                    <div class="flex justify-start gap-1">
-                      <x-a-button wire:navigate href="{{ route('suppliers-suppliers-show', $supplier->id) }}" bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600">ver</x-a-button>
-
-                      <x-a-button wire:navigate href="{{ route('suppliers-suppliers-edit', $supplier->id) }}" bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600">editar</x-a-button>
-
-                      <x-btn-button btn_type="button" color="red" wire:click="delete({{ $supplier->id }})" wire:confirm="¿desea borrar el registro? esta accion es irreversible, se eliminara el proveedor y sus credenciales de acceso">eliminar</x-btn-button>
-                    </div>
-                  </td>
+                <x-table-td>{{ $supplier->id }}</x-table-td>
+                <x-table-td>{{ $supplier->company_name }}</x-table-td>
+                <x-table-td>{{ $supplier->company_cuit }}</x-table-td>
+                <x-table-td>{{ $supplier->phone_number }}</x-table-td>
+                <x-table-td>{{ $supplier->user->email }}</x-table-td>
+                <x-table-td>{{ formatDateTime($supplier->created_at, 'd-m-Y') }}</x-table-td>
+                <x-table-td>
+                  <div class="flex justify-start gap-1">
+                    <x-a-button wire:navigate href="{{ route('suppliers-suppliers-show', $supplier->id) }}" bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600">ver</x-a-button>
+                    <x-a-button wire:navigate href="{{ route('suppliers-suppliers-edit', $supplier->id) }}" bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600">editar</x-a-button>
+                    <x-btn-button btn_type="button" color="red" wire:click="delete({{ $supplier->id }})" wire:confirm="¿desea borrar el registro? esta accion es irreversible, se eliminara el proveedor y sus credenciales de acceso">eliminar</x-btn-button>
+                  </div>
+                </x-table-td>
               </tr>
             @empty
               <tr class="border">
                 <td colspan="7">sin registros!</td>
               </tr>
             @endforelse
-          </tbody>
-        </table>
+          </x-slot:tablebody>
+        </x-table-base>
+
       </x-slot:content>
 
       <x-slot:footer class="py-2">

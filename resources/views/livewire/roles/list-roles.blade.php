@@ -32,46 +32,46 @@
       </x-slot:header>
 
       <x-slot:content>
-        <!-- tabla -->
-        <table
-          class="w-full table-auto border-collapse border rounded capitalize">
-          <thead class="border text-sm font-medium">
-            <tr class="border">
-              <th class="border text-left p-0.5">id</th>
-              <th class="border text-left p-0.5">nombre</th>
-              <th class="border text-left p-0.5">permisos</th>
-              <th class="border text-left p-0.5">editable?</th>
-              <th class="border text-left p-0.5">interno?</th>
-              <th class="border text-left p-0.5">descripcion</th>
-              <th class="border text-left p-0.5">fecha de creacion</th>
-              <th class="border text-left p-0.5">acciones</th>
+
+        <x-table-base>
+          <x-slot:tablehead>
+            <tr class="border bg-neutral-100">
+              <x-table-th>id</x-table-th>
+              <x-table-th>nombre</x-table-th>
+              <x-table-th>permisos</x-table-th>
+              <x-table-th>editable?</x-table-th>
+              <x-table-th>interno?</x-table-th>
+              <x-table-th>descripcion</x-table-th>
+              <x-table-th>fecha de creacion</x-table-th>
+              <x-table-th>acciones</x-table-th>
             </tr>
-          </thead>
-          <tbody class="border text-sm font-normal">
+          </x-slot:tablehead>
+          <x-slot:tablebody>
             @forelse ($roles as $role)
             <tr wire:key="{{$role->id}}" class="border">
-                <td class="border p-0.5">{{$role->id}}</td>
-                <td class="border p-0.5">{{$role->name}}</td>
-                <td class="border p-0.5">{{count($role->permissions)}}</td>
-                <td class="border p-0.5">@if ($role->is_editable)<span>si</span>@else<span>no</span>@endif</td>
-                <td class="border p-0.5">@if ($role->is_internal)<span>si</span>@else<span>no</span>@endif</td>
-                <td class="border p-0.5">{{$role->short_description}}</td>
-                <td class="border p-0.5">{{Date::parse($role->created_at)->format('d-m-Y');}}</td>
-                <td class="border p-0.5">
-                  <div class="w-full inline-flex gap-2 justify-start items-center">
-                    <a wire:navigate href="{{route('users-roles-edit', $role->id)}}" class="flex justify-center items-center box-border w-fit h-6 p-1 border-solid border rounded border-neutral-200 bg-neutral-100 text-center text-neutral-600 uppercase text-xs">editar</a>
-                    {{-- boton delete con confirmacion --}}
-                    <button wire:click="delete({{$role->id}})" wire:confirm="¿Desea borrar el registro?" type="button" class="flex justify-center items-center box-border w-fit h-6 p-1 border-solid border rounded border-red-600 bg-red-600 text-center text-neutral-100 uppercase text-xs">eliminar</button>
-                  </div>
-                </td>
+              <x-table-td>{{$role->id}}</x-table-td>
+              <x-table-td>{{$role->name}}</x-table-td>
+              <x-table-td>{{count($role->permissions)}}</x-table-td>
+              <x-table-td>@if ($role->is_editable)<span>si</span>@else<span>no</span>@endif</x-table-td>
+              <x-table-td>@if ($role->is_internal)<span>si</span>@else<span>no</span>@endif</x-table-td>
+              <x-table-td>{{$role->short_description}}</x-table-td>
+              <x-table-td>{{Date::parse($role->created_at)->format('d-m-Y');}}</x-table-td>
+              <x-table-td>
+                <div class="w-full inline-flex gap-2 justify-start items-center">
+                  <a wire:navigate href="{{route('users-roles-edit', $role->id)}}" class="flex justify-center items-center box-border w-fit h-6 p-1 border-solid border rounded border-neutral-200 bg-neutral-100 text-center text-neutral-600 uppercase text-xs">editar</a>
+
+                  <button wire:click="delete({{$role->id}})" wire:confirm="¿Desea borrar el registro?" type="button" class="flex justify-center items-center box-border w-fit h-6 p-1 border-solid border rounded border-red-600 bg-red-600 text-center text-neutral-100 uppercase text-xs">eliminar</button>
+                </div>
+              </x-table-td>
             </tr>
             @empty
             <tr class="border">
               <td colspan="8">sin registros!</td>
             </tr>
             @endforelse
-          </tbody>
-        </table>
+          </x-slot:tablebody>
+        </x-table-base>
+
       </x-slot:content>
 
       <x-slot:footer class="py-2">
