@@ -32,7 +32,7 @@
                 <span class="text-red-400 text-xs">{{ $message }}</span>
               @enderror
             </span>
-            <input disabled wire:model="user_email" type="email" name="user_email" class="p-1 text-sm w-full border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300 bg-neutral-100"></input>
+            <input wire:model="user_email" type="email" name="user_email" class="p-1 text-sm w-full border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"></input>
           </div>
         </fieldset>
          <!-- este es un grupo de inputs por tema -->
