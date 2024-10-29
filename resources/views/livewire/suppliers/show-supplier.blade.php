@@ -44,31 +44,26 @@
               <th class="border text-left p-0.5 w-1/4">correo de contacto:</th>
               <td class="border p-0.5">{{ $supplier->user->email }}</td>
             </tr>
-          </tbody>
-        </table>
-        {{-- direccion --}}
-        <table class="w-full table-auto border-collapse border rounded capitalize">
-          <thead class="border text-sm font-medium">
             <tr class="border">
-              <th class="border text-left p-0.5" colspan="2">direccion:</th>
-            </tr>
-          </thead>
-          <tbody class="border text-sm font-normal">
-            <tr class="border">
-              <th class="border text-left p-0.5 w-1/4">calle:</th>
-              <td class="border p-0.5">{{ $supplier->address->street }}</td>
-            </tr>
-            <tr class="border">
-              <th class="border text-left p-0.5 w-1/4">número de calle:</th>
-              <td class="border p-0.5">{{ $supplier->address->number }}</td>
+              <th class="border text-left p-0.5 w-1/4">direccion:</th>
+              <td class="border p-0.5">
+                <span class="font-bold">calle:</span>
+                <span>{{ $supplier->address->street }}</span>
+                <span class="font-bold">numero de calle:</span>
+                <span>{{ $supplier->address->number }}</span>
+                <span class="font-bold">ciudad:</span>
+                <span>{{ $supplier->address->city }}</span>
+                <span class="font-bold">código postal:</span>
+                <span>{{ $supplier->address->postal_code }}</span>
+              </td>
             </tr>
             <tr class="border">
-              <th class="border text-left p-0.5 w-1/4">ciudad:</th>
-              <td class="border p-0.5">{{ $supplier->address->city }}</td>
+              <th class="border text-left p-0.5 w-1/4">fecha de creacion:</th>
+              <td class="border p-0.5">{{ formatDateTime($supplier->created_at, 'd-m-Y') }}</td>
             </tr>
             <tr class="border">
-              <th class="border text-left p-0.5 w-1/4">código postal:</th>
-              <td class="border p-0.5">{{ $supplier->address->postal_code }}</td>
+              <th class="border text-left p-0.5 w-1/4">fecha de última edición:</th>
+              <td class="border p-0.5">{{ formatDateTime($supplier->updated_at, 'd-m-Y') }}</td>
             </tr>
           </tbody>
         </table>
