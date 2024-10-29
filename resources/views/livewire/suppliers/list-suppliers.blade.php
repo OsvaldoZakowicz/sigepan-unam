@@ -46,8 +46,8 @@
                   <td class="border p-0.5">
                     <div class="flex justify-start gap-1">
                       <x-a-button wire:navigate href="{{ route('suppliers-suppliers-show', $supplier->id) }}" bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600">ver</x-a-button>
-                      {{-- todo: editar proveedor --}}
-                      <x-a-button wire:navigate href="#" bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600">editar</x-a-button>
+
+                      <x-a-button wire:navigate href="{{ route('suppliers-suppliers-edit', $supplier->id) }}" bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600">editar</x-a-button>
 
                       <x-btn-button btn_type="button" color="red" wire:click="delete({{ $supplier->id }})" wire:confirm="¿desea borrar el registro? esta accion es irreversible, se eliminara el proveedor y sus credenciales de acceso">eliminar</x-btn-button>
                     </div>
@@ -55,7 +55,7 @@
               </tr>
             @empty
               <tr class="border">
-                <td colspan="6">sin registros!</td>
+                <td colspan="7">sin registros!</td>
               </tr>
             @endforelse
           </tbody>

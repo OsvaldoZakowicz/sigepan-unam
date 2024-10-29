@@ -25,4 +25,10 @@ class SupplierController extends Controller
   {
     return view('suppliers.suppliers-show', ['id' => $id]);
   }
+
+  //* editar un proveedor
+  public function suppliers_edit($id): View
+  {
+    return view('suppliers.suppliers-edit', ['id' => $id]);
+  }
 }

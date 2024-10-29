@@ -62,6 +62,36 @@ class SupplierService
   }
 
   /**
+   * * servicio: actualizar proveedor
+   * NOTA: recibe un usuario actualizado previamente
+   * NOTA: recibe el array de inputs validados
+   */
+  public function editSupplier(User $supplier_user, Supplier $supplier, Array $supplier_data): Supplier
+  {
+    // direccion
+    $address = $supplier->address;
+
+    $address->street      = $supplier_data['company_street'];
+    $address->number      = $supplier_data['company_number'];
+    $address->postal_code = $supplier_data['company_postal_code'];
+    $address->city        = $supplier_data['company_city'];
+    $address->save();
+
+    // proveedor
+    $supplier->company_name        = $supplier_data['company_name'];
+    $supplier->company_cuit        = $supplier_data['company_cuit'];
+    $supplier->iva_condition       = $supplier_data['company_iva'];
+    $supplier->phone_number        = $supplier_data['company_phone'];
+    $supplier->short_description   = $supplier_data['company_short_desc'];
+    $supplier->user_id             = $supplier_user->id;
+    $supplier->address_id          = $address->id;
+    $supplier->save();
+
+    return $supplier;
+  }
+
+
+  /**
    * * servicio: eliminar provedor
    * NOTA: elimina el usuario y direccion asociados
    */
