@@ -63,11 +63,11 @@ class ListRoles extends Component
   {
     // * veamos la tabla intermedia model_has_roles, las foreign key son "on delete restrict"
     // si el rol aparece al menos una vez en la tabla intermedia, VERIFICA que tiene usuarios signados.
-    $record = DB::table('model_has_roles')
+    $role_have_users = DB::table('model_has_roles')
       ->select('role_id')->where('role_id', '=', $role_id)->first();
 
     // si es distinto de null, haveUsers = true, haveUsers = false
-    return ($record !== null) ? true : false;
+    return ($role_have_users !== null) ? true : false;
   }
 
   /**
@@ -86,7 +86,7 @@ class ListRoles extends Component
 
       $this->dispatch('toast-event', toast_data: [
         'event_type' => 'info',
-        'title_toast' => toastTitle('', false),
+        'title_toast' => toastTitle('', true),
         'descr_toast' => 'Este rol no puede ser borrado, es un rol interno del sistema'
       ]);
 
@@ -113,7 +113,7 @@ class ListRoles extends Component
 
       $this->dispatch('toast-event', toast_data: [
         'event_type' => 'info',
-        'title_toast' => toastTitle('', false),
+        'title_toast' => toastTitle('', true),
         'descr_toast' => 'Este rol no puede ser borrado, tiene usuarios asignados'
       ]);
 
