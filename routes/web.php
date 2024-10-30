@@ -12,7 +12,7 @@ Route::view('/', 'welcome')->name('welcome');
 //* layout interno
 Route::middleware(['auth', 'verified', 'can:panel'])->group(function () {
 
-  Route::view('dashboard', 'dashboard')
+  Route::view('dashboard', 'resume-dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
