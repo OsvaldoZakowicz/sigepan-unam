@@ -19,7 +19,8 @@ class DatabaseSeeder extends Seeder
     $this->call([
       GenderSeeder::class,
       PermissionSeeder::class,
-      RoleSeeder::class
+      RoleSeeder::class,
+      MeasureSeeder::class,
     ]);
 
     // usuario de pruebas
