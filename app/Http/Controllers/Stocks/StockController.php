@@ -1,0 +1,22 @@
+<?php
+
+namespace App\Http\Controllers\Stocks;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
+
+class StockController extends Controller
+{
+  //* lista de stock de productos
+  public function stocks_index(): View
+  {
+    return view('stocks.stocks-index');
+  }
+
+  //* lista de unidades de medida
+  public function measures_index(): View
+  {
+    return view('stocks.measures-index');
+  }
+}

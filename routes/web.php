@@ -5,6 +5,7 @@ use App\Http\Controllers\Users\UserController;
 use App\Http\Controllers\Clients\ClientLogOutController;
 use App\Http\Controllers\Audits\AuditController;
 use App\Http\Controllers\Suppliers\SupplierController;
+use App\Http\Controllers\Stocks\StockController;
 
 //* layout publico
 Route::view('/', 'welcome')->name('welcome');
@@ -63,5 +64,12 @@ Route::middleware(['auth', 'verified', 'can:proveedores'])->group(function () {
 
 });
 
+//* stock
+Route::middleware(['auth', 'verified', 'can:stock'])->group(function () {
+
+  Route::get('stocks', [StockController::class, 'stocks_index'])->name('stocks-stocks-index');
+  Route::get('stocks/measures', [StockController::class, 'measures_index'])->name('stocks-measures-index');
+
+});
 
 require __DIR__.'/auth.php';
