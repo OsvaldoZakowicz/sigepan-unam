@@ -5,6 +5,7 @@ namespace App\Livewire\Suppliers;
 use Livewire\Component;
 use App\Services\Supplier\SupplierService;
 use App\Services\User\UserService;
+use App\Rules\CuitCuilRule;
 
 class CreateSupplier extends Component
 {
@@ -45,48 +46,38 @@ class CreateSupplier extends Component
     // validar proveedor, direccion y credenciales de usuario
     // todo: validacion corecta del cuit, formato adecuado.
     $validated = $this->validate([
-
       'user_name'       => 'required|regex:/^[\p{L}\p{N}\s]+$/u|max:50',
       'user_email'      => 'required|unique:users,email|max:90',
       'user_password'   => 'required|min:8|max:20',
       'user_passw_test' => 'required|min:8|max:20|same:user_password',
-
       'company_name'  => 'required|regex:/^[\p{L}\p{N}\s]+$/u|unique:suppliers,company_name|max:50',
-      'company_cuit'  => 'required|unique:suppliers,company_cuit|size:11',
+      'company_cuit'  => ['required', 'unique:suppliers,company_cuit', new CuitCuilRule],
       'company_iva'   => 'required',
       'company_phone' => 'required|unique:suppliers,phone_number|size:10',
       'company_short_desc' => 'nullable|max:150',
-
       'company_street'  => 'required|regex:/^[\p{L}\p{N}\s]+$/u|max:45',
       'company_number'  => 'nullable|max:8',
       'company_city'    => 'required|regex:/^[\p{L}\p{N}\s]+$/u|max:45',
       'company_postal_code' => 'required|integer|digits:4|min:1000|max:9999',
-
     ],[
-
       'user_name.regex'       => 'El campo :attribute solo permite letras, numeros y espacios',
       'company_name.regex'    => 'El campo :attribute solo permite letras, numeros y espacios',
       'company_street.regex'  => 'El campo :attribute solo permite letras, numeros y espacios',
       'company_city.regex'    => 'El campo :attribute solo permite letras, numeros y espacios',
-
     ],[
-
       'user_name'       => 'nombre de usuario',
       'user_email'      => 'correo electronico',
       'user_password'      => 'contraseña',
       'user_passw_test' => 'repetir contraseña',
-
       'company_name'  => 'razon social',
       'company_cuit'  => 'cuit',
       'company_iva'   => 'condicion frente al iva',
       'company_phone' => 'telefono de contacto',
       'company_short_desc' => 'descripcion corta',
-
       'company_street'  => 'calle',
       'company_number'  => 'numero de calle',
       'company_city'    => 'ciudad',
       'company_postal_code'  => 'codigo postal'
-
     ]);
 
     try {
