@@ -5,9 +5,24 @@ namespace App\Livewire\Suppliers;
 use App\Models\Supplier;
 use App\Services\Supplier\SupplierService;
 use Livewire\Component;
+use Livewire\Attributes\Url;
+use Livewire\WithPagination;
 
 class ListSuppliers extends Component
 {
+  use WithPagination;
+
+  #[Url]
+  public $search_input = '';
+
+  public $iva_conditions = [];
+
+  //* montar datos
+  public function mount(SupplierService $supplier_service)
+  {
+    $this->iva_conditions = $supplier_service->getSuppilerIvaConditions();
+  }
+
   //* eliminar proveedor
   public function delete(SupplierService $supplier_service, Supplier $supplier)
   {
@@ -32,9 +47,23 @@ class ListSuppliers extends Component
     }
   }
 
+  //* buscar proveedores
+  public function searchSuppliers()
+  {
+    return Supplier::when($this->search_input,
+                      function ($query) {
+                        $query->where('id', 'like', '%' . $this->search_input . '%')
+                              ->orWhere('company_name', 'like', '%' . $this->search_input . '%')
+                              ->orWhere('company_cuit', 'like', '%' . $this->search_input . '%')
+                              ->orWhere('phone_number', 'like', '%' . $this->search_input . '%');
+                      }
+                    )->orderBy('id', 'desc')
+                    ->paginate('10');
+  }
+
   public function render()
   {
-    $suppliers = Supplier::all();
+    $suppliers = $this->searchSuppliers();
 
     return view('livewire.suppliers.list-suppliers', compact('suppliers'));
   }

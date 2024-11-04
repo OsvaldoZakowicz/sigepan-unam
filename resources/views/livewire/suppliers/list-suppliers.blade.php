@@ -15,7 +15,7 @@
         {{-- formulario de busqueda --}}
         <form class="grow">
           {{-- termino de busqueda --}}
-          <input type="text" name="search" placeholder="ingrese un id, o termino de busqueda" class="w-1/4 shrink text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
+          <input type="text" wire:model.live="search_input" name="search" placeholder="ingrese un id, razon social, telefono o CUIT ..." class="w-1/4 shrink text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
         </form>
         <!-- grupo de botones -->
         <div class="flex"></div>
@@ -30,7 +30,7 @@
               <x-table-th>razón social</x-table-th>
               <x-table-th>cuit</x-table-th>
               <x-table-th>teléfono</x-table-th>
-              <x-table-th>correo</x-table-th>
+              <x-table-th>condicion frente al iva</x-table-th>
               <x-table-th>fecha de creación</x-table-th>
               <x-table-th>acciones</x-table-th>
             </tr>
@@ -42,7 +42,7 @@
                 <x-table-td>{{ $supplier->company_name }}</x-table-td>
                 <x-table-td>{{ $supplier->company_cuit }}</x-table-td>
                 <x-table-td>{{ $supplier->phone_number }}</x-table-td>
-                <x-table-td>{{ $supplier->user->email }}</x-table-td>
+                <x-table-td>{{ $supplier->iva_condition }}</x-table-td>
                 <x-table-td>{{ formatDateTime($supplier->created_at, 'd-m-Y') }}</x-table-td>
                 <x-table-td>
                   <div class="flex justify-start gap-1">
