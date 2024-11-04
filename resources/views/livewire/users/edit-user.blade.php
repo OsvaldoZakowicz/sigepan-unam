@@ -9,34 +9,33 @@
       {{-- formulario --}}
       <span class="mb-2 font-bold">formulario</span>
       <form wire:submit="update" wire:confirm="¿editar registro?, tenga en cuenta que el usuario puede tener acceso a otras partes del sistema al cambiarle el rol" class="w-full">
-        <!-- este es un grupo de inputs por tema -->
-        <fieldset class="flex flex-wrap mb-2 border rounded border-neutral-200">
-          <legend>datos del usuario</legend>
-          {{-- nombre --}}
-          <div class="flex flex-col gap-1 p-2 w-1/2 shrink">
-            <span>
-              <label for="user_name">nombre de usuario</label>
-              <span class="text-red-600">*</span>
-              @error('user_name')
-                <span class="text-red-400 text-xs">{{ $message }}</span>
-              @enderror
-            </span>
-            <input wire:model="user_name" type="text" name="user_name" class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300 bg-white" />
-          </div>
-          {{-- email --}}
-          <div class="flex flex-col gap-1 p-2 w-1/2 shrink">
-            <span>
-              <label for="user_email">email</label>
-              <span class="text-red-600">*</span>
-              @error('user_email')
-                <span class="text-red-400 text-xs">{{ $message }}</span>
-              @enderror
-            </span>
-            <input wire:model="user_email" type="email" name="user_email" class="p-1 text-sm w-full border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"></input>
-          </div>
-        </fieldset>
-         <!-- este es un grupo de inputs por tema -->
-         <fieldset class="flex flex-col mb-2 border rounded border-neutral-200">
+        <div class="flex flex-col md:flex-row gap-2 w-full">
+          <fieldset class="flex flex-wrap mb-2 w-full md:w-1/2 border rounded border-neutral-200">
+            <legend>datos del usuario</legend>
+            {{-- nombre --}}
+            <div class="flex flex-col gap-1 p-2 w-full shrink">
+              <span>
+                <label for="user_name">nombre de usuario</label>
+                <span class="text-red-600">*</span>
+                @error('user_name')
+                  <span class="text-red-400 text-xs">{{ $message }}</span>
+                @enderror
+              </span>
+              <input disabled wire:model="user_name" type="text" name="user_name" class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300 bg-neutral-200" />
+            </div>
+            {{-- email --}}
+            <div class="flex flex-col gap-1 p-2 w-full shrink">
+              <span>
+                <label for="user_email">email</label>
+                <span class="text-red-600">*</span>
+                @error('user_email')
+                  <span class="text-red-400 text-xs">{{ $message }}</span>
+                @enderror
+              </span>
+              <input disabled wire:model="user_email" type="email" name="user_email" class="p-1 text-sm w-full border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300 bg-neutral-200"></input>
+            </div>
+          </fieldset>
+          <fieldset class="flex flex-col mb-2 w-full md:w-1/2 border rounded border-neutral-200">
           <legend>rol del usuario</legend>
           <div class="flex flex-col gap-1 p-2 grow">
             <span>
@@ -57,7 +56,10 @@
               @endforelse
             </div>
           </div>
-         </fieldset>
+          </fieldset>
+        </div>
+
+
 
         <!-- botones del formulario -->
         <div class="flex justify-end">

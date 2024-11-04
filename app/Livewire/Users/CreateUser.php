@@ -12,7 +12,6 @@ class CreateUser extends Component
   public $user_name;
   public $user_email;
   public $user_password;
-  public $user_password_test;
   public $user_role;
 
   //* montar datos
@@ -31,21 +30,18 @@ class CreateUser extends Component
     $validated = $this->validate([
       'user_name' => 'required|max:50|regex:/^[a-zA-Z\s]+$/u',
       'user_email' => 'required|email|unique:users,email',
-      'user_password' => 'required|min:8|max:15',
-      'user_password_test' => 'required|min:8|max:15|same:user_password',
       'user_role' => 'required',
     ], [
       'user_name.regex' => 'El :attribute debe contener letras y espacios solamente',
     ], [
       'user_name' => 'nombre de usuario',
       'user_email' => 'email',
-      'user_password' => 'contraseña',
-      'user_password_test' => 'repetir contraseña',
       'user_role' => 'rol'
     ]);
 
     try {
 
+      $validated += ['user_password' => randomPassword()];
       $user_service->createInternalUser($validated);
 
       //todo: si la creacion es correcta:
@@ -54,13 +50,11 @@ class CreateUser extends Component
       $this->reset();
 
       session()->flash('operation-success', toastSuccessBody('usuario', 'creado'));
-
       $this->redirectRoute('users-users-index');
 
     } catch (\Exception $e) {
 
       session()->flash('operation-error', 'error: ' . $e->getMessage() . ', contacte con el Administrador');
-
       $this->redirectRoute('users-users-index');
 
     }

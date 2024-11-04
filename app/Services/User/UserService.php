@@ -120,4 +120,14 @@ class UserService
 
     return $user;
   }
+
+  /**
+   * * servicio: editar usuario interno y solo cambiar el rol
+   */
+  public function editRoleInternalUser(User $user, Array $internal_user_data): User
+  {
+    $user->syncRoles($internal_user_data['user_role']);
+
+    return $user;
+  }
 }

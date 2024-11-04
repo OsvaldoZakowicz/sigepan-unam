@@ -87,18 +87,16 @@ class EditUser extends Component
 
     try {
 
-      $user_service->editInternalUser($this->user, $validated);
+      $user_service->editRoleInternalUser($this->user, $validated);
 
       $this->reset();
 
       session()->flash('operation-success', toastSuccessBody('usuario', 'editado'));
-
       $this->redirectRoute('users-users-index');
 
     } catch (\Exception $e) {
 
       session()->flash('operation-error', 'error: ' . $e->getMessage() . ', contacte al Administrador');
-
       $this->redirectRoute('users-users-index');
 
     }

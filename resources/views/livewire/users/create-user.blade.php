@@ -9,56 +9,39 @@
       {{-- formulario --}}
       <span class="mb-2 font-bold">formulario</span>
       <form wire:submit="save" class="w-full">
-        <!-- este es un grupo de inputs por tema -->
-        <fieldset class="flex flex-wrap mb-2 border rounded border-neutral-200">
-          <legend>datos del usuario</legend>
-          {{-- nombre --}}
-          <div class="flex flex-col gap-1 p-2 w-1/2 shrink">
-            <span>
-              <label for="user_name">nombre de usuario</label>
-              <span class="text-red-600">*</span>
-              @error('user_name')
-                <span class="text-red-400 text-xs">{{ $message }}</span>
-              @enderror
-            </span>
-            <input wire:model="user_name" type="text" name="user_name" class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300" />
-          </div>
-          {{-- email --}}
-          <div class="flex flex-col gap-1 p-2 w-1/2 shrink">
-            <span>
-              <label for="user_email">email</label>
-              <span class="text-red-600">*</span>
-              @error('user_email')
-                <span class="text-red-400 text-xs">{{ $message }}</span>
-              @enderror
-            </span>
-            <input wire:model="user_email" type="email" name="user_email" class="p-1 text-sm w-full border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"></input>
-          </div>
-          {{-- contrasenia --}}
-          <div class="flex flex-col gap-1 p-2 w-1/2 shrink">
-            <span>
-              <label for="user_password">contraseña</label>
-              <span class="text-red-600">*</span>
-              @error('user_password')
-                <span class="text-red-400 text-xs">{{ $message }}</span>
-              @enderror
-            </span>
-            <input wire:model="user_password" type="password" name="user_password" class="p-1 text-sm w-full border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"></input>
-          </div>
-          {{-- contrasenia (control) --}}
-          <div class="flex flex-col gap-1 p-2 w-1/2 shrink">
-            <span>
-              <label for="user_password_test">repetir contraseña</label>
-              <span class="text-red-600">*</span>
-              @error('user_password_test')
-                <span class="text-red-400 text-xs">{{ $message }}</span>
-              @enderror
-            </span>
-            <input wire:model="user_password_test" type="password" name="user_password_test" class="p-1 text-sm w-full border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"></input>
-          </div>
-        </fieldset>
-         <!-- este es un grupo de inputs por tema -->
-         <fieldset class="flex flex-col mb-2 border rounded border-neutral-200">
+        <div class="flex flex-col md:flex-row gap-2 w-full">
+          <!-- este es un grupo de inputs por tema -->
+          <fieldset class="flex flex-wrap mb-2 w-full md:w-1/2 border rounded border-neutral-200">
+            <legend>datos del usuario</legend>
+            {{-- nombre --}}
+            <div class="flex flex-col gap-1 p-2 w-full shrink">
+              <span>
+                <label for="user_name">nombre de usuario</label>
+                <span class="text-red-600">*</span>
+                @error('user_name')
+                  <span class="text-red-400 text-xs">{{ $message }}</span>
+                @enderror
+              </span>
+              <input wire:model="user_name" type="text" name="user_name" class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300" />
+            </div>
+            {{-- email --}}
+            <div class="flex flex-col gap-1 p-2 w-full shrink">
+              <span>
+                <label for="user_email">email</label>
+                <span class="text-red-600">*</span>
+                @error('user_email')
+                  <span class="text-red-400 text-xs">{{ $message }}</span>
+                @enderror
+              </span>
+              <input wire:model="user_email" type="email" name="user_email" class="p-1 text-sm w-full border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"></input>
+            </div>
+            {{-- password --}}
+            <div class="flex flex-col gap-1 p-2 w-full shrink">
+              <span class="text-sm text-neutral-600">Se creará una <span class="font-semibold">contraseña aleatoria</span> para el usuario, y se enviará al email proporcionado</span>
+            </div>
+          </fieldset>
+          <!-- este es un grupo de inputs por tema -->
+          <fieldset class="flex flex-col mb-2 w-full md:w-1/2 border rounded border-neutral-200">
           <legend>rol del usuario</legend>
           <div class="flex flex-col gap-1 p-2 grow">
             <span>
@@ -68,7 +51,7 @@
                 <span class="text-red-400 text-xs">{{ $message }}</span>
               @enderror
             </span>
-            <div class="flex justify-start items-center flex-wrap gap-1 p-2 min-w-1/3 grow">
+            <div class="flex justify-start items-start flex-wrap gap-1 p-2 min-w-1/3 grow">
               @forelse ($roles as $role)
               <div class="border rounded-sm p-1 mx-1">
                 <input wire:model="user_role" type="radio" name="user_role" id="{{ $role->name }}" value="{{ $role->name }}" class="cursor-pointer">
@@ -79,7 +62,8 @@
               @endforelse
             </div>
           </div>
-         </fieldset>
+          </fieldset>
+        </div>
 
         <!-- botones del formulario -->
         <div class="flex justify-end">

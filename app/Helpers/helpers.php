@@ -64,3 +64,33 @@ function toastSuccessBody($modelo = 'modelo', $operacion = 'creado')
   return 'El ' . $modelo . ' fue ' . $operacion . ' correctamente';
 }
 
+
+/**
+ * * generar contrasenia aleatoria
+ * - 8 caracteres por defecto
+ * - 14 caracteres maximo
+ */
+function randomPassword(int $length = 8)
+{
+  // asegurar 8 caracteres
+  if ($length < 8) {
+    $length = 8;
+  }
+
+  // asegurar hasta 16 caracteres
+  if ($length > 14) {
+    $length = 14;
+  }
+
+  // 2 mayusculas, 3 numeros, lo demas letras
+  $cant_upper_letters = 2;
+  $cant_numbers = 3;
+  $cant_lower_letters = $length - $cant_upper_letters - $cant_numbers;
+
+  $regex = '[A-Z]{'.$cant_upper_letters.'}[a-z]{'.$cant_lower_letters.'}[0-9]{'.$cant_numbers.'}';
+
+  // obtener un string regex valido y mezclarlo
+  $password = fake()->shuffle(fake()->regexify($regex));
+
+  return $password;
+}
