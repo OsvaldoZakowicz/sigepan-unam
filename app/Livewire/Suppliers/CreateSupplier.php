@@ -27,8 +27,6 @@ class CreateSupplier extends Component
   // proveedor credenciales
   public $user_name;
   public $user_email;
-  public $user_password;
-  public $user_passw_test;
 
   // posibles condiciones de iva
   public $iva_condition_params = [];
@@ -43,15 +41,10 @@ class CreateSupplier extends Component
   public function save(SupplierService $supplier_service, UserService $user_service)
   {
 
-    // validar proveedor, direccion y credenciales de usuario
-    // todo: validacion corecta del cuit, formato adecuado.
     $validated = $this->validate([
-      'user_name'       => 'required|regex:/^[\p{L}\p{N}\s]+$/u|max:50',
       'user_email'      => 'required|unique:users,email|max:90',
-      'user_password'   => 'required|min:8|max:20',
-      'user_passw_test' => 'required|min:8|max:20|same:user_password',
       'company_name'  => 'required|regex:/^[\p{L}\p{N}\s]+$/u|unique:suppliers,company_name|max:50',
-      'company_cuit'  => ['required', 'unique:suppliers,company_cuit', new CuitCuilRule],
+      'company_cuit'  => ['required', 'regex:/^[0-9]{11}$/u', 'unique:suppliers,company_cuit', new CuitCuilRule],
       'company_iva'   => 'required',
       'company_phone' => 'required|unique:suppliers,phone_number|size:10',
       'company_short_desc' => 'nullable|max:150',
@@ -60,15 +53,12 @@ class CreateSupplier extends Component
       'company_city'    => 'required|regex:/^[\p{L}\p{N}\s]+$/u|max:45',
       'company_postal_code' => 'required|integer|digits:4|min:1000|max:9999',
     ],[
-      'user_name.regex'       => 'El campo :attribute solo permite letras, numeros y espacios',
       'company_name.regex'    => 'El campo :attribute solo permite letras, numeros y espacios',
+      'company_cuit.regex'    => 'El campo :attribute debe ser un numero de 11 digitos',
       'company_street.regex'  => 'El campo :attribute solo permite letras, numeros y espacios',
       'company_city.regex'    => 'El campo :attribute solo permite letras, numeros y espacios',
     ],[
-      'user_name'       => 'nombre de usuario',
       'user_email'      => 'correo electronico',
-      'user_password'      => 'contraseña',
-      'user_passw_test' => 'repetir contraseña',
       'company_name'  => 'razon social',
       'company_cuit'  => 'cuit',
       'company_iva'   => 'condicion frente al iva',
@@ -82,11 +72,20 @@ class CreateSupplier extends Component
 
     try {
 
+
       // necesito el rol proveedor
-      $validated += ['user_role' => $supplier_service->getSupplierRolename()];
+      // el nombre de usuario sera el cuit
+      // la contrasenia de acceso sera aleatoria
+      $validated += [
+        'user_role' => $supplier_service->getSupplierRolename(),
+        'user_name' => $validated['company_cuit'],
+        'user_password' => randomPassword()
+      ];
 
       $supplier_user = $user_service->createInternalUser($validated);
       $supplier = $supplier_service->createSupplier($supplier_user, $validated);
+
+      // todo: enviar credenciales de acceso via email
 
       $this->reset();
 
@@ -94,6 +93,8 @@ class CreateSupplier extends Component
       $this->redirectRoute('suppliers-suppliers-index');
 
     } catch (\Exception $e) {
+
+      // todo: como elimino registros creados a medias si algo falla?, por ej: usuario o direccion?
 
       session()->flash('operation-error', 'error: ' . $e->getMessage() . ', contacte al Administrador');
       $this->redirectRoute('suppliers-suppliers-index');

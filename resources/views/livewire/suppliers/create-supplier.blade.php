@@ -10,7 +10,9 @@
 
     <x-slot:header class="hidden"></x-slot:header>
 
-    <x-slot:content>
+    <x-slot:content class="flex-col">
+
+      <span class="mb-2 font-bold">formulario</span>
 
       <form wire:submit="save" class="w-full flex flex-col gap-2">
 
@@ -39,7 +41,7 @@
               </span>
               <input wire:model="company_name" type="text" name="company_name" class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300" />
             </div>
-            {{-- cuit --}}
+            {{-- cuit o cuil --}}
             <div class="flex flex-col gap-1 p-2 w-full md:w-1/2 lg:w-1/4">
               <span>
                 <label for="company_cuit" class="uppercase">cuit</label>
@@ -139,7 +141,7 @@
 
         <x-div-toggle
           x-data="{ open: false }"
-          title="registro del usuario proveedor"
+          title="usuario del proveedor"
           subtitle="complete los siguientes datos de acceso al sistema para el usuario del proveedor"
           class="p-2">
 
@@ -150,17 +152,14 @@
             </x-slot:messages>
           @enderror
 
-          <x-fieldset-base tema="credenciales de acceso" class="w-full">
+          <x-fieldset-base tema="credenciales de acceso del proveedor" class="w-full">
             {{-- nombre de usuario --}}
             <div class="flex flex-col gap-1 p-2 w-full md:w-1/2 lg:w-1/4">
               <span>
-                <label for="user_name">nombre de usuario</label>
+                <label for="user_name">nombre de usuario (se usará el CUIT)</label>
                 <span class="text-red-600">*</span>
-                @error('user_name')
-                  <span class="text-red-400 text-xs">{{ $message }}</span>
-                @enderror
               </span>
-              <input wire:model="user_name" type="text" name="user_name" class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300" />
+              <input disabled wire:model="company_cuit" type="text" name="company_cuit" class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300 bg-neutral-200" />
             </div>
             {{-- email --}}
             <div class="flex flex-col gap-1 p-2 w-full md:w-1/2 lg:w-1/4">
@@ -174,26 +173,8 @@
               <input wire:model="user_email" type="email" name="user_email" class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300" />
             </div>
             {{-- contrasenia --}}
-            <div class="flex flex-col gap-1 p-2 w-full md:w-1/2 lg:w-1/4">
-              <span>
-                <label for="user_password">contraseña</label>
-                <span class="text-red-600">*</span>
-                @error('user_password')
-                  <span class="text-red-400 text-xs">{{ $message }}</span>
-                @enderror
-              </span>
-              <input wire:model="user_password" type="password" name="user_password" class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300" />
-            </div>
-            {{-- control de contrasenia --}}
-            <div class="flex flex-col gap-1 p-2 w-full md:w-1/2 lg:w-1/4">
-              <span>
-                <label for="user_passw_test">repetir contraseña</label>
-                <span class="text-red-600">*</span>
-                @error('user_passw_test')
-                  <span class="text-red-400 text-xs">{{ $message }}</span>
-                @enderror
-              </span>
-              <input wire:model="user_passw_test" type="password" name="user_passw_test" class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300" />
+            <div class="flex flex-col justify-end gap-1 p-2 w-full md:w-1/2 lg:w-1/4">
+              <span class="text-sm text-neutral-600">Se creará una <span class="font-semibold">contraseña aleatoria</span> para el proveedor, y se enviará al email proporcionado</span>
             </div>
           </x-fieldset-base>
 

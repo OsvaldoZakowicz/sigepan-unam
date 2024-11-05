@@ -10,11 +10,13 @@
 
       <x-slot:header class="hidden"></x-slot:header>
 
-      <x-slot:content>
+      <x-slot:content class="flex-col">
+
+        <span class="mb-2 font-bold">formulario</span>
 
         <form wire:submit="update" class="w-full flex flex-col gap-2">
 
-          <x-div-toggle x-data="{ open: true }" title="proveedor" subtitle="puede editar los siguientes datos del proveedor y su direccion." class="p-2">
+          <x-div-toggle x-data="{ open: true }" title="proveedor" subtitle="Editar los siguientes datos del proveedor y su direccion." class="p-2">
 
             {{-- mensajes de seccion --}}
             @error('company_*')
@@ -135,7 +137,9 @@
 
           </x-div-toggle>
 
-          <x-div-toggle x-data="{ open: false }" title="registro del usuario proveedor" subtitle="puede editar los siguientes datos de acceso al sistema para el usuario del proveedor. Si cambia el correo electronico, el proveedor deberá volver a verificarlo en su proximo inicio de sesión." class="p-2">
+          {{-- <x-div-toggle x-data="{ open: true }" title="estado del proveedor" subtitle="Editar el estado del proveedor." class="p-2"></x-div-toggle> --}}
+
+          <x-div-toggle x-data="{ open: false }" title="usuario del proveedor" subtitle="Editar las credenciales de acceso del proveedor." class="p-2">
 
             {{-- mensajes de seccion --}}
             @error('user_*')
@@ -150,12 +154,9 @@
                 <span>
                   <label for="user_name">nombre de usuario</label>
                   <span class="text-red-600">*</span>
-                  @error('user_name')
-                    <span class="text-red-400 text-xs">{{ $message }}</span>
-                  @enderror
                 </span>
-                <input wire:model="user_name" type="text" name="user_name" class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300" />
-            </div>
+                <input disabled wire:model="company_cuit" type="text" name="" class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300 bg-neutral-200" />
+              </div>
               {{-- email --}}
               <div class="flex flex-col gap-1 p-2 w-full md:w-1/2 lg:w-1/4">
                 <span>
@@ -166,29 +167,8 @@
                   @enderror
                 </span>
                 <input wire:model="user_email" type="email" name="user_email" class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300" />
+                <span class="text-sm lowercase text-neutral-600">Si cambia el correo electronico, el proveedor deberá volver a verificarlo en su proximo inicio de sesión.</span>
               </div>
-              {{-- contrasenia --}}
-              {{-- <div class="flex flex-col gap-1 p-2 w-full md:w-1/2 lg:w-1/4">
-                <span>
-                  <label for="user_password">contraseña</label>
-                  <span class="text-red-600">*</span>
-                  @error('user_password')
-                    <span class="text-red-400 text-xs">{{ $message }}</span>
-                  @enderror
-                </span>
-                <input wire:model="user_password" type="password" name="user_password" class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300" />
-              </div> --}}
-              {{-- control de contrasenia --}}
-              {{-- <div class="flex flex-col gap-1 p-2 w-full md:w-1/2 lg:w-1/4">
-                <span>
-                  <label for="user_passw_test">repetir contraseña</label>
-                  <span class="text-red-600">*</span>
-                  @error('user_passw_test')
-                    <span class="text-red-400 text-xs">{{ $message }}</span>
-                  @enderror
-                </span>
-                <input wire:model="user_passw_test" type="password" name="user_passw_test" class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300" />
-              </div> --}}
             </x-fieldset-base>
 
           </x-div-toggle>

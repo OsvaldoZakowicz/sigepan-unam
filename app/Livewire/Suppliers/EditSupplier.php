@@ -59,24 +59,38 @@ class EditSupplier extends Component
   {
     // validar proveedor, direccion y credenciales de usuario
     $validated = $this->validate([
-      'user_name'       => 'required|regex:/^[\p{L}\p{N}\s]+$/u|max:50',
-      'user_email'      => ['required','max:90', Rule::unique('users','email')->ignore($this->supplier->user->id)],
-      'company_name'  => ['required','regex:/^[\p{L}\p{N}\s]+$/u','max:50',Rule::unique('suppliers','company_name')->ignore($this->supplier->id)],
-      'company_cuit'  => ['required', new CuitCuilRule, Rule::unique('suppliers','company_cuit')->ignore($this->supplier->id)],
+      'user_email' => [
+        'required',
+        'max:90',
+        Rule::unique('users','email')->ignore($this->supplier->user->id)
+      ],
+      'company_name' => [
+        'required',
+        'regex:/^[\p{L}\p{N}\s]+$/u',
+        'max:50',
+        Rule::unique('suppliers','company_name')->ignore($this->supplier->id)
+      ],
+      'company_cuit' => [
+        'required',
+        new CuitCuilRule,
+        Rule::unique('suppliers','company_cuit')->ignore($this->supplier->id)
+      ],
       'company_iva'   => 'required',
-      'company_phone' => ['required','size:10',Rule::unique('suppliers','phone_number')->ignore($this->supplier->id)],
+      'company_phone' => [
+        'required',
+        'size:10',
+        Rule::unique('suppliers','phone_number')->ignore($this->supplier->id)
+      ],
       'company_short_desc' => 'nullable|max:150',
       'company_street'  => 'required|regex:/^[\p{L}\p{N}\s]+$/u|max:45',
       'company_number'  => 'nullable|max:8',
       'company_city'    => 'required|regex:/^[\p{L}\p{N}\s]+$/u|max:45',
       'company_postal_code' => 'required|integer|digits:4|min:1000|max:9999',
     ],[
-      'user_name.regex'       => 'El campo :attribute solo permite letras, numeros y espacios',
       'company_name.regex'    => 'El campo :attribute solo permite letras, numeros y espacios',
       'company_street.regex'  => 'El campo :attribute solo permite letras, numeros y espacios',
       'company_city.regex'    => 'El campo :attribute solo permite letras, numeros y espacios',
     ],[
-      'user_name'       => 'nombre de usuario',
       'user_email'      => 'correo electronico',
       'company_name'  => 'razon social',
       'company_cuit'  => 'cuit',
@@ -92,10 +106,16 @@ class EditSupplier extends Component
     try {
 
       // debe tener siempre el rol proveedor
-      $validated += ['user_role' => $supplier_service->getSupplierRolename()];
+      // el nombre de usuario sera el cuit
+      $validated += [
+        'user_role' => $supplier_service->getSupplierRolename(),
+        'user_name' => $validated['company_cuit']
+      ];
 
       $updated_supplier_user = $user_service->editInternalUser($this->supplier->user, $validated);
       $updated_supplier = $supplier_service->editSupplier($updated_supplier_user, $this->supplier, $validated);
+
+      // todo: enviar credenciales de acceso via email
 
       $this->reset();
 
@@ -104,7 +124,7 @@ class EditSupplier extends Component
 
     } catch (\Exception $e) {
 
-      // todo: como elimino registros creados a medias, por ej: usuario o direccion?
+      // todo: como elimino registros creados a medias si algo falla?, por ej: usuario o direccion?
 
       session()->flash('operation-error', 'error: ' . $e->getMessage() . ', contacte al Administrador');
       $this->redirectRoute('suppliers-suppliers-index');
