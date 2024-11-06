@@ -7,19 +7,32 @@ use App\Http\Controllers\Audits\AuditController;
 use App\Http\Controllers\Suppliers\SupplierController;
 use App\Http\Controllers\Stocks\StockController;
 
+/**
+ * * NOTA aplicar permisos de acceso via middleware a:
+ * - modulos por su nombre (mostrando el index)
+ * - vistas por su nombre (perfil por ejemplo)
+ */
+
 //* layout publico
 Route::view('/', 'welcome')->name('welcome');
 
-//* layout interno
-Route::middleware(['auth', 'verified', 'can:panel'])->group(function () {
+//* layout interno panel
+Route::middleware(['auth', 'verified'])->group(function () {
 
+  // vista del panel
   Route::view('dashboard', 'resume-dashboard')
-    ->middleware(['auth', 'verified'])
+    ->middleware(['can:panel'])
     ->name('dashboard');
 
+  // vista del perfil, actualizar usuario y password, borrar cuenta
   Route::view('profile', 'profile')
-    ->middleware(['auth'])
+    ->middleware(['can:panel','can:panel-perfil'])
     ->name('profile');
+
+  // vista de completar y/o editar perfil
+  Route::get('profile/complete', [UserController::class, 'profile_complete'])
+    ->middleware(['can:panel','can:panel-perfil'])
+    ->name('profile-complete');
 
 });
 
@@ -27,49 +40,75 @@ Route::middleware(['auth', 'verified', 'can:panel'])->group(function () {
 Route::middleware(['auth', 'verified', 'can:usuarios'])->group(function () {
 
   //* usuarios
-  Route::get('users', [UserController::class, 'users_index'])->name('users-users-index');
-  Route::get('users/create', [UserController::class, 'users_create'])->name('users-users-create');
-  Route::get('users/edit/{id}', [UserController::class, 'users_edit'])->name('users-users-edit');
-  Route::get('profile/complete', [UserController::class, 'profile_complete'])->name('profile-complete');
+  Route::get('users', [UserController::class, 'users_index'])
+    ->name('users-users-index');
+
+  Route::get('users/create', [UserController::class, 'users_create'])
+    ->name('users-users-create');
+
+  Route::get('users/edit/{id}', [UserController::class, 'users_edit'])
+    ->name('users-users-edit');
 
   //* roles
-  Route::get('users/roles', [UserController::class, 'roles_index'])->name('users-roles-index');
-  Route::get('users/role/create', [UserController::class, 'roles_create'])->name('users-roles-create');
-  Route::get('users/role/edit/{id}', [UserController::class, 'roles_edit'])->name('users-roles-edit');
+  Route::get('users/roles', [UserController::class, 'roles_index'])
+    ->name('users-roles-index');
+
+  Route::get('users/role/create', [UserController::class, 'roles_create'])
+    ->name('users-roles-create');
+
+  Route::get('users/role/edit/{id}', [UserController::class, 'roles_edit'])
+    ->name('users-roles-edit');
 
   //* permisos
-  Route::get('users/permissions', [UserController::class, 'permissions_index'])->name('users-permissions-index');
+  Route::get('users/permissions', [UserController::class, 'permissions_index'])
+    ->name('users-permissions-index');
 
 });
 
-//* auditoria
+//* modulo de auditoria
 Route::middleware(['auth', 'verified', 'can:auditoria'])->group(function () {
 
-  Route::get('audits', [AuditController::class, 'audits_index'])->name('audits-audits-index');
-  Route::get('audits/show/{id}', [AuditController::class, 'audits_show'])->name('audits-audits-show');
-  Route::get('audits/report/one/{id}', [AuditController::class, 'audits_report_one'])->name('audits-audits-report');
+  Route::get('audits', [AuditController::class, 'audits_index'])
+    ->name('audits-audits-index');
+
+  Route::get('audits/show/{id}', [AuditController::class, 'audits_show'])
+    ->name('audits-audits-show');
+
+  Route::get('audits/report/one/{id}', [AuditController::class, 'audits_report_one'])
+    ->name('audits-audits-report');
 
 });
 
-//* clientes
-Route::get('client/logout', ClientLogOutController::class)->name('client-logout');
-
-//* proveedores
+//* modulo de proveedores
 Route::middleware(['auth', 'verified', 'can:proveedores'])->group(function () {
 
-  Route::get('suppliers', [SupplierController::class, 'suppliers_index'])->name('suppliers-suppliers-index');
-  Route::get('suppliers/create', [SupplierController::class, 'suppliers_create'])->name('suppliers-suppliers-create');
-  Route::get('supplier/show/{id}', [SupplierController::class, 'suppliers_show'])->name('suppliers-suppliers-show');
-  Route::get('supplier/edit/{id}', [SupplierController::class, 'suppliers_edit'])->name('suppliers-suppliers-edit');
+  Route::get('suppliers', [SupplierController::class, 'suppliers_index'])
+    ->name('suppliers-suppliers-index');
+
+  Route::get('suppliers/create', [SupplierController::class, 'suppliers_create'])
+    ->name('suppliers-suppliers-create');
+
+  Route::get('supplier/show/{id}', [SupplierController::class, 'suppliers_show'])
+    ->name('suppliers-suppliers-show');
+
+  Route::get('supplier/edit/{id}', [SupplierController::class, 'suppliers_edit'])
+    ->name('suppliers-suppliers-edit');
 
 });
 
-//* stock
+//* modulo de stock
 Route::middleware(['auth', 'verified', 'can:stock'])->group(function () {
 
-  Route::get('stocks', [StockController::class, 'stocks_index'])->name('stocks-stocks-index');
-  Route::get('stocks/measures', [StockController::class, 'measures_index'])->name('stocks-measures-index');
+  Route::get('stocks', [StockController::class, 'stocks_index'])
+    ->name('stocks-stocks-index');
+
+  Route::get('stocks/measures', [StockController::class, 'measures_index'])
+    ->name('stocks-measures-index');
 
 });
+
+//* modulo de clientes
+Route::get('client/logout', ClientLogOutController::class)
+  ->name('client-logout');
 
 require __DIR__.'/auth.php';
