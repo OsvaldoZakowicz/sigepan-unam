@@ -28,29 +28,29 @@ class RoleSeeder extends Seeder
 
     // permisos
     $gerente->syncPermissions([
-      'panel','usuarios','stock','proveedores','ventas','compras','tienda'
+      'panel','panel-perfil','usuarios','stock','proveedores','ventas','compras','tienda'
     ]);
 
     $panadero->syncPermissions([
-      'panel','stock'
+      'panel','panel-perfil','stock'
     ]);
 
     $vendedor->syncPermissions([
-      'panel','ventas'
+      'panel','panel-perfil','ventas'
     ]);
 
     $repartidor->syncPermissions([
-      'panel','ventas'
+      'panel','panel-perfil','ventas'
     ]);
 
     $proveedor->syncPermissions([]);
 
     $administrador->syncPermissions([
-      'panel','usuarios','auditoria','stock','proveedores','ventas','compras','tienda'
+      'panel','panel-perfil','usuarios','auditoria','stock','proveedores','ventas','compras','tienda'
     ]);
 
     $auditor->syncPermissions([
-      'panel','auditoria'
+      'panel','panel-perfil','auditoria'
     ]);
 
     //* roles no internos (is_internal = false)
@@ -64,7 +64,7 @@ class RoleSeeder extends Seeder
 
     //* permisos estrictamente no internos (is_internal = false)
     $cliente->syncPermissions([
-      'tienda'
+      'tienda','tienda-perfil',
     ]);
   }
 }

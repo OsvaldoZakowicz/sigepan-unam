@@ -45,6 +45,7 @@ class User extends Authenticatable implements MustVerifyEmail, Auditable
     'name',
     'email',
     'password',
+    'is_first_login'
   ];
 
   /**

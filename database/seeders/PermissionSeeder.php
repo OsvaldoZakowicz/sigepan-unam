@@ -17,14 +17,19 @@ class PermissionSeeder extends Seeder
   {
     // permisos de modulos y secciones
     DB::table('permissions')->insert([
-      ['name' => 'panel',     'guard_name' => 'web', 'is_internal' => true, 'created_at' => now(env('APP_TIMEZONE'))],
-      ['name' => 'usuarios',  'guard_name' => 'web', 'is_internal' => true, 'created_at' => now(env('APP_TIMEZONE'))],
-      ['name' => 'stock',       'guard_name' => 'web', 'is_internal' => true, 'created_at' => now(env('APP_TIMEZONE'))],
-      ['name' => 'proveedores', 'guard_name' => 'web', 'is_internal' => true, 'created_at' => now(env('APP_TIMEZONE'))],
-      ['name' => 'ventas',      'guard_name' => 'web', 'is_internal' => true, 'created_at' => now(env('APP_TIMEZONE'))],
-      ['name' => 'compras',     'guard_name' => 'web', 'is_internal' => true, 'created_at' => now(env('APP_TIMEZONE'))],
-      ['name' => 'auditoria',     'guard_name' => 'web', 'is_internal' => true, 'created_at' => now(env('APP_TIMEZONE'))],
-      ['name' => 'tienda',      'guard_name' => 'web', 'is_internal' => false, 'created_at' => now(env('APP_TIMEZONE'))],
+      // internos
+      ['name' => 'panel',        'guard_name' => 'web', 'is_internal' => true, 'created_at' => now(env('APP_TIMEZONE'))],
+      ['name' => 'panel-perfil', 'guard_name' => 'web', 'is_internal' => true, 'created_at' => now(env('APP_TIMEZONE'))],
+      ['name' => 'usuarios',     'guard_name' => 'web', 'is_internal' => true, 'created_at' => now(env('APP_TIMEZONE'))],
+      ['name' => 'stock',        'guard_name' => 'web', 'is_internal' => true, 'created_at' => now(env('APP_TIMEZONE'))],
+      ['name' => 'proveedores',  'guard_name' => 'web', 'is_internal' => true, 'created_at' => now(env('APP_TIMEZONE'))],
+      ['name' => 'ventas',       'guard_name' => 'web', 'is_internal' => true, 'created_at' => now(env('APP_TIMEZONE'))],
+      ['name' => 'compras',      'guard_name' => 'web', 'is_internal' => true, 'created_at' => now(env('APP_TIMEZONE'))],
+      ['name' => 'auditoria',    'guard_name' => 'web', 'is_internal' => true, 'created_at' => now(env('APP_TIMEZONE'))],
+
+      // no internos
+      ['name' => 'tienda',        'guard_name' => 'web', 'is_internal' => false, 'created_at' => now(env('APP_TIMEZONE'))],
+      ['name' => 'tienda-perfil', 'guard_name' => 'web', 'is_internal' => false, 'created_at' => now(env('APP_TIMEZONE'))],
     ]);
   }
 }

@@ -20,16 +20,10 @@ class DatabaseSeeder extends Seeder
       GenderSeeder::class,
       PermissionSeeder::class,
       RoleSeeder::class,
+      // usuarios siempre despues de roles y permisos
+      UserSeeder::class,
       MeasureSeeder::class,
     ]);
 
-    // usuario de pruebas
-    $user = User::create([
-      'name' => 'test',
-      'email' => 'test@test.com',
-      'password' => bcrypt(12345678)
-    ]);
-
-    $user->assignRole('administrador');
   }
 }
