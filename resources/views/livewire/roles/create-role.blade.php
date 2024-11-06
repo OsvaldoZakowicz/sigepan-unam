@@ -47,9 +47,32 @@
               @enderror
             </span>
             <div class="flex justify-start items-center gap-1 p-2 min-w-1/3 grow">
+              {{-- permisos por defecto --}}
+              @foreach ($permissions_default as $permission)
+              <div
+                class="border rounded-sm p-1 mx-1 bg-neutral-200"
+                title="{{ $permission->short_description }}" >
+                <input
+                  type="checkbox"
+                  checked
+                  disabled
+                  value="{{ $permission->name }}"
+                  class="cursor-pointer" />
+                <label for="{{ $permission->name }}" class="cursor-pointer">{{ $permission->name }}</label>
+              </div>
+              @endforeach
+              {{-- permisos elegibles --}}
               @forelse ($permissions as $permission)
-              <div class="border rounded-sm p-1 mx-1">
-                <input wire:model="role_permissions" type="checkbox" name="role_permissions[]" id="{{ $permission->name }}" value="{{ $permission->name }}" class="cursor-pointer">
+              <div
+                class="border rounded-sm p-1 mx-1"
+                title="{{ $permission->short_description }}" >
+                <input
+                  wire:model="role_permissions"
+                  type="checkbox"
+                  name="role_permissions[]"
+                  id="{{ $permission->name }}"
+                  value="{{ $permission->name }}"
+                  class="cursor-pointer" />
                 <label for="{{ $permission->name }}" class="cursor-pointer">{{ $permission->name }}</label>
               </div>
               @empty

@@ -13,22 +13,30 @@ use Illuminate\Validation\Rule;
  */
 class CreateRole extends Component
 {
-  //* propiedades accesibles
-  // del modelo:
+  // permisos seleccionables
   public $permissions;
 
-  //* propiedades accesibles de la vista
-  // de la vista:
   public $role_name;
   public $role_short_description;
-  public $role_permissions = []; // capturo nombres
 
-  /**
-   * *se ejecuta al renderizar el componente
-   */
+  // capturo nombres
+  public $role_permissions = [];
+
+  // roles por defecto
+  public $permissions_default_names = ['panel', 'panel-perfil'];
+  public $permissions_default = [];
+
+  //* montar datos
   public function mount()
   {
-    $this->permissions = Permission::where('is_internal', true)->get();
+    // permisos que no son por defecto
+    $this->permissions = Permission::where('is_internal', true)
+      ->whereNotIn('name', $this->permissions_default_names)
+      ->get();
+
+    // permisos por defecto
+    $this->permissions_default = Permission::whereIn('name', $this->permissions_default_names)
+      ->get();
   }
 
   /**
@@ -51,20 +59,24 @@ class CreateRole extends Component
     ]);
 
     $new_role = Role::create([
-      'name' => $this->role_name,
-      'guard_name' => 'web',
+      'name'              => $this->role_name,
+      'guard_name'        => 'web',
       'short_description' => $this->role_short_description,
       'is_editable' => true,
       'is_internal' => true
     ]);
 
+    // completar con permisos por defecto
+    foreach ($this->permissions_default as $permission) {
+      array_push($this->role_permissions, $permission->name);
+    }
+
     $new_role->syncPermissions($this->role_permissions);
 
     // limpiar propiedades
-    $this->reset(['role_name', 'role_short_description', 'role_permissions']);
+    $this->reset();
 
     session()->flash('operation-success', toastSuccessBody('rol', 'creado'));
-
     $this->redirectRoute('users-roles-index');
   }
 

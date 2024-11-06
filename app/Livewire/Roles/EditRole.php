@@ -17,6 +17,10 @@ class EditRole extends Component
   public $role_short_description;
   public $role_permissions = [];
 
+  // roles por defecto
+  public $permissions_default_names = ['panel', 'panel-perfil'];
+  public $permissions_default = [];
+
   public function mount($role_id)
   {
     $this->role = Role::findOrFail($role_id);
@@ -27,12 +31,17 @@ class EditRole extends Component
       $this->redirectRoute('users-roles-index');
     }
 
-    $this->permissions = Permission::where('is_internal', true)->get();
+    $this->permissions = Permission::where('is_internal', true)
+      ->whereNotIn('name', $this->permissions_default_names)
+      ->get();
+
+    $this->permissions_default = Permission::whereIn('name', $this->permissions_default_names)
+      ->get();
 
     //completo el formulario con los datos del rol
     $this->role_name = $this->role->name;
     $this->role_short_description = $this->role->short_description;
-    $this->role_permissions = $this->role->permissions->pluck('name');
+    $this->role_permissions = $this->role->permissions->pluck('name')->toArray();
   }
 
   public function update()
