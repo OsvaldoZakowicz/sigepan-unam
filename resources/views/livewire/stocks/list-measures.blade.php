@@ -3,8 +3,8 @@
   <article class="m-2 border rounded-sm border-neutral-200">
 
     {{-- barra de titulo --}}
-    <x-title-section title="lista de usuarios">
-      <x-a-button wire:navigate href="#" class="mx-1">crear unidad</x-a-button>
+    <x-title-section title="lista de unidades de medida">
+      <x-a-button wire:navigate href="{{ route('stocks-measures-create') }}" class="mx-1">crear unidad</x-a-button>
     </x-title-section>
 
     {{-- cuerpo --}}

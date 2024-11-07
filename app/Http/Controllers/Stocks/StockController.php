@@ -19,4 +19,10 @@ class StockController extends Controller
   {
     return view('stocks.measures-index');
   }
+
+  //* crear unidad de medida
+  public function measures_create(): View
+  {
+    return view('stocks.measures-create');
+  }
 }
