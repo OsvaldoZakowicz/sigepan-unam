@@ -94,6 +94,12 @@ Route::middleware(['auth', 'verified', 'can:proveedores'])->group(function () {
   Route::get('supplier/edit/{id}', [SupplierController::class, 'suppliers_edit'])
     ->name('suppliers-suppliers-edit');
 
+  Route::get('suppliers/provisions', [SupplierController::class, 'provisions_index'])
+    ->name('suppliers-provisions-index');
+
+  Route::get('suppliers/provision/create', [SupplierController::class, 'provisions_create'])
+    ->name('suppliers-provisions-create');
+
 });
 
 //* modulo de stock

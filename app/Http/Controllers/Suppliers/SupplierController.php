@@ -31,4 +31,16 @@ class SupplierController extends Controller
   {
     return view('suppliers.suppliers-edit', ['id' => $id]);
   }
+
+  //* ver suministros
+  public function provisions_index(): View
+  {
+    return view('suppliers.provisions-index');
+  }
+
+  //* crear suministro
+  public function provisions_create(): View
+  {
+    return view('suppliers.provisions-create');
+  }
 }
