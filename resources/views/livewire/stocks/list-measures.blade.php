@@ -15,7 +15,7 @@
         {{-- formulario de busqueda --}}
         <form class="grow">
           {{-- termino de busqueda --}}
-          <input type="text" wire:model.live="search" name="search" placeholder="ingrese un id, o termino de busqueda" class="w-1/4 shrink text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
+          <input type="text" wire:model.live="search" name="search" wire:click="resetPagination()" placeholder="ingrese un id, o termino de busqueda" class="w-1/4 shrink text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
         </form>
         <!-- grupo de botones -->
         <div class="flex"></div>

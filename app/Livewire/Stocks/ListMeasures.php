@@ -23,6 +23,11 @@ class ListMeasures extends Component
     ]);
   }
 
+  public function resetPagination()
+  {
+    $this->resetPage();
+  }
+
   public function searchMeasures()
   {
     return Measure::when($this->search, function ($query) {
@@ -31,7 +36,7 @@ class ListMeasures extends Component
             ->orWhere('measure_base', 'like', $this->search);
     })
     ->orderBy('id', 'desc')
-    ->paginate(10);
+    ->paginate(5);
   }
 
   public function render()
