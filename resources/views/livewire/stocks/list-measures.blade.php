@@ -15,7 +15,7 @@
         {{-- formulario de busqueda --}}
         <form class="grow">
           {{-- termino de busqueda --}}
-          <input type="text" name="search" placeholder="ingrese un id, o termino de busqueda" class="w-1/4 shrink text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
+          <input type="text" wire:model.live="search" name="search" placeholder="ingrese un id, o termino de busqueda" class="w-1/4 shrink text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
         </form>
         <!-- grupo de botones -->
         <div class="flex"></div>
@@ -48,8 +48,12 @@
                 <x-table-td>{{ formatDateTime($measure->created_at, 'd-m-Y') }}</x-table-td>
                 <x-table-td>
                   <div class="w-full inline-flex gap-2 justify-start items-center">
-                    <x-a-button wire:navigate href="#" bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600">editar</x-a-button>
-                    <x-btn-button type="button" color="red">eliminar</x-btn-button>
+                    @if ($measure->measure_is_editable)
+                      <x-a-button wire:navigate href="#" bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600">editar</x-a-button>
+                      <x-btn-button type="button" color="red">eliminar</x-btn-button>
+                    @else
+                      <a wire:click.prevent="toast" href="#">ninguna</a>
+                    @endif
                   </div>
                 </x-table-td>
             </tr>
@@ -65,7 +69,7 @@
 
       <x-slot:footer class="py-2">
         {{-- paginacion --}}
-        {{-- {{ $users->links() }} --}}
+        {{ $measures->links() }}
         <!-- grupo de botones -->
         <div class="flex"></div>
       </x-slot:footer>
