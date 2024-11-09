@@ -19,6 +19,6 @@ class ProvisionType extends Model
   // * un tipo de suministro tiene muchos suministros
   public function provisions(): HasMany
   {
-    return $this->hasMany(Provision::class);
+    return $this->hasMany(Provision::class, 'provision_type_id', 'id');
   }
 }

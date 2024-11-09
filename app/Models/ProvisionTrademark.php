@@ -18,6 +18,6 @@ class ProvisionTrademark extends Model
   // * una marca esta presente en muchos suministros
   public function provisions(): HasMany
   {
-    return $this->hasMany(Provision::class);
+    return $this->hasMany(Provision::class, 'provision_trademark_id', 'id');
   }
 }

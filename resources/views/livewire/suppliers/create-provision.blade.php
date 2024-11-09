@@ -16,7 +16,7 @@
 
         <form wire:submit="save" class="w-full flex flex-col gap-2">
 
-          <x-fieldset-base tema="suministro" class="w-full">
+          <x-fieldset-base tema="suministro individual" class="w-full">
 
             {{-- nombre --}}
             <div class="flex flex-col gap-1 p-2 w-full md:w-1/2 lg:w-1/4">
@@ -68,8 +68,8 @@
               <select name="measure_id" wire:model="measure_id" id="measure_id" class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
                 <option value="" selected>seleccione una unidad ...</option>
                 @foreach ($measures as $measure)
-                  <option value="{{ $measure->id }}">
-                    {{ $measure->measure_name }}:&nbsp;{{ $measure->measure_base }}({{ $measure->measure_abrv }})
+                  <option value="{{ $measure->id }}" title="{{ $measure->measure_short_description }}" class="cursor-pointer">
+                    {{ $measure->measure_name }}({{ $measure->measure_abrv }})
                   </option>
                 @endforeach
               </select>
@@ -78,7 +78,7 @@
             {{-- cantidad --}}
             <div class="flex flex-col gap-1 p-2 w-full md:w-1/2 lg:w-1/4">
               <span>
-                <x-input-label for="provision_quantity" class="font-normal">cantidad: {{ $measure_id }}</x-input-label>
+                <x-input-label for="provision_quantity" class="font-normal">cantidad, volumen o peso: {{ $measure_id }}</x-input-label>
                 <span class="text-red-600">*</span>
                 @error('provision_quantity') <span class="text-red-400 text-xs">{{ $message }}</span> @enderror
               </span>
@@ -94,8 +94,20 @@
               <x-text-input wire:model="provision_short_description" name="provision_short_description" />
             </div>
 
+            {{-- crear pack --}}
+            {{-- <div class="flex flex-col items-start justify-center gap-1 p-2 w-full md:w-1/2 lg:w-1/4">
+              <x-input-label for="provision_short_description" class="font-normal">crear pack del suministro?</x-input-label>
+              <input type="checkbox" wire:click="togglePackForm()" name="show_pack_form" class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
+            </div> --}}
 
           </x-fieldset-base>
+
+          {{-- todo: si es pack, cargar pack --}}
+          {{-- @if ($show_pack_form)
+            <x-fieldset-base tema="pack del suministro" class="w-full">
+              crear pack
+            </x-fieldset-base>
+          @endif --}}
 
           <!-- botones del formulario -->
           <div class="flex justify-end my-2 gap-2">

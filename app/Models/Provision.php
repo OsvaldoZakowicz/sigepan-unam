@@ -24,13 +24,13 @@ class Provision extends Model
   // * un suministro pertenece a una marca
   public function trademark(): BelongsTo
   {
-    return $this->belongsTo(ProvisionTrademark::class);
+    return $this->belongsTo(ProvisionTrademark::class, 'provision_trademark_id', 'id');
   }
 
   // * un suministro pertenece a un tipo
   public function type(): BelongsTo
   {
-    return $this->belongsTo(ProvisionType::class);
+    return $this->belongsTo(ProvisionType::class, 'provision_type_id', 'id');
   }
 
   // * un suministro pertenece a una unidad de medida

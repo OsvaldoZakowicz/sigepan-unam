@@ -30,8 +30,7 @@
               <x-table-th>nombre</x-table-th>
               <x-table-th>marca</x-table-th>
               <x-table-th>tipo</x-table-th>
-              <x-table-th>cantidad</x-table-th>
-              <x-table-th>unidad de medida</x-table-th>
+              <x-table-th>cantidad, volumen o peso</x-table-th>
               <x-table-th>acciones</x-table-th>
             </tr>
           </x-slot:tablehead>
@@ -39,6 +38,10 @@
             @forelse ($provisions as $provision)
             <tr wire:key="{{$provision->id}}" class="border">
                 <x-table-td>{{ $provision->id }}</x-table-td>
+                <x-table-td>{{ $provision->provision_name }}</x-table-td>
+                <x-table-td>{{ $provision->trademark->provision_trademark_name }}</x-table-td>
+                <x-table-td>{{ $provision->type->provision_type_name }}</x-table-td>
+                <x-table-td>{{ $provision->provision_quantity }}&nbsp;({{ $provision->measure->measure_abrv }})</x-table-td>
                 <x-table-td>
                   <div class="w-full inline-flex gap-2 justify-start items-center">
                     <x-a-button wire:navigate href="#" bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600">editar</x-a-button>
