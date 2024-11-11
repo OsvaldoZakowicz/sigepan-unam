@@ -100,6 +100,12 @@ Route::middleware(['auth', 'verified', 'can:proveedores'])->group(function () {
   Route::get('suppliers/provision/create', [SupplierController::class, 'provisions_create'])
     ->name('suppliers-provisions-create');
 
+  Route::get('suppliers/trademarks', [SupplierController::class, 'trademarks_index'])
+    ->name('suppliers-trademarks-index');
+
+  Route::get('suppliers/trademark/create', [SupplierController::class, 'trademarks_create'])
+    ->name('suppliers-trademarks-create');
+
 });
 
 //* modulo de stock

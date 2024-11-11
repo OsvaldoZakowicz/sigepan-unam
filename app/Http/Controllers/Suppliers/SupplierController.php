@@ -43,4 +43,16 @@ class SupplierController extends Controller
   {
     return view('suppliers.provisions-create');
   }
+
+  //* ver marcas de suministros
+  public function trademarks_index(): View
+  {
+    return view('suppliers.trademarks-index');
+  }
+
+  //* crear marca de suministros
+  public function trademarks_create(): View
+  {
+    return view('suppliers.trademarks-create');
+  }
 }
