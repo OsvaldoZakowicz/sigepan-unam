@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('provisions', function (Blueprint $table) {
             $table->id();
             $table->string('provision_name', 50);
-            $table->integer('provision_quantity', false, true);
+            $table->decimal('provision_quantity',6 ,2); // numeros de 0.00 a 999.99
             $table->string('provision_short_description', 50)->nullable();
 
             // * fk provision trademarks
