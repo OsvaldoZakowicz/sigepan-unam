@@ -44,8 +44,11 @@
                 <x-table-td>{{ $provision->provision_quantity }}&nbsp;({{ $provision->measure->measure_abrv }})</x-table-td>
                 <x-table-td>
                   <div class="w-full inline-flex gap-2 justify-start items-center">
+
                     <x-a-button wire:navigate href="#" bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600">editar</x-a-button>
-                    <x-btn-button type="button" wire:navigate wire:confirm="¿Desea borrar el registro?" color="red">eliminar</x-btn-button>
+
+                    <x-btn-button type="button" wire:navigate wire:click="delete({{ $provision->id }})" wire:confirm="¿Desea borrar el registro?, eliminar la provision afectara a la lista de precios de los proveedores." color="red">eliminar</x-btn-button>
+
                   </div>
                 </x-table-td>
             </tr>
