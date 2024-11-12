@@ -76,10 +76,16 @@ class CreateSupplier extends Component
       // necesito el rol proveedor
       // el nombre de usuario sera el cuit
       // la contrasenia de acceso sera aleatoria
+      // el estado sera activo (true), explicitamente
+      // la descripcion del estado sera "proveedor activo"
+      // la fecha del estado sera la fecha del alta
       $validated += [
         'user_role' => $supplier_service->getSupplierRolename(),
         'user_name' => $validated['company_cuit'],
-        'user_password' => randomPassword()
+        'user_password' => randomPassword(),
+        'company_status_is_active' => true,
+        'company_status_description' => "proveedor activo",
+        'company_status_date' => now(),
       ];
 
       $supplier_user = $user_service->createInternalUser($validated);

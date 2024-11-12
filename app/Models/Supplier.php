@@ -22,6 +22,9 @@ class Supplier extends Model implements Auditable
     'iva_condition',
     'phone_number',
     'short_description',
+    'status_is_active',
+    'status_description',
+    'status_date',
     'user_id',
     'address_id'
   ];

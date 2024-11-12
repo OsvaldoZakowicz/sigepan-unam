@@ -30,7 +30,8 @@
               <x-table-th>razón social</x-table-th>
               <x-table-th>cuit</x-table-th>
               <x-table-th>teléfono</x-table-th>
-              <x-table-th>condicion frente al iva</x-table-th>
+              <x-table-th>cond. iva</x-table-th>
+              <x-table-th>estado</x-table-th>
               <x-table-th>fecha de creación</x-table-th>
               <x-table-th>acciones</x-table-th>
             </tr>
@@ -43,6 +44,7 @@
                 <x-table-td>{{ $supplier->company_cuit }}</x-table-td>
                 <x-table-td>{{ $supplier->phone_number }}</x-table-td>
                 <x-table-td>{{ $supplier->iva_condition }}</x-table-td>
+                <x-table-td>{{ $supplier->status_is_active }}</x-table-td>
                 <x-table-td>{{ formatDateTime($supplier->created_at, 'd-m-Y') }}</x-table-td>
                 <x-table-td>
                   <div class="flex justify-start gap-1">
@@ -54,7 +56,7 @@
               </tr>
             @empty
               <tr class="border">
-                <td colspan="7">sin registros!</td>
+                <td colspan="8">sin registros!</td>
               </tr>
             @endforelse
           </x-slot:tablebody>

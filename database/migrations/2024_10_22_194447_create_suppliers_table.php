@@ -18,6 +18,9 @@ return new class extends Migration
       $table->string('iva_condition', 50);
       $table->string('phone_number', 10)->unique();
       $table->string('short_description', 150)->nullable();
+      $table->boolean('status_is_active')->default(true);
+      $table->string('status_description', 150)->nullable();
+      $table->date('status_date');
 
       // fk addresses
       //? que sucede con el proveedor si borro la direccion?

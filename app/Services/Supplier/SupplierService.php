@@ -49,13 +49,16 @@ class SupplierService
     ]);
 
     $supplier = Supplier::create([
-      'company_name'        => $supplier_data['company_name'],
-      'company_cuit'        => $supplier_data['company_cuit'],
-      'iva_condition'       => $supplier_data['company_iva'],
-      'phone_number'        => $supplier_data['company_phone'],
-      'short_description'   => $supplier_data['company_short_desc'],
-      'user_id'             => $supplier_user->id,
-      'address_id'          => $supplier_address->id
+      'company_name'        =>  $supplier_data['company_name'],
+      'company_cuit'        =>  $supplier_data['company_cuit'],
+      'iva_condition'       =>  $supplier_data['company_iva'],
+      'phone_number'        =>  $supplier_data['company_phone'],
+      'short_description'   =>  $supplier_data['company_short_desc'],
+      'status_is_active'    =>  $supplier_data['company_status_is_active'],
+      'status_description'  =>  $supplier_data['company_status_description'],
+      'status_date'         =>  $supplier_data['company_status_date'],
+      'user_id'             =>  $supplier_user->id,
+      'address_id'          =>  $supplier_address->id
     ]);
 
     return $supplier;
