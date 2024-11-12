@@ -44,13 +44,17 @@
                 <x-table-td>{{ $supplier->company_cuit }}</x-table-td>
                 <x-table-td>{{ $supplier->phone_number }}</x-table-td>
                 <x-table-td>{{ $supplier->iva_condition }}</x-table-td>
-                <x-table-td>{{ $supplier->status_is_active }}</x-table-td>
+                <x-table-td>{{ ($supplier->status_is_active) ? 'activo' : 'inactivo' }}</x-table-td>
                 <x-table-td>{{ formatDateTime($supplier->created_at, 'd-m-Y') }}</x-table-td>
                 <x-table-td>
                   <div class="flex justify-start gap-1">
+
                     <x-a-button wire:navigate href="{{ route('suppliers-suppliers-show', $supplier->id) }}" bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600">ver</x-a-button>
+
                     <x-a-button wire:navigate href="{{ route('suppliers-suppliers-edit', $supplier->id) }}" bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600">editar</x-a-button>
+
                     <x-btn-button btn_type="button" color="red" wire:click="delete({{ $supplier->id }})" wire:confirm="¿desea borrar el registro? esta accion es irreversible, se eliminara el proveedor y sus credenciales de acceso">eliminar</x-btn-button>
+
                   </div>
                 </x-table-td>
               </tr>
