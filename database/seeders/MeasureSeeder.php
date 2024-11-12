@@ -15,34 +15,26 @@ class MeasureSeeder extends Seeder
 
     DB::table('measures')->insert([
       [
-        'measure_name' => 'gramos',
-        'measure_abrv' => 'gr',
-        'measure_base' => 1000,
-        'measure_short_description' => 'unidad de medida en gramos',
+        'measure_name' => 'kilogramos',
+        'measure_abrv' => 'kg',
+        'measure_base' => 1.000,
+        'measure_short_description' => 'mil gramos',
         'measure_is_editable' => false,
         'created_at' => now()
       ],
       [
-        'measure_name' => 'centimetros cubicos',
-        'measure_abrv' => 'cc',
-        'measure_base' => 1000,
-        'measure_short_description' => 'unidad de medida en centimetros cubicos',
+        'measure_name' => 'litros',
+        'measure_abrv' => 'lts',
+        'measure_base' => 1.000,
+        'measure_short_description' => 'mil mililitros',
         'measure_is_editable' => false,
         'created_at' => now()
       ],
       [
         'measure_name' => 'unidad',
         'measure_abrv' => 'un',
-        'measure_base' => 1,
-        'measure_short_description' => 'unidad de medida en unidad',
-        'measure_is_editable' => false,
-        'created_at' => now()
-      ],
-      [
-        'measure_name' => 'docena',
-        'measure_abrv' => 'docn',
-        'measure_base' => 12,
-        'measure_short_description' => 'unidad de medida en docena',
+        'measure_base' => 1.000,
+        'measure_short_description' => 'una unidad',
         'measure_is_editable' => false,
         'created_at' => now()
       ],

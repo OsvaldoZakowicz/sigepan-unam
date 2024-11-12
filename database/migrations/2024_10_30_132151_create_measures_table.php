@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('measure_name', 50)->unique();
             $table->string('measure_abrv', 4)->unique();
-            $table->integer('measure_base', false, true);
+            $table->decimal('measure_base', 20, 3);
             $table->string('measure_short_description', 150)->nullable();
             $table->boolean('measure_is_editable')->default(false);
             $table->timestamps();
