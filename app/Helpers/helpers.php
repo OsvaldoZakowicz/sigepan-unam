@@ -5,10 +5,10 @@ use Illuminate\Support\Str;
 
 /**
  * * formato de un datetime usando carbon
- * $datetime datetime
+ * $datetime fecha y hora (datetime o string)
  * $format string, ejemplo 'd-m-Y H:i:s'
  */
-function formatDateTime(DateTime $datetime, string $format = 'd-m-Y H:i:s')
+function formatDateTime($datetime, string $format = 'd-m-Y H:i:s')
 {
   return Carbon::parse($datetime)
     ->format($format);
