@@ -100,6 +100,9 @@ Route::middleware(['auth', 'verified', 'can:proveedores'])->group(function () {
   Route::get('suppliers/provision/create', [SupplierController::class, 'provisions_create'])
     ->name('suppliers-provisions-create');
 
+  Route::get('suppliers/provision/edit/{id}', [SupplierController::class, 'provisions_edit'])
+    ->name('suppliers-provisions-edit');
+
   Route::get('suppliers/trademarks', [SupplierController::class, 'trademarks_index'])
     ->name('suppliers-trademarks-index');
 

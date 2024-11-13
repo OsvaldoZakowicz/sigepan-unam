@@ -1,9 +1,9 @@
 <div>
-  {{-- componente crear suministro --}}
+  {{-- componente editar suministro --}}
   <article class="m-2 border rounded-sm border-neutral-200">
 
     {{-- barra de titulo --}}
-    <x-title-section title="crear suministro"></x-title-section>
+    <x-title-section title="editar suministro"></x-title-section>
 
     {{-- cuerpo --}}
     <x-content-section>

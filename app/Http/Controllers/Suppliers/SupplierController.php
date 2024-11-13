@@ -44,6 +44,12 @@ class SupplierController extends Controller
     return view('suppliers.provisions-create');
   }
 
+  //* editar suministro
+  public function provisions_edit($id): View
+  {
+    return view('suppliers.provisions-edit', ['id' => $id]);
+  }
+
   //* ver marcas de suministros
   public function trademarks_index(): View
   {

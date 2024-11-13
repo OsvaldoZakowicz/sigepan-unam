@@ -2,38 +2,44 @@
 
 namespace App\Livewire\Suppliers;
 
-use App\Models\Measure;
 use App\Models\Provision;
 use App\Models\ProvisionTrademark;
 use App\Models\ProvisionType;
+use App\Models\Measure;
 use Livewire\Component;
 
-class CreateProvision extends Component
+class EditProvision extends Component
 {
+  public $provision;
   public $trademarks;
   public $measures;
   public $provision_types;
 
+  // parametros form
   public $provision_name;
   public $provision_quantity;
-  public $provision_short_description = 'sin descripcion';
+  public $provision_short_description;
   public $provision_trademark_id;
   public $provision_type_id;
   public $measure_id;
-
   public $show_pack_form;
 
-  public function mount()
+  public function mount($id)
   {
+    $this->provision = Provision::findOrFail($id);
     $this->trademarks = ProvisionTrademark::all();
     $this->measures = Measure::all();
     $this->provision_types = ProvisionType::all();
-    $this->show_pack_form = false;
-  }
 
-  public function togglePackForm()
-  {
-    $this->show_pack_form = !$this->show_pack_form;
+    // parametros form
+    $this->provision_name               = $this->provision->provision_name;
+    $this->provision_quantity           = $this->provision->provision_quantity;
+    $this->provision_short_description  = $this->provision->provision_short_description;
+    $this->provision_trademark_id       = $this->provision->provision_trademark_id;
+    $this->provision_type_id            = $this->provision->provision_type_id;
+    $this->measure_id                   = $this->provision->measure_id;
+
+    $this->show_pack_form = false;
   }
 
   public function save()
@@ -46,6 +52,8 @@ class CreateProvision extends Component
       'type' => $this->provision_type_id,
       'measure' => $this->measure_id
     ]); */
+
+    // todo: validar nombre + marca + cantidad unica?
 
     $validated = $this->validate([
       'provision_name'              =>  ['required', 'string', 'max:50'],
@@ -63,13 +71,23 @@ class CreateProvision extends Component
       'provision_short_description' =>  'descripcion',
     ]);
 
+    //dd($validated);
+
     try {
 
-      Provision::create($validated);
+      // todo: cuando es seguro editar un suministro, sobre todo su cantidad  o tipo?
+
+      $this->provision->provision_name              = $this->provision_name;
+      $this->provision->provision_quantity          = $this->provision_quantity;
+      $this->provision->provision_short_description = $this->provision_short_description;
+      $this->provision->provision_trademark_id      = $this->provision_trademark_id;
+      $this->provision->provision_type_id           = $this->provision_type_id;
+      $this->provision->measure_id                  = $this->measure_id;
+      $this->provision->save();
 
       $this->reset();
 
-      session()->flash('operation-success', toastSuccessBody('suministro', 'creado'));
+      session()->flash('operation-success', toastSuccessBody('suministro', 'editado'));
       $this->redirectRoute('suppliers-provisions-index');
 
     } catch (\Exception $e) {
@@ -78,11 +96,10 @@ class CreateProvision extends Component
       $this->redirectRoute('suppliers-provisions-index');
 
     }
-
   }
 
   public function render()
   {
-    return view('livewire.suppliers.create-provision');
+    return view('livewire.suppliers.edit-provision');
   }
 }
