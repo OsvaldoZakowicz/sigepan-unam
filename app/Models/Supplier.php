@@ -29,6 +29,10 @@ class Supplier extends Model implements Auditable
     'address_id'
   ];
 
+  protected $casts = [
+    'status_date' => 'date'
+  ];
+
   //* a un proveedor le pertenece un usuario
   // suppliers 0..1 : 1 users
   public function user(): BelongsTo

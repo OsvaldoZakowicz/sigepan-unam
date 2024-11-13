@@ -86,6 +86,9 @@ class SupplierService
     $supplier->iva_condition       = $supplier_data['company_iva'];
     $supplier->phone_number        = $supplier_data['company_phone'];
     $supplier->short_description   = $supplier_data['company_short_desc'];
+    $supplier->status_is_active    = $supplier_data['status_is_active'];
+    $supplier->status_description  = $supplier_data['status_description'];
+    $supplier->status_date         = $supplier_data['status_date'];
     $supplier->user_id             = $supplier_user->id;
     $supplier->address_id          = $address->id;
     $supplier->save();

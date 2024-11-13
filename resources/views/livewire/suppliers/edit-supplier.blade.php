@@ -16,7 +16,7 @@
 
         <form wire:submit="update" class="w-full flex flex-col gap-2">
 
-          <x-div-toggle x-data="{ open: true }" title="proveedor" subtitle="Editar los siguientes datos del proveedor y su direccion." class="p-2">
+          <x-div-toggle x-data="{ open: false }" title="proveedor" subtitle="Editar los siguientes datos del proveedor y su direccion." class="p-2">
 
             {{-- mensajes de seccion --}}
             @error('company_*')
@@ -137,7 +137,55 @@
 
           </x-div-toggle>
 
-          {{-- <x-div-toggle x-data="{ open: true }" title="estado del proveedor" subtitle="Editar el estado del proveedor." class="p-2"></x-div-toggle> --}}
+          <x-div-toggle x-data="{ open: false }" title="estado del proveedor" subtitle="Editar el estado del proveedor." class="p-2">
+
+            {{-- mensajes de seccion --}}
+            @error('status_*')
+              <x-slot:messages class="my-2">
+                <span class="text-red-400">¡hay errores en esta seccion!</span>
+              </x-slot:messages>
+            @enderror
+
+            <x-fieldset-base tema="estado" class="w-full">
+
+              {{-- estado --}}
+              <div class="flex flex-col gap-2 p-2 w-fit-content">
+                <label class="capitalize max-w-fit">seleccione el estado del proveedor<span class="text-red-600">*</span></label>
+                <div class="flex gap-2">
+                  <div class="border border-neutral-200 h-min rounded-sm p-1">
+                    <input type="radio" id="active" wire:model.live="status_is_active" wire:click="checkIfStatusChanged" name="status_is_active" value="1">
+                    <label for="active">Activo</label>
+                  </div>
+                  <div class="border border-neutral-200 h-min rounded-sm p-1">
+                    <input type="radio" id="inactive" wire:model.live="status_is_active" wire:click="checkIfStatusChanged" name="status_is_active" value="0">
+                    <label for="inactive">Inactivo</label>
+                  </div>
+                </div>
+              </div>
+
+              {{-- descripcion del estado --}}
+              @if ($status_changed)
+                <div class="flex flex-col gap-1 p-2 w-full md:w-1/2 lg:grow">
+                  <span>
+                    <label for="status_new_description" class="capitalize max-w-fit">Describa la razón del cambio de estado</label>
+                    <span class="text-red-600">*</span>
+                    @error('status_new_description')
+                      <span class="inline-block text-red-400 text-xs">{{ $message }}</span>
+                    @enderror
+                  </span>
+                  <x-text-input wire:model="status_new_description" id="status_new_description" name="status_new_description" type="text" class="mt-1 block w-full" />
+                </div>
+              @else
+                {{-- solo visualizar descripcion --}}
+                <div class="flex flex-col gap-1 p-2 w-full md:w-1/2 lg:grow">
+                  <label for="status_description" class="capitalize max-w-fit">Estado actual del proveedor</label>
+                  <x-text-input disabled wire:model="status_description" type="text" class="mt-1 block w-full bg-neutral-200" />
+                </div>
+              @endif
+
+            </x-fieldset-base>
+
+          </x-div-toggle>
 
           <x-div-toggle x-data="{ open: false }" title="usuario del proveedor" subtitle="Editar las credenciales de acceso del proveedor." class="p-2">
 

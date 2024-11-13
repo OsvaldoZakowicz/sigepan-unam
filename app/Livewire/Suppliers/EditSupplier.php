@@ -22,6 +22,15 @@ class EditSupplier extends Component
   // debido al campo nullable, inicializar
   public $company_short_desc = "sin descripcion";
 
+  // estado del proveedor
+  public $status_is_active;
+  public $status_description;
+  public $status_date;
+
+  // cambio el estado del proveedor?
+  public $status_changed;
+  public $status_new_description;
+
   // proveedor direccion
   public $company_street;
   // debido al campo nullable, inicializar
@@ -42,22 +51,49 @@ class EditSupplier extends Component
     $this->supplier = Supplier::findOrFail($id);
     $this->iva_condition_params = $supplier_service->getSuppilerIvaConditions();
 
-    $this->company_name        = $this->supplier->company_name;
-    $this->company_cuit        = $this->supplier->company_cuit;
-    $this->company_iva         = $this->supplier->iva_condition;
-    $this->company_phone       = $this->supplier->phone_number;
-    $this->company_short_desc  = $this->supplier->short_description;
-    $this->company_street      = $this->supplier->address->street;
-    $this->company_number      = $this->supplier->address->number;
-    $this->company_city        = $this->supplier->address->city;
-    $this->company_postal_code = $this->supplier->address->postal_code;
-    $this->user_name           = $this->supplier->user->name;
-    $this->user_email          = $this->supplier->user->email;
+    $this->company_name         =  $this->supplier->company_name;
+    $this->company_cuit         =  $this->supplier->company_cuit;
+    $this->company_iva          =  $this->supplier->iva_condition;
+    $this->company_phone        =  $this->supplier->phone_number;
+    $this->company_short_desc   =  $this->supplier->short_description;
+
+    // estado actual del proveedor
+    $this->status_is_active     =  $this->supplier->status_is_active;
+    $this->status_description   =  $this->supplier->status_description;
+    $this->status_date          =  $this->supplier->status_date;
+
+    $this->company_street       =  $this->supplier->address->street;
+    $this->company_number       =  $this->supplier->address->number;
+    $this->company_city         =  $this->supplier->address->city;
+    $this->company_postal_code  =  $this->supplier->address->postal_code;
+
+    $this->user_name            =  $this->supplier->user->name;
+    $this->user_email           =  $this->supplier->user->email;
+
+    // al cargar los datos, el estado no cambia
+    $this->status_changed       =  false;
+  }
+
+  //* comprobar si el estado del proveedor fue cambiado
+  //* NOTA: true y false se trabaja en 0 y 1, ojo al comparar con igualdad estricta con true y false.
+  public function checkIfStatusChanged()
+  {
+    // estado actual del proveedor
+    $CURRENT_STATUS = $this->supplier->status_is_active;
+
+    if ($CURRENT_STATUS == $this->status_is_active) {
+      // lo que tengo es igual a lo elegido, no hay cambio
+      $this->status_changed = false;
+    } else {
+      // lo que tengo es distinto a lo elegido, hay cambio
+      $this->status_changed = true;
+    }
+
   }
 
   public function update(SupplierService $supplier_service, UserService $user_service)
   {
-    // validar proveedor, direccion y credenciales de usuario
+    // validar proveedor, direccion, estado y credenciales de usuario
     $validated = $this->validate([
       'user_email' => [
         'required',
@@ -81,7 +117,10 @@ class EditSupplier extends Component
         'size:10',
         Rule::unique('suppliers','phone_number')->ignore($this->supplier->id)
       ],
-      'company_short_desc' => 'nullable|max:150',
+      'company_short_desc'  => 'nullable|max:150',
+      'status_is_active'    => 'required',
+      'status_description'  => 'required',
+      'status_new_description'  => [Rule::requiredIf($this->status_changed), 'max:150'],
       'company_street'  => 'required|regex:/^[\p{L}\p{N}\s]+$/u|max:45',
       'company_number'  => 'nullable|max:8',
       'company_city'    => 'required|regex:/^[\p{L}\p{N}\s]+$/u|max:45',
@@ -89,7 +128,7 @@ class EditSupplier extends Component
     ],[
       'company_name.regex'    => 'El campo :attribute solo permite letras, numeros y espacios',
       'company_street.regex'  => 'El campo :attribute solo permite letras, numeros y espacios',
-      'company_city.regex'    => 'El campo :attribute solo permite letras, numeros y espacios',
+      'company_city.regex'    => 'El campo :attribute solo permite letras, numeros y espacios'
     ],[
       'user_email'      => 'correo electronico',
       'company_name'  => 'razon social',
@@ -97,6 +136,7 @@ class EditSupplier extends Component
       'company_iva'   => 'condicion frente al iva',
       'company_phone' => 'telefono de contacto',
       'company_short_desc' => 'descripcion corta',
+      'status_description' => 'razón del cambio de estado',
       'company_street'  => 'calle',
       'company_number'  => 'numero de calle',
       'company_city'    => 'ciudad',
@@ -109,8 +149,20 @@ class EditSupplier extends Component
       // el nombre de usuario sera el cuit
       $validated += [
         'user_role' => $supplier_service->getSupplierRolename(),
-        'user_name' => $validated['company_cuit']
+        'user_name' => $validated['company_cuit'],
       ];
+
+      if ($this->status_changed) {
+        // el estado cambia, agregar fecha nueva y descripcion nueva
+        $validated += ['status_date' => now()->format('d-m-Y')];
+        $validated['status_description'] = $validated['status_new_description'];
+      } else {
+        // el estado no cambia, mantener fecha y descripcion
+        $validated += ['status_date' => $this->supplier->status_date->format('d-m-Y')];
+        $validated += ['status_description' => $this->supplier->status_description];
+      }
+
+      //dd($validated);
 
       $updated_supplier_user = $user_service->editInternalUser($this->supplier->user, $validated);
       $updated_supplier = $supplier_service->editSupplier($updated_supplier_user, $this->supplier, $validated);
