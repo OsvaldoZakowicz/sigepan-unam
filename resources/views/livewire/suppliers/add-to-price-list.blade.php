@@ -15,15 +15,17 @@
       <x-slot:content class="w-full flex-col">
 
         {{-- buscar suministros --}}
-        <livewire:suppliers.search-provision />
+        @livewire('suppliers.search-provision')
 
         {{-- lista de suministros elegidos --}}
         <div>
-          @forelse ($provisions as $pvs)
-            <p>{{ $pvs->id }}, {{ $pvs->provision_name }}</p>
-          @empty
-            <p>vacio</p>
-          @endforelse
+          @foreach ($provisions as $provision_key => $provision_id)
+            @livewire('suppliers.input-price-form', ['provision_id' => $provision_id, 'supplier_id' => $supplier->id], key($provision_key))
+          @endforeach
+        </div>
+
+        <div class="bt-4">
+          <button type="button" wire:click="save" >guardar!</button>
         </div>
 
       </x-slot:content>

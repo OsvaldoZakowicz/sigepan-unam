@@ -17,21 +17,39 @@ class AddToPriceList extends Component
 
   // lista de suministros seleccionada
   public $provisions = [];
+  // key autoincremental para el array de suministros seleccionados
+  public $provision_key;
 
   //* montar datos
   public function mount($id)
   {
     $this->supplier = Supplier::findOrFail($id);
+    $this->provision_key = 0;
   }
 
   //* capturar evento de añadir provisiones a la lista
   #[On('add-provision')]
   public function onAddEvent($id)
   {
-    // buscar y agregar a la lista
+    // buscar suministro
     $provision = Provision::findOrFail($id);
-    $this->provisions = Arr::add($this->provisions, $provision->id, $provision);
 
+    // no agregar a la lista si existe
+    if (in_array($provision->id, $this->provisions)) {
+      return;
+    }
+
+    // agregar a la lista
+    // lista [ 'id' => 'provision_id' ]
+    $this->provisions = Arr::add($this->provisions, $this->provision_key, $provision->id);
+    $this->provision_key++;
+
+  }
+
+  //* guardar precios
+  public function save()
+  {
+    $this->dispatch('save-prices');
   }
 
   public function render()
