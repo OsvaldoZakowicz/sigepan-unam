@@ -32,6 +32,19 @@ class SupplierController extends Controller
     return view('suppliers.suppliers-edit', ['id' => $id]);
   }
 
+  //* lista de precios de un proveedor, id del proveedor
+  // recupera para el proveedor su lista de suministros con precios
+  public function suppliers_price_list($id): View
+  {
+    return view('suppliers.suppliers-prices-index', ['id' => $id]);
+  }
+
+  //* lista de alta de suministros con precio para un proveedor, id del proveedor
+  public function suppliers_add_provision_price_to_provisions_price_list($id): View
+  {
+    return view('suppliers.suppliers-prices-create', ['id' => $id]);
+  }
+
   //* ver suministros
   public function provisions_index(): View
   {

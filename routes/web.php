@@ -103,6 +103,14 @@ Route::middleware(['auth', 'verified', 'can:proveedores'])->group(function () {
   Route::get('suppliers/provision/edit/{id}', [SupplierController::class, 'provisions_edit'])
     ->name('suppliers-provisions-edit');
 
+  // NOTA: mantengo la ruta con nombre suppliers-suppliers-*
+  Route::get('supplier/{id}/provisions/prices', [SupplierController::class, 'suppliers_price_list'])
+    ->name('suppliers-suppliers-price-index');
+
+  // NOTA: mantengo la ruta con nombre suppliers-suppliers-*
+  Route::get('supplier/{id}/provision/prices/create', [SupplierController::class, 'suppliers_add_provision_price_to_provisions_price_list'])
+    ->name('suppliers-suppliers-price-create');
+
   Route::get('suppliers/trademarks', [SupplierController::class, 'trademarks_index'])
     ->name('suppliers-trademarks-index');
 
