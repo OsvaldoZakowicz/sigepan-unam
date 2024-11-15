@@ -15,9 +15,10 @@ class SearchProvision extends Component
   public $search;
 
   //* enviar la provision elegida mediante un evento
+  // notifica al componente livewire AddToPriceList
   public function addProvision($id)
   {
-    $this->dispatch('add-provision', id: $id);
+    $this->dispatch('append-provision', id: $id);
   }
 
   public function render()

@@ -19,9 +19,18 @@
 
         {{-- lista de suministros elegidos --}}
         <div>
-          @foreach ($provisions as $provision_key => $provision_id)
-            @livewire('suppliers.input-price-form', ['provision_id' => $provision_id, 'supplier_id' => $supplier->id], key($provision_key))
-          @endforeach
+          @forelse ($provisions as $provision_array_key => $provision_id)
+            @livewire(
+              'suppliers.input-price-form',
+              [
+                'provision_id'        => $provision_id,
+                'supplier_id'         => $supplier->id,
+                'provision_array_key' => $provision_array_key
+              ],
+              key($provision_array_key))
+          @empty
+            <p>vacio!</p>
+          @endforelse
         </div>
 
         <div class="bt-4">
