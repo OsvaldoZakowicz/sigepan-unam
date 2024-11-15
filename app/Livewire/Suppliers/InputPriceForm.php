@@ -107,7 +107,7 @@ class InputPriceForm extends Component
 
     $this->resetError();
 
-    dd((float)$this->provision_price);
+    //dd((float)$this->provision_price);
 
 
     try {

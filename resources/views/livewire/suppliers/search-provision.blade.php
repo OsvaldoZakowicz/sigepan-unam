@@ -2,7 +2,7 @@
   {{-- formulario de busqueda --}}
   <form class="w-full">
 
-    <div class="flex flex-col gap-2 w-full">
+    <div class="flex flex-col w-full">
 
       {{-- buscar --}}
       <div class="flex w-full">
@@ -15,7 +15,7 @@
 
       {{-- seleccion de resultado --}}
       <div class="flex flex-col w-full">
-        <x-table-base>
+        {{-- <x-table-base>
           <x-slot:tablehead>
             <tr class="border bg-neutral-100">
               <x-table-th>id</x-table-th>
@@ -35,7 +35,7 @@
                 <x-table-td>{{ $provision->trademark->provision_trademark_name }}</x-table-td>
                 <x-table-td>{{ $provision->type->provision_type_name }}</x-table-td>
                 <x-table-td>
-                  <x-a-button wire:click="addProvision({{ $provision->id }})" href="#">elegir</x-a-button>
+                  <span wire:click="addProvision({{ $provision->id }})" class="font-bold cursor-pointer text-lg leading-none">&plus;</span>
                 </x-table-td>
               </tr>
             @empty
@@ -47,6 +47,29 @@
         </x-table-base>
         <div class="flex justify-end items-center gap-4 py-1">
           {{ $provisions->links() }}
+        </div> --}}
+
+        @forelse ($provisions_filter as $provision)
+          <div wire:key="{{ $provision->id }}" class="flex justify-between p-1 border-x border-b">
+            {{-- datos de suministro --}}
+            <div class="flex">
+              <span class="font-semibold">{{ $provision->type->provision_type_name }}:&nbsp;</span>
+              <span>{{ $provision->provision_name }}&nbsp;</span>
+              <span>{{ $provision->provision_quantity }}({{ $provision->measure->measure_abrv }}),&nbsp;</span>
+              <span class="font-semibold">marca:&nbsp;{{ $provision->trademark->provision_trademark_name }}</span>
+            </div>
+            {{-- botones --}}
+            <div class="flex">
+              <span wire:click="addProvision({{ $provision->id }})" class="font-bold cursor-pointer text-lg leading-none px-1 mx-1 bg-neutral-100 text-neutral-600 border-neutral-300 rounded-sm" title="agregar a la lista.">&plus;</span>
+            </div>
+          </div>
+        @empty
+          <div class="border">
+            <span colspan="5">sin registros!</span>
+          </div>
+        @endforelse
+        <div class="flex justify-end items-center gap-4 py-1">
+          {{ $provisions_filter->links() }}
         </div>
       </div>
 
