@@ -17,11 +17,70 @@ class InputPriceForm extends Component
   // campos del formulario
   public $provision_price;
 
+  // error de validacion
+  public $validation_error;
+  public $validation_error_message;
+
+  // montar datos
   public function mount($provision_id, $supplier_id, $provision_array_key)
   {
     $this->provision = Provision::findOrFail($provision_id);
     $this->supplier = Supplier::findOrFail($supplier_id);
     $this->provision_array_key = $provision_array_key;
+    $this->validation_error = false;
+  }
+
+  // validacion, numero decimal, positivo, no nulo
+  public function isValidPositiveDecimal(mixed $value): bool
+  {
+    if (!is_numeric($value)) {
+      return false;
+    }
+
+    // retorno true cuando cumple ambas condiciones
+    return $value !== null && $value > 0;
+  }
+
+  // error de validacion
+  // no es un numero positivo o es nulo
+  function positiveDecimalError()
+  {
+    $this->validation_error = true;
+    $this->validation_error_message = 'el precio debe ser un numero decimal positivo no nulo';
+  }
+
+  // validacion en la cantidad de digitos enteros
+  function isValidDecimalWithMaxIntDigits(mixed $value, int $max_int_digits = 6, int $max_decimal_digits = 2): bool
+  {
+    if (!is_numeric($value)) {
+        return false;
+    }
+
+    // divide el valor, casteado a string, en dos en el punto
+    // el punto separa un numero en formato float: entero.decimal
+    $parts = explode('.', (string) $value);
+    // cuento la cantidad de digitos enteros
+    $int_digits = strlen($parts[0]);
+    // cuento la cantidad de digitos decimales, si hay, o asigno 0
+    $decimal_digits = isset($parts[1]) ? strlen($parts[1]) : 0;
+
+    // retorno true si la parte entera y la decimal son menores y/o iguales a lo permitido
+    return $int_digits <= $max_int_digits && $decimal_digits <= $max_decimal_digits;
+  }
+
+  // error de validacion
+  // no cumple con la longitud y cantidad de digitos aceptados
+  function maxDigitsError(string $max_format = '999999.99')
+  {
+    $this->validation_error = true;
+    $this->validation_error_message = 'el precio debe cumplir con un formato máximo de: ' . $max_format;
+  }
+
+  // limpiar error
+  function resetError()
+  {
+    $this->validation_error = false;
+    $this->validation_error_message = '';
   }
 
   //* al recibir notificacion de guardado
@@ -30,9 +89,26 @@ class InputPriceForm extends Component
   public function savePrice()
   {
 
-    // todo: validar precio
+    // el precio debe ser un numero decimal positivo no nulo
+    if (!$this->isValidPositiveDecimal($this->provision_price))
+    {
+      $this->positiveDecimalError();
+      return;
+    }
 
-    // todo: como comunico errores de validacion?
+    $this->resetError();
+
+    // el precio debe cumplir con la longitud maxima aceptada
+    if (!$this->isValidDecimalWithMaxIntDigits($this->provision_price))
+    {
+      $this->maxDigitsError();
+      return;
+    }
+
+    $this->resetError();
+
+    dd((float)$this->provision_price);
+
 
     try {
 
