@@ -10,7 +10,6 @@ use App\Models\User;
 use App\Models\Address;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-// todo: auditar
 class Supplier extends Model implements Auditable
 {
   use HasFactory;
