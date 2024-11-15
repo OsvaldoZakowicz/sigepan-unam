@@ -32,7 +32,9 @@ class SupplierTest extends TestCase
     'company_cuit' => '12345678912',
     'iva_condition' => 'monotributista',
     'phone_number' => '3755121447',
-    'short_description' => 'description'
+    'short_description' => 'description',
+    'status_is_active' => true,
+    'status_description' => 'dscription',
   ];
 
   /**
@@ -46,7 +48,12 @@ class SupplierTest extends TestCase
     $user = User::create($this->user_data);
     $addres = Address::create($this->address_data);
 
-    $this->supplier_data += ['user_id' => $user->id, 'address_id' => $addres->id];
+    $this->supplier_data += [
+      'status_date' => formatDateTime(now(), 'Y-m-d'),
+      'user_id' => $user->id,
+      'address_id' => $addres->id
+    ];
+
     $supplier = Supplier::create($this->supplier_data);
 
     //* afirmar cambios
@@ -72,7 +79,12 @@ class SupplierTest extends TestCase
     $user = User::create($this->user_data);
     $addres = Address::create($this->address_data);
 
-    $this->supplier_data += ['user_id' => $user->id, 'address_id' => $addres->id];
+    $this->supplier_data += [
+      'status_date' => formatDateTime(now(), 'Y-m-d'),
+      'user_id' => $user->id,
+      'address_id' => $addres->id
+    ];
+
     $supplier = Supplier::create($this->supplier_data);
 
     // borrar registros
@@ -97,7 +109,13 @@ class SupplierTest extends TestCase
     //* probar
     $user = User::create($this->user_data);
     $addres = Address::create($this->address_data);
-    $this->supplier_data += ['user_id' => $user->id, 'address_id' => $addres->id];
+
+    $this->supplier_data += [
+      'status_date' => formatDateTime(now(), 'Y-m-d'),
+      'user_id' => $user->id,
+      'address_id' => $addres->id
+    ];
+
     $supplier = Supplier::create($this->supplier_data);
 
     // editar telefono
