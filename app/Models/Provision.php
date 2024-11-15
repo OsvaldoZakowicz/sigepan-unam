@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 // todo: auditar
 
@@ -37,5 +38,13 @@ class Provision extends Model
   public function measure(): BelongsTo
   {
     return $this->belongsTo(Measure::class);
+  }
+
+  // * un suministro es provisto por muchos provedores
+  // provisions n : n suppliers
+  public function suppliers(): BelongsToMany
+  {
+    return $this->belongsToMany(Supplier::class)
+      ->withPivot('price')->withTimestamps();
   }
 }

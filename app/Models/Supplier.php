@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use OwenIt\Auditing\Contracts\Auditable;
 use App\Models\User;
 use App\Models\Address;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 // todo: auditar
 class Supplier extends Model implements Auditable
@@ -45,5 +46,13 @@ class Supplier extends Model implements Auditable
   public function address(): BelongsTo
   {
     return $this->belongsTo(Address::class);
+  }
+
+  //* un proveedor tiene muchos suministros asociados
+  // suppliers n : n provisions
+  public function provisions(): BelongsToMany
+  {
+    return $this->belongsToMany(Provision::class)
+      ->withPivot('price')->withTimestamps();
   }
 }
