@@ -65,9 +65,9 @@
                 <x-table-td>
                   <div class="w-full inline-flex gap-2 justify-start items-center">
 
-                    <x-a-button wire:navigate href="{{ route('suppliers-provisions-edit', $provision->id) }}" bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600">editar</x-a-button>
+                    <x-a-button wire:click="edit({{ $provision->id }})" href="#" bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600">editar</x-a-button>
 
-                    <x-btn-button type="button" wire:navigate wire:click="delete({{ $provision->id }})" wire:confirm="¿Desea borrar el registro?, eliminar la provision afectara a la lista de precios de los proveedores." color="red">eliminar</x-btn-button>
+                    <x-btn-button type="button" wire:click="delete({{ $provision->id }})" wire:confirm="¿Desea borrar el registro?, eliminar un suministro hará que no este disponible para asignar a ningún proveedor." color="red">eliminar</x-btn-button>
 
                   </div>
                 </x-table-td>

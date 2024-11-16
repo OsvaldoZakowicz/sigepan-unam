@@ -5,6 +5,7 @@ namespace App\Livewire\Suppliers;
 use App\Models\Provision;
 use App\Models\ProvisionTrademark;
 use App\Models\ProvisionType;
+use Illuminate\Database\QueryException;
 use Livewire\Component;
 use Livewire\Attributes\Url;
 use Livewire\WithPagination;
@@ -31,10 +32,10 @@ class ListProvisions extends Component
   }
 
   //* borrar suministro
+  // solo cuando no este asociado a proveedores
   public function delete(Provision $provision)
   {
-    // todo: controles previos al borrado, cuando es seguro borrar?
-    //dd($provision);
+    // todo: cuando el suministro se use en recetas, no permitir el borrado
 
     try {
 
@@ -46,16 +47,54 @@ class ListProvisions extends Component
         'descr_toast' =>  toastSuccessBody('suministro', 'eliminado'),
       ]);
 
-    } catch (\Exception $e) {
+    } catch (QueryException $qe) {
 
+      // capturar codigo del error
+      $error_code = $qe->errorInfo[1];
+
+      // error 1451 de clave foranea, restrict on delete
+      if ($error_code == 1451) {
+
+        $this->dispatch('toast-event', toast_data: [
+          'event_type'  =>  'info',
+          'title_toast' =>  toastTitle('', true),
+          'descr_toast' =>  'No se puede eliminar el suministro, está asociado a listas de precios de proveedores',
+        ]);
+
+        return;
+
+      }
+
+      // otro error
       $this->dispatch('toast-event', toast_data: [
         'event_type'  =>  'error',
         'title_toast' =>  toastTitle('fallida'),
-        'descr_toast' =>  'error: ' . $e->getMessage() . ' contacte al Administrador',
+        'descr_toast' =>  'Error inesperado: ' . $qe->getMessage() . 'contacte al Administrador',
       ]);
 
     }
 
+  }
+
+  //* editar suministro
+  // solo cuando no este asociado a proveedores
+  public function edit(Provision $provision)
+  {
+    if ($provision->suppliers->count() !== 0) {
+
+      // no editar, esta asociado a proveedores
+      $this->dispatch('toast-event', toast_data: [
+        'event_type'  =>  'info',
+        'title_toast' =>  toastTitle('', true),
+        'descr_toast' =>  'El suministro no se puede editar, está asociado a listas de precios de proveedores',
+      ]);
+
+      return;
+
+    }
+
+    // rdirigir a la edicion
+    $this->redirectRoute('suppliers-provisions-edit', $provision->id, true, true);
   }
 
   //* reiniciar la pagina para establecer la paginacion al inicio y buscar
@@ -68,16 +107,16 @@ class ListProvisions extends Component
   public function searchProvision()
   {
     return Provision::when($this->search, function ($query) {
-                        $query->where('id', 'like', '%' . $this->search . '%')
-                              ->orWhere('provision_name', 'like', '%' . $this->search . '%');
-                      })
-                      ->when($this->trademark_filter, function ($query) {
-                        $query->where('provision_trademark_id', $this->trademark_filter);
-                      })
-                      ->when($this->type_filter, function ($query) {
-                        $query->where('provision_type_id', $this->type_filter);
-                      })
-                      ->orderBy('id', 'desc')->paginate(10);
+        $query->where('id', 'like', '%' . $this->search . '%')
+              ->orWhere('provision_name', 'like', '%' . $this->search . '%');
+      })
+      ->when($this->trademark_filter, function ($query) {
+        $query->where('provision_trademark_id', $this->trademark_filter);
+      })
+      ->when($this->type_filter, function ($query) {
+        $query->where('provision_type_id', $this->type_filter);
+      })
+      ->orderBy('id', 'desc')->paginate(10);
   }
 
   public function render()
