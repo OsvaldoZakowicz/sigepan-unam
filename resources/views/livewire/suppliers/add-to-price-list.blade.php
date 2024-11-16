@@ -3,7 +3,7 @@
   <article class="m-2 border rounded-sm border-neutral-200">
 
     {{-- barra de titulo --}}
-    <x-title-section title="agregar suministros a la lista de precios del proveedor: {{ $supplier->company_name }}">
+    <x-title-section title="alta de precios de suministros para el proveedor: {{ $supplier->company_name }}">
       <x-a-button wire:navigate href="{{ route('suppliers-suppliers-price-index', $supplier->id) }}" bg_color="neutral-100" border_color="neutral-300" text_color="neutral-600">volver</x-a-button>
     </x-title-section>
 
@@ -19,8 +19,8 @@
 
         {{-- lista de suministros elegidos --}}
         <div class="flex flex-col gap-1 w-full">
-          <span class="font-semibold capitalize">lista de suministros para el proveedor</span>
-          <div class="max-h-36 overflow-y-auto overflow-x-hidden">
+          <span class="font-semibold capitalize">formulario</span>
+          <div class="max-h-72 overflow-y-auto overflow-x-hidden">
             <x-table-base>
               <x-slot:tablehead>
                 <tr class="border bg-neutral-100">
@@ -39,7 +39,7 @@
                   )
                 @empty
                   <tr class="border">
-                    <td colspan="3">¡lista vacia!, búsque y elija suministros para comenzar.</td>
+                    <td colspan="3">¡lista vacia!, búsque y agregue suministros a esta lista para comenzar.</td>
                   </tr>
                 @endforelse
               </x-slot:tablebody>
@@ -51,7 +51,8 @@
 
       <x-slot:footer class="py-2">
         <!-- grupo de botones -->
-        <div class="flex">
+        <div class="flex gap-2">
+          <x-a-button wire:navigate href="#" wire:click="refresh" bg_color="neutral-100" border_color="neutral-300" text_color="neutral-600">vaciar lista</x-a-button>
           <x-btn-button type="button" wire:click="save" >guardar suministros listados</x-btn-button>
         </div>
       </x-slot:footer>

@@ -5,6 +5,7 @@ namespace App\Livewire\Suppliers;
 use App\Models\Provision;
 use App\Models\ProvisionTrademark;
 use App\Models\ProvisionType;
+use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
 use Livewire\WithPagination;
 use Livewire\Component;
@@ -64,6 +65,7 @@ class SearchProvision extends Component
                         ->paginate(4);
   }
 
+  #[On('refresh-search')]
   public function render()
   {
     $provisions = $this->searchProvisions();

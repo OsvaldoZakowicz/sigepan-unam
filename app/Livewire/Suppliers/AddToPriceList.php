@@ -20,11 +20,17 @@ class AddToPriceList extends Component
   // key autoincremental para el array de suministros seleccionados
   public $provision_array_key;
 
-  //* montar datos
+  // montar datos
   public function mount($id)
   {
     $this->supplier = Supplier::findOrFail($id);
     $this->provision_array_key = 0;
+  }
+
+  // vaciar array
+  public function refresh()
+  {
+    $this->provisions = [];
   }
 
   //* capturar evento de añadir provision a la lista
@@ -38,7 +44,12 @@ class AddToPriceList extends Component
     // no agregar a la lista si existe
     if (in_array($provision->id, $this->provisions)) {
 
-      // todo: mensaje "ya esta en la lista"
+      $this->dispatch('toast-event', toast_data: [
+        'event_type' => 'info',
+        'title_toast' => toastTitle('', true),
+        'descr_toast' => 'Este suministro ya está en la lista!'
+      ]);
+
       return;
     }
 
@@ -58,11 +69,20 @@ class AddToPriceList extends Component
     unset($this->provisions[$id]);
   }
 
-  //* guardar precios
+  //* evento guardar precios
   // notificar a cada componente livewire InputPriceForm
   public function save()
   {
+    //no hacer nada si la lista de provisones esta vacia
+    if (count($this->provisions) === 0) {
+      return;
+    }
+
+    // guardar al menos uno
     $this->dispatch('save-prices')->to(InputPriceForm::class);
+
+    // refrescar cuadro de busqueda
+    $this->dispatch('refresh-search')->to(SearchProvision::class);
   }
 
   public function render()

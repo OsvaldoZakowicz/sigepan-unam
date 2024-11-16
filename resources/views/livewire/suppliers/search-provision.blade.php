@@ -6,7 +6,7 @@
       <form class="w-full">
         <div class="flex flex-col w-full">
           {{-- buscar --}}
-          <div class="flex w-full gap-1 bg-neutral-100 p-1">
+          <div class="flex w-full gap-1 bg-neutral-100 p-1 border-t border-x border-neutral-200">
             {{-- termino de busqueda --}}
             <div class="flex flex-col w-full justify-end">
               <x-input-label>buscar suministros</x-input-label>

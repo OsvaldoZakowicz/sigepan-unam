@@ -107,27 +107,22 @@ class InputPriceForm extends Component
 
     $this->resetError();
 
-    //dd((float)$this->provision_price);
-
 
     try {
-
-      // todo: no duplicar suministros ya existentes con precios
 
       // guardar suministro con precio
       $this->supplier->provisions()->attach($this->provision->id, ['price' => $this->provision_price]);
 
-      // todo: al guardar exitosamente, quitar suministro de la lista
+      // al guardar exitosamente, quitar suministro de la lista
+      $this->dispatch('remove-provision', id: $this->provision_array_key);
 
     } catch (\Exception $e) {
-
-      // todo: como manejo errores de cada form individual?
 
       // manejar errores
       $this->dispatch('toast-event', toast_data: [
         'event_type' => 'error',
         'title_toast' => 'error',
-        'descr_toast' => 'error: ' . $e->getMessage(),
+        'descr_toast' => 'error: ' . $e->getMessage() . ' contacte al Administrador',
       ]);
 
     }
