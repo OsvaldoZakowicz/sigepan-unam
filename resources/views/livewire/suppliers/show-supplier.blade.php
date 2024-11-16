@@ -4,7 +4,7 @@
 
     {{-- barra de titulo --}}
     <x-title-section title="ver proveedor">
-      <x-a-button wire:navigate href="{{ route('suppliers-suppliers-index') }}" bg_color="neutral-600" border_color="neutral-600" text_color="neutral-100">volver</x-a-button>
+      <x-a-button wire:navigate href="{{ route('suppliers-suppliers-index') }}" bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600">volver</x-a-button>
     </x-title-section>
 
     <x-content-section>

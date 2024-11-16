@@ -6,7 +6,7 @@
       {{-- volver --}}
       <x-a-button
         wire:navigate href="{{ route('audits-audits-index') }}"
-        bg_color="neutral-600" border_color="neutral-600" text_color="neutral-100"
+        bg_color="neutral-100" border_color="neutral-300" text_color="neutral-600"
         class="mr-2">volver</x-a-button>
       {{-- nueva pestaña con reporte --}}
       <x-a-button target="_blank" href="{{ route('audits-audits-report', $audit->id) }}">generar reporte</x-a-button>
