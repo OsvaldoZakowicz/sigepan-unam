@@ -4,6 +4,7 @@
 
     {{-- barra de titulo --}}
     <x-title-section title="lista de proveedores">
+      <x-a-button wire:navigate href="{{ route('suppliers-suppliers-price-all') }}" class="mx-1" bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600">lista de precios general</x-a-button>
       <x-a-button wire:navigate href="{{route('suppliers-suppliers-create')}}" class="mx-1">crear proveedor</x-a-button>
     </x-title-section>
 

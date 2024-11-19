@@ -1,14 +1,9 @@
 <div>
-  {{-- componente lista de precios del proveedor --}}
+  {{-- componente de lista de TODOS los precios --}}
   <article class="m-2 border rounded-sm border-neutral-200">
 
     {{-- barra de titulo --}}
-    <x-title-section title="lista de precios del proveedor: {{ $supplier->company_name }}">
-      <div class="flex gap-2">
-        <x-a-button wire:navigate href="{{ route('suppliers-suppliers-index', $supplier->id) }}" bg_color="neutral-100" border_color="neutral-300" text_color="neutral-600">volver a proveedores</x-a-button>
-        <x-a-button wire:navigate href="{{ route('suppliers-suppliers-price-create', $supplier->id) }}">agregar precios</x-a-button>
-      </div>
-    </x-title-section>
+    <x-title-section title="lista de precios de todos los proveedores"></x-title-section>
 
     {{-- cuerpo --}}
     <x-content-section>
@@ -50,25 +45,36 @@
               <x-table-th>tipo</x-table-th>
               <x-table-th>cantidad, peso o volumen</x-table-th>
               <x-table-th>$&nbsp;precio</x-table-th>
+              <x-table-th>proveedor</x-table-th>
               <x-table-th>acciones</x-table-th>
             </tr>
           </x-slot:tablehead>
           <x-slot:tablebody>
-            @forelse ($provisions_with_price as $pwp)
-              <tr class="border" wire:key="{{ $pwp->id }}">
-                <x-table-td>{{ $pwp->id }}</x-table-td>
-                <x-table-td>{{ $pwp->provision_name }}</x-table-td>
-                <x-table-td>{{ $pwp->trademark->provision_trademark_name }}</x-table-td>
-                <x-table-td>{{ $pwp->type->provision_type_name }}</x-table-td>
-                <x-table-td>{{ $pwp->provision_quantity }}({{ $pwp->measure->measure_abrv }})</x-table-td>
-                <x-table-td>$&nbsp;<span class="font-semibold text-neutral-600">{{ $pwp->pivot->price }}</span></x-table-td>
-                <x-table-td>
-                  <x-btn-button type="button" wire:navigate wire:click="delete({{ $pwp->id }})" wire:confirm="¿Desea borrar el registro?, eliminará el precio del proveedor: {{ $supplier->company_name }}, para el suministro: {{ $pwp->provision_name }} {{ $pwp->trademark->provision_trademark_name }} de {{ $pwp->provision_quantity }}({{ $pwp->measure->measure_abrv }})" color="red">eliminar</x-btn-button>
-                </x-table-td>
-              </tr>
+            {{-- por cada suministro individual --}}
+            @forelse ($all_provisions as $key => $provision)
+              {{-- por cada proveedor del suministro --}}
+              {{-- usare como key el indice del array superior, engloba la fila generada en la tabla --}}
+              @foreach ($provision->suppliers as $supplier)
+                {{-- repetir informacion del suministro, capturar informacion del proveedor --}}
+                {{-- usare como key el id de la tabla pivote, que es unico --}}
+                <tr class="border" wire:key="{{ $supplier->pivot->id }}">
+                  <x-table-td>{{ $provision->id }}</x-table-td>
+                  <x-table-td>{{ $provision->provision_name }}</x-table-td>
+                  <x-table-td>{{ $provision->trademark->provision_trademark_name }}</x-table-td>
+                  <x-table-td>{{ $provision->type->provision_type_name }}</x-table-td>
+                  <x-table-td>{{ $provision->provision_quantity }}({{ $provision->measure->measure_abrv }})</x-table-td>
+                  <x-table-td>$&nbsp;<span class="font-semibold text-neutral-600">{{ $supplier->pivot->price }}</span></x-table-td>
+                  <x-table-td>{{ $supplier->company_name }}</x-table-td>
+                  <x-table-td>
+                    <div class="flex gap-1">
+                      <x-a-button wire:navigate href="{{ route('suppliers-suppliers-price-index', $supplier->id) }}" bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600" title="ver lista de precios del proveedor">precios</x-a-button>
+                    </div>
+                  </x-table-td>
+                </tr>
+              @endforeach
             @empty
               <tr class="border">
-                <td colspan="3">sin registros!</td>
+                <td colspan="8">sin registros!</td>
               </tr>
             @endforelse
           </x-slot:tablebody>
@@ -77,7 +83,7 @@
 
       <x-slot:footer class="py-2">
         {{-- paginacion --}}
-        {{ $provisions_with_price->links() }}
+        {{ $all_provisions->links() }}
         <!-- grupo de botones -->
         <div class="flex"></div>
       </x-slot:footer>

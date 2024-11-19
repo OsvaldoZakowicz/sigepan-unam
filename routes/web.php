@@ -111,6 +111,10 @@ Route::middleware(['auth', 'verified', 'can:proveedores'])->group(function () {
   Route::get('supplier/{id}/provision/prices/create', [SupplierController::class, 'suppliers_add_provision_price_to_provisions_price_list'])
     ->name('suppliers-suppliers-price-create');
 
+  // NOTA: lista de todos los precios
+  Route::get('suppliers/prices', [SupplierController::class, 'suppliers_all_prices_list'])
+    ->name('suppliers-suppliers-price-all');
+
   Route::get('suppliers/trademarks', [SupplierController::class, 'trademarks_index'])
     ->name('suppliers-trademarks-index');
 

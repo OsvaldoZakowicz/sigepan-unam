@@ -52,6 +52,6 @@ class Supplier extends Model implements Auditable
   public function provisions(): BelongsToMany
   {
     return $this->belongsToMany(Provision::class)
-      ->withPivot('price')->withTimestamps();
+      ->withPivot('id', 'price')->withTimestamps();
   }
 }

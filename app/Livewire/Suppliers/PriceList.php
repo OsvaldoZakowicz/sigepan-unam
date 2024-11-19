@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Suppliers;
 
-use App\Models\Provision;
 use App\Models\Supplier;
 use App\Models\ProvisionTrademark;
 use App\Models\ProvisionType;

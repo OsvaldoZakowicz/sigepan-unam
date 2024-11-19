@@ -45,6 +45,6 @@ class Provision extends Model
   public function suppliers(): BelongsToMany
   {
     return $this->belongsToMany(Supplier::class)
-      ->withPivot('price')->withTimestamps();
+      ->withPivot('id', 'price')->withTimestamps();
   }
 }
