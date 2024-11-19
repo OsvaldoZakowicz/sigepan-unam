@@ -36,52 +36,57 @@
       </x-slot:header>
 
       <x-slot:content class="w-full flex-col">
-        <x-table-base>
-          <x-slot:tablehead>
-            <tr class="border bg-neutral-100">
-              <x-table-th>id</x-table-th>
-              <x-table-th>nombre</x-table-th>
-              <x-table-th>marca</x-table-th>
-              <x-table-th>tipo</x-table-th>
-              <x-table-th>cantidad, peso o volumen</x-table-th>
-              <x-table-th>$&nbsp;precio</x-table-th>
-              <x-table-th>proveedor</x-table-th>
-              <x-table-th>acciones</x-table-th>
-            </tr>
-          </x-slot:tablehead>
-          <x-slot:tablebody>
-            {{-- por cada suministro individual --}}
-            @forelse ($all_provisions as $key => $provision)
-              {{-- por cada proveedor del suministro --}}
-              {{-- usare como key el indice del array superior, engloba la fila generada en la tabla --}}
-              @foreach ($provision->suppliers as $supplier)
-                {{-- repetir informacion del suministro, capturar informacion del proveedor --}}
-                {{-- usare como key el id de la tabla pivote, que es unico --}}
-                <tr class="border" wire:key="{{ $supplier->pivot->id }}">
-                  <x-table-td>{{ $provision->id }}</x-table-td>
-                  <x-table-td>{{ $provision->provision_name }}</x-table-td>
-                  <x-table-td>{{ $provision->trademark->provision_trademark_name }}</x-table-td>
-                  <x-table-td>{{ $provision->type->provision_type_name }}</x-table-td>
-                  <x-table-td>{{ $provision->provision_quantity }}({{ $provision->measure->measure_abrv }})</x-table-td>
-                  <x-table-td>$&nbsp;<span class="font-semibold text-neutral-600">{{ $supplier->pivot->price }}</span></x-table-td>
-                  <x-table-td>{{ $supplier->company_name }}</x-table-td>
-                  <x-table-td>
-                    <div class="flex gap-1">
-                      <x-a-button wire:navigate href="{{ route('suppliers-suppliers-price-index', $supplier->id) }}" bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600" title="ver lista de precios del proveedor">precios</x-a-button>
-                    </div>
-                  </x-table-td>
-                </tr>
-              @endforeach
-            @empty
-              <tr class="border">
-                <td colspan="8">sin registros!</td>
+        {{-- controlar el alto maximo de la tabla --}}
+        <div class="max-h-80 overflow-y-scroll overflow-x-hidden">
+          <x-table-base>
+            <x-slot:tablehead>
+              <tr class="border bg-neutral-100">
+                <x-table-th>id*</x-table-th>
+                <x-table-th>nombre</x-table-th>
+                <x-table-th>marca</x-table-th>
+                <x-table-th>tipo</x-table-th>
+                <x-table-th>cantidad, peso o volumen</x-table-th>
+                <x-table-th>$&nbsp;precio</x-table-th>
+                <x-table-th>proveedor</x-table-th>
+                <x-table-th>acciones</x-table-th>
               </tr>
-            @endforelse
-          </x-slot:tablebody>
-        </x-table-base>
+            </x-slot:tablehead>
+            <x-slot:tablebody>
+              {{-- por cada suministro individual --}}
+              @forelse ($all_provisions as $key => $provision)
+                {{-- por cada proveedor del suministro --}}
+                {{-- usare como key el indice del array superior, engloba la fila generada en la tabla --}}
+                @foreach ($provision->suppliers as $supplier)
+                  {{-- repetir informacion del suministro, capturar informacion del proveedor --}}
+                  {{-- usare como key el id de la tabla pivote, que es unico --}}
+                  <tr class="border" wire:key="{{ $supplier->pivot->id }}">
+                    <x-table-td>{{ $provision->id }}</x-table-td>
+                    <x-table-td>{{ $provision->provision_name }}</x-table-td>
+                    <x-table-td>{{ $provision->trademark->provision_trademark_name }}</x-table-td>
+                    <x-table-td>{{ $provision->type->provision_type_name }}</x-table-td>
+                    <x-table-td>{{ $provision->provision_quantity }}({{ $provision->measure->measure_abrv }})</x-table-td>
+                    <x-table-td>$&nbsp;<span class="font-semibold text-neutral-600">{{ $supplier->pivot->price }}</span></x-table-td>
+                    <x-table-td>{{ $supplier->company_name }}</x-table-td>
+                    <x-table-td>
+                      <div class="flex gap-1">
+                        <x-a-button wire:navigate href="{{ route('suppliers-suppliers-price-index', $supplier->id) }}" bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600" title="ver lista de precios del proveedor">precios</x-a-button>
+                      </div>
+                    </x-table-td>
+                  </tr>
+                @endforeach
+              @empty
+                <tr class="border">
+                  <td colspan="8">sin registros!</td>
+                </tr>
+              @endforelse
+            </x-slot:tablebody>
+          </x-table-base>
+        </div>
       </x-slot:content>
 
       <x-slot:footer class="py-2">
+        {{-- nota --}}
+        <p class="text-xs text-neutral-600 font-semibold">*cantidad de suministros NO repetidos, los IDs repetidos indican que un mismo suministro se vende para diferentes proveedores, con sus respectivos precios.</p>
         {{-- paginacion --}}
         {{ $all_provisions->links() }}
         <!-- grupo de botones -->
