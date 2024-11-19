@@ -21,13 +21,24 @@ class InputPriceForm extends Component
   public $validation_error;
   public $validation_error_message;
 
+  // input de edicion
+  public $is_editing;
+
   // montar datos
-  public function mount($provision_id, $supplier_id, $provision_array_key)
+  public function mount($provision_id, $supplier_id, $provision_array_key, $is_editing = false)
   {
     $this->provision = Provision::findOrFail($provision_id);
     $this->supplier = Supplier::findOrFail($supplier_id);
     $this->provision_array_key = $provision_array_key;
     $this->validation_error = false;
+    $this->is_editing = $is_editing;
+
+    // si se trata de una edicion, completar el input con el precio
+    if ($this->is_editing) {
+      // proveedor->suministros->donde(id suministro BD = id suministro elegido)->primero->tabla_intermedia->precios
+      $this->provision_price = $this->supplier->provisions()
+        ->where('provision_id', $provision_id)->first()->pivot->price;
+    }
   }
 
   // validacion, numero decimal, positivo, no nulo
@@ -110,8 +121,16 @@ class InputPriceForm extends Component
 
     try {
 
-      // guardar suministro con precio
-      $this->supplier->provisions()->attach($this->provision->id, ['price' => $this->provision_price]);
+      if ($this->is_editing) {
+        // editar suministro con precio
+        $this->supplier->provisions()
+          ->updateExistingPivot($this->provision->id, ['price' => $this->provision_price]);
+      } else {
+        // guardar suministro con precio
+        $this->supplier->provisions()
+          ->attach($this->provision->id, ['price' => $this->provision_price]);
+      }
+
 
       // al guardar exitosamente, quitar suministro de la lista
       $this->dispatch('remove-provision', id: $this->provision_array_key);

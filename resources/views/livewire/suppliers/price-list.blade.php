@@ -1,11 +1,12 @@
 <div>
-  {{-- componente lista de precios del proveedor --}}
+  {{-- componente lista de precios de un proveedor --}}
   <article class="m-2 border rounded-sm border-neutral-200">
 
     {{-- barra de titulo --}}
     <x-title-section title="lista de precios del proveedor: {{ $supplier->company_name }}">
       <div class="flex gap-2">
         <x-a-button wire:navigate href="{{ route('suppliers-suppliers-index', $supplier->id) }}" bg_color="neutral-100" border_color="neutral-300" text_color="neutral-600">volver a proveedores</x-a-button>
+        <x-a-button wire:navigate href="{{ route('suppliers-suppliers-price-edit', $supplier->id) }}" bg_color="neutral-100" border_color="neutral-300" text_color="neutral-600">editar precios</x-a-button>
         <x-a-button wire:navigate href="{{ route('suppliers-suppliers-price-create', $supplier->id) }}">agregar precios</x-a-button>
       </div>
     </x-title-section>

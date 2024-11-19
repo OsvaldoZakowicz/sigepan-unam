@@ -5,6 +5,7 @@ namespace App\Livewire\Suppliers;
 use App\Models\Provision;
 use App\Models\ProvisionTrademark;
 use App\Models\ProvisionType;
+use App\Models\Supplier;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
 use Livewire\WithPagination;
@@ -22,18 +23,22 @@ class SearchProvision extends Component
   public $search_ty = '';
 
   // proveedor
-  public $supplier_id;
+  public $supplier;
   // marcas de suministros
   public $trademarks;
   // tipos de suministros
   public $provision_types;
 
+  // busqueda de edicion
+  public $is_editing;
+
   // montar datos
-  public function mount($supplier_id)
+  public function mount($supplier_id, $is_editing = false)
   {
-    $this->supplier_id = $supplier_id;
+    $this->supplier = Supplier::findOrFail($supplier_id);
     $this->trademarks = ProvisionTrademark::all();
     $this->provision_types = ProvisionType::all();
+    $this->is_editing = $is_editing;
   }
 
   // reiniciar la paginacion al buscar
@@ -49,20 +54,38 @@ class SearchProvision extends Component
     $this->dispatch('append-provision', id: $id);
   }
 
-  //* buscar suministros NO asociados al proveedor
-  // los mismos deben asociarse con un precio al proveedor
+  // * buscar suministros para el proveedor
+  // en alta o edicion
   public function searchProvisions()
   {
-    return Provision::whereDoesntHave('suppliers', function ($query) {
-                        $query->where('supplier_id', $this->supplier_id);
-                      })->when($this->search, function ($query) {
-                        $query->where('provision_name', 'like', '%' . $this->search . '%');
-                      })->when($this->search_tr, function ($query) {
-                        $query->where('provision_trademark_id', $this->search_tr);
-                      })->when($this->search_ty, function ($query) {
-                        $query->where('provision_type_id', $this->search_ty);
-                      })->orderBy('id', 'desc')
-                        ->paginate(4);
+    if ($this->is_editing) {
+      // verdadero que estoy editando
+      //* buscar suministros con precios del proveedor
+      $result = $this->supplier->provisions()
+        ->when($this->search, function ($query) {
+          $query->where('provision_name', 'like', '%' . $this->search . '%');
+        })->when($this->search_tr, function ($query) {
+          $query->where('provision_trademark_id', $this->search_tr);
+        })->when($this->search_ty, function ($query) {
+          $query->where('provision_type_id', $this->search_ty);
+        })->orderBy('id', 'desc')
+          ->paginate(4);
+
+    } else {
+      //* buscar suministros NO asociados al proveedor
+      $result = Provision::whereDoesntHave('suppliers', function ($query) {
+          $query->where('supplier_id', $this->supplier->id);
+        })->when($this->search, function ($query) {
+          $query->where('provision_name', 'like', '%' . $this->search . '%');
+        })->when($this->search_tr, function ($query) {
+          $query->where('provision_trademark_id', $this->search_tr);
+        })->when($this->search_ty, function ($query) {
+          $query->where('provision_type_id', $this->search_ty);
+        })->orderBy('id', 'desc')
+          ->paginate(4);
+    }
+
+    return $result;
   }
 
   #[On('refresh-search')]

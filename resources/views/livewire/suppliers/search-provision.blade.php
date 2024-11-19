@@ -44,7 +44,13 @@
                   <span class="font-semibold">{{ $provision->type->provision_type_name }}:&nbsp;</span>
                   <span>{{ $provision->provision_name }}&nbsp;</span>
                   <span>{{ $provision->provision_quantity }}({{ $provision->measure->measure_abrv }}),&nbsp;</span>
-                  <span class="font-semibold">marca:&nbsp;{{ $provision->trademark->provision_trademark_name }}</span>
+                  <span class="font-semibold">marca:&nbsp;</span>
+                  <span>{{ $provision->trademark->provision_trademark_name }}&nbsp;</span>
+                  {{-- consultar precio solo al editar --}}
+                  @if ($is_editing)
+                    <span class="font-semibold">,&nbsp;precio:&nbsp;</span>
+                    <span>${{ $provision->pivot->price }}</span>
+                  @endif
                 </div>
                 {{-- botones --}}
                 <div class="flex">
