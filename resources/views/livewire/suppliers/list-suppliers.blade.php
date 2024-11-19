@@ -44,8 +44,14 @@
                 <x-table-td>{{ $supplier->company_cuit }}</x-table-td>
                 <x-table-td>{{ $supplier->phone_number }}</x-table-td>
                 <x-table-td>{{ $supplier->iva_condition }}</x-table-td>
-                <x-table-td>{{ ($supplier->status_is_active) ? 'activo' : 'inactivo' }}</x-table-td>
                 <x-table-td>{{ formatDateTime($supplier->created_at, 'd-m-Y') }}</x-table-td>
+                <x-table-td>
+                  @if ($supplier->status_is_active)
+                    <span class="font-semibold text-emerald-500">activo</span>
+                  @else
+                    <span class="font-semibold text-neutral-500">inactivo</span>
+                  @endif
+                </x-table-td>
                 <x-table-td>
                   <div class="flex justify-start gap-1">
 
