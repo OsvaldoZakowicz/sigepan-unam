@@ -19,7 +19,7 @@
 
         {{-- lista de suministros elegidos --}}
         <div class="flex flex-col gap-1 w-full">
-          <span class="font-semibold capitalize">formulario</span>
+          <span class="font-semibold capitalize">formulario: lista de suministros elegidos.</span>
           <div class="max-h-72 overflow-y-auto overflow-x-hidden">
             <x-table-base>
               <x-slot:tablehead>
