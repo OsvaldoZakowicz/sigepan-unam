@@ -139,6 +139,12 @@ Route::middleware(['auth', 'verified', 'can:stock'])->group(function () {
   Route::get('stocks/measures/create', [StockController::class, 'measures_create'])
     ->name('stocks-measures-create');
 
+  Route::get('stocks/recipes', [StockController::class, 'recipes_index'])
+    ->name('stocks-recipes-index');
+
+  Route::get('stocks/recipes/create', [StockController::class, 'recipes_create'])
+    ->name('stocks-recipes-create');
+
 });
 
 //* modulo de clientes

@@ -25,4 +25,16 @@ class StockController extends Controller
   {
     return view('stocks.measures-create');
   }
+
+  //* lista de recetas
+  public function recipes_index(): View
+  {
+    return view('stocks.recipes-index');
+  }
+
+  //* crear receta
+  public function recipes_create(): View
+  {
+    return view('stocks.recipes-create');
+  }
 }
