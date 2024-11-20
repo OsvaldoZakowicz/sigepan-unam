@@ -3,7 +3,9 @@
   <article class="m-2 border rounded-sm border-neutral-200">
 
     {{-- barra de titulo --}}
-    <x-title-section title="lista de precios de todos los proveedores"></x-title-section>
+    <x-title-section title="lista de precios de todos los proveedores">
+      <x-a-button wire:navigate href="{{ route('suppliers-suppliers-index') }}" class="mx-1" bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600">volver a proveedores</x-a-button>
+    </x-title-section>
 
     {{-- cuerpo --}}
     <x-content-section>
