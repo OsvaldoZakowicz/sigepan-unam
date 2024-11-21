@@ -14,8 +14,16 @@
         <span class="text-sm capitalize">buscar marca:</span>
         {{-- formulario de busqueda --}}
         <form class="grow">
+
           {{-- termino de busqueda --}}
-          <input type="text" wire:model.live="search_input" name="search_input" wire:click="resetPagination" placeholder="ingrese un id, o nombre ..." class="w-1/4 shrink text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
+          <input
+            type="text"
+            name="search_input"
+            wire:model.live="search_input"
+            wire:click="resetPagination"
+            placeholder="ingrese un id, o nombre ..."
+            class="w-1/4 shrink text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300" />
+
         </form>
         <!-- grupo de botones -->
         <div class="flex"></div>
@@ -26,23 +34,36 @@
         <x-table-base>
           <x-slot:tablehead>
             <tr class="border bg-neutral-100">
-              <x-table-th>id</x-table-th>
-              <x-table-th>marca</x-table-th>
-              <x-table-th>fecha de creación</x-table-th>
-              <x-table-th>acciones</x-table-th>
+              <x-table-th class="text-end w-12">id</x-table-th>
+              <x-table-th class="text-start">marca</x-table-th>
+              <x-table-th class="text-end">fecha de creación</x-table-th>
+              <x-table-th class="text-start w-24">acciones</x-table-th>
             </tr>
           </x-slot:tablehead>
           <x-slot:tablebody>
             @forelse ($trademarks as $trademark)
               <tr wire:key="{{ $trademark->id }}" class="border">
-                <x-table-td>{{ $trademark->id }}</x-table-td>
-                <x-table-td>{{ $trademark->provision_trademark_name }}</x-table-td>
-                <x-table-td>{{ formatDateTime($trademark->created_at, 'd-m-Y') }}</x-table-td>
+                <x-table-td class="text-end">{{ $trademark->id }}</x-table-td>
+                <x-table-td class="text-start">{{ $trademark->provision_trademark_name }}</x-table-td>
+                <x-table-td class="text-end">{{ formatDateTime($trademark->created_at, 'd-m-Y') }}</x-table-td>
                 <x-table-td>
                   <div class="flex justify-start gap-1">
-                    {{-- <x-a-button wire:navigate href="{{ route('trademarks-trademarks-show', $trademark->id) }}" bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600">ver</x-a-button>
-                    <x-a-button wire:navigate href="{{ route('trademarks-trademarks-edit', $trademark->id) }}" bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600">editar</x-a-button>
-                    <x-btn-button btn_type="button" color="red" wire:click="delete({{ $trademark->id }})" wire:confirm="¿desea borrar el registro? esta accion es irreversible, se eliminara el proveedor y sus credenciales de acceso">eliminar</x-btn-button> --}}
+
+                    <x-a-button
+                      wire:click=""
+                      href="#"
+                      bg_color="neutral-100"
+                      border_color="neutral-200"
+                      text_color="neutral-600"
+                      >editar</x-a-button>
+
+                    <x-btn-button
+                      type="button"
+                      wire:click=""
+                      wire:confirm="¿Desea borrar el registro?, eliminar una marca hará que no este disponible para asignar a ningún suministro."
+                      color="red"
+                      >eliminar</x-btn-button>
+
                   </div>
                 </x-table-td>
               </tr>

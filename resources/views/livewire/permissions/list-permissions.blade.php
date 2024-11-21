@@ -14,21 +14,31 @@
         <x-table-base>
           <x-slot:tablehead>
             <tr class="border bg-neutral-100">
-              <x-table-th>id</x-table-th>
-              <x-table-th>permiso</x-table-th>
-              <x-table-th>interno?</x-table-th>
-              <x-table-th>descripcion</x-table-th>
-              <x-table-th>fecha de creacion</x-table-th>
+              <x-table-th class="text-end w-12">id</x-table-th>
+              <x-table-th class="text-start">permiso</x-table-th>
+              <x-table-th class="text-start">interno?</x-table-th>
+              <x-table-th class="text-start">descripcion</x-table-th>
+              <x-table-th class="text-end">fecha de creacion</x-table-th>
             </tr>
           </x-slot:tablehead>
           <x-slot:tablebody>
             @forelse ($permissions as $permission)
             <tr wire:key="{{$permission->id}}" class="border">
-                <x-table-td>{{$permission->id}}</x-table-td>
-                <x-table-td>{{$permission->name}}</x-table-td>
-                <x-table-td>@if ($permission->is_internal) <span>si</span> @else <span>no</span> @endif</x-table-td>
-                <x-table-td>{{$permission->short_description}}</x-table-td>
-                <x-table-td>{{Date::parse($permission->created_at)->format('d-m-Y')}}</x-table-td>
+                <x-table-td class="text-end">
+                  {{$permission->id}}
+                </x-table-td>
+                <x-table-td class="text-start">
+                  {{$permission->name}}
+                </x-table-td>
+                <x-table-td class="text-start">
+                  @if ($permission->is_internal) <span>si</span> @else <span>no</span> @endif
+                </x-table-td>
+                <x-table-td class="text-start">
+                  {{$permission->short_description}}
+                </x-table-td>
+                <x-table-td class="text-end">
+                  {{Date::parse($permission->created_at)->format('d-m-Y')}}
+                </x-table-td>
             </tr>
             @empty
             <tr class="border">
@@ -41,10 +51,13 @@
       </x-slot:content>
 
       <x-slot:footer class="py-2">
+
         {{-- paginacion --}}
         {{ $permissions->links() }}
+
         <!-- grupo de botones -->
         <div class="flex"></div>
+
       </x-slot:footer>
 
     </x-content-section>
