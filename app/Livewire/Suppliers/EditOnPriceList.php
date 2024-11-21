@@ -8,6 +8,8 @@ use Illuminate\Support\Arr;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
+use function PHPUnit\Framework\isEmpty;
+
 //* componente donde editar los precios a los suministros del proveedor
 // completa la tabla intermedia supplier_has_provisions
 class EditOnPriceList extends Component
@@ -32,7 +34,7 @@ class EditOnPriceList extends Component
   }
 
   //* capturar evento de añadir provision a la lista
-  // carga la provision en una lista donde cada provision espera recibir un precio
+  // carga el suministro en una lista donde cada suministro espera recibir un precio
   #[On('append-provision')]
   public function onAppendEvent($id)
   {
@@ -58,8 +60,8 @@ class EditOnPriceList extends Component
 
   }
 
-  //* capturar evento de remover provision de la lista
-  // quita la provision de la lista, recibe el id de array de la provision
+  //* capturar evento de remover suministro de la lista
+  // quita el suministro de la lista, recibe el id de array del suministro
   #[On('remove-provision')]
   public function onRemoveEvent($id)
   {
@@ -71,7 +73,7 @@ class EditOnPriceList extends Component
   // notificar a cada componente livewire InputPriceForm
   public function save()
   {
-    //no hacer nada si la lista de provisones esta vacia
+    //no hacer nada si la lista de suministros esta vacia
     if (count($this->provisions) === 0) {
       return;
     }
@@ -81,6 +83,28 @@ class EditOnPriceList extends Component
 
     // refrescar cuadro de busqueda
     $this->dispatch('refresh-search')->to(SearchProvision::class);
+  }
+
+  //* funcion para notificar de operacion de edicion de precios exitosa
+  // especificamente remover del array los suministros guardados,
+  // cada evento disparado verifica que el array este vacio, si lo esta, mostrara un mensaje de exito
+  #[On('edit-success')]
+  public function onSaveSuccessEvent($id)
+  {
+    // uso unset y afecto directamente al array de suministros
+    unset($this->provisions[$id]);
+
+    // todo: buscar una mejor forma de notificar al final
+    // no contempla quitar suministros de la lista y que sea el ultimo
+    if (is_array($this->provisions) && empty($this->provisions)) {
+
+      $this->dispatch('toast-event', toast_data: [
+        'event_type' => 'success',
+        'title_toast' => toastTitle('exitosa'),
+        'descr_toast' => 'Todos los precios fueron editados con éxito!'
+      ]);
+
+    }
   }
 
   public function render()

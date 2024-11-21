@@ -122,18 +122,25 @@ class InputPriceForm extends Component
     try {
 
       if ($this->is_editing) {
+
         // editar suministro con precio
         $this->supplier->provisions()
           ->updateExistingPivot($this->provision->id, ['price' => $this->provision_price]);
+
+        // al guardar exitosamente, quitar suministro de la lista
+        $this->dispatch('edit-success', id: $this->provision_array_key)->to(EditOnPriceList::class);
+
       } else {
+
         // guardar suministro con precio
         $this->supplier->provisions()
           ->attach($this->provision->id, ['price' => $this->provision_price]);
+
+        // al guardar exitosamente, quitar suministro de la lista
+        $this->dispatch('save-success', id: $this->provision_array_key)->to(AddToPriceList::class);
       }
 
 
-      // al guardar exitosamente, quitar suministro de la lista
-      $this->dispatch('remove-provision', id: $this->provision_array_key);
 
     } catch (\Exception $e) {
 
