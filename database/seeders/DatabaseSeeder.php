@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
       MeasureSeeder::class,
       ProvisionTypeSeeder::class,
       ProvisionTrademarkSeeder::class,
+      PeriodStatusSeeder::class,
     ]);
 
   }
