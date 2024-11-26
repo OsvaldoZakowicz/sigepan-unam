@@ -2,14 +2,18 @@
 
 namespace App\Livewire\Stocks;
 
+use App\Models\Recipe;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class ListRecipes extends Component
 {
-  public $recipes = [];
+  use WithPagination;
 
   public function render()
   {
-    return view('livewire.stocks.list-recipes');
+    $recipes = Recipe::paginate(10);
+
+    return view('livewire.stocks.list-recipes', compact('recipes'));
   }
 }
