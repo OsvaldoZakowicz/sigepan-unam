@@ -86,4 +86,16 @@ class SupplierController extends Controller
   {
     return view('suppliers.trademarks-create');
   }
+
+  //* listar periodos de peticion de presupuestos
+  public function budget_periods_index(): View
+  {
+    return view('suppliers.budgets-periods-index');
+  }
+
+  //* crear periodo de peticion de presupuestos
+  public function budget_periods_create(): View
+  {
+    return view('suppliers.budgets-periods-create');
+  }
 }

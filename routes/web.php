@@ -125,6 +125,14 @@ Route::middleware(['auth', 'verified', 'can:proveedores'])->group(function () {
   Route::get('suppliers/trademark/create', [SupplierController::class, 'trademarks_create'])
     ->name('suppliers-trademarks-create');
 
+  // NOTA: listar periodos de presupuestos (presupuesto = budget, periodo = period)
+  Route::get('suppliers/budgets/periods', [SupplierController::class, 'budget_periods_index'])
+    ->name('suppliers-budgets-periods-index');
+
+  // NOTA: crear periodo de presupuesto (presupuesto = budget, periodo = period)
+  Route::get('suppliers/budgets/periods/create', [SupplierController::class, 'budget_periods_create'])
+    ->name('suppliers-budgets-periods-create');
+
 });
 
 //* modulo de stock
