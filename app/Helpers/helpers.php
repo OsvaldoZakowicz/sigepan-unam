@@ -15,6 +15,22 @@ function formatDateTime($datetime, string $format = 'd-m-Y H:i:s')
 }
 
 /**
+ * * diferencia en dias entre fechas
+ * si no se proporciona fecha de inicio, se toma la actual
+ */
+function diffInDays($start_date = null, $end_date)
+{
+  if (is_null($start_date)) {
+    $start_date = now();
+  }
+
+  $sdt = Carbon::parse($start_date);
+  $edt = Carbon::parse($end_date);
+
+  return (int) $sdt->diffInDays($edt);
+}
+
+/**
  * * obtener el modelo a partir de una ruta usando Str
  * ejemplo: de 'App\Models\User' obtener 'User'
  * $path string
