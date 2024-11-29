@@ -7,6 +7,9 @@ use App\Models\PeriodStatus;
 use App\Models\RequestForQuotationPeriod;
 use Illuminate\Support\Carbon;
 
+/**
+ * * crear periodo de peticion de presupuestos
+ */
 class CreateBudgetPeriod extends Component
 {
   public $period_start_at;
@@ -57,30 +60,15 @@ class CreateBudgetPeriod extends Component
       // construyo el codigo
       $validated += ['period_code' => $this->period_code . str_replace(':', '', now()->format('H:i:s'))];
 
-      // fechas en instancias de Carbon
-      $today = Carbon::parse($this->min_date);
-      $start = Carbon::parse($this->period_start_at);
-
-      // defino el estado
-      // todo: descomentar luego de probar el job.
-      /* if ($today->equalTo($start)) {
-
-        // si el periodo se define para iniciar en el dia, estado: abierto
-        $validated += ['period_status_id' => $this->status_open->id];
-      } else {
-
-        // si el periodo se define para iniciar otro dia, estado: planificado
-        $validated += ['period_status_id' => $this->status_scheduled->id];
-      } */
-
-      //! siempre programado, para probar el job.
+      // inicialmente el estado es: planificado
       $validated += ['period_status_id' => $this->status_scheduled->id];
 
-      // guardar periodo
+      // guardar periodo.
       RequestForQuotationPeriod::create($validated);
 
       $this->reset();
-      session()->flash('operation-success', toastSuccessBody('periodo de solicitud'));
+
+      session()->flash('operation-success', toastSuccessBody('periodo de solicitud', 'creado y programado'));
       $this->redirectRoute('suppliers-budgets-periods-index');
 
     } catch (\Exception $e) {

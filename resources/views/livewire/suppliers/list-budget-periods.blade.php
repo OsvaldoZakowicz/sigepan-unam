@@ -1,5 +1,5 @@
 <div>
-  {{-- componente listar periodos de presupuesto --}}
+  {{-- componente listar periodos de peticion de presupuesto --}}
   <article class="m-2 border rounded-sm border-neutral-200">
 
     {{-- barra de titulo --}}
@@ -72,12 +72,13 @@
                       <span
                         class="font-semibold text-neutral-600 cursor-pointer"
                         title="{{ $period->status->status_short_description }}"
-                        >{{ $period->status->status_name }},
+                        >{{ $period->status->status_name }}
                       </span>
                       {{-- mostrar cuanto falta para iniciar --}}
-                      <span>inicia en:</span>
+                      {{-- todo: corregir calculo --}}
+                      {{-- <span>inicia en:</span>
                       <span>{{ diffInDays(null, $period->period_start_at) }}</span>
-                      <span>días.</span>
+                      <span>días.</span> --}}
                       @break
 
                     @case(1)
@@ -88,9 +89,9 @@
                         >{{ $period->status->status_name }}
                       </span>
                       {{-- mostrar cuanto falta para cerrar --}}
-                      <span>cierra en:</span>
+                      {{-- <span>cierra en:</span>
                       <span>{{ diffInDays(null, $period->period_end_at) }}</span>
-                      <span>días.</span>
+                      <span>días.</span> --}}
                       @break
 
                     @default

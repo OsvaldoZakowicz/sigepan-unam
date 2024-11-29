@@ -6,6 +6,9 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\RequestForQuotationPeriod;
 
+/**
+ * * listar periodos de peticion de presupuestos.
+ */
 class ListBudgetPeriods extends Component
 {
   use WithPagination;

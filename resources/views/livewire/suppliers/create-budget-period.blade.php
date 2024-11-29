@@ -1,5 +1,5 @@
 <div>
-  {{-- componente crear periodo de presupuesto --}}
+  {{-- componente crear periodo de peticion presupuesto --}}
   <article class="m-2 border rounded-sm border-neutral-200">
 
     {{-- barra de titulo --}}
