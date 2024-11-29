@@ -47,4 +47,11 @@ class Provision extends Model
     return $this->belongsToMany(Supplier::class)
       ->withPivot('id', 'price')->withTimestamps();
   }
+
+  //* un suministro participa en muchas solicitudes de presupuesto.
+  public function periods(): BelongsToMany
+  {
+    return $this->belongsToMany(RequestForQuotationPeriod::class, 'period_provision', 'provision_id', 'period_id')
+      ->withTimestamps();
+  }
 }
