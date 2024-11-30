@@ -2,9 +2,11 @@
 
 namespace App\Services\Supplier;
 
-use App\Models\Supplier;
 use App\Models\User;
 use App\Models\Address;
+use App\Models\Supplier;
+use App\Models\ProvisionTrademark;
+use App\Models\ProvisionType;
 
 class SupplierService
 {
@@ -117,6 +119,22 @@ class SupplierService
     }
 
     return;
+  }
+
+  /**
+   * * servicio: obtener marcas de suministros
+   */
+  public function getProvisionTrademarks($order_by = 'asc')
+  {
+    return ProvisionTrademark::orderBy('provision_trademark_name', $order_by)->get();
+  }
+
+  /**
+   * * servicio: obtener tipos de suministros
+   */
+  public function getProvisionTypes()
+  {
+    return ProvisionType::all();
   }
 
 }

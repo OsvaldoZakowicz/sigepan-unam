@@ -3,7 +3,7 @@
   <article class="m-2 border rounded-sm border-neutral-200">
 
     {{-- barra de titulo --}}
-    <x-title-section title="lista de solicitudes de presupuesto">
+    <x-title-section title="lista de periodos de petición de presupuesto">
 
       <x-a-button
         wire:navigate
