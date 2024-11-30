@@ -5,7 +5,7 @@ namespace App\Services\Supplier;
 use App\Models\PeriodStatus;
 use App\Models\RequestForQuotationPeriod;
 
-class BudgetPeriodService
+class QuotationPeriodService
 {
   //* obtener estado programado
   public function getStatusScheduled()

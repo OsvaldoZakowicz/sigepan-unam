@@ -1,7 +1,6 @@
 <?php
 
-use App\Models\RequestForQuotationPeriod;
-use App\Services\Supplier\BudgetPeriodService;
+use App\Services\Supplier\QuotationPeriodService;
 use Illuminate\Support\Facades\Artisan;
 
 /**
@@ -26,15 +25,15 @@ use Illuminate\Support\Facades\Artisan;
  * @param signature: firma del comando (nombre y argumentos opcionales)
  * @param clusure: callback fn con la logica o servicio del comando.
 */
-Artisan::command('budget-periods:open', function (BudgetPeriodService $bps) {
+Artisan::command('budget-periods:open', function (QuotationPeriodService $quotation_period_service) {
 
   // periodos cuya fecha de inicio sea igual a la fecha actual, y estatus programado
-  $periods_to_open = $bps->getQuotationPeriodsToOpen();
+  $periods_to_open = $quotation_period_service->getQuotationPeriodsToOpen();
 
   // cada periodo debe abrirse y procesarse
   foreach ($periods_to_open as $period) {
 
-    $period->period_status_id = $bps->getStatusOpen();
+    $period->period_status_id = $quotation_period_service->getStatusOpen();
     $period->save();
 
   }
@@ -45,15 +44,15 @@ Artisan::command('budget-periods:open', function (BudgetPeriodService $bps) {
  * @param signature: firma del comando (nombre y argumentos opcionales)
  * @param clusure: callback fn con la logica o servicio del comando.
  */
-Artisan::command('budget-periods:close', function (BudgetPeriodService $bps) {
+Artisan::command('budget-periods:close', function (QuotationPeriodService $quotation_period_service) {
 
   // periodos cuya fecha de fin sea igual a la fecha actual, y estatus abierto
-  $periods_to_close = $bps->getQuotationPeriodsToClose();
+  $periods_to_close = $quotation_period_service->getQuotationPeriodsToClose();
 
   // cada periodo debe cerrarse y procesarse
   foreach ($periods_to_close as $period) {
 
-    $period->period_status_id = $bps->getStatusClosed();
+    $period->period_status_id = $quotation_period_service->getStatusClosed();
     $period->save();
 
   }
