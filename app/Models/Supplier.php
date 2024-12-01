@@ -9,6 +9,7 @@ use OwenIt\Auditing\Contracts\Auditable;
 use App\Models\User;
 use App\Models\Address;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Supplier extends Model implements Auditable
 {
@@ -53,5 +54,11 @@ class Supplier extends Model implements Auditable
   {
     return $this->belongsToMany(Provision::class)
       ->withPivot('id', 'price')->withTimestamps();
+  }
+
+  //* un proveedor completa muchos presupuestos (quotations)
+  public function quotations(): HasMany
+  {
+    return $this->hasMany(Quotation::class, 'supplier_id', 'id');
   }
 }
