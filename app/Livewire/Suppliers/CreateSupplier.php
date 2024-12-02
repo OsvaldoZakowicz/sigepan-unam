@@ -2,10 +2,12 @@
 
 namespace App\Livewire\Suppliers;
 
+use App\Mail\SupplierRegistered;
 use Livewire\Component;
 use App\Services\Supplier\SupplierService;
 use App\Services\User\UserService;
 use App\Rules\CuitCuilRule;
+use Illuminate\Support\Facades\Mail;
 
 class CreateSupplier extends Component
 {
@@ -72,13 +74,6 @@ class CreateSupplier extends Component
 
     try {
 
-
-      // necesito el rol proveedor
-      // el nombre de usuario sera el cuit
-      // la contrasenia de acceso sera aleatoria
-      // el estado sera activo (true), explicitamente
-      // la descripcion del estado sera "proveedor activo"
-      // la fecha del estado sera la fecha del alta
       $validated += [
         'user_role' => $supplier_service->getSupplierRolename(),
         'user_name' => $validated['company_cuit'],
@@ -91,7 +86,7 @@ class CreateSupplier extends Component
       $supplier_user = $user_service->createInternalUser($validated);
       $supplier = $supplier_service->createSupplier($supplier_user, $validated);
 
-      // todo: enviar credenciales de acceso via email
+      Mail::to($supplier_user->email)->send(new SupplierRegistered($supplier_user, $validated['user_password'], $supplier));
 
       $this->reset();
 
