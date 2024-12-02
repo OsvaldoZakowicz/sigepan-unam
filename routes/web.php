@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Users\UserController;
 use App\Http\Controllers\Clients\ClientLogOutController;
 use App\Http\Controllers\Audits\AuditController;
+use App\Http\Controllers\Quotation\QuotationController;
 use App\Http\Controllers\Suppliers\SupplierController;
 use App\Http\Controllers\Stocks\StockController;
 
@@ -132,6 +133,17 @@ Route::middleware(['auth', 'verified', 'can:proveedores'])->group(function () {
   // NOTA: crear periodo de presupuesto (presupuesto = budget, periodo = period)
   Route::get('suppliers/budgets/periods/create', [SupplierController::class, 'budget_periods_create'])
     ->name('suppliers-budgets-periods-create');
+
+});
+
+//* seccion de presupuestos (quotations) para proveedores
+Route::middleware(['auth', 'verified', 'can:presupuestos'])->group(function () {
+
+  Route::get('quotations', [QuotationController::class, 'quotations_index'])
+    ->name('quotations-quotations-index');
+
+  Route::get('quotations/respond/{id}', [QuotationController::class, 'quotations_respond'])
+    ->name('quotations-quotations-respond');
 
 });
 

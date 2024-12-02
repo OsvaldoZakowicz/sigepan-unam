@@ -61,6 +61,16 @@ new class extends Component {
             </x-nav-link>
           @endcan
 
+          {{-- presupuestos --}}
+          @can('presupuestos')
+            <x-nav-link
+              :href="route('quotations-quotations-index')"
+              :active="request()->routeIs('quotations-*')"
+              wire:navigate
+              >Presupuestos
+            </x-nav-link>
+          @endcan
+
           {{-- usuarios --}}
           @can('usuarios')
             <x-nav-link
@@ -172,6 +182,16 @@ new class extends Component {
           :active="request()->routeIs('suppliers-*')"
           wire:navigate
           >Proveedores
+        </x-responsive-nav-link>
+      @endcan
+
+      {{-- presupuestos --}}
+      @can('presupuestos')
+        <x-responsive-nav-link
+          :href="route('quotations-quotations-index')"
+          :active="request()->routeIs('quotations-*')"
+          wire:navigate
+          >Presupuestos
         </x-responsive-nav-link>
       @endcan
 
