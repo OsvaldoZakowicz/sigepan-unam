@@ -54,7 +54,26 @@
           <span><span class="font-semibold">Cierre:</span>&nbsp;{{ formatDateTime($period->period_end_at, 'd-m-Y') }}</span>
         </div>
         <div class="w-1/4 flex justify-end items-center gap-2">
-          <x-a-button wire:navigate href="#" bg_color="red-600" border_color="red-600" text_color="neutral-100">cerrar ahora</x-a-button>
+
+          <x-a-button
+            wire:navigate
+            href="{{ route('suppliers-budgets-periods-index') }}"
+            bg_color="neutral-100"
+            border_color="neutral-200"
+            text_color="neutral-600"
+            >volver</x-a-button>
+
+          <x-a-button
+            wire:navigate
+            wire:click="close()"
+            href="#"
+            bg_color="red-600"
+            border_color="red-600"
+            text_color="neutral-100"
+            wire:confirm="¿Cerrar este período?, los proveedores con presupuesto sin responder quedarán fuera del periodo."
+            >cerrar ahora
+          </x-a-button>
+
         </div>
       </x-slot:header>
 

@@ -28,8 +28,8 @@ class QuotationPeriodService
   //* obtener estado cerrado
   public function getStatusClosed()
   {
-    $status_close = PeriodStatus::where('status_name', 'abierto')
-      ->where('status_code', 1)->first();
+    $status_close = PeriodStatus::where('status_name', 'cerrado')
+      ->where('status_code', 2)->first();
 
     return $status_close->id;
   }
