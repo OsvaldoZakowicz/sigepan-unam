@@ -13,7 +13,8 @@ return new class extends Migration
   {
     Schema::create('quotations', function (Blueprint $table) {
       $table->id();
-      $table->string('quotation_id', 25)->unique();
+      $table->string('quotation_code', 25)->unique();
+      $table->boolean('is_completed')->default(false);
 
       // fk periodo de peticion de presupuestos
       $table->unsignedBigInteger('period_id');

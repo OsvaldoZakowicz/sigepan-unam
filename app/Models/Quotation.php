@@ -15,6 +15,7 @@ class Quotation extends Model
 
   protected $fillable = [
     'quotation_code',
+    'is_completed',
     'period_id',
     'supplier_id',
   ];
