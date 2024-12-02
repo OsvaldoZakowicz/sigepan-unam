@@ -67,5 +67,14 @@ class UserSeeder extends Seeder
       'is_first_login' => false,
     ])->assignRole('repartidor');
 
+    // proveedor
+    User::create([
+      'name' => 'proveedor test',
+      'email' => 'proveedor@test.com',
+      'email_verified_at' => now(env('APP_TIMEZONE')),
+      'password' => bcrypt(12345678),
+      'is_first_login' => false,
+    ])->assignRole('proveedor');
+
   }
 }

@@ -43,10 +43,12 @@ class RoleSeeder extends Seeder
       'panel','panel-perfil','ventas'
     ]);
 
-    $proveedor->syncPermissions([]);
+    $proveedor->syncPermissions([
+      'panel','panel-perfil','presupuestos','ordenes'
+    ]);
 
     $administrador->syncPermissions([
-      'panel','panel-perfil','usuarios','auditoria','stock','proveedores','ventas','compras','tienda'
+      'panel','panel-perfil','usuarios','auditoria','stock','proveedores','ventas','compras','tienda','presupuestos','ordenes'
     ]);
 
     $auditor->syncPermissions([

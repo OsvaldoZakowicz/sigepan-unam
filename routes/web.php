@@ -156,7 +156,11 @@ Route::middleware(['auth', 'verified', 'can:stock'])->group(function () {
 });
 
 //* modulo de clientes
-Route::get('client/logout', ClientLogOutController::class)
-  ->name('client-logout');
+Route::middleware(['can:cliente'])->group(function () {
+
+  Route::get('client/logout', ClientLogOutController::class)
+    ->name('client-logout');
+
+});
 
 require __DIR__.'/auth.php';

@@ -23,6 +23,8 @@ class PermissionSeeder extends Seeder
       ['name' => 'usuarios',     'guard_name' => 'web', 'is_internal' => true, 'created_at' => now(env('APP_TIMEZONE'))],
       ['name' => 'stock',        'guard_name' => 'web', 'is_internal' => true, 'created_at' => now(env('APP_TIMEZONE'))],
       ['name' => 'proveedores',  'guard_name' => 'web', 'is_internal' => true, 'created_at' => now(env('APP_TIMEZONE'))],
+      ['name' => 'presupuestos', 'guard_name' => 'web', 'is_internal' => true, 'created_at' => now(env('APP_TIMEZONE'))],
+      ['name' => 'ordenes',      'guard_name' => 'web', 'is_internal' => true, 'created_at' => now(env('APP_TIMEZONE'))],
       ['name' => 'ventas',       'guard_name' => 'web', 'is_internal' => true, 'created_at' => now(env('APP_TIMEZONE'))],
       ['name' => 'compras',      'guard_name' => 'web', 'is_internal' => true, 'created_at' => now(env('APP_TIMEZONE'))],
       ['name' => 'auditoria',    'guard_name' => 'web', 'is_internal' => true, 'created_at' => now(env('APP_TIMEZONE'))],
