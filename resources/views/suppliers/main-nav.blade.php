@@ -12,7 +12,7 @@
     wire:navigate
     :href="route('suppliers-budgets-periods-index')"
     :active="request()->routeIs('suppliers-budgets-*')"
-    >presupuestos
+    >periodo presupuestario
   </x-nav-linkwire>
 
   <x-nav-link

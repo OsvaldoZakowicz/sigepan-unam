@@ -112,7 +112,7 @@
 
                     <x-a-button
                       wire:navigate
-                      href="#"
+                      href="{{ route('suppliers-budgets-periods-show', $period->id) }}"
                       bg_color="neutral-100"
                       border_color="neutral-200"
                       text_color="neutral-600"

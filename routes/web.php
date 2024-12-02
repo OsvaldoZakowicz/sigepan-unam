@@ -134,6 +134,14 @@ Route::middleware(['auth', 'verified', 'can:proveedores'])->group(function () {
   Route::get('suppliers/budgets/periods/create', [SupplierController::class, 'budget_periods_create'])
     ->name('suppliers-budgets-periods-create');
 
+  // NOTA: ver periodo de presupuesto (presupuesto = budget, periodo = period)
+  Route::get('suppliers/budget/periods/show/{id}', [SupplierController::class, 'budget_periods_show'])
+    ->name('suppliers-budgets-periods-show');
+
+  // NOTA: ver respuesta de un proveedor a un presupuesto en el periodo
+  Route::get('suppliers/budget/response/{id}', [SupplierController::class, 'budget_response'])
+    ->name('suppliers-budgets-response');
+
 });
 
 //* seccion de presupuestos (quotations) para proveedores

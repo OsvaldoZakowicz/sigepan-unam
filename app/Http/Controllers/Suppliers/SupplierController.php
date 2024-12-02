@@ -98,4 +98,16 @@ class SupplierController extends Controller
   {
     return view('suppliers.budgets-periods-create');
   }
+
+  //* ver periodo de peticion de presupuestos
+  public function budget_periods_show($id): View
+  {
+    return view('suppliers.budgets-periods-show', ['id' => $id]);
+  }
+
+  //* ver respuestas de un presupuesto
+  public function budget_response($id): View
+  {
+    return view('suppliers.budget-response', ['id' => $id]);
+  }
 }
