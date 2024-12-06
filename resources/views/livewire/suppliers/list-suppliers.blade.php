@@ -80,9 +80,19 @@
                 </x-table-td>
                 <x-table-td class="text-start">
                   @if ($supplier->status_is_active)
-                    <span class="font-semibold text-emerald-600">activo</span>
+                    <span
+                      class="font-semibold text-emerald-600 cursor-help"
+                      title="{{ $supplier->status_description }}"
+                      >activo
+                      <x-quest-icon/>
+                    </span>
                   @else
-                    <span class="font-semibold text-neutral-600">inactivo</span>
+                    <span
+                      class="font-semibold text-neutral-600 cursor-help"
+                      title="{{ $supplier->status_description }}"
+                      >inactivo
+                      <x-quest-icon/>
+                    </span>
                   @endif
                 </x-table-td>
                 <x-table-td class="text-end">

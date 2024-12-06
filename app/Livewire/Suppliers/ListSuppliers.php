@@ -5,6 +5,7 @@ namespace App\Livewire\Suppliers;
 use App\Models\Supplier;
 use App\Services\Supplier\SupplierService;
 use Illuminate\Database\QueryException;
+use Illuminate\View\View;
 use Livewire\Component;
 use Livewire\Attributes\Url;
 use Livewire\WithPagination;
@@ -16,21 +17,32 @@ class ListSuppliers extends Component
   #[Url]
   public $search_input = '';
 
+  // condiciones frente al iva
   public $iva_conditions = [];
 
-  //* montar datos
-  public function mount(SupplierService $supplier_service)
+  /**
+   * montar datos
+   * @param SupplierService $supplier_service servicio para proveedores.
+   * @return void.
+  */
+  public function mount(SupplierService $supplier_service): void
   {
     $this->iva_conditions = $supplier_service->getSuppilerIvaConditions();
   }
 
-  //* eliminar proveedor
-  public function delete(SupplierService $supplier_service, Supplier $supplier)
+  /**
+   * eliminar un proveedor
+   * @param SupplierService $supplier_service servicio para proveedores.
+   * @param Supplier $supplier proveedor
+   * @return void
+  */
+  public function delete(SupplierService $supplier_service, Supplier $supplier): void
   {
     try {
 
       // todo: politicas para borrar un proveedor
-      // //no permitir si tiene suministros asociados
+      // no permitir si tiene suministros asociados
+      // no prmitir si participa en pedidos de presupuesto abiertos
       // no permitir si esta activo
 
       $supplier_service->deleteSupplier($supplier);
@@ -69,24 +81,29 @@ class ListSuppliers extends Component
     }
   }
 
-  //* buscar proveedores
+  /**
+   * buscar proveedores
+  */
   public function searchSuppliers()
   {
     return Supplier::when($this->search_input,
-              function ($query) {
-                $query->where('id', 'like', '%' . $this->search_input . '%')
-                      ->orWhere('company_name', 'like', '%' . $this->search_input . '%')
-                      ->orWhere('company_cuit', 'like', '%' . $this->search_input . '%')
-                      ->orWhere('phone_number', 'like', '%' . $this->search_input . '%');
-              }
-            )->orderBy('id', 'desc')
-            ->paginate('10');
+        function ($query) {
+          $query->where('id', 'like', '%' . $this->search_input . '%')
+                ->orWhere('company_name', 'like', '%' . $this->search_input . '%')
+                ->orWhere('company_cuit', 'like', '%' . $this->search_input . '%')
+                ->orWhere('phone_number', 'like', '%' . $this->search_input . '%');
+        }
+      )->orderBy('id', 'desc')
+      ->paginate('10');
   }
 
-  public function render()
+  /**
+   * renderizar vista
+   * @return view
+  */
+  public function render(): View
   {
     $suppliers = $this->searchSuppliers();
-
     return view('livewire.suppliers.list-suppliers', compact('suppliers'));
   }
 }

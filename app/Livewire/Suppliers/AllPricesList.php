@@ -5,6 +5,7 @@ namespace App\Livewire\Suppliers;
 use App\Models\Provision;
 use App\Models\ProvisionTrademark;
 use App\Models\ProvisionType;
+use Illuminate\View\View;
 use Livewire\Attributes\Url;
 use Livewire\WithPagination;
 use Livewire\Component;
@@ -23,13 +24,19 @@ class AllPricesList extends Component
   public $trademarks;
   public $provision_types;
 
-  public function mount()
+  /**
+   * montar datos
+   * @return void
+  */
+  public function mount(): void
   {
     $this->trademarks = ProvisionTrademark::all();
     $this->provision_types = ProvisionType::all();
   }
 
-  //* buscar suministros con sus proveedores
+  /**
+   * buscar suministros con sus proveedores
+  */
   public function searchProvisionsSuppliers()
   {
     $result = Provision::with('suppliers')
@@ -48,16 +55,22 @@ class AllPricesList extends Component
     return $result;
   }
 
-  // reiniciar paginacion al buscar
-  public function resetPagination()
+  /**
+   * reiniciar paginacion al buscar
+   * @return void
+  */
+  public function resetPagination(): void
   {
     $this->resetPage();
   }
 
-  public function render()
+  /**
+   * renderizar vista
+   * @return view
+  */
+  public function render(): View
   {
     $all_provisions = $this->searchProvisionsSuppliers();
-
     return view('livewire.suppliers.all-prices-list', compact('all_provisions'));
   }
 }

@@ -79,7 +79,14 @@
           <x-table-base>
             <x-slot:tablehead>
               <tr class="border bg-neutral-100">
-                <x-table-th class="text-end w-12">id*</x-table-th>
+                <x-table-th class="text-end w-12">
+                  <span
+                    class="cursor-help"
+                    title="los IDs repetidos indican que un mismo suministro se vende para diferentes proveedores, con sus respectivos precios."
+                    >id
+                    <x-quest-icon/>
+                  </span>
+                </x-table-th>
                 <x-table-th class="text-start">nombre</x-table-th>
                 <x-table-th class="text-start">marca</x-table-th>
                 <x-table-th class="text-start">tipo</x-table-th>
@@ -129,7 +136,7 @@
                           border_color="neutral-200"
                           text_color="neutral-600"
                           title="ver lista de precios del proveedor"
-                          >precios
+                          >ver proveedor
                         </x-a-button>
 
                       </div>
@@ -149,7 +156,7 @@
       <x-slot:footer class="py-2">
 
         {{-- nota --}}
-        <p class="text-xs text-neutral-600 font-semibold">*cantidad de suministros NO repetidos, los IDs repetidos indican que un mismo suministro se vende para diferentes proveedores, con sus respectivos precios.</p>
+        <p class="text-xs text-neutral-600 font-semibold">Indica cantidad de suministros NO repetidos:</p>
 
         {{-- paginacion --}}
         {{ $all_provisions->links() }}

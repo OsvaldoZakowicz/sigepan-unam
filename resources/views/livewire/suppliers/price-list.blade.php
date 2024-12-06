@@ -9,9 +9,19 @@
         <span class="font-semibold">{{ $supplier->company_name }},&nbsp;</span>
         <span>El proveedor se encuentra:&nbsp;</span>
         @if ($supplier->status_is_active)
-          <span class="font-semibold text-emerald-600">activo</span>
+          <span
+            class="font-semibold text-emerald-600 cursor-help"
+            title="{{ $supplier->status_description }}"
+            >activo
+            <x-quest-icon/>
+          </span>
         @else
-          <span class="font-semibold text-neutral-600">inactivo</span>
+          <span
+            class="font-semibold text-neutral-600 cursor-help"
+            title="{{ $supplier->status_description }}"
+            >inactivo
+            <x-quest-icon/>
+          </span>
         @endif
       </x-slot:title>
       <div class="flex gap-2">
