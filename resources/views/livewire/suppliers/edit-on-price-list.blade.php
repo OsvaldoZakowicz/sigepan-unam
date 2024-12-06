@@ -3,7 +3,12 @@
   <article class="m-2 border rounded-sm border-neutral-200">
 
     {{-- barra de titulo --}}
-    <x-title-section title="edición de precios de suministros para el proveedor: {{ $supplier->company_name }}">
+    <x-title-section>
+
+      <x-slot:title>
+        <span>Edición de precios de suministros para el proveedor:&nbsp;</span>
+        <span class="font-semibold">{{ $supplier->company_name }}</span>
+      </x-slot:title>
 
       <x-a-button
         wire:navigate
@@ -28,7 +33,7 @@
 
         {{-- lista de suministros elegidos --}}
         <div class="flex flex-col gap-1 w-full">
-          <span class="font-semibold capitalize">formulario: lista de suministros elegidos.</span>
+          <span class="font-semibold capitalize">lista de suministros elegidos para la edicion.</span>
           <div class="max-h-72 overflow-y-auto overflow-x-hidden">
             <x-table-base>
               {{-- cabecera de la tabla --}}
@@ -44,19 +49,53 @@
                 </tr>
               </x-slot:tablehead>
               <x-slot:tablebody>
-                @forelse ($provisions as $provision_array_key => $provision_id)
-
-                  @livewire(
-                    'suppliers.input-price-form',
-                    [
-                      'provision_id' => $provision_id,
-                      'supplier_id' => $supplier->id,
-                      'provision_array_key' => $provision_array_key,
-                      'is_editing' => true,
-                    ],
-                    key($provision_array_key)
-                  )
-
+                @forelse ($prices as $key => $price_item)
+                  <tr wire:key="{{ $key }}">
+                    <x-table-td class="text-end">
+                      {{ $price_item['provision']->id }}
+                    </x-table-td>
+                    <x-table-td
+                      title="{{ $price_item['provision']->provision_short_description }}"
+                      class="cursor-pointer text-start">
+                      {{ $price_item['provision']->provision_name }}
+                    </x-table-td>
+                    <x-table-td class="text-start">
+                      {{ $price_item['provision']->trademark->provision_trademark_name }}
+                    </x-table-td>
+                    <x-table-td class="text-start">
+                      {{ $price_item['provision']->type->provision_type_name }}
+                    </x-table-td>
+                    <x-table-td class="text-end">
+                      {{ $price_item['provision']->provision_quantity }}&nbsp;
+                      ({{ $price_item['provision']->measure->measure_abrv }})
+                    </x-table-td>
+                    <x-table-td class="text-start">
+                      {{-- input precio --}}
+                      @error('prices.'.$key.'.price')<span class="text-red-400 text-xs capitalize">{{ $message }}</span>@enderror
+                      <div class="flex justify-start items-center">
+                        {{-- simbolo de $ --}}
+                        <span>$&nbsp;</span>
+                        {{-- precio --}}
+                        <x-text-input
+                          id="prices_{{ $key }}_price"
+                          wire:model.defer="prices.{{ $key }}.price"
+                          name="prices.{{ $key }}.price"
+                          value=""
+                          type="text"
+                          placeholder="precio ..."
+                          class="w-full text-right"/>
+                      </div>
+                    </x-table-td>
+                    <x-table-td class="text-start">
+                      {{-- boton para quitar de la lista --}}
+                      <span
+                        title="quitar de la lista."
+                        wire:click="removeFromPriceList({{ $key }})"
+                        class="font-semibold cursor-pointer leading-none p-1 bg-red-200 text-neutral-600 border-red-300 rounded-sm"
+                        >&times;
+                      </span>
+                    </x-table-td>
+                  </tr>
                 @empty
                   <tr class="border">
                     <td colspan="3">¡lista vacia!</td>
@@ -77,7 +116,7 @@
           <x-a-button
             wire:navigate
             href="#"
-            wire:click="refresh"
+            wire:click="setPricesList()"
             bg_color="neutral-100"
             border_color="neutral-300"
             text_color="neutral-600"
@@ -86,7 +125,7 @@
 
           <x-btn-button
             type="button"
-            wire:click="save"
+            wire:click="save()"
             >editar suministros listados
           </x-btn-button>
 

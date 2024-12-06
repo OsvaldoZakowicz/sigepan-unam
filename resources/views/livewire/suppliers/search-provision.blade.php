@@ -1,7 +1,17 @@
 <div class="w-full">
 
   {{-- desplegable --}}
-  <x-div-toggle x-data="{ open: false }" title="cuadro de búsqueda" subtitle="Busque y elija suministros para la lista." class="p-1">
+  <x-div-toggle x-data="{ open: false }" title="cuadro de búsqueda" class="p-1">
+
+    <x-slot:subtitle>
+      <span class="font-semibold">Mostrando:&nbsp;</span>
+      @if ($is_editing)
+        <span>Suministros de la lista de precios actual del proveedor.</span>
+      @else
+        <span>Suministros no asignados al proveedor.</span>
+      @endif
+      <span>Búsque y elija suministros para la lista.</span>
+    </x-slot:subtitle>
 
     <div class="flex flex-col gap-1 w-full">
 
@@ -122,7 +132,7 @@
                 <x-table-td class="text-start">
                   <div class="w-full inline-flex gap-1 justify-start items-center">
                     <span
-                      wire:click="addProvision({{ $provision->id }})"
+                      wire:click="addProvision({{ $provision }})"
                       title="elegir y agregar a la lista"
                       class="font-bold leading-none text-center p-1 cursor-pointer bg-neutral-100 border border-neutral-200 rounded-sm"
                       >&plus;

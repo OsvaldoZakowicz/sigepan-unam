@@ -3,7 +3,17 @@
   <article class="m-2 border rounded-sm border-neutral-200">
 
     {{-- barra de titulo --}}
-    <x-title-section title="lista de precios del proveedor: {{ $supplier->company_name }}">
+    <x-title-section>
+      <x-slot:title>
+        <span>lista de precios del proveedor:&nbsp;</span>
+        <span class="font-semibold">{{ $supplier->company_name }},&nbsp;</span>
+        <span>El proveedor se encuentra:&nbsp;</span>
+        @if ($supplier->status_is_active)
+          <span class="font-semibold text-emerald-600">activo</span>
+        @else
+          <span class="font-semibold text-neutral-600">inactivo</span>
+        @endif
+      </x-slot:title>
       <div class="flex gap-2">
 
         <x-a-button

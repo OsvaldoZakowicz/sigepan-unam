@@ -5,6 +5,7 @@ namespace App\Livewire\Suppliers;
 use App\Models\Supplier;
 use App\Models\ProvisionTrademark;
 use App\Models\ProvisionType;
+use Illuminate\View\View;
 use Livewire\WithPagination;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -27,15 +28,21 @@ class PriceList extends Component
   // tipos de suministros
   public $provision_types;
 
-  //* montar datos
-  public function mount($id)
+  /**
+   * montar datos del componente
+   * @param int $id id de un proveedor.
+   * @return void
+  */
+  public function mount(int $id): void
   {
     $this->supplier = Supplier::findOrFail($id);
     $this->trademarks = ProvisionTrademark::orderBy('id', 'desc')->get();
     $this->provision_types = ProvisionType::all();
   }
 
-  //* buscar suministros con precio del proveedor
+  /**
+   * buscar suministos del proveedor
+  */
   public function searchSupplierProvisions()
   {
     return $this->supplier->provisions()
@@ -52,16 +59,23 @@ class PriceList extends Component
       ->paginate(10);
   }
 
-  // reiniciar paginacion al buscar
+  /**
+   * reiniciar la paginacion para buscar
+   * @return void.
+  */
   public function resetPagination()
   {
     $this->resetPage();
   }
 
-  //* eliminar precio del suministro
-  // quita la asociacion suministro con proveedor y el precio,
-  // no borra el suministro.
-  public function delete($id)
+  /**
+   * eliminar precio del suministro
+   * quita la asociacion suministro con proveedor y el precio,
+   * no borra el suministro.
+   * @param int $id del suministro
+   * @return void
+  */
+  public function delete(int $id): void
   {
     try {
 
@@ -85,10 +99,13 @@ class PriceList extends Component
     }
   }
 
-  public function render()
+  /**
+   * renderizar vista
+   * @return View
+  */
+  public function render(): View
   {
     $provisions_with_price = $this->searchSupplierProvisions();
-
     return view('livewire.suppliers.price-list', compact('provisions_with_price'));
   }
 }
