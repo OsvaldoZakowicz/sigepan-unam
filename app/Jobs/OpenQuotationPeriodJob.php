@@ -16,14 +16,17 @@ class OpenQuotationPeriodJob implements ShouldQueue
   use Queueable;
 
   /**
-   * * crear la instancia del trabajo
+   * crear la instancia del trabajo
+   * @param RequestForQuotationPeriod $period periodo de peticion de presupuestos
+   * @return void
    */
   public function __construct(public RequestForQuotationPeriod $period) {}
 
   /**
-   * * ejecutar el trabajo.
-   * todo: comprobar la unicidad del codigo de quotation.
-   */
+   * ejecutar el trabajo.
+   * todo: manejo de errores?
+   * @param QuotationPeriodService $quotation_period_service servicio para el periodo de presupuestos
+  */
   public function handle(QuotationPeriodService $quotation_period_service): void
   {
     // estado: abierto
@@ -55,7 +58,7 @@ class OpenQuotationPeriodJob implements ShouldQueue
     foreach ($all_suppliers as $key => $supplier) {
       // crear un presupuesto a responder
       $quotation = Quotation::create([
-        'quotation_code'  => 'presupuesto_#' . $key . str_replace(':', '', now()->format('H:i:s')),
+        'quotation_code'  => $quotation_period_service->generateUniqueQuotationCode(),
         'is_completed'    => false,
         'period_id'       => $this->period->id,
         'supplier_id'     => $supplier['sup_id'],

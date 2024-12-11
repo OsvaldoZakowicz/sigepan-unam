@@ -13,20 +13,19 @@ use Illuminate\Support\Facades\Artisan;
  * sail artisan list o sail artisan help.
  *
  * * scheduling clousure commands.
- * * listar comandos: sail artisan schedule:list
- * * correr comandos: sail artisan schedule:work
+ * listar comandos: sail artisan schedule:list
+ * correr comandos: sail artisan schedule:work
  * https://laravel.com/docs/11.x/scheduling#scheduling-artisan-closure-commands
  * ->everyMinute(); ejecutar el comando cada minuto.
  * ->everyTwoMinutes(); ejecutar el comando cada dos minutos.
  * ->everyFiveMinutes(); ejecutar el comando cada cinco minutos.
- */
-
+*/
 
 /**
- * * command: abrir periodos de peticion de presupuesto.
+ * command: abrir periodos de peticion de presupuesto.
  * @param signature: firma del comando (nombre y argumentos opcionales)
  * @param clusure: callback fn con la logica o servicio del comando.
- */
+*/
 Artisan::command('budget-periods:open', function (QuotationPeriodService $quotation_period_service) {
 
   $periods_to_open = $quotation_period_service->getQuotationPeriodsToOpen();
@@ -40,10 +39,10 @@ Artisan::command('budget-periods:open', function (QuotationPeriodService $quotat
 })->purpose('abrir periodos de peticion de presupuestos')->everyMinute();
 
 /**
- * * command: cerrar periodos de peticion de presupuesto.
+ * command: cerrar periodos de peticion de presupuesto.
  * @param signature: firma del comando (nombre y argumentos opcionales)
  * @param clusure: callback fn con la logica o servicio del comando.
- */
+*/
 Artisan::command('budget-periods:close', function (QuotationPeriodService $quotation_period_service) {
 
   $periods_to_close = $quotation_period_service->getQuotationPeriodsToClose();
@@ -54,4 +53,4 @@ Artisan::command('budget-periods:close', function (QuotationPeriodService $quota
       CloseQuotationPeriodJob::dispatch($period);
     }
   }
-})->purpose('cerrar periodos de peticion de presupuestos')->everyMinute();
+})->purpose('cerrar periodos de peticion de presupuestos')->everyTwoMinutes();

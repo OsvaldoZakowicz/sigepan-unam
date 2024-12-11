@@ -106,6 +106,7 @@
       <x-slot:content class="flex-col">
 
         {{-- suministros --}}
+        {{-- todo: completar la lista con columnas igual que 'ver respuesta del presupuesto' --}}
         <x-div-toggle x-data="{ open: false }" title="suministros de interés para este período:" class="p-2">
           {{-- leyenda --}}
           <x-slot:subtitle>
