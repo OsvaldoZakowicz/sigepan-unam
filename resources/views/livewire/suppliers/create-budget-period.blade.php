@@ -16,7 +16,7 @@
         <form class="w-full flex flex-col gap-1">
 
           {{-- datos del periodo --}}
-          <x-div-toggle x-data="{open: true}" title="formulario: datos del período" class="p-2">
+          <x-div-toggle x-data="{open: true}" title="datos del período" class="p-2">
 
             {{-- leyenda --}}
             <x-slot:subtitle>
@@ -83,7 +83,7 @@
           </x-div-toggle>
 
           {{-- buscar suministros para presupuestar --}}
-          <x-div-toggle x-data="{open: true}" title="formulario: suministros a presupuestar" class="p-2">
+          <x-div-toggle x-data="{open: true}" title="suministros a presupuestar" class="p-2">
 
             {{-- leyenda --}}
             <x-slot:subtitle>
@@ -188,7 +188,11 @@
             >cancelar
           </x-a-button>
 
-          <x-btn-button type="button" wire:click="save()">guardar</x-btn-button>
+          <x-btn-button
+            type="button"
+            wire:click="save()"
+            >guardar
+          </x-btn-button>
 
         </div>
       </x-slot:footer>

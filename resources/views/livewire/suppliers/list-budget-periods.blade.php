@@ -17,21 +17,60 @@
     {{-- cuerpo --}}
     <x-content-section>
 
-      <x-slot:header class="hidden">
-        <span class="text-sm capitalize">buscar periodo:</span>
-        {{-- formulario de busqueda --}}
-        <form class="grow">
+      <x-slot:header class="">
+
+        {{-- busqueda --}}
+        <div class="flex gap-1 justify-start items-start grow">
 
           {{-- termino de busqueda --}}
-          <input
-            type="text"
-            name="search"
-            placeholder="ingrese un id, razon social, telefono o CUIT ..."
-            class="w-1/4 shrink text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300" />
+          <div class="flex flex-col justify-end w-1/4">
+            <label for="search">buscar periodo</label>
+            <input
+              type="text"
+              name="search"
+              id="search"
+              wire:model.live="search"
+              wire:click="resetPagination()"
+              placeholder="ingrese un id o codigo de período ..."
+              class="w-full text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"/>
+          </div>
 
-        </form>
-        <!-- grupo de botones -->
-        <div class="flex"></div>
+          {{-- fecha de inicio --}}
+          <div class="flex flex-col justify-end w-1/6">
+            <label for="search_start_at">fecha de inicio desde</label>
+            <input
+              type="date"
+              name="search_start_at"
+              id="search_start_at"
+              wire:model.live="search_start_at"
+              class="w-full text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"/>
+          </div>
+
+          {{-- fecha de fin --}}
+          <div class="flex flex-col justify-end w-1/6">
+            <label for="search_end_at">fecha de fin hasta</label>
+            <input
+              type="date"
+              name="search_end_at"
+              id="search_end_at"
+              wire:model.live="search_end_at"
+              class="w-full text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"/>
+          </div>
+
+        </div>
+
+        {{-- limpiar campos de busqueda --}}
+        <div class="flex flex-col self-start h-full">
+          <x-a-button
+            href="#"
+            wire:click="resetSearchInputs()"
+            bg_color="neutral-200"
+            border_color="neutral-300"
+            text_color="neutral-600"
+            >limpiar
+          </x-a-button>
+        </div>
+
       </x-slot:header>
 
       <x-slot:content>
@@ -132,8 +171,13 @@
       </x-slot:content>
 
       <x-slot:footer class="py-2">
+
+        {{-- paginacion --}}
+        {{ $periods->links() }}
+
         <!-- grupo de botones -->
         <div class="flex"></div>
+
       </x-slot:footer>
 
     </x-content-section>
