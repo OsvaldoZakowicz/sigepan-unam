@@ -23,7 +23,9 @@
 <body class="font-sans antialiased">
   <div class="relative min-h-screen bg-gray-100">
 
+    {{-- grupo de navegacion, encabezado y notificaciones --}}
     <div class="fixed z-50 top-0 left-0 right-0">
+
       {{-- navegacion de livewire --}}
       <livewire:layout.navigation />
 
@@ -33,6 +35,32 @@
           {{ $header }}
         </header>
       @endif
+
+      {{-- todo: componente de notificaciones por eventos --}}
+      <div x-data="{}">
+
+      </div>
+
+      {{-- todo: notificaciones de sesion --}}
+      {{-- notificaciones recibidas a traves de la sesion --}}
+      <div>
+        {{-- mensaje toast exito, recibido por session --}}
+        @if (session('operation-success'))
+          <x-session-toast type="success" msg="{{ session('operation-success') }}" />
+        @endif
+
+        {{-- mensaje toast info, recibido por sesion --}}
+        @if (session('operation-info'))
+          <x-session-toast type="info" msg="{{ session('operation-info') }}" />
+        @endif
+
+        {{-- mensaje toast error, recibido por sesion --}}
+        @if (session('operation-error'))
+          <x-session-toast type="error" msg="{{ session('operation-error') }}" />
+        @endif
+      </div>
+
+
     </div>
 
     {{-- contendio de seccion --}}
