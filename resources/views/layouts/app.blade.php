@@ -36,12 +36,55 @@
         </header>
       @endif
 
-      {{-- todo: componente de notificaciones por eventos --}}
-      <div x-data="{}">
+      {{-- notificaciones toast, llamadas 'toast-event' --}}
+      <div x-cloak x-data="{
+        showToast: false,
+        toastData: null,
+        toastIcon: '',
+        getToastClasses() {
+            const types = {
+                success: 'bg-emerald-100 border-emerald-500',
+                info: 'bg-blue-100 border-blue-500',
+                error: 'bg-red-100 border-red-500'
+            };
+            return `${types[this.toastData?.event_type] || ''} `;
+        },
+        setToastIcon() {
+            const icons = {
+                success: '&#10003;',
+                info: '&#33;',
+                error: '&#10007;'
+            };
+            this.toastIcon = icons[this.toastData?.event_type] || '';
+        },
+        init() {
+            window.addEventListener('toast-event', (event) => {
+                this.toastData = event.detail.toast_data;
+                this.setToastIcon();
+                this.showToast = true;
+                //setTimeout(() => this.showToast = false, 5000);
+            });
+        }
+      }">
+        {{-- visualizacion y posicion del toast --}}
+        <div x-show="showToast"
+              x-transition
+              class="absolute z-50 top-32 left-2 lg:inset-x-1/3">
+            <div
+              :class="'relative flex gap-3 p-4 rounded-lg border max-w-lg' + ' ' + getToastClasses()">
+              <div class="mt-0.5">
+                <span x-text="toastIcon" class="text-xl"></span>
+              </div>
 
+              <div class="flex flex-col gap-1">
+                <h3 x-text="toastData?.title_toast" class="text-sm font-medium text-neutral-800"></h3>
+                <p x-text="toastData?.descr_toast" class="text-sm text-neutral-600"></p>
+                <span x-on:click="showToast = false" class="absolute top-2 right-2 cursor-pointer">&#10005;</span>
+              </div>
+            </div>
+        </div>
       </div>
 
-      {{-- todo: notificaciones de sesion --}}
       {{-- notificaciones recibidas a traves de la sesion --}}
       <div>
         {{-- mensaje toast exito, recibido por session --}}

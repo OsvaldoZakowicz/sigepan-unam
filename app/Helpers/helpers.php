@@ -55,11 +55,11 @@ function englishPluralFromPath($model_path)
 }
 
 /**
- * * retornar un titulo de mensaje para mensajes toast
- * formato ejemplo: Operacion 'estado'!,
- * formato default: Informacion:,
- * estado: exitosa, fallida, otro.
- */
+ * * devuelve la construccion de un titulo de mensaje para mensajes toast.
+ * * formato ejemplo: 'Operacion $estado!' o 'Información:'
+ * @param string $estado de la opracion, ejemplo: 'exitosa', 'fallida', 'incompleta', 'cancelada'.
+ * @param bool $default si es verdadero, se devuelve 'Información:'.
+*/
 function toastTitle($estado = 'exitosa', $default = false )
 {
   if($default) {
@@ -70,16 +70,38 @@ function toastTitle($estado = 'exitosa', $default = false )
 }
 
 /**
- * * retornar un cuerpo de mensaje de exito para mensajes toast
- * formato ejemplo: El 'modelo' fue 'operacion' correctamente.
- * modelo: usuario, rol, proveedor, ...
- * operacion: creado, eliminado, editado, otro, ...
- */
+ * * retornar un cuerpo de mensaje de exito para mensajes toast.
+ * * formato ejemplo: 'El $modelo fue $operacion correctamente'
+ * @param string $modelo nombre del modelo o clase principal de la operacion.
+ * @param string $operacion nombre de la operacion realizada, ejemplo: 'creado', 'actualizado', 'eliminado'.
+*/
 function toastSuccessBody($modelo = 'modelo', $operacion = 'creado')
 {
-  return 'El ' . $modelo . ' fue ' . $operacion . ' correctamente';
+  return 'El ' . $modelo . ' fue ' . $operacion . ' correctamente.';
 }
 
+/**
+ * * retornar un cuerpo de mensaje de error para mensajes toast.
+ * * formato ejemplo: 'No se pudo $operacion el $modelo $detalle'
+ * * cuerpo de mensaje de ejemplo: 'No se pudo crear el proveedor debido a...'
+ * @param string $modelo nombre del modelo o clase principal de la operacion.
+ * @param string $operacion nombre de la operacion realizada, ejemplo: 'crear', 'actualizar', 'eliminar'.
+ * @param string $detalle detalles adicionales del error.
+*/
+function toastErrorBody($modelo = 'modelo', $operacion = 'crear', $detalle = '')
+{
+  return 'No se pudo ' . $operacion . ' el ' . $modelo . '.' . $detalle . '.';
+}
+
+/**
+ * * retornar un cuerpo de mensaje de informacion para mensajes toast.
+ * * formato ejemplo: '$detalle!'
+ * @param string $detalle detalles adicionales del mensaje.
+*/
+function toastInfoBody($detalle = '')
+{
+  return $detalle . '!';
+}
 
 /**
  * * generar contrasenia aleatoria
