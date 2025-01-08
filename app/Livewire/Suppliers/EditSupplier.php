@@ -8,6 +8,7 @@ use App\Services\Supplier\SupplierService;
 use App\Services\User\UserService;
 use Illuminate\Validation\Rule;
 use App\Rules\CuitCuilRule;
+use Illuminate\View\View;
 
 class EditSupplier extends Component
 {
@@ -19,7 +20,6 @@ class EditSupplier extends Component
   public $company_cuit;
   public $company_iva;
   public $company_phone;
-  // debido al campo nullable, inicializar
   public $company_short_desc = "sin descripcion";
 
   // estado del proveedor
@@ -33,7 +33,6 @@ class EditSupplier extends Component
 
   // proveedor direccion
   public $company_street;
-  // debido al campo nullable, inicializar
   public $company_number = "s/n";
   public $company_city;
   public $company_postal_code;
@@ -79,8 +78,11 @@ class EditSupplier extends Component
     $this->status_changed       =  false;
   }
 
-  //* comprobar si el estado del proveedor fue cambiado
-  //* NOTA: true y false se trabaja en 0 y 1, ojo al comparar con igualdad estricta con true y false.
+  /**
+   * verificar si cambio el estado del proveedor
+   * NOTA: true y false se trabaja en 0 y 1, ojo al comparar con igualdad estricta con true y false.
+   * @return void
+   */
   public function checkIfStatusChanged()
   {
     // estado actual del proveedor
@@ -96,6 +98,12 @@ class EditSupplier extends Component
 
   }
 
+  /**
+   * editar un proveedor
+   * @param SupplierService $supplier_service
+   * @param UserService $user_service
+   * @return void
+   */
   public function update(SupplierService $supplier_service, UserService $user_service)
   {
     // validar proveedor, direccion, estado y credenciales de usuario
@@ -167,12 +175,8 @@ class EditSupplier extends Component
         $validated += ['status_description' => $this->supplier->status_description];
       }
 
-      //dd($validated);
-
       $updated_supplier_user = $user_service->editInternalUser($this->supplier->user, $validated);
       $updated_supplier = $supplier_service->editSupplier($updated_supplier_user, $this->supplier, $validated);
-
-      // todo: enviar credenciales de acceso via email
 
       $this->reset();
 
@@ -189,7 +193,11 @@ class EditSupplier extends Component
     }
   }
 
-  public function render()
+  /**
+   * renderizar vista
+   * @return View
+   */
+  public function render(): View
   {
     return view('livewire.suppliers.edit-supplier');
   }

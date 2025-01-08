@@ -25,7 +25,8 @@ class SupplierService
   }
 
   /**
-   * * servicio: obtener rol proveedor
+   * servicio: obtener rol proveedor
+   * @return string $SUPPLIER_ROLE
    */
   public function getSupplierRolename(): string
   {
@@ -33,9 +34,12 @@ class SupplierService
   }
 
   /**
-   * * servicio: crear proveedor
+   * servicio: crear proveedor
    * NOTA: recibe un usuario creado previamente
    * NOTA: recibe el array de inputs validados
+   * @param User $supplier_user
+   * @param Array $supplier_data
+   * @return Supplier $supplier
    */
   public function createSupplier(User $supplier_user, Array $supplier_data): Supplier
   {
@@ -63,9 +67,13 @@ class SupplierService
   }
 
   /**
-   * * servicio: actualizar proveedor
+   * servicio: actualizar proveedor
    * NOTA: recibe un usuario actualizado previamente
    * NOTA: recibe el array de inputs validados
+   * @param User $supplier_user
+   * @param Supplier $supplier
+   * @param Array $supplier_data
+   * @return Supplier $supplier actualizado
    */
   public function editSupplier(User $supplier_user, Supplier $supplier, Array $supplier_data): Supplier
   {
@@ -96,10 +104,12 @@ class SupplierService
 
 
   /**
-   * * servicio: eliminar provedor
+   * servicio: eliminar provedor
    * NOTA: elimina el usuario y direccion asociados
+   * @param Supplier $supplier
+   * @return void
    */
-  public function deleteSupplier(Supplier $supplier)
+  public function deleteSupplier(Supplier $supplier): void
   {
     $supplier_user = $supplier->user;
     $supplier_address = $supplier->address;
@@ -118,17 +128,20 @@ class SupplierService
   }
 
   /**
-   * * servicio: obtener marcas de suministros
+   * servicio: obtener marcas de suministros
+   * @param string $order_by orden de los registros
+   * @return Collection $provision_trademarks
    */
-  public function getProvisionTrademarks($order_by = 'asc')
+  public function getProvisionTrademarks($order_by = 'asc'): Collection
   {
     return ProvisionTrademark::orderBy('provision_trademark_name', $order_by)->get();
   }
 
   /**
-   * * servicio: obtener tipos de suministros
+   * servicio: obtener tipos de suministros
+   * @return Collection $provision_types
    */
-  public function getProvisionTypes()
+  public function getProvisionTypes(): Collection
   {
     return ProvisionType::all();
   }

@@ -8,6 +8,7 @@ use App\Services\Supplier\SupplierService;
 use App\Services\User\UserService;
 use App\Rules\CuitCuilRule;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\View\View;
 
 class CreateSupplier extends Component
 {
@@ -16,12 +17,10 @@ class CreateSupplier extends Component
   public $company_cuit;
   public $company_iva;
   public $company_phone;
-  // debido al campo nullable, inicializar
   public $company_short_desc = "sin descripcion";
 
   // proveedor direccion
   public $company_street;
-  // debido al campo nullable, inicializar
   public $company_number = "s/n";
   public $company_city;
   public $company_postal_code;
@@ -43,7 +42,12 @@ class CreateSupplier extends Component
     $this->iva_conditions = $supplier_service->getSuppilerIvaConditions();
   }
 
-  //* crear un proveedor
+  /**
+   * crear un proveedor
+   * @param SupplierService $supplier_service
+   * @param UserService $user_service
+   * @return void
+   */
   public function save(SupplierService $supplier_service, UserService $user_service)
   {
 
@@ -58,12 +62,12 @@ class CreateSupplier extends Component
       'company_number'  => 'nullable|max:8',
       'company_city'    => 'required|regex:/^[\p{L}\p{N}\s]+$/u|max:45',
       'company_postal_code' => 'required|integer|digits:4|min:1000|max:9999',
-    ],[
+    ], [
       'company_name.regex'    => 'El campo :attribute solo permite letras, numeros y espacios',
       'company_cuit.regex'    => 'El campo :attribute debe ser un numero de 11 digitos',
       'company_street.regex'  => 'El campo :attribute solo permite letras, numeros y espacios',
       'company_city.regex'    => 'El campo :attribute solo permite letras, numeros y espacios',
-    ],[
+    ], [
       'user_email'      => 'correo electronico',
       'company_name'  => 'razon social',
       'company_cuit'  => 'cuit',
@@ -96,19 +100,21 @@ class CreateSupplier extends Component
 
       session()->flash('operation-success', toastSuccessBody('proveedor', 'creado'));
       $this->redirectRoute('suppliers-suppliers-index');
-
     } catch (\Exception $e) {
 
       // todo: como elimino registros creados a medias si algo falla?, por ej: usuario o direccion?
 
       session()->flash('operation-error', 'error: ' . $e->getMessage() . ', contacte al Administrador');
       $this->redirectRoute('suppliers-suppliers-index');
-
     }
   }
 
-  public function render()
+  /**
+   * renderizar vista
+   * @return View
+   */
+  public function render(): View
   {
-      return view('livewire.suppliers.create-supplier');
+    return view('livewire.suppliers.create-supplier');
   }
 }
