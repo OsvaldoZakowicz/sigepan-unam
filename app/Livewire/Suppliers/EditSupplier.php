@@ -43,13 +43,18 @@ class EditSupplier extends Component
   public $user_email;
 
   // posibles condiciones de iva
-  public $iva_condition_params = [];
+  public $iva_conditions = [];
 
-  //* montar datos
-  public function mount(SupplierService $supplier_service, $id)
+  /**
+   * montar datos
+   * @param SupplierService $supplier_service
+   * @param int $id id del proveedor
+   * @return void
+   */
+  public function mount(SupplierService $supplier_service, $id): void
   {
     $this->supplier = Supplier::findOrFail($id);
-    $this->iva_condition_params = $supplier_service->getSuppilerIvaConditions();
+    $this->iva_conditions = $supplier_service->getSuppilerIvaConditions();
 
     $this->company_name         =  $this->supplier->company_name;
     $this->company_cuit         =  $this->supplier->company_cuit;

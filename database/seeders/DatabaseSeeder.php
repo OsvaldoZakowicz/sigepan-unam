@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
       ProvisionTypeSeeder::class,
       ProvisionTrademarkSeeder::class,
       PeriodStatusSeeder::class,
+      IvaConditionSeeder::class,
     ]);
 
   }

@@ -63,8 +63,8 @@
               </span>
               <select wire:model="company_iva" name="company_iva" id="company_iva" class="p-1 text-sm w-full border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
                 <option value="" selected>seleccione...</option>
-                @foreach ($iva_condition_params as $condition)
-                  <option value="{{ $condition }}">{{ $condition }}</option>
+                @foreach ($iva_conditions as $condition)
+                  <option value="{{ $condition->name }}">{{ $condition->name }}</option>
                 @endforeach
               </select>
             </div>

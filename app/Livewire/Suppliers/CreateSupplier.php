@@ -31,12 +31,16 @@ class CreateSupplier extends Component
   public $user_email;
 
   // posibles condiciones de iva
-  public $iva_condition_params = [];
+  public $iva_conditions = [];
 
-  //* montar datos
-  public function mount(SupplierService $supplier_service)
+  /**
+   * montar datos
+   * @param SupplierService $supplier_service
+   * @return void
+   */
+  public function mount(SupplierService $supplier_service): void
   {
-    $this->iva_condition_params = $supplier_service->getSuppilerIvaConditions();
+    $this->iva_conditions = $supplier_service->getSuppilerIvaConditions();
   }
 
   //* crear un proveedor

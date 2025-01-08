@@ -7,25 +7,21 @@ use App\Models\Address;
 use App\Models\Supplier;
 use App\Models\ProvisionTrademark;
 use App\Models\ProvisionType;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class SupplierService
 {
-  //* rol proveedor
+  // rol proveedor
   protected $SUPPLIER_ROLE = 'proveedor';
 
-  //* reglas sobre proveedores
-  protected $IVA_CONDITIONS = [
-    'responsable inscripto',
-    'monotributista',
-    'iva excento'
-  ];
-
   /**
-   * * servicio: obtener condiciones frente al iva
+   * servicio: obtener condiciones frente al iva
+   * @return Collection $iva_conditions
    */
-  public function getSuppilerIvaConditions(): Array
+  public function getSuppilerIvaConditions(): Collection
   {
-    return $this->IVA_CONDITIONS;
+    return DB::table('iva_conditions')->get();
   }
 
   /**
