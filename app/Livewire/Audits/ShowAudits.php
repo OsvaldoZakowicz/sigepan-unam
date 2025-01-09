@@ -6,6 +6,10 @@ use Livewire\Component;
 use OwenIt\Auditing\Models\Audit;
 use Illuminate\View\View;
 
+/**
+ * Class ShowAudits
+ * todo: traducir nombres de las propiedades usando lang
+ */
 class ShowAudits extends Component
 {
   // registro auditado

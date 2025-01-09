@@ -147,7 +147,16 @@
                       bg_color="neutral-100"
                       border_color="neutral-200"
                       text_color="neutral_600"
-                      >ver cambios
+                      >ver
+                    </x-a-button>
+
+                    <x-a-button
+                      wire:navigate
+                      href="{{route('audits-audits-show-history', $audit->id)}}"
+                      bg_color="neutral-100"
+                      border_color="neutral-200"
+                      text_color="neutral_600"
+                      >historial
                     </x-a-button>
 
                   </div>
@@ -155,7 +164,7 @@
             </tr>
             @empty
             <tr class="border">
-              <td colspan="6">sin registros!</td>
+              <td colspan="7">sin registros!</td>
             </tr>
             @endforelse
           </x-slot:tablebody>

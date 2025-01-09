@@ -75,6 +75,9 @@ Route::middleware(['auth', 'verified', 'can:auditoria'])->group(function () {
   Route::get('audits/show/{id}', [AuditController::class, 'audits_show'])
     ->name('audits-audits-show');
 
+  Route::get('audits/show/history/{id}', [AuditController::class, 'audits_show_history'])
+    ->name('audits-audits-show-history');
+
   Route::get('audits/report/one/{id}', [AuditController::class, 'audits_report_one'])
     ->name('audits-audits-report');
 
