@@ -55,6 +55,20 @@ function englishPluralFromPath($model_path)
 }
 
 /**
+ * * a partir de un nombre plural en ingles,
+ * obtener el path completo del modelo.
+ * ejemplo: de 'users' obtener 'App\Models\User'
+ * @param string $plural_name nombre plural en ingles
+ * @return string
+ */
+function modelPathFromPlural($plural_name)
+{
+  return 'App\\Models\\' . Str::of($plural_name)
+    ->singular()
+    ->studly();
+}
+
+/**
  * * devuelve la construccion de un titulo de mensaje para mensajes toast.
  * * formato ejemplo: 'Operacion $estado!' o 'Información:'
  * @param string $estado de la opracion, ejemplo: 'exitosa', 'fallida', 'incompleta', 'cancelada'.

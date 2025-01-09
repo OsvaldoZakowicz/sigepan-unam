@@ -4,26 +4,40 @@ namespace App\Livewire\Audits;
 
 use Livewire\Component;
 use OwenIt\Auditing\Models\Audit;
-use App\Models\User;
+use Illuminate\View\View;
 
 class ShowAudits extends Component
 {
-  public $audit; // registro auditado
-  public $audit_metadata; // metadatos de auditoria
-  public $audit_modified_properties; // propiedades que cambiaron
-  public $user_resp; // responsable del cambio
+  // registro auditado
+  public $audit;
+  // metadatos de auditoria
+  public $audit_metadata;
+  // propiedades que cambiaron
+  public $audit_modified_properties;
+  // responsable del cambio
+  public $user_resp;
 
-  public function mount($id)
+  /**
+   * montar datos
+   * @param int $id id del registro auditado
+   * @return void
+   */
+  public function mount($id): void
   {
     $this->audit = Audit::findOrFail($id);
     $this->audit_metadata = $this->audit->getMetadata();
     $this->audit_modified_properties = $this->audit->getModified();
+
     // responsable del cambio que disparo el registro de auditoria
-    $this->user_resp = User::find($this->audit_metadata['user_id']);
+    $this->user_resp = $this->audit->user;
   }
 
-  public function render()
+  /**
+   * renderizar vista
+   * @return View
+   */
+  public function render(): View
   {
-      return view('livewire.audits.show-audits');
+    return view('livewire.audits.show-audits');
   }
 }
