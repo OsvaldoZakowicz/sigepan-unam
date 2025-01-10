@@ -14,24 +14,25 @@ class NewRequestForQuotationReceived extends Mailable
 {
   use Queueable, SerializesModels;
 
-  /**
-   * Create a new message instance.
-   */
-  public function __construct(public Supplier $supplier) {}
+  public function __construct(
+    public Supplier $supplier
+  ) {}
 
   /**
-   * Get the message envelope.
-   */
+   * asunto del correo
+   * @return Envelope
+  */
   public function envelope(): Envelope
   {
     return new Envelope(
-      subject: 'Nueva solicitud de presupuesto recibida!',
+      subject: '¡Nueva solicitud de presupuesto recibida!',
     );
   }
 
   /**
-   * Get the message content definition.
-   */
+   * cuerpo del correo
+   * @return Content
+  */
   public function content(): Content
   {
     return new Content(
@@ -41,9 +42,8 @@ class NewRequestForQuotationReceived extends Mailable
 
   /**
    * Get the attachments for the message.
-   *
    * @return array<int, \Illuminate\Mail\Mailables\Attachment>
-   */
+  */
   public function attachments(): array
   {
     return [];

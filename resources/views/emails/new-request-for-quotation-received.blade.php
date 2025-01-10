@@ -1,27 +1,25 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Nueva solicitud de presupuestos</title>
-  <style>
-    div {
-      width: 500px;
-      margin: 20px auto;
-      padding: 20px;
-    }
-  </style>
-</head>
-<body>
-  <div>
-    <h1>Tiene una nueva solicitud de prsupuestos</h1>
-    <p>Para proveedor:&nbsp;{{ $supplier->company_name }}</p>
-    <br>
-    <p>Ha recibido una nueva solicitud de presupuesto de parte de la panadería, complétela accediendo al siguiente enlace, o acceda a su cuenta y revise el apartado de presupuestos:</p>
-    <br>
-    <a href="http://localhost/quotations">Completar presupuesto.</a>
-    <br>
-  </div>
-</body>
-</html>
+@extends('emails.email-layout')
+
+@section('header')
+  <h1>Nueva solicitud de presupuesto recibida</h1>
+  <p>Se ha recibido una nueva solicitud de presupuesto de parte de la panadería <i>nombre</i>.</p>
+  {{-- todo: mostrar id del periodo y fechas limites para responder --}}
+@endsection
+
+@section('content')
+  <p>Para ver los detalles de la solicitud y enviar su cotización, ingrese a su cuenta en el sistema de gestión de panaderías.</p>
+  <p>Luego diríjase al apartado de presupuestos.</p>
+  <a href="http://localhost/login" target="_blank">Ingresar a mi cuenta</a>
+@endsection
+
+@section('footer')
+  <p>¡Gracias por ser parte de nosotros!</p>
+  <p>Si tiene alguna duda o pregunta, no dude en contactarnos:</p>
+
+  {{-- seccion de contacto, mostrar telefono e email ficticios --}}
+  <p>Teléfono: <strong>123 456 7890</strong></p>
+  <p>Correo electrónico: <strong>contacto@ejemplo.com</strong></p>
+
+  {{-- copyright de SiGePAN, todos los derechos reservados --}}
+  <p>&copy; {{ date('Y') }} SiGePAN - Sistema de Gestión de Panaderías. Todos los derechos reservados.</p>
+@endsection
