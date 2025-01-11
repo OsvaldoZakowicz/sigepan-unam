@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Suppliers;
 
+use App\Jobs\SendEmailJob;
 use App\Mail\SupplierRegistered;
 use Livewire\Component;
 use App\Services\Supplier\SupplierService;
@@ -94,7 +95,11 @@ class CreateSupplier extends Component
       $supplier_user = $user_service->createInternalUser($validated);
       $supplier = $supplier_service->createSupplier($supplier_user, $validated);
 
-      Mail::to($supplier_user->email)->send(new SupplierRegistered($supplier_user, $validated['user_password'], $supplier));
+      /* enviar email con credenciales */
+      SendEmailJob::dispatch(
+        $supplier_user->email,
+        new SupplierRegistered($supplier_user, $validated['user_password'], $supplier)
+      );
 
       $this->reset();
 
