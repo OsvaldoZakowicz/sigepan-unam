@@ -9,10 +9,10 @@
   {{-- estilos base --}}
   <style>
     main {
-      max-width: 420px;
-      min-width: 280px;
+      max-width: 520px;
+      min-width: 320px;
       padding: 1rem;
-      margin: 0;
+      margin: 0 auto;
       color: #333333;
       font-family: Verdana, sans-serif;
       font-size: .95rem;
