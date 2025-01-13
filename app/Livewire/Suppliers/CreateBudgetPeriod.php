@@ -29,28 +29,16 @@ class CreateBudgetPeriod extends Component
   public bool $period_provisions_error;
   public string $period_provisions_error_msj;
 
-  //posibles estados del periodo
-  public int $status_scheduled;
-  public int $status_open;
-
   // configuracion de input de tipo date
   public string $min_date;
   public string $max_date;
 
   /**
-   * montar datos
-   * @param QuotationPeriodService $quotation_period_service
+   * montar datos iniciales
    * @return void
   */
-  public function mount(QuotationPeriodService $quotation_period_service): void
+  public function mount(): void
   {
-    // posibles estados del periodo
-    $this->status_scheduled = $quotation_period_service->getStatusScheduled();
-    $this->status_open = $quotation_period_service->getStatusOpen();
-
-    // prefijo del periodo
-    $this->period_code = $quotation_period_service->getPeriodCodePrefix();
-
     // min_date corresponde a la fecha de hoy
     $this->min_date = Carbon::now()->format('Y-m-d'); // formato string html yyyy-mm-dd
     $this->max_date = Carbon::now()->addDays(30)->format('Y-m-d'); // formato string html yyyy-mm-dd
@@ -134,9 +122,52 @@ class CreateBudgetPeriod extends Component
   }
 
   /**
-   * guardar periodo de solicitud
+   * reglas de validacion
+   * @return array reglas de validacion
   */
-  public function save()
+  protected function getValidationRules(): array
+  {
+    return [
+        'period_start_at'           =>  ['required', 'date', 'after_or_equal:' . $this->min_date],
+        'period_end_at'             =>  ['required', 'date', 'after:period_start_at'],
+        'period_short_description'  =>  ['nullable', 'regex:/^[A-Za-z\s]+$/', 'max:150'],
+      ];
+  }
+
+  /**
+   * mensajes de validacion
+   * @return array mensajes de validacion
+  */
+  protected function getValidationMessages(): array
+  {
+    return [
+      'period_start_at.required'        =>  'La :attribute es obligatoria',
+      'period_start_at.after_or_equal'  =>  'La :attribute debe ser a partir de hoy como mínimo',
+      'period_end_at.required'          =>  'La :attribute es obligatoria',
+      'period_end_at.after'             =>  'La :attribute debe estar después de la fecha de inicio',
+      'period_short_description.regex'  =>  'La :attribute solo permite letras y espacios'
+    ];
+  }
+
+  /**
+   * atributos de validacion
+   * @return array atributos de validacion
+  */
+  protected function getValidationAttributes(): array
+  {
+    return [
+      'period_start_at'           =>  'fecha de inicio',
+      'period_end_at'             =>  'fecha de cierre',
+      'period_short_description'  =>  'descripción corta',
+    ];
+  }
+
+  /**
+   * guardar periodo de solicitud
+   * @param QuotationPeriodService $quotation_period_service
+   * @return void
+  */
+  public function save(QuotationPeriodService $quotation_period_service): void
   {
     // validar lista de suministros a presupuestar (debe estar antes de validate())
     if ($this->isPeriodProvisionsEmpty()) {
@@ -148,38 +179,30 @@ class CreateBudgetPeriod extends Component
     }
 
     // validar parametros del formulario
-    $validated = $this->validate([
-      'period_start_at'           =>  ['required', 'date', 'after_or_equal:' . $this->min_date],
-      'period_end_at'             =>  ['required', 'date', 'after:period_start_at'],
-      'period_short_description'  =>  ['nullable', 'regex:/^[A-Za-z\s]+$/', 'max:150'],
-    ], [
-      'period_start_at.required'        =>  'La :attribute es obligatoria',
-      'period_start_at.after_or_equal'  =>  'La :attribute debe ser a partir de hoy como mínimo',
-      'period_end_at.required'          =>  'La :attribute es obligatoria',
-      'period_end_at.after'             =>  'La :attribute debe estar después de la fecha de inicio',
-      'period_short_description.regex'  =>  'La :attribute solo permite letras y espacios'
-    ], [
-      'period_start_at'           =>  'fecha de inicio',
-      'period_end_at'             =>  'fecha de cierre',
-      'period_short_description'  =>  'descripción corta',
-    ]);
+    $validated = $this->validate(
+      $this->getValidationRules(),
+      $this->getValidationMessages(),
+      $this->getValidationAttributes()
+    );
 
     try {
 
-      // construyo el codigo
-      $validated += ['period_code' => $this->period_code . str_replace(':', '', now()->format('H:i:s'))];
+      // construyo el codigo del periodo de solicitud de presupuestos
+      $validated += [
+        'period_code' => $quotation_period_service->getPeriodCodePrefix() . str_replace(':', '', now()->format('H:i:s'))
+      ];
 
-      // inicialmente el estado es: planificado
-      $validated += ['period_status_id' => $this->status_scheduled];
+      // inicialmente el estado del periodo es: planificado
+      $validated += [
+        'period_status_id' => $quotation_period_service->getStatusScheduled(),
+      ];
 
-      // guardar periodo.
+      // guardar periodo
       $period = RequestForQuotationPeriod::create($validated);
 
-      // asignar suministros
+      // asignar suministros que deben presupuestarse en el periodo
       $provisions_ids = Arr::map($this->period_provisions, fn ($pr) => $pr->id);
       $period->provisions()->attach($provisions_ids);
-
-      // todo: si la fecha de inicio es la del dia actual, disparar job de apertura del periodo
 
       $this->reset();
 

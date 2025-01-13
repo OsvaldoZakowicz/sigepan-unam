@@ -13,23 +13,34 @@ class RespondQuotation extends Component
   public $quotation;
   public $provisions;
 
-  // inputs precio
+  // inputs para suministro y precio
   public Collection $inputs;
 
-  // reglas de validacion, solo necesito traer el id junto al precio
+  /**
+   * reglas de validacion
+   * solo necesito traer el id junto al precio.
+   * @var array
+  */
   protected $rules = [
     'inputs.*.price'        => ['required', 'numeric', 'regex:/^\d{1,6}(\.\d{1,2})?$/'],
     'inputs.*.provision_id' => 'nullable',
   ];
 
-  // mensajes de validacion
+  /**
+   * mensajes de validacion
+   * @var array
+  */
   protected $messages = [
     'inputs.*.price.required' => 'El precio es requerido',
     'inputs.*.price.numeric' => 'El precio es debe ser un número',
     'inputs.*.price.regex' => 'El precio puede ser hasta $999999.99',
   ];
 
-  // preparar inputs
+  /**
+   * inicializar datos
+   * @param int $id id del presupuesto a responder
+   * @return void
+  */
   public function mount($id)
   {
     $this->quotation = Quotation::findOrFail($id);
@@ -46,8 +57,12 @@ class RespondQuotation extends Component
     }
   }
 
-  //* agrego un input al formulario
-  public function addInput(Provision $provision)
+  /**
+   * agregar un suministro al array de inputs
+   * @param Provision $provision suministro
+   * @return void
+  */
+  public function addInput(Provision $provision): void
   {
     $this->inputs->push([
       'provision_id' => $provision->id,
@@ -59,8 +74,13 @@ class RespondQuotation extends Component
     ]);
   }
 
-  //* guardar presupuesto
-  public function submit()
+  /**
+   * guardar presupuesto
+   * se trata de la respuesta con el precio para cada input suministro generado y montado.
+   * todo: se debe indicar si tiene o no stock.
+   * @return void
+  */
+  public function submit(): void
   {
     // aplico las reglas y mensajes de validacion
     $validated = $this->validate();
@@ -73,10 +93,13 @@ class RespondQuotation extends Component
       // por cada input, obtener el suministro y actualizar el precio
       // para el presupuesto
       foreach ($inputs as $input) {
-        $this->quotation->provisions()->updateExistingPivot($input['provision_id'], [
-          'price'     => $input['price'],
-          'has_stock' => true
-        ]);
+        $this->quotation->provisions()->updateExistingPivot(
+          $input['provision_id'],
+          [
+            'price'     => $input['price'],
+            'has_stock' => true
+          ]
+        );
       }
 
       // marcar presupuesto como completado

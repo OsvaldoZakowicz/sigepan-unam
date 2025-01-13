@@ -11,15 +11,24 @@
 
           <x-slot:header class="hidden"></x-slot:header>
 
+          {{-- todo: agregar altura maxima y scroll en el eje y --}}
           <x-slot:content class="flex-col">
+
+            {{-- todo: cabecera desplegable con datos del emisor, receptor, presupuesto, periodo y fecha de ultima modificación --}}
 
             {{-- formulario --}}
             <x-fieldset-base tema="{{ $quotation->quotation_code }}" class="w-full p-2">
 
+
               {{-- leyenda --}}
+              {{-- todo: mejorar texto descriptivo de leyenda --}}
               <span>complete los siguientes precios:</span>
 
+              {{-- todo: mensajes de error aqui, uno por tipo de error --}}
+              {{-- todo: marcar en rojo los inputs con error --}}
+
               {{-- inputs --}}
+              {{-- todo: cambiar formato de tabla e incluir columnas extra segun diseño --}}
               <x-table-base>
                 <x-slot:tablehead>
                   <tr class="border bg-neutral-100">

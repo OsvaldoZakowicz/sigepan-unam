@@ -36,7 +36,7 @@ Artisan::command('budget-periods:open', function (QuotationPeriodService $quotat
       OpenQuotationPeriodJob::dispatch($period);
     }
   }
-})->purpose('abrir periodos de peticion de presupuestos')->everyMinute();
+})->purpose('abrir periodos de solicitud de presupuestos')->everyMinute();
 
 /**
  * command: cerrar periodos de peticion de presupuesto.
@@ -53,4 +53,4 @@ Artisan::command('budget-periods:close', function (QuotationPeriodService $quota
       CloseQuotationPeriodJob::dispatch($period);
     }
   }
-})->purpose('cerrar periodos de peticion de presupuestos')->everyTwoMinutes();
+})->purpose('cerrar periodos de solicitud de presupuestos')->everyTwoMinutes();
