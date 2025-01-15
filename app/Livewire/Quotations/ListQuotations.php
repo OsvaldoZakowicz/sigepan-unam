@@ -13,6 +13,10 @@ class ListQuotations extends Component
   use WithPagination;
 
   /**
+   * todo: vista responsiva
+   */
+
+  /**
    * renderizar vista
    * @return view
   */

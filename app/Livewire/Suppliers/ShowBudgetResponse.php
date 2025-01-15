@@ -6,11 +6,6 @@ use App\Models\Quotation;
 use Illuminate\View\View;
 use Livewire\Component;
 
-/**
- * ver la respuesta de un proveedor a un presupuesto solicitado
- * todo: necesito la fecha de respuesta al presupuesto, es decir, la fecha en que
- * proporciona los precios y o actualiza los precios.
- */
 class ShowBudgetResponse extends Component
 {
   public $quotation;
@@ -27,6 +22,7 @@ class ShowBudgetResponse extends Component
 
   /**
    * obtener presupuesto en pdf
+   * @return void
   */
   public function export(): void
   {

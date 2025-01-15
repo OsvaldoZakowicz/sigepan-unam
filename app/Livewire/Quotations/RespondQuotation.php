@@ -5,6 +5,8 @@ namespace App\Livewire\Quotations;
 use App\Models\Provision;
 use App\Models\Quotation;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Arr;
+use Illuminate\View\View;
 use Livewire\Component;
 
 class RespondQuotation extends Component
@@ -15,26 +17,6 @@ class RespondQuotation extends Component
 
   // inputs para suministro y precio
   public Collection $inputs;
-
-  /**
-   * reglas de validacion
-   * solo necesito traer el id junto al precio.
-   * @var array
-  */
-  protected $rules = [
-    'inputs.*.price'        => ['required', 'numeric', 'regex:/^\d{1,6}(\.\d{1,2})?$/'],
-    'inputs.*.provision_id' => 'nullable',
-  ];
-
-  /**
-   * mensajes de validacion
-   * @var array
-  */
-  protected $messages = [
-    'inputs.*.price.required' => 'El precio es requerido',
-    'inputs.*.price.numeric' => 'El precio es debe ser un número',
-    'inputs.*.price.regex' => 'El precio puede ser hasta $999999.99',
-  ];
 
   /**
    * inicializar datos
@@ -59,6 +41,8 @@ class RespondQuotation extends Component
 
   /**
    * agregar un suministro al array de inputs
+   * * el precio debe ser "vacio": price => ''
+   * * el stock se establece a true: has_stock => true
    * @param Provision $provision suministro
    * @return void
   */
@@ -70,35 +54,46 @@ class RespondQuotation extends Component
       'provision_trademark' => $provision->trademark->provision_trademark_name,
       'provision_quantity' => $provision->provision_quantity,
       'provision_quantity_abrv' => $provision->measure->measure_abrv,
-      'price' => ''
+      'price' => '',
+      'has_stock' => true
     ]);
   }
 
   /**
    * guardar presupuesto
    * se trata de la respuesta con el precio para cada input suministro generado y montado.
-   * todo: se debe indicar si tiene o no stock.
    * @return void
   */
   public function submit(): void
   {
     // aplico las reglas y mensajes de validacion
-    $validated = $this->validate();
-
-    // obtengo cada input
-    $inputs = $validated['inputs'];
+    $validated = $this->validate([
+      'inputs.*.has_stock'    => 'nullable',
+      'inputs.*.price'        => ['required_if_accepted:inputs.*.has_stock', 'numeric', 'regex:/^\d{1,6}(\.\d{1,2})?$/'],
+      'inputs.*.provision_id' => 'nullable',
+    ], [
+      'inputs.*.price.required'             => 'El precio es requerido',
+      'inputs.*.price.numeric'              => 'El precio es debe ser un número',
+      'inputs.*.price.regex'                => 'El precio puede ser hasta $999999.99',
+      'inputs.*.price.required_if_accepted' => 'El precio es obligatorio si marco que tiene stock'
+    ]);
 
     try {
 
-      // por cada input, obtener el suministro y actualizar el precio
-      // para el presupuesto
+      // obtengo cada input, mapeo de tal forma que inputs vacios tengan un precio = 0
+      $inputs = Arr::map($validated['inputs'], function ($input) {
+        // $input = [..., 'price' => '', 'has_stock' => true|false]
+        // si no tiene stock o el precio esta vacio
+        if (!$input['has_stock'] || $input['price'] === '') {
+          $input['price'] = 0;
+        }
+        return $input;
+      });
+
+      // por cada input, obtener el suministro y actualizar el precio para el presupuesto
       foreach ($inputs as $input) {
         $this->quotation->provisions()->updateExistingPivot(
-          $input['provision_id'],
-          [
-            'price'     => $input['price'],
-            'has_stock' => true
-          ]
+          $input['provision_id'], ['price' => $input['price'], 'has_stock' => $input['has_stock']]
         );
       }
 
@@ -120,7 +115,11 @@ class RespondQuotation extends Component
 
   }
 
-  public function render()
+  /**
+   * renderizar vista
+   * @return view
+  */
+  public function render(): View
   {
     return view('livewire.quotations.respond-quotation');
   }

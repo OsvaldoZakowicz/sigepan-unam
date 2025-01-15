@@ -84,13 +84,27 @@
 
                     {{-- no puedo responder si esta cerrado el periodo --}}
                     @if ($quotation->period->period_status_id !== 3)
-                    <x-a-button
-                      wire:navigate
-                      href="{{ route('quotations-quotations-respond', $quotation->id) }}"
-                      bg_color="neutral-100"
-                      border_color="neutral-200"
-                      text_color="neutral-600"
-                      >responder</x-a-button>
+
+                      {{-- responder si no esta completado, de lo contrario, editar --}}
+                      @if ($quotation->is_completed)
+                        <x-a-button
+                          wire:navigate
+                          href="#"
+                          bg_color="neutral-100"
+                          border_color="neutral-200"
+                          text_color="neutral-600"
+                          >modificar
+                        </x-a-button>
+                      @else
+                        <x-a-button
+                          wire:navigate
+                          href="{{ route('quotations-quotations-respond', $quotation->id) }}"
+                          bg_color="neutral-100"
+                          border_color="neutral-200"
+                          text_color="neutral-600"
+                          >responder
+                        </x-a-button>
+                      @endif
                     @endif
 
                   </div>

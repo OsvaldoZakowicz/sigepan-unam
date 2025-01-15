@@ -6,11 +6,11 @@
     <x-title-section>
 
       <x-slot:title>
-        <span>ver presupuesto:&nbsp;</span>
+        <span>ver presupuesto,&nbsp;</span>
+        <span>código del presupuesto:&nbsp;</span>
         <span class="font-semibold">{{ $quotation->quotation_code }},&nbsp;</span>
-        {{-- todo: fecha de ultima modificacion del presupuesto con los precios --}}
         <span>fecha del presupuesto:&nbsp;</span>
-        <span class="font-semibold">{{ formatDateTime($quotation->created_at, 'm-d-Y') }},&nbsp;</span>
+        <span class="font-semibold">{{ formatDateTime($quotation->updated_at, 'd-m-Y H:i:s') }}&nbsp;(último cambio)</span>
       </x-slot:title>
 
       <x-a-button
@@ -79,7 +79,7 @@
 
       </x-slot:header>
 
-      <x-slot:content class="flex-col">
+      <x-slot:content class="flex-col max-h-80 overflow-y-auto overflow-x-hidden">
 
         {{-- suministros presupuestados --}}
         {{-- todo: ver ejemplo --}}
@@ -88,11 +88,13 @@
         <x-table-base>
           <x-slot:tablehead>
             <tr class="border bg-neutral-100">
-              <x-table-th class="text-end w-12">id</x-table-th>
-              <x-table-th class="text-start">suministro</x-table-th>
+              <x-table-th class="text-end w-12">id:</x-table-th>
+              <x-table-th class="text-start">nombre</x-table-th>
               <x-table-th class="text-start">marca</x-table-th>
-              <x-table-th class="text-end">cantidad</x-table-th>
-              <x-table-th class="text-end">$&nbsp;precio</x-table-th>
+              <x-table-th class="text-end">volumen</x-table-th>
+              <x-table-th class="text-start">cantidad</x-table-th>
+              <x-table-th class="text-start w-1/6">tiene stock?</x-table-th>
+              <x-table-th class="text-end w-1/4">$&nbsp;precio</x-table-th>
             </tr>
           </x-slot:tablehead>
           <x-slot:tablebody>
@@ -102,15 +104,24 @@
                   {{ $provision->id }}
                 </x-table-td>
                 <x-table-td class="text-start">
-                  {{ $provision->provision_name }},&nbsp;de:&nbsp;
-                  {{ $provision->provision_quantity }}&nbsp;({{ $provision->measure->measure_abrv }})
+                  {{ $provision->provision_name }}
                 </x-table-td>
                 <x-table-td class="text-start">
                   {{ $provision->trademark->provision_trademark_name }}
                 </x-table-td>
                 <x-table-td class="text-end">
-                  {{-- todo: siempre unitario? --}}
-                  <span class="font-semibold">1</span>
+                  {{ $provision->provision_quantity }}&nbsp;{{ $provision->measure->measure_abrv }}
+                </x-table-td>
+                <x-table-td class="text-start">
+                  {{-- todo: agregar si es unidad o pack --}}
+                  <span class="font-semibold">unidad/pack</span>
+                </x-table-td>
+                <x-table-td class="text-start">
+                  @if ($provision->pivot->has_stock)
+                    <span>si</span>
+                  @else
+                    <span>no</span>
+                  @endif
                 </x-table-td>
                 <x-table-td class="text-end">
                   $&nbsp;{{ $provision->pivot->price }}
@@ -118,7 +129,7 @@
               </tr>
             @empty
               <tr class="border">
-                <td colspan="2">sin registros!</td>
+                <td colspan="7">sin registros!</td>
               </tr>
             @endforelse
           </x-slot:tablebody>
