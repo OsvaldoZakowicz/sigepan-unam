@@ -1,4 +1,6 @@
-<div>
+<div wire:poll>
+  {{-- * componente POLL, consulta a la BD por actualizacion cada 2.5 segundos --}}
+
   {{-- componente listar periodos de peticion de presupuesto --}}
   <article class="m-2 border rounded-sm border-neutral-200">
 

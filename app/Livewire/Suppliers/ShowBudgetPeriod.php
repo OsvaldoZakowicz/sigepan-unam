@@ -21,10 +21,26 @@ class ShowBudgetPeriod extends Component
 
   public RequestForQuotationPeriod $period;
 
-  // estados del periodo
-  public bool $is_opened = false;
-  public bool $is_scheduled = false;
-  public bool $is_closed = false;
+  // posibles estados del periodo
+  public int $scheduled;
+  public int $opened;
+  public int $closed;
+
+  // estado del periodo
+  public int $period_status;
+
+  /**
+   * boot de constantes
+   * @param $qps quotation period service
+   * @return void
+  */
+  public function boot(QuotationPeriodService $qps): void
+  {
+    // ids de estados
+    $this->scheduled = $qps->getStatusScheduled();
+    $this->opened = $qps->getStatusOpen();
+    $this->closed = $qps->getStatusClosed();
+  }
 
   /**
    * montar datos.
@@ -32,39 +48,14 @@ class ShowBudgetPeriod extends Component
    * @param QuotationPeriodService $quotation_period_service servicio.
    * @return void
   */
-  public function mount(int $id, QuotationPeriodService $quotation_period_service): void
+  public function mount(int $id): void
   {
     // periodo
     $this->period = RequestForQuotationPeriod::findOrFail($id);
-
-    // estado: abierto
-    if ($quotation_period_service->getStatusOpen() == $this->period->period_status_id) {
-      $this->is_opened = true;
-    }
-
-    // estado: planificado
-    if ($quotation_period_service->getStatusScheduled() == $this->period->period_status_id) {
-      $this->is_scheduled = true;
-    }
-
-    // estado: cerrado
-    if ($quotation_period_service->getStatusClosed() == $this->period->period_status_id) {
-      $this->is_closed = true;
-    }
-
-  }
-
-  public function test()
-  {
-    $this->period->period_status_id = 2;
-    $this->period->save();
-
-    $this->dispatch('test');
   }
 
   /**
    * abrir el periodo.
-   * todo: como refrescar la vista para mostrar lo nuevo?
    * @return void
   */
   public function openPeriod(): void
@@ -76,14 +67,11 @@ class ShowBudgetPeriod extends Component
 
   /**
    * cerrar el periodo.
-   * todo: como refrescar la vista para mostrar lo nuevo?
    * @return void
   */
   public function closePeriod(): void
   {
     CloseQuotationPeriodJob::dispatch($this->period);
-
-    //$this->js("window.location.reload()");
   }
 
   /**

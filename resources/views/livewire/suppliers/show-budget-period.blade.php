@@ -1,4 +1,6 @@
-<div>
+<div wire:poll>
+  {{-- * componente POLL, consulta a la BD por actualizaciones cada 2.5 segundos --}}
+
   {{-- componente ver periodo de peticion de presupuestos --}}
   <article class="m-2 border rounded-sm border-neutral-200">
 
@@ -76,7 +78,7 @@
             >volver
           </x-a-button>
 
-          @if ($is_scheduled)
+          @if ($period->period_status_id === $scheduled)
             <x-a-button
               href="#"
               wire:click="openPeriod()"
@@ -86,9 +88,7 @@
               wire:confirm="¿Abrir este período?, se enviarán pedidos de presupuesto a los proveedores activos de los suministros de interés"
               >abrir ahora
             </x-a-button>
-          @endif
-
-          @if ($is_opened)
+          @elseif ($period->period_status_id === $opened)
             <x-a-button
               href="#"
               wire:click="closePeriod()"
