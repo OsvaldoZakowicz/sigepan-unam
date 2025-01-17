@@ -4,10 +4,13 @@ namespace App\Livewire\Suppliers;
 
 use App\Models\Quotation;
 use Illuminate\View\View;
+use Livewire\WithPagination;
 use Livewire\Component;
 
 class ShowBudgetResponse extends Component
 {
+  use WithPagination;
+
   public $quotation;
 
   /**
@@ -35,6 +38,8 @@ class ShowBudgetResponse extends Component
   */
   public function render(): View
   {
-    return view('livewire.suppliers.show-budget-response');
+    $provisions = $this->quotation->provisions()->paginate(8);
+
+    return view('livewire.suppliers.show-budget-response', compact('provisions'));
   }
 }

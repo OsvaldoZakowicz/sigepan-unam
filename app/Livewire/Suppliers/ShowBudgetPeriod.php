@@ -3,8 +3,10 @@
 namespace App\Livewire\Suppliers;
 
 use App\Jobs\CloseQuotationPeriodJob;
+use App\Jobs\OpenQuotationPeriodJob;
 use App\Models\RequestForQuotationPeriod;
 use App\Services\Supplier\QuotationPeriodService;
+use Illuminate\Support\Carbon;
 use Illuminate\View\View;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -18,12 +20,16 @@ class ShowBudgetPeriod extends Component
   use WithPagination;
 
   public RequestForQuotationPeriod $period;
+
+  // estados del periodo
   public bool $is_opened = false;
   public bool $is_scheduled = false;
+  public bool $is_closed = false;
 
   /**
-   * montar datos
-   * @param int $id id de un periodo de peticion de presupuestos
+   * montar datos.
+   * @param int $id id de un periodo de peticion de presupuestos.
+   * @param QuotationPeriodService $quotation_period_service servicio.
    * @return void
   */
   public function mount(int $id, QuotationPeriodService $quotation_period_service): void
@@ -31,48 +37,57 @@ class ShowBudgetPeriod extends Component
     // periodo
     $this->period = RequestForQuotationPeriod::findOrFail($id);
 
-    // estado
-    $opened_status = $quotation_period_service->getStatusOpen();
-    $scheduled_status = $quotation_period_service->getStatusScheduled();
-
-    if ($opened_status == $this->period->period_status_id) {
+    // estado: abierto
+    if ($quotation_period_service->getStatusOpen() == $this->period->period_status_id) {
       $this->is_opened = true;
     }
 
-    if ($scheduled_status == $this->period->period_status_id) {
+    // estado: planificado
+    if ($quotation_period_service->getStatusScheduled() == $this->period->period_status_id) {
       $this->is_scheduled = true;
     }
+
+    // estado: cerrado
+    if ($quotation_period_service->getStatusClosed() == $this->period->period_status_id) {
+      $this->is_closed = true;
+    }
+
+  }
+
+  public function test()
+  {
+    $this->period->period_status_id = 2;
+    $this->period->save();
+
+    $this->dispatch('test');
   }
 
   /**
-   * abrir el periodo manualmente
+   * abrir el periodo.
+   * todo: como refrescar la vista para mostrar lo nuevo?
    * @return void
   */
   public function openPeriod(): void
   {
-    // todo
+    $this->period->period_start_at = Carbon::now()->format('Y-m-d');
+    $this->period->save();
+    OpenQuotationPeriodJob::dispatch($this->period);
   }
 
   /**
-   * cerrar el periodo manualmente
+   * cerrar el periodo.
+   * todo: como refrescar la vista para mostrar lo nuevo?
    * @return void
   */
   public function closePeriod(): void
   {
-    // todo: verificar por que el dispatch no funciona
-    /* CloseQuotationPeriodJob::dispatch($this->period); */
+    CloseQuotationPeriodJob::dispatch($this->period);
 
-    $this->period->period_status_id = 3;
-    $this->period->save();
-
-    // todo: no redireccionar, refrescar vista y mostrar cierre
-
-    $this->redirectRoute('suppliers-budgets-periods-index');
+    //$this->js("window.location.reload()");
   }
 
   /**
    * renderizar vista
-   * NOTA: las variables con paginacion deben enviarse a la vista mediante compact()
    * @return View
   */
   public function render(): View

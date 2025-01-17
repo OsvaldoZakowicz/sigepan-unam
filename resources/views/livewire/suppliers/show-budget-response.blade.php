@@ -8,9 +8,13 @@
       <x-slot:title>
         <span>ver presupuesto,&nbsp;</span>
         <span>código del presupuesto:&nbsp;</span>
-        <span class="font-semibold">{{ $quotation->quotation_code }},&nbsp;</span>
-        <span>fecha del presupuesto:&nbsp;</span>
-        <span class="font-semibold">{{ formatDateTime($quotation->updated_at, 'd-m-Y H:i:s') }}&nbsp;(último cambio)</span>
+        <span class="font-semibold">{{ $quotation->quotation_code }}.&nbsp;</span>
+        @if ($quotation->is_completed)
+          <span>fecha del presupuesto:&nbsp;</span>
+          <span class="font-semibold">{{ formatDateTime($quotation->updated_at, 'd-m-Y H:i:s') }}&nbsp;(último cambio)</span>
+        @else
+          <span class="font-semibold text-red-400">sin responder</span>
+        @endif
       </x-slot:title>
 
       <x-a-button
@@ -81,6 +85,8 @@
 
       <x-slot:content class="flex-col max-h-80 overflow-y-auto overflow-x-hidden">
 
+        <span class="font-semibold my-2">suministros solicitados:</span>
+
         {{-- suministros presupuestados --}}
         {{-- todo: ver ejemplo --}}
         {{-- https://getquipu.com/wp-content/uploads/2023/01/03135440/plantilla-presupuesto-word-1-724x1024.png --}}
@@ -98,7 +104,7 @@
             </tr>
           </x-slot:tablehead>
           <x-slot:tablebody>
-            @forelse ($quotation->provisions as $provision)
+            @forelse ($provisions as $provision)
               <tr wire:key="{{ $provision->id }}" class="border">
                 <x-table-td class="text-end">
                   {{ $provision->id }}
@@ -117,14 +123,22 @@
                   <span class="font-semibold">unidad/pack</span>
                 </x-table-td>
                 <x-table-td class="text-start">
-                  @if ($provision->pivot->has_stock)
-                    <span>si</span>
+                  @if ($quotation->is_completed)
+                    @if ($provision->pivot->has_stock)
+                      <span>si</span>
+                    @else
+                      <span>no</span>
+                    @endif
                   @else
-                    <span>no</span>
+                    <span class="font-semibold text-red-400">-</span>
                   @endif
                 </x-table-td>
                 <x-table-td class="text-end">
-                  $&nbsp;{{ $provision->pivot->price }}
+                  @if ($quotation->is_completed)
+                    <span>$&nbsp;{{ $provision->pivot->price }}</span>
+                  @else
+                    <span class="font-semibold text-red-400">-</span>
+                  @endif
                 </x-table-td>
               </tr>
             @empty
@@ -138,7 +152,8 @@
       </x-slot:content>
 
       <x-slot:footer class="my-2">
-        <div></div>
+        {{-- paginacion --}}
+        {{ $provisions->links() }}
       </x-slot:footer>
 
     </x-content-section>

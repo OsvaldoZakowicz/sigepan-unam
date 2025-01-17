@@ -63,6 +63,7 @@
             {{ formatDateTime($period->period_end_at, 'd-m-Y') }}
           </span>
         </div>
+
         {{-- botones con acciones --}}
         <div class="w-2/3 flex justify-end items-center gap-2">
 
@@ -106,18 +107,22 @@
       <x-slot:content class="flex-col">
 
         {{-- suministros --}}
-        {{-- todo: completar la lista con columnas igual que 'ver respuesta del presupuesto' --}}
         <x-div-toggle x-data="{ open: false }" title="suministros de interés para este período:" class="p-2">
+
           {{-- leyenda --}}
           <x-slot:subtitle>
             <span>lista de suministros de los que se espera recibir presupuestos</span>
           </x-slot:subtitle>
+
           {{-- tabla de suministros --}}
           <x-table-base>
             <x-slot:tablehead>
               <tr class="border bg-neutral-100">
                 <x-table-th class="text-end w-12">id</x-table-th>
-                <x-table-th class="text-start">suministro</x-table-th>
+                <x-table-th class="text-start">nombre</x-table-th>
+                <x-table-th class="text-start">marca</x-table-th>
+                <x-table-th class="text-end">volumen</x-table-th>
+                <x-table-th class="text-start">cantidad</x-table-th>
               </tr>
             </x-slot:tablehead>
             <x-slot:tablebody>
@@ -127,17 +132,22 @@
                     {{ $provision->id }}
                   </x-table-td>
                   <x-table-td class="text-start">
-                    <span class="font-semibold">suministro</span>:&nbsp;
-                    {{ $provision->provision_name }},&nbsp;
-                    <span class="font-semibold">marca</span>:&nbsp;
-                    {{ $provision->trademark->provision_trademark_name }},&nbsp;
-                    {{ $provision->provision_quantity }}&nbsp;({{ $provision->measure->measure_abrv }}),&nbsp;
-                    <span class="font-semibold">cantidad: 1</span>
+                    {{ $provision->provision_name }}
+                  </x-table-td>
+                  <x-table-td class="text-start">
+                    {{ $provision->trademark->provision_trademark_name }}
+                  </x-table-td>
+                  <x-table-td class="text-end">
+                    {{ $provision->provision_quantity }}&nbsp;{{ $provision->measure->measure_abrv }}
+                  </x-table-td>
+                  <x-table-td class="text-start">
+                    {{-- todo: agregar si es unidad o pack --}}
+                    <span class="font-semibold">unidad/pack</span>
                   </x-table-td>
                 </tr>
               @empty
                 <tr class="border">
-                  <td colspan="2">sin registros!</td>
+                  <td colspan="5">¡sin registros!</td>
                 </tr>
               @endforelse
             </x-slot:tablebody>
@@ -148,11 +158,14 @@
           </div>
         </x-div-toggle>
 
+        {{-- presupuestos --}}
         <x-div-toggle x-data="{ open: true }" title="presupuestos solicitados en este período:" class="p-2">
+
           {{-- leyenda --}}
           <x-slot:subtitle>
             <span>lista de presupuestos a la espera de ser respondidos en el período</span>
           </x-slot:subtitle>
+
           {{-- tabla de presupuestos --}}
           <x-table-base>
             <x-slot:tablehead>
@@ -191,23 +204,20 @@
                   </x-table-td>
                   <x-table-td>
 
-                    @if ($quotation->is_completed)
-                      <x-a-button
-                        wire:navigate
-                        href="{{ route('suppliers-budgets-response', $quotation->id) }}"
-                        bg_color="neutral-100"
-                        border_color="neutral-200"
-                        text_color="neutral-600"
-                        >ver</x-a-button>
-                    @else
-                      <p>-</p>
-                    @endif
+                    <x-a-button
+                      wire:navigate
+                      href="{{ route('suppliers-budgets-response', $quotation->id) }}"
+                      bg_color="neutral-100"
+                      border_color="neutral-200"
+                      text_color="neutral-600"
+                      >ver
+                    </x-a-button>
 
                   </x-table-td>
                 </tr>
               @empty
                 <tr class="border">
-                  <td colspan="2">¡sin registros hasta que el período abra!</td>
+                  <td colspan="2">¡sin registros hasta que el período comience!</td>
                 </tr>
               @endforelse
             </x-slot:tablebody>
@@ -217,14 +227,6 @@
             {{ $period_quotations->links() }}
           </div>
         </x-div-toggle>
-
-        {{-- todo: crear ranking de precios --}}
-        {{-- mostrar suministro, y por suministro el proveedor y precio --}}
-        {{-- <x-div-toggle x-data="{ open: true }" title="ranking de los mejores precios por suministro" class="p-2">
-          <x-slot:subtitle>
-            <span>lista de ...</span>
-          </x-slot:subtitle>
-        </x-div-toggle> --}}
 
       </x-slot:content>
 
