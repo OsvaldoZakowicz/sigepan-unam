@@ -106,6 +106,13 @@
 
       <x-slot:content class="flex-col">
 
+        {{-- todo: sub componente, comparativa de precios --}}
+        @if ($period->period_status_id === $closed)
+          <x-div-toggle x-data="{ open: true }" title="resultados de los presupuestos obtenidos" class="p-2">
+
+          </x-div-toggle>
+        @endif
+
         {{-- suministros --}}
         <x-div-toggle x-data="{ open: false }" title="suministros de interés para este período:" class="p-2">
 

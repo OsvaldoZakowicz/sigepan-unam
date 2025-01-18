@@ -134,4 +134,62 @@ class QuotationPeriodService
   {
     return Quotation::where('quotation_code', $code)->exists();
   }
+
+  /**
+   * obtener comparativa de precios de presupuestos
+   * @param int $period_id id del periodo a consultar
+   * @return array $comparePrices array de comparativa de precios
+  */
+  public function comparePricesBetweenQuotations(int $period_id): array
+  {
+    $period = RequestForQuotationPeriod::with(['quotations.supplier', 'quotations.provisions'])
+      ->where('id', $period_id)
+      ->where('period_status_id', $this->getStatusClosed())
+      ->first();
+
+    $comparePrices = [];
+
+    foreach ($period->quotations as $quotation) {
+
+      foreach ($quotation->provisions as $provision) {
+
+        if (!isset($comparePrices[$provision->id])) {
+
+          $comparePrices[$provision->id] = [
+              'id_suministro'         => $provision->id,
+              'nombre_suministro'     => $provision->provision_name,
+              'marca'                 => $provision->trademark->provision_trademark_name,
+              'tipo'                  => $provision->type->provision_type_name,
+              'volumen'               => $provision->provision_quantity,
+              'volumen_tag'           => $provision->measure->measure_abrv,
+              'cantidad'              => 'unidad/pack',
+              'precios_por_proveedor' => []
+          ];
+
+        }
+
+        $comparePrices[$provision->id]['precios_por_proveedor'][] = [
+          'id_proveedor'  => $quotation->supplier->id,
+          'proveedor'     => $quotation->supplier->company_name,
+          'cuit'          => $quotation->supplier->company_cuit,
+          'precio'        => $provision->pivot->price,
+          'tiene_stock'   => $provision->pivot->has_stock
+        ];
+
+      }
+    }
+
+    // Calcular estadísticas por suministro
+    foreach ($comparePrices as &$comparePrice) {
+      $prices = array_column($comparePrice['precios_por_proveedor'], 'precio');
+      $comparePrice['estadisticas'] = [
+        'precio_minimo' => min($prices),
+        'precio_maximo' => max($prices),
+        'precio_promedio' => array_sum($prices) / count($prices),
+        'cantidad_proveedores' => count($prices)
+      ];
+    }
+
+    return $comparePrices;
+  }
 }
