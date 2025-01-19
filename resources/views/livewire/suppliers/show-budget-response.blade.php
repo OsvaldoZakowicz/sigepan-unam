@@ -99,8 +99,8 @@
               <x-table-th class="text-start">marca</x-table-th>
               <x-table-th class="text-end">volumen</x-table-th>
               <x-table-th class="text-start">cantidad</x-table-th>
-              <x-table-th class="text-start w-1/6">tiene stock?</x-table-th>
-              <x-table-th class="text-end w-1/4">$&nbsp;precio</x-table-th>
+              <x-table-th class="text-start w-48">stock</x-table-th>
+              <x-table-th class="text-end w-48">precio</x-table-th>
             </tr>
           </x-slot:tablehead>
           <x-slot:tablebody>
@@ -125,9 +125,9 @@
                 <x-table-td class="text-start">
                   @if ($quotation->is_completed)
                     @if ($provision->pivot->has_stock)
-                      <span>si</span>
+                      <span class="bg-emerald-200 text-emerald-700 font-light px-1">disponible</span>
                     @else
-                      <span>no</span>
+                      <span class="bg-red-200 text-red-600 font-light px-1">sin stock</span>
                     @endif
                   @else
                     <span class="font-semibold text-red-400">-</span>
@@ -141,6 +141,10 @@
                   @endif
                 </x-table-td>
               </tr>
+              @if ($loop->last)
+                <x-table-td class="text-end font-semibold capitalize" colspan="6">total</x-table-td>
+                <x-table-td class="text-end font-semibold">$&nbsp;{{ $total_price }}</x-table-td>
+              @endif
             @empty
               <tr class="border">
                 <td colspan="7">sin registros!</td>

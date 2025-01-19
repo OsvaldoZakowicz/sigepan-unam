@@ -5,7 +5,18 @@
   <article class="m-2 border rounded-sm border-neutral-200">
 
     {{-- barra de titulo --}}
-    <x-title-section title="ver periodo presupuestario: {{ $period->period_code }}"></x-title-section>
+    <x-title-section title="ver periodo presupuestario: {{ $period->period_code }}">
+
+      <x-a-button
+        wire:navigate
+        href="{{ route('suppliers-budgets-periods-index') }}"
+        bg_color="neutral-100"
+        border_color="neutral-200"
+        text_color="neutral-600"
+        >volver
+      </x-a-button>
+
+    </x-title-section>
 
     {{-- cuerpo --}}
     <x-content-section>
@@ -68,15 +79,6 @@
 
         {{-- botones con acciones --}}
         <div class="w-2/3 flex justify-end items-center gap-2">
-
-          <x-a-button
-            wire:navigate
-            href="{{ route('suppliers-budgets-periods-index') }}"
-            bg_color="neutral-100"
-            border_color="neutral-200"
-            text_color="neutral-600"
-            >volver
-          </x-a-button>
 
           @if ($period->period_status_id === $scheduled)
             <x-a-button

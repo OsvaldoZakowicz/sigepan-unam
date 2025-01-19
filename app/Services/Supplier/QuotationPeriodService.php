@@ -155,6 +155,7 @@ class QuotationPeriodService
 
         if (!isset($comparePrices[$provision->id])) {
 
+          /* un suministro */
           $comparePrices[$provision->id] = [
               'id_suministro'         => $provision->id,
               'nombre_suministro'     => $provision->provision_name,
@@ -168,12 +169,14 @@ class QuotationPeriodService
 
         }
 
+        /* por suministro: proveedor, precio, stock, presupuesto */
         $comparePrices[$provision->id]['precios_por_proveedor'][] = [
-          'id_proveedor'  => $quotation->supplier->id,
-          'proveedor'     => $quotation->supplier->company_name,
-          'cuit'          => $quotation->supplier->company_cuit,
-          'precio'        => $provision->pivot->price,
-          'tiene_stock'   => $provision->pivot->has_stock
+          'id_proveedor'    => $quotation->supplier->id,
+          'id_presupuesto'  => $quotation->id,
+          'proveedor'       => $quotation->supplier->company_name,
+          'cuit'            => $quotation->supplier->company_cuit,
+          'precio'          => $provision->pivot->price,
+          'tiene_stock'     => $provision->pivot->has_stock
         ];
 
       }
