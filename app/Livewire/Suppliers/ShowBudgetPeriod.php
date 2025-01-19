@@ -29,8 +29,8 @@ class ShowBudgetPeriod extends Component
   // estado del periodo
   public int $period_status;
 
-  // calculo de comparativa de precios
-  public array $prices_between_quotations;
+  // conteo de presupuestos respondidos
+  public int $count_quotations;
 
   /**
    * boot de constantes
@@ -53,11 +53,9 @@ class ShowBudgetPeriod extends Component
   */
   public function mount(QuotationPeriodService $qps, int $id): void
   {
-    // periodo
     $this->period = RequestForQuotationPeriod::findOrFail($id);
-
-    // comparacion de precios de suministros entre presupuestos
-    $this->prices_between_quotations = $qps->comparePricesBetweenQuotations($this->period->id);
+    $this->period_status = $this->period->period_status_id;
+    $this->count_quotations = $qps->countQuotationsFromPeriod($this->period->id);
   }
 
   /**

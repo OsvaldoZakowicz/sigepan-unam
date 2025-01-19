@@ -192,4 +192,17 @@ class QuotationPeriodService
 
     return $comparePrices;
   }
+
+  /**
+   * contar cuantos presupuestos fueron respondidos
+   * en un periodo presupuestario.
+   * @param int $period_id id del periodo sobre el que consultar
+   * @return int conteo
+  */
+  public function countQuotationsFromPeriod(int $period_id): int
+  {
+    return Quotation::where('period_id', $period_id)
+      ->where('is_completed', true)
+      ->count();
+  }
 }

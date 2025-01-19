@@ -110,4 +110,10 @@ class SupplierController extends Controller
   {
     return view('suppliers.budget-response', ['id' => $id]);
   }
+
+  //* ver ranking de presupuestos de un periodo
+  public function budget_ranking($id): View
+  {
+    return view('suppliers.budget-ranking', ['id' => $id]);
+  }
 }

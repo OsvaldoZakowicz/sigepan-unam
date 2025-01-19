@@ -140,6 +140,10 @@ Route::middleware(['auth', 'verified', 'can:proveedores'])->group(function () {
   Route::get('suppliers/budget/response/{id}', [SupplierController::class, 'budget_response'])
     ->name('suppliers-budgets-response');
 
+  // NOTA: ver ranking de presupuestos respondidos, recibe id de periodo en cuestion
+  Route::get('suppliers/budget/ranking/{id}', [SupplierController::class, 'budget_ranking'])
+    ->name('suppliers-budgets-ranking');
+
 });
 
 //* seccion de presupuestos (quotations) para proveedores
