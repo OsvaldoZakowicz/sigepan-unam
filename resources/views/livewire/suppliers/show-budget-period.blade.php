@@ -138,7 +138,10 @@
                 <x-table-th class="text-end w-12">id</x-table-th>
                 <x-table-th class="text-start">nombre</x-table-th>
                 <x-table-th class="text-start">marca</x-table-th>
-                <x-table-th class="text-end">volumen</x-table-th>
+                <x-table-th class="text-end">
+                  <span>volumen</span>
+                  <x-quest-icon title="kilogramos (kg), litros (lts) o unidades (un)"/>
+                </x-table-th>
                 <x-table-th class="text-start">cantidad</x-table-th>
               </tr>
             </x-slot:tablehead>
@@ -191,7 +194,10 @@
                 <x-table-th class="text-start">presupuesto</x-table-th>
                 <x-table-th class="text-start">proveedor</x-table-th>
                 <x-table-th class="text-start">estado</x-table-th>
-                <x-table-th class="text-end">fecha de recepción</x-table-th>
+                <x-table-th class="text-end">
+                  <span>última respuesta</span>
+                  <x-quest-icon title="última vez que el proveedor modificó los precios de este presupuesto"/>
+                </x-table-th>
                 <x-table-th class="text-start w-48">acciones</x-table-th>
               </tr>
             </x-slot:tablehead>
@@ -216,8 +222,12 @@
                       <span class="font-semibold text-red-400">sin responder</span>
                     @endif
                   </x-table-td>
-                  <x-table-td class="text-start">
-                    {{ formatDateTime($quotation->created_at, 'd-m-Y') }}
+                  <x-table-td class="text-end">
+                    @if ($quotation->is_completed)
+                      {{ formatDateTime($quotation->updated_at, 'd-m-Y') }}
+                    @else
+                      <span class="font-semibold text-red-400">-</span>
+                    @endif
                   </x-table-td>
                   <x-table-td>
 

@@ -102,7 +102,9 @@
             {{-- leyenda --}}
             <div class="py-1">
               <span class="text-sm text-neutral-600">Lista de suministros a presupuestar.</span>
-              @if ($period_provisions_error) <span class="text-red-400 text-xs capitalize">{{ $period_provisions_error_msj }}</span> @endif
+              @if ($period_provisions_error)
+                <span class="text-red-400 text-xs capitalize">{{ $period_provisions_error_msj }}</span>
+              @endif
             </div>
 
             {{-- lista de seleccion, con scroll --}}
@@ -114,7 +116,10 @@
                     <x-table-th class="text-start">nombre</x-table-th>
                     <x-table-th class="text-start">marca</x-table-th>
                     <x-table-th class="text-start">tipo</x-table-th>
-                    <x-table-th class="text-end">cantidad</x-table-th>
+                    <x-table-th class="text-end">
+                      <span>volumen</span>
+                      <x-quest-icon title="kilogramos (kg), litros (lts) o unidades (un)"/>
+                    </x-table-th>
                     <x-table-th class="text-start w-16">quitar</x-table-th>
                   </tr>
                 </x-slot:tablehead>

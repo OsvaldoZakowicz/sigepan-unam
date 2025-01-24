@@ -97,7 +97,10 @@
               <x-table-th class="text-end w-12">id:</x-table-th>
               <x-table-th class="text-start">nombre</x-table-th>
               <x-table-th class="text-start">marca</x-table-th>
-              <x-table-th class="text-end">volumen</x-table-th>
+              <x-table-th class="text-end">
+                <span>volumen</span>
+                <x-quest-icon title="kilogramos (kg), litros (lts) o unidades (un)"/>
+              </x-table-th>
               <x-table-th class="text-start">cantidad</x-table-th>
               <x-table-th class="text-start w-48">stock</x-table-th>
               <x-table-th class="text-end w-48">precio</x-table-th>

@@ -81,17 +81,18 @@
               <tr class="border bg-neutral-100">
                 <x-table-th class="text-end w-12">
                   <span
-                    class="cursor-help"
-                    title="los IDs repetidos indican que un mismo suministro se vende para diferentes proveedores, con sus respectivos precios."
                     >id
-                    <x-quest-icon/>
+                    <x-quest-icon title="los IDs repetidos indican que un mismo suministro se vende para diferentes proveedores, con sus respectivos precios."/>
                   </span>
                 </x-table-th>
                 <x-table-th class="text-start">nombre</x-table-th>
                 <x-table-th class="text-start">marca</x-table-th>
                 <x-table-th class="text-start">tipo</x-table-th>
                 <x-table-th class="text-start">proveedor</x-table-th>
-                <x-table-th class="text-end">cantidad</x-table-th>
+                <x-table-th class="text-end">
+                  <span>volumen</span>
+                  <x-quest-icon title="kilogramos (kg), litros (lts) o unidades (un)"/>
+                </x-table-th>
                 <x-table-th class="text-end">$&nbsp;precio</x-table-th>
                 <x-table-th class="text-start w-48">acciones</x-table-th>
               </tr>

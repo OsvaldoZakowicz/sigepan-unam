@@ -6,6 +6,7 @@ use App\Models\Provision;
 use App\Models\ProvisionTrademark;
 use App\Models\ProvisionType;
 use Illuminate\Database\QueryException;
+use Illuminate\View\View;
 use Livewire\Component;
 use Livewire\Attributes\Url;
 use Livewire\WithPagination;
@@ -16,24 +17,33 @@ class ListProvisions extends Component
 
   #[Url]
   public $search;
+
   #[Url]
   public $trademark_filter;
+
   #[Url]
   public $type_filter;
 
   public $trademarks;
   public $provision_types;
 
-  //* montar datos
-  public function mount()
+  /**
+   * montar datos
+   * @return void
+  */
+  public function mount(): void
   {
     $this->trademarks = ProvisionTrademark::orderBy('id', 'desc')->get();
     $this->provision_types = ProvisionType::all();
   }
 
-  //* borrar suministro
-  // solo cuando no este asociado a proveedores
-  public function delete(Provision $provision)
+  /**
+   * borrar suministro
+   * solo cuando no este asociado a proveedores
+   * @param Provision $provision
+   * @return void
+  */
+  public function delete(Provision $provision): void
   {
     // todo: cuando el suministro se use en recetas, no permitir el borrado
 
@@ -76,9 +86,13 @@ class ListProvisions extends Component
 
   }
 
-  //* editar suministro
-  // solo cuando no este asociado a proveedores
-  public function edit(Provision $provision)
+  /**
+   * editar suministro
+   * solo cuando no este asociado a proveedores.
+   * @param Provision $provision
+   * @return void
+  */
+  public function edit(Provision $provision): void
   {
     if ($provision->suppliers->count() !== 0) {
 
@@ -97,13 +111,19 @@ class ListProvisions extends Component
     $this->redirectRoute('suppliers-provisions-edit', $provision->id, true, true);
   }
 
-  //* reiniciar la pagina para establecer la paginacion al inicio y buscar
-  public function resetPagination()
+  /**
+   * resetear la paginacion
+   * @return void
+  */
+  public function resetPagination(): void
   {
     $this->resetPage();
   }
 
-  ///* buscar suministro
+  /**
+   * buscar suministros
+   * @return mixed
+  */
   public function searchProvision()
   {
     return Provision::when($this->search, function ($query) {
@@ -119,10 +139,13 @@ class ListProvisions extends Component
       ->orderBy('id', 'desc')->paginate(10);
   }
 
-  public function render()
+  /**
+   * renderizar vista
+   * @return View
+  */
+  public function render(): View
   {
     $provisions = $this->searchProvision();
-
     return view('livewire.suppliers.list-provisions', compact('provisions'));
   }
 }

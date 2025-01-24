@@ -42,7 +42,10 @@
                   <x-table-th class="text-start">nombre</x-table-th>
                   <x-table-th class="text-start">marca</x-table-th>
                   <x-table-th class="text-start">tipo</x-table-th>
-                  <x-table-th class="text-end">cantidad</x-table-th>
+                  <x-table-th class="text-end">
+                    <span>volumen</span>
+                    <x-quest-icon title="kilogramos (kg), litros (lts) o unidades (un)"/>
+                  </x-table-th>
                   <x-table-th class="text-end w-1/3">$&nbsp;precio <span class="text-red-400">*</span> </x-table-th>
                   <x-table-th class="text-start w-16">quitar</x-table-th>
                 </tr>

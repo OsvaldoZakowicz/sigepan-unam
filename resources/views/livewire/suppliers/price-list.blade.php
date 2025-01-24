@@ -10,17 +10,15 @@
         <span>El proveedor se encuentra:&nbsp;</span>
         @if ($supplier->status_is_active)
           <span
-            class="font-semibold text-emerald-600 cursor-help"
-            title="{{ $supplier->status_description }}"
+            class="font-semibold text-emerald-600"
             >activo
-            <x-quest-icon/>
+            <x-quest-icon title="El proveedor esta activo para la panaderia, puede contactarse para presupuestos y ordenes de compras. Puede asignarle suministros y generarle una lista de precios"/>
           </span>
         @else
           <span
-            class="font-semibold text-neutral-600 cursor-help"
-            title="{{ $supplier->status_description }}"
+            class="font-semibold text-neutral-600"
             >inactivo
-            <x-quest-icon/>
+            <x-quest-icon title="El proveedor no esta activo debido a {{ $supplier->status_description }}"/>
           </span>
         @endif
       </x-slot:title>
@@ -117,7 +115,10 @@
               <x-table-th class="text-start">nombre</x-table-th>
               <x-table-th class="text-start">marca</x-table-th>
               <x-table-th class="text-start">tipo</x-table-th>
-              <x-table-th class="text-end">cantidad</x-table-th>
+              <x-table-th class="text-end">
+                <span>volumen</span>
+                <x-quest-icon title="kilogramos (kg), litros (lts) o unidades (un)"/>
+              </x-table-th>
               <x-table-th class="text-end">$&nbsp;precio</x-table-th>
               <x-table-th class="text-start w-48">acciones</x-table-th>
             </tr>

@@ -81,17 +81,15 @@
                 <x-table-td class="text-start">
                   @if ($supplier->status_is_active)
                     <span
-                      class="font-semibold text-emerald-600 cursor-help"
-                      title="{{ $supplier->status_description }}"
+                      class="font-semibold text-emerald-600"
                       >activo
-                      <x-quest-icon/>
+                      <x-quest-icon title="El proveedor esta activo para la panaderia, puede contactarse para presupuestos y ordenes de compras. Puede asignarle suministros y generarle una lista de precios"/>
                     </span>
                   @else
                     <span
-                      class="font-semibold text-neutral-600 cursor-help"
-                      title="{{ $supplier->status_description }}"
+                      class="font-semibold text-neutral-600"
                       >inactivo
-                      <x-quest-icon/>
+                      <x-quest-icon title="El proveedor no esta activo debido a {{ $supplier->status_description }}"/>
                     </span>
                   @endif
                 </x-table-td>

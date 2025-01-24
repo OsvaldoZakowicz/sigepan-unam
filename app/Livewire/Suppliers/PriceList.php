@@ -16,8 +16,10 @@ class PriceList extends Component
 
   #[Url]
   public $search = '';
+
   #[Url]
   public $trademark_filter = '';
+
   #[Url]
   public $type_filter = '';
 
@@ -42,6 +44,7 @@ class PriceList extends Component
 
   /**
    * buscar suministos del proveedor
+   * @return mixed
   */
   public function searchSupplierProvisions()
   {
