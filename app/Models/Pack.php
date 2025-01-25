@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Pack extends Model
 {
@@ -22,5 +23,13 @@ class Pack extends Model
   public function provision(): BelongsTo
   {
     return $this->belongsTo(Provision::class);
+  }
+
+  // * un pack es provisto por muchos proveedores
+  // packs n : n suppliers
+  public function suppliers(): BelongsToMany
+  {
+    return $this->belongsToMany(Supplier::class)
+      ->withPivot('price')->withTimestamps();
   }
 }

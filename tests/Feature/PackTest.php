@@ -6,6 +6,9 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Arr;
+use App\Models\User;
+use App\Models\Address;
+use App\Models\Supplier;
 use App\Models\ProvisionTrademark;
 use App\Models\Measure;
 use App\Models\ProvisionType;
@@ -13,6 +16,7 @@ use App\Models\Provision;
 use App\Models\Pack;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Tests\TestCase;
 
 class PackTest extends TestCase
@@ -52,6 +56,32 @@ class PackTest extends TestCase
     'pack_name' => 'pack de aceite',
     'pack_units' => 6,
     'pack_quantity' => 5.40,
+  ];
+
+  // usuario proveedor
+  public $user_data = [
+    'name' => 'user',
+    'email' => 'user@mail.com',
+    'password' => '12345678',
+  ];
+
+  // direccion proveedor
+  public  $address_data = [
+    'street' => 'calle1',
+    'number' => '123',
+    'postal_code' => '3350',
+    'city' => 'apotoles',
+  ];
+
+  // proveedor
+  public  $supplier_data = [
+    'company_name' => 'arcor',
+    'company_cuit' => '12345678912',
+    'iva_condition' => 'monotributista',
+    'phone_number' => '3755121447',
+    'short_description' => 'description',
+    'status_is_active' => true,
+    'status_description' => 'dscription',
   ];
 
   /**
@@ -110,6 +140,24 @@ class PackTest extends TestCase
   }
 
   /**
+   * crear proveedor
+   * @return Supplier
+  */
+  public function crearProveedor()
+  {
+    $user = User::create($this->user_data);
+    $addres = Address::create($this->address_data);
+
+    $this->supplier_data += [
+      'status_date' => formatDateTime(now(), 'Y-m-d'),
+      'user_id' => $user->id,
+      'address_id' => $addres->id
+    ];
+
+    return Supplier::create($this->supplier_data);
+  }
+
+  /**
    * test crear un pack de suministros
    * @return void
   */
@@ -153,6 +201,31 @@ class PackTest extends TestCase
     $pack           = $this->crearPack($provision);
 
     $this->assertInstanceOf(HasMany::class, $provision->packs());
+  }
+
+  /**
+   * test asignar pack a un proveedor
+  */
+  public function test_asignar_pack_a_proveedor()
+  {
+    $trademark      = $this->crearMarca();
+    $provision_type = $this->crearTipo();
+    $measure        = $this->crearMedida();
+    $provision      = $this->crearSuministro($trademark, $provision_type, $measure);
+    $pack           = $this->crearPack($provision);
+    $supplier       = $this->crearProveedor();
+
+    $supplier->packs()->attach($pack->id, ['price' => 100]);
+
+    $this->assertDatabaseHas('pack_supplier', [
+      'pack_id' => $pack->id,
+      'supplier_id' => $supplier->id,
+      'price' => 100
+    ]);
+
+    // relaciones entre pack y proveedor
+    $this->assertInstanceOf(BelongsToMany::class, $pack->suppliers());
+    $this->assertInstanceOf(BelongsToMany::class, $supplier->packs());
   }
 
 }

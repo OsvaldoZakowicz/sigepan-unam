@@ -56,6 +56,14 @@ class Supplier extends Model implements Auditable
       ->withPivot('id', 'price')->withTimestamps();
   }
 
+  // * un provedor tiene muchos packs de suministros asociados
+  // suppliers n : n packs
+  public function packs(): BelongsToMany
+  {
+    return $this->belongsToMany(Pack::class)
+      ->withPivot('price')->withTimestamps();
+  }
+
   //* un proveedor completa muchos presupuestos (quotations)
   public function quotations(): HasMany
   {
