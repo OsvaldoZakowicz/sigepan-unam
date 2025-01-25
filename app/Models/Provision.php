@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 // todo: auditar
 
@@ -61,5 +62,12 @@ class Provision extends Model
     return $this->belongsToMany(Quotation::class)
       ->withPivot(['has_stock', 'price'])
       ->withTimestamps();
+  }
+
+  // * un suministro puede estar en muchos packs que le pertenecen
+  // o tambien un suministro se agrupa en packs de diversas unidades.
+  public function packs(): HasMany
+  {
+    return $this->hasMany(Pack::class);
   }
 }
