@@ -121,13 +121,22 @@ class ListProvisions extends Component
   }
 
   /**
+   * resetear los filtros de busqueda
+   * @return void
+  */
+  public function resetSearchInputs(): void
+  {
+    $this->reset('search', 'trademark_filter', 'type_filter');
+  }
+
+  /**
    * buscar suministros
    * @return mixed
   */
   public function searchProvision()
   {
     return Provision::when($this->search, function ($query) {
-        $query->where('id', 'like', '%' . $this->search . '%')
+        $query->where('id',$this->search)
               ->orWhere('provision_name', 'like', '%' . $this->search . '%');
       })
       ->when($this->trademark_filter, function ($query) {

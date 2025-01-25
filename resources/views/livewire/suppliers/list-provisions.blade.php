@@ -18,59 +18,79 @@
     <x-content-section>
 
       <x-slot:header>
-        <span class="text-sm capitalize">buscar suministro:</span>
-        {{-- formulario de busqueda --}}
-        <form class="grow">
+        {{-- busqueda --}}
+        <div class="flex gap-1 justify-start items-start grow">
 
           {{-- termino de busqueda --}}
-          <input
-            type="text"
-            name="search"
-            wire:model.live="search"
-            wire:click="resetPagination()"
-            placeholder="ingrese un id, o termino de busqueda"
-            class="w-1/4 shrink text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300" />
+          <div class="flex flex-col justify-end w-1/4">
+            <label for="">buscar suministro</label>
+            <input
+              type="text"
+              name="search"
+              wire:model.live="search"
+              wire:click="resetPagination()"
+              placeholder="ingrese un id, o termino de busqueda"
+              class="text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+            />
+          </div>
 
           {{-- filtro de marca --}}
-          <select
-            name="trademark_filter"
-            id="trademark_filter"
-            wire:model.live="trademark_filter"
-            wire:click="resetPagination()"
-            class="w-1/4 shrink text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
+          <div class="flex flex-col justify-end w-1/4">
+            <label for="trademark_filter">filtrar por marca</label>
+            <select
+              name="trademark_filter"
+              id="trademark_filter"
+              wire:model.live="trademark_filter"
+              wire:click="resetPagination()"
+              class="text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
 
-            <option value="">seleccione una marca ...</option>
+              <option value="">seleccione una marca ...</option>
 
-            @forelse ($trademarks as $trademark)
-              <option value="{{ $trademark->id }}">{{ $trademark->provision_trademark_name }}</option>
-            @empty
-              <option value="">sin marcas ...</option>
-            @endforelse
+              @forelse ($trademarks as $trademark)
+                <option value="{{ $trademark->id }}">{{ $trademark->provision_trademark_name }}</option>
+              @empty
+                <option value="">sin marcas ...</option>
+              @endforelse
 
-          </select>
+            </select>
+          </div>
 
           {{-- filtro de tipo --}}
-          <select
-            name="type_filter"
-            id="type_filter"
-            wire:model.live="type_filter"
-            wire:click="resetPagination()"
-            class="w-1/4 shrink text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
+          <div class="flex flex-col justify-end w-1/4">
+            {{-- filtro de tipo --}}
+            <label for="type_filter">filtrar por tipo</label>
+            <select
+              name="type_filter"
+              id="type_filter"
+              wire:model.live="type_filter"
+              wire:click="resetPagination()"
+              class="text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
 
-            <option value="">seleccione un tipo ...</option>
+              <option value="">seleccione un tipo ...</option>
 
-            @forelse ($provision_types as $type)
-              <option value="{{ $type->id }}">{{ $type->provision_type_name }}</option>
-            @empty
-              <option value="">sin tipos ...</option>
-            @endforelse
+              @forelse ($provision_types as $type)
+                <option value="{{ $type->id }}">{{ $type->provision_type_name }}</option>
+              @empty
+                <option value="">sin tipos ...</option>
+              @endforelse
 
-          </select>
+            </select>
+          </div>
 
-        </form>
+        </div>
 
-        <!-- grupo de botones -->
-        <div class="flex"></div>
+        {{-- limpiar campos de busqueda --}}
+        <div class="flex flex-col self-start h-full">
+          <x-a-button
+            href="#"
+            wire:click="resetSearchInputs()"
+            bg_color="neutral-200"
+            border_color="neutral-300"
+            text_color="neutral-600"
+            >limpiar
+          </x-a-button>
+        </div>
+
       </x-slot:header>
 
       <x-slot:content>
