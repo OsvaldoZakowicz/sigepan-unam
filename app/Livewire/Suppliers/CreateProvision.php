@@ -6,6 +6,8 @@ use App\Models\Measure;
 use App\Models\Provision;
 use App\Models\ProvisionTrademark;
 use App\Models\ProvisionType;
+use Illuminate\Support\Arr;
+use Illuminate\View\View;
 use Livewire\Component;
 
 class CreateProvision extends Component
@@ -21,32 +23,55 @@ class CreateProvision extends Component
   public $provision_type_id;
   public $measure_id;
 
-  public $show_pack_form;
+  public $pack_units;
+  public $packs = [];
 
-  public function mount()
+  public function boot()
   {
     $this->trademarks = ProvisionTrademark::all();
     $this->measures = Measure::all();
     $this->provision_types = ProvisionType::all();
-    $this->show_pack_form = false;
   }
 
-  public function togglePackForm()
+  /**
+   * agregar cantidad de packs a la lista
+   * por cada cantidad se crea un pack del suministro con dicha cantidad.
+   * @return void
+  */
+  public function addPackUnits(): void
   {
-    $this->show_pack_form = !$this->show_pack_form;
+
+    if ($this->pack_units == 0 || $this->pack_units == null) {
+      return;
+    }
+
+    if (in_array($this->pack_units, $this->packs)) {
+
+      $this->dispatch('toast-event', toast_data: [
+        'event_type' => 'info',
+        'title_toast' => toastTitle('', true),
+        'descr_toast' => 'esta opcion ya fue elegida'
+      ]);
+
+      return;
+    }
+
+    array_push($this->packs, $this->pack_units);
+    $this->reset('pack_units');
+  }
+
+  /**
+   * remover cantidad de packs de la lista
+   * @param int $index indice del elemento a remover
+   * @return void
+  */
+  public function removePackUnits($index)
+  {
+    array_splice($this->packs, $index, 1);
   }
 
   public function save()
   {
-    /* dd([
-      'name' => $this->provision_name,
-      'quantity' => $this->provision_quantity,
-      'description' => $this->provision_short_description,
-      'trademark' => $this->provision_trademark_id,
-      'type' => $this->provision_type_id,
-      'measure' => $this->measure_id
-    ]); */
-
     $validated = $this->validate([
       'provision_name'              =>  ['required', 'string', 'max:50'],
       'provision_trademark_id'      =>  ['required'],
@@ -59,13 +84,29 @@ class CreateProvision extends Component
       'provision_trademark_id'      =>  'marca',
       'provision_type_id'           =>  'tipo',
       'measure_id'                  =>  'unidad de medida',
-      'provision_quantity'          =>  'cantidad',
+      'provision_quantity'          =>  'volumen',
       'provision_short_description' =>  'descripcion',
     ]);
 
     try {
 
-      Provision::create($validated);
+      // suministro
+      $provision = Provision::create($validated);
+
+      // packs
+      if (count($this->packs) > 0) {
+
+        foreach ($this->packs as $pack) {
+
+          $provision->packs()->create([
+            'pack_name'     => 'pack de ' . $provision->provision_name . ' x ' . $pack,
+            'pack_units'    => $pack,
+            'pack_quantity' => $provision->provision_quantity * $pack
+          ]);
+
+        }
+
+      }
 
       $this->reset();
 
@@ -81,7 +122,11 @@ class CreateProvision extends Component
 
   }
 
-  public function render()
+  /**
+   * renderizar vista
+   * @return View
+  */
+  public function render(): View
   {
     return view('livewire.suppliers.create-provision');
   }
