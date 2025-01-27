@@ -103,15 +103,19 @@
               <x-table-th class="text-start">marca</x-table-th>
               <x-table-th class="text-start">tipo</x-table-th>
               <x-table-th class="text-end">
-                <span>volumen</span>
+                <span>volumen unitario</span>
                 <x-quest-icon title="kilogramos (kg), litros (lts) o unidades (un)"/>
+              </x-table-th>
+              <x-table-th class="text-start">
+                <span>packs disponibles</span>
+                <x-quest-icon title="packs en los que se puede encontrar el suministro" />
               </x-table-th>
               <x-table-th class="text-start w-24">acciones</x-table-th>
             </tr>
           </x-slot:tablehead>
           <x-slot:tablebody>
             @forelse ($provisions as $provision)
-            <tr wire:key="{{$provision->id}}" class="border">
+              <tr wire:key="{{$provision->id}}" class="border">
                 <x-table-td class="text-end">
                   {{ $provision->id }}
                 </x-table-td>
@@ -128,6 +132,22 @@
                 </x-table-td>
                 <x-table-td class="text-end">
                   {{ $provision->provision_quantity }}&nbsp;({{ $provision->measure->measure_abrv }})
+                </x-table-td>
+                <x-table-td class="text-start">
+                  @php
+                    $packs = $provision->packs;
+                  @endphp
+                  @if (count($packs) > 0)
+                    @foreach ($packs as $pack)
+                    <div
+                      class="inline-flex items-center justify-start gap-1 border border-blue-300 bg-blue-200 px-1 rounded-lg cursor-pointer"
+                      title="volumen total:&nbsp;{{ $pack->pack_quantity }}{{ $provision->measure->measure_abrv }}">
+                      <span>&times;{{ $pack->pack_units }}</span>
+                    </div>
+                    @endforeach
+                  @else
+                    <span>ninguno</span>
+                  @endif
                 </x-table-td>
                 <x-table-td class="text-start">
                   <div class="w-full inline-flex gap-1 justify-start items-center">
@@ -149,7 +169,7 @@
 
                   </div>
                 </x-table-td>
-            </tr>
+              </tr>
             @empty
             <tr class="border">
               <td colspan="7">sin registros!</td>

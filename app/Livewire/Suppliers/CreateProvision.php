@@ -24,13 +24,26 @@ class CreateProvision extends Component
   public $measure_id;
 
   public $pack_units;
-  public $packs = [];
+  public $packs;
 
-  public function boot()
+  /**
+   * preparar constantes
+   * @return void
+  */
+  public function boot(): void
   {
     $this->trademarks = ProvisionTrademark::all();
     $this->measures = Measure::all();
     $this->provision_types = ProvisionType::all();
+  }
+
+  /**
+   * montar datos
+   * @return void
+  */
+  public function mount(): void
+  {
+    $this->packs = collect();
   }
 
   /**
@@ -45,7 +58,7 @@ class CreateProvision extends Component
       return;
     }
 
-    if (in_array($this->pack_units, $this->packs)) {
+    if ($this->packs->contains($this->pack_units)) {
 
       $this->dispatch('toast-event', toast_data: [
         'event_type' => 'info',
@@ -56,7 +69,7 @@ class CreateProvision extends Component
       return;
     }
 
-    array_push($this->packs, $this->pack_units);
+    $this->packs->prepend($this->pack_units);
     $this->reset('pack_units');
   }
 
@@ -67,9 +80,13 @@ class CreateProvision extends Component
   */
   public function removePackUnits($index)
   {
-    array_splice($this->packs, $index, 1);
+    $this->packs->forget($index);
   }
 
+  /**
+   * guardar suministro
+   * @return void
+  */
   public function save()
   {
     $validated = $this->validate([

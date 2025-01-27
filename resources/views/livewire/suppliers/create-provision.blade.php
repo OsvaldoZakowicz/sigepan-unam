@@ -185,19 +185,19 @@
               </div>
 
               {{-- mostrar packs a crear --}}
-              <div class="flex justify-start items-center gap-1 ml-2 p-1 h-8 md:w-1/2 lg:grow border border-dashed border-neutral-200 leading-none">
-                @forelse ($packs as $key => $pack)
-                  <div class="flex items-center justify-start gap-1 border border-blue-300 bg-blue-200 py-px px-1 rounded-lg">
-                    <span class="text-sm text-neutral-600 lowercase">pack de {{ $pack }}</span>
-                    <span
-                      wire:click="removePackUnits({{ $key }})"
-                      class="text-lg leading-none cursor-pointer text-red-400 hover:text-red-600 hover:font-semibold"
-                      >&times;
-                    </span>
-                  </div>
-                @empty
-                  <span class="text-sm text-neutral-600">no se crearán packs de este suministro ...</span>
-                @endforelse
+              <div class="flex flex-col md:w-1/2 lg:grow">
+                <span class="ml-2">lista de packs</span>
+                <div class="flex justify-start items-center gap-1 ml-2 p-1 h-8 border border-dashed border-neutral-200 leading-none">
+                  @forelse ($packs as $key => $pack)
+                    <div class="flex items-center justify-start gap-1 border border-blue-300 bg-blue-200 py-px px-1 rounded-lg">
+                      <span class="text-xs uppercase font-semibold">crear</span>
+                      <span class="text-sm text-neutral-600 lowercase">pack de {{ $pack }}</span>
+                      <span wire:click="removePackUnits({{ $key }})" class="text-lg leading-none cursor-pointer text-red-400 hover:text-red-600 hover:font-semibold" title="cancelar creación">&times;</span>
+                    </div>
+                  @empty
+                    <span class="text-sm text-neutral-600">no se crearán packs de este suministro ...</span>
+                  @endforelse
+                </div>
               </div>
 
             </div>
