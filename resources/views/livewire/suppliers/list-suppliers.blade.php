@@ -28,21 +28,24 @@
     <x-content-section>
 
       <x-slot:header>
-        <span class="text-sm capitalize">buscar proveedor:</span>
-        {{-- formulario de busqueda --}}
-        <form class="grow">
+
+        {{-- busqueda --}}
+        <div class="grow">
 
           {{-- termino de busqueda --}}
-          <input
-            type="text"
-            wire:model.live="search_input"
-            name="search"
-            placeholder="ingrese un id, razon social, telefono o CUIT ..."
-            class="w-1/4 shrink text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300" />
+          <div class="flex flex-col">
+            <span>buscar proveedor</span>
+            <input
+              type="text"
+              wire:model.live="search_input"
+              name="search"
+              placeholder="ingrese un id, razon social, telefono o CUIT ..."
+              class="w-1/4 shrink text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+            />
+          </div>
 
-        </form>
-        <!-- grupo de botones -->
-        <div class="flex"></div>
+        </div>
+
       </x-slot:header>
 
       <x-slot:content>
