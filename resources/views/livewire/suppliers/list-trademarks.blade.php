@@ -11,22 +11,25 @@
     <x-content-section>
 
       <x-slot:header>
-        <span class="text-sm capitalize">buscar marca:</span>
-        {{-- formulario de busqueda --}}
-        <form class="grow">
+
+        {{-- busqueda --}}
+        <div class="grow">
 
           {{-- termino de busqueda --}}
-          <input
-            type="text"
-            name="search_input"
-            wire:model.live="search_input"
-            wire:click="resetPagination"
-            placeholder="ingrese un id, o nombre ..."
-            class="w-1/4 shrink text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300" />
+          <div class="flex flex-col">
+            <label for="search_input">buscar marca</label>
+            <input
+              type="text"
+              name="search_input"
+              wire:model.live="search_input"
+              wire:click="resetPagination"
+              placeholder="ingrese un id, o nombre ..."
+              class="w-1/4 shrink text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+            />
+          </div>
 
-        </form>
-        <!-- grupo de botones -->
-        <div class="flex"></div>
+        </div>
+
       </x-slot:header>
 
       <x-slot:content>
@@ -50,19 +53,21 @@
                   <div class="flex justify-start gap-1">
 
                     <x-a-button
-                      wire:click=""
+                      wire:click="edit({{ $trademark->id }})"
                       href="#"
                       bg_color="neutral-100"
                       border_color="neutral-200"
                       text_color="neutral-600"
-                      >editar</x-a-button>
+                      >editar
+                    </x-a-button>
 
                     <x-btn-button
                       type="button"
-                      wire:click=""
+                      wire:click="delete({{ $trademark->id }})"
                       wire:confirm="¿Desea borrar el registro?, eliminar una marca hará que no este disponible para asignar a ningún suministro."
                       color="red"
-                      >eliminar</x-btn-button>
+                      >eliminar
+                    </x-btn-button>
 
                   </div>
                 </x-table-td>
