@@ -61,7 +61,13 @@
 
           {{-- termino de busqueda --}}
           <div class="flex flex-col w-1/4">
-            <label for="search">buscar suministro</label>
+            <label for="search">
+              @if ($toggle)
+                <span>buscar pack</span>
+              @else
+                <span>buscar suministro</span>
+              @endif
+            </label>
             <input
               type="text"
               name="search"
