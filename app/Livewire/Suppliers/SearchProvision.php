@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Suppliers;
 
+use App\Models\Pack;
 use App\Models\Provision;
 use App\Models\ProvisionTrademark;
 use App\Models\ProvisionType;
@@ -18,10 +19,22 @@ class SearchProvision extends Component
 
   #[Url]
   public $search = '';
+
+  #[Url]
+  public $search_pack = '';
+
   #[Url]
   public $search_tr = '';
+
+  #[Url]
+  public $search_tr_pack = '';
+
   #[Url]
   public $search_ty = '';
+
+  #[Url]
+  public $search_ty_pack = '';
+
   #[Url]
   public $paginas = '5';
 
@@ -35,6 +48,19 @@ class SearchProvision extends Component
   // busqueda de edicion
   public $is_editing;
 
+  // toggle del objetivo de busqueda
+  public $toggle;
+
+  /**
+   * boot de datos
+   * @return void
+  */
+  public function boot(): void
+  {
+    $this->trademarks = ProvisionTrademark::orderBy('provision_trademark_name', 'asc')->get();
+    $this->provision_types = ProvisionType::all();
+  }
+
   /**
    * montar datos del componente
    * @param int $supplier_id id de un proveedor.
@@ -44,19 +70,38 @@ class SearchProvision extends Component
   public function mount($supplier_id, $is_editing = false): void
   {
     $this->supplier = Supplier::findOrFail($supplier_id);
-    $this->trademarks = ProvisionTrademark::orderBy('provision_trademark_name', 'asc')->get();
-    $this->provision_types = ProvisionType::all();
     $this->is_editing = $is_editing;
+    $this->toggle = false;
+  }
+
+  /**
+   * cambiar busqueda
+   * alternar entre busqueda de suministros individuales o packs
+   * @return void
+  */
+  public function toggleSearch(): void
+  {
+      $this->toggle = !$this->toggle;
   }
 
   /**
    * enviar un suministro de la lista de busqueda a la lista de precios
-   * @param Provision $provision id del suministro.
-   * @return void.
+   * @param Provision $provision
+   * @return void
    */
   public function addProvision(Provision $provision): void
   {
     $this->dispatch('add-provision', provision: $provision);
+  }
+
+  /**
+   * enviar un pack de la lista de busqueda a la lista de precios
+   * @param Pack $pack
+   * @return void
+  */
+  public function addPack(Pack $pack): void
+  {
+    $this->dispatch('add-pack', pack: $pack);
   }
 
   /**
@@ -106,6 +151,41 @@ class SearchProvision extends Component
   }
 
   /**
+   * buscar packs para el proveedor
+   * en edicion: buscar asociados al proveedor.
+  */
+  public function searchPacks()
+  {
+    if ($this->is_editing) {
+
+
+    } else {
+
+      $result = Pack::whereDoesntHave('suppliers', function ($query) {
+          $query->where('supplier_id', $this->supplier->id);
+        })
+        ->has('provision')  // solo packs con suministros
+        ->when($this->search_pack, function ($query) {
+          $query->where('pack_name', 'like', '%' . $this->search_pack . '%');
+        })
+        ->when($this->search_tr_pack, function ($query) {
+          $query->whereHas('provision', function ($q) {
+            $q->where('provision_trademark_id', $this->search_tr_pack);
+          });
+        })
+        ->when($this->search_ty_pack, function ($query) {
+          $query->whereHas('provision', function ($q) {
+            $q->where('provision_type_id', $this->search_ty_pack);
+          });
+        })
+        ->orderBy('id', 'desc')
+        ->paginate((int) $this->paginas);
+    }
+
+    return $result;
+  }
+
+  /**
    * reiniciar la paginacion para buscar
    * @return void.
   */
@@ -122,6 +202,7 @@ class SearchProvision extends Component
   public function render(): View
   {
     $provisions = $this->searchProvisions();
-    return view('livewire.suppliers.search-provision', compact('provisions'));
+    $packs = $this->searchPacks();
+    return view('livewire.suppliers.search-provision', compact('provisions', 'packs'));
   }
 }

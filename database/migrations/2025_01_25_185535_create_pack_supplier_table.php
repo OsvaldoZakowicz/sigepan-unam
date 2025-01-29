@@ -24,7 +24,7 @@ return new class extends Migration
       $table->unsignedBigInteger('pack_id');
       $table->foreign('pack_id')->references('id')->on('packs')->restrictOnDelete();
 
-      $table->decimal('price', 6, 2);
+      $table->decimal('price');
 
       $table->timestamps();
     });
