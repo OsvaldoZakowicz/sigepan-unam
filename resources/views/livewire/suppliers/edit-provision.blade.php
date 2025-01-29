@@ -12,7 +12,11 @@
 
       <x-slot:content class="flex-col">
 
-        <span class="mb-2 font-bold">formulario</span>
+        <span class="mb-1 font-bold">formulario</span>
+
+        @if (!$can_edit)
+          <span class="mb-1">El suministro esta asociado a proveedores, solo puede editar la descripcion o los packs</span>
+        @endif
 
         <form wire:submit="save" wire:confirm="¿Editar este suministro?, confirme que desea hacer cambios en el suministro individual y/o packs del mismo" class="w-full flex flex-col gap-2">
 
@@ -31,7 +35,13 @@
               @error('provision_name')
                 <span class="text-red-400 text-xs">{{ $message }}</span>
               @enderror
-              <x-text-input wire:model="provision_name" name="provision_name" />
+              <input
+                wire:model="provision_name"
+                name="provision_name"
+                type="text"
+                readonly="{{ $can_edit }}"
+                class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300 @if (!$can_edit)bg-neutral-100 @endif"
+              />
             </div>
 
             {{-- marca --}}
@@ -51,7 +61,8 @@
                 name="provision_trademark_id"
                 wire:model="provision_trademark_id"
                 id="provision_trademark_id"
-                class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
+                @if (!$can_edit) disabled @endif
+                class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300 @if (!$can_edit) bg-neutral-100 @endif">
 
                 <option value="" selected>seleccione una marca ...</option>
 
@@ -79,7 +90,8 @@
                 name="provision_type_id"
                 wire:model="provision_type_id"
                 id="provision_type_id"
-                class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
+                @if (!$can_edit) disabled @endif
+                class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300 @if (!$can_edit) bg-neutral-100 @endif">
 
                 <option value="" selected>seleccione un tipo ...</option>
 
@@ -107,7 +119,8 @@
                 name="measure_id"
                 wire:model="measure_id"
                 id="measure_id"
-                class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
+                @if (!$can_edit) disabled @endif
+                class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300 @if (!$can_edit) bg-neutral-100 @endif">
 
                 <option value="" selected>seleccione una unidad ...</option>
 
@@ -135,7 +148,13 @@
               @error('provision_quantity')
                 <span class="text-red-400 text-xs">{{ $message }}</span>
               @enderror
-              <x-text-input wire:model="provision_quantity" name="provision_quantity" />
+              <input
+                wire:model="provision_quantity"
+                name="provision_quantity"
+                type="text"
+                readonly="{{ $can_edit }}"
+                class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300 @if (!$can_edit)bg-neutral-100 @endif"
+              />
             </div>
 
             {{-- descripcion --}}
@@ -188,13 +207,14 @@
 
               {{-- mostrar packs a crear o editar --}}
               <div class="flex flex-col md:w-1/2 lg:grow">
-                <span class="ml-2">lista de packs</span>
+                <span class="ml-2">lista de packs, use el icono <strong>x</strong> para eliminar o cancelar un pack</span>
                 <div class="flex justify-start items-center gap-1 ml-2 p-1 h-8 border border-dashed border-neutral-200 leading-none">
 
                   {{-- packs creados --}}
                   {{-- mostrar en neutral --}}
                   @foreach ($packs as $key => $pack)
                     <div class="flex items-center justify-start gap-1 border border-neutral-300 bg-neutral-200 py-px px-1 rounded-lg">
+                      <span class="text-xs uppercase font-semibold">creado</span>
                       <span class="text-sm text-neutral-600 lowercase">pack de {{ $pack->pack_units }}</span>
                       <span wire:click="deletePackUnits({{ $pack->id }}, {{ $key }})" class="text-lg leading-none cursor-pointer text-red-400 hover:text-red-600 hover:font-semibold" title="eliminar este pack">&times;</span>
                     </div>

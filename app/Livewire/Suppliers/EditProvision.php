@@ -17,7 +17,7 @@ class EditProvision extends Component
   public $measures;
   public $provision_types;
 
-  // parametros form
+  // suministro
   public $provision_name;
   public $provision_quantity;
   public $provision_short_description;
@@ -26,10 +26,14 @@ class EditProvision extends Component
   public $measure_id;
   public $show_pack_form;
 
+  // pack
   public $pack_units;
   public $packs;
   public $new_packs;
   public $packs_to_delete;
+
+  // puedo editar el suministro?
+  public $can_edit;
 
   /**
    * preparar constantes
@@ -52,6 +56,13 @@ class EditProvision extends Component
   {
     // suministro
     $this->provision = Provision::findOrFail($id);
+
+    // puedo editar el suministro
+    if ($this->provision->suppliers->count() > 0) {
+      $this->can_edit = false;
+    } else {
+      $this->can_edit = true;
+    }
 
     // datos a editar
     $this->provision_name               = $this->provision->provision_name;
@@ -146,10 +157,11 @@ class EditProvision extends Component
   {
     // si el pack esta asignado a uno o mas proveedores no se puede eliminar
     if ($pack->suppliers->count() !== 0) {
+
       $this->dispatch('toast-event', toast_data: [
         'event_type' => 'info',
-        'toast_title' => toastTitle('', true),
-        'toast_descr' => 'No se puede eliminar el pack de ' . $pack->pack_units . ' unidades, está asociado a listas de precios de proveedores',
+        'title_toast' => toastTitle('', true),
+        'descr_toast' => 'No se puede eliminar el pack de ' . $pack->pack_units . ' unidades, está asociado a listas de precios de proveedores',
       ]);
 
       return;

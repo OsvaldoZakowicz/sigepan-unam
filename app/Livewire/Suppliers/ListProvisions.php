@@ -47,42 +47,29 @@ class ListProvisions extends Component
   {
     // todo: cuando el suministro se use en recetas, no permitir el borrado
 
-    try {
-
-      $provision->delete();
+    if ($provision->suppliers->count() > 0) {
 
       $this->dispatch('toast-event', toast_data: [
-        'event_type'  =>  'success',
-        'title_toast' =>  toastTitle('exitosa'),
-        'descr_toast' =>  toastSuccessBody('suministro', 'eliminado'),
+        'event_type'  =>  'info',
+        'title_toast' =>  toastTitle('', true),
+        'descr_toast' =>  'No se puede eliminar el suministro, está asociado a listas de precios de proveedores',
       ]);
 
-    } catch (QueryException $qe) {
-
-      // capturar codigo del error
-      $error_code = $qe->errorInfo[1];
-
-      // error 1451 de clave foranea, restrict on delete
-      if ($error_code == 1451) {
-
-        $this->dispatch('toast-event', toast_data: [
-          'event_type'  =>  'info',
-          'title_toast' =>  toastTitle('', true),
-          'descr_toast' =>  'No se puede eliminar el suministro, está asociado a listas de precios de proveedores',
-        ]);
-
-        return;
-
-      }
-
-      // otro error
-      $this->dispatch('toast-event', toast_data: [
-        'event_type'  =>  'error',
-        'title_toast' =>  toastTitle('fallida'),
-        'descr_toast' =>  'Error inesperado: ' . $qe->getMessage() . 'contacte al Administrador',
-      ]);
-
+      return;
     }
+
+    if ($provision->packs->count() > 0) {
+
+      $this->dispatch('toast-event', toast_data: [
+        'event_type'  =>  'info',
+        'title_toast' =>  toastTitle('', true),
+        'descr_toast' =>  'No se puede eliminar el suministro, tiene packs asociados',
+      ]);
+
+      return;
+    }
+
+    $provision->delete();
 
   }
 
@@ -94,20 +81,7 @@ class ListProvisions extends Component
   */
   public function edit(Provision $provision): void
   {
-    if ($provision->suppliers->count() !== 0) {
-
-      // no editar, esta asociado a proveedores
-      $this->dispatch('toast-event', toast_data: [
-        'event_type'  =>  'info',
-        'title_toast' =>  toastTitle('', true),
-        'descr_toast' =>  'El suministro no se puede editar, está asociado a listas de precios de proveedores',
-      ]);
-
-      return;
-
-    }
-
-    // rdirigir a la edicion
+    // redirigir a la edicion
     $this->redirectRoute('suppliers-provisions-edit', $provision->id, true, true);
   }
 
