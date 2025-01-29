@@ -55,56 +55,76 @@
     <x-content-section>
 
       <x-slot:header>
-        <span class="text-sm capitalize">buscar suministro:</span>
-        {{-- formulario de busqueda --}}
-        <form class="grow">
+
+        {{-- busqueda --}}
+        <div class="w-full flex items-center gap-1">
 
           {{-- termino de busqueda --}}
-          <input
-            type="text"
-            name="search"
-            wire:model.live="search"
-            wire:click="resetPagination"
-            placeholder="ingrese un id, o termino de busqueda"
-            class="w-1/4 shrink text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300" />
+          <div class="flex flex-col w-1/4">
+            <label for="search">buscar suministro</label>
+            <input
+              type="text"
+              name="search"
+              id="search"
+              wire:model.live="search"
+              wire:click="resetPagination"
+              placeholder="ingrese un id, o termino de busqueda"
+              class="text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+            />
+          </div>
 
           {{-- filtro de marca --}}
-          <select
-            name="trademark_filter"
-            id="trademark_filter"
-            wire:model.live="trademark_filter"
-            wire:click="resetPagination"
-            class="w-1/4 shrink text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
+          <div class="flex flex-col w-1/4">
+            <label for="trademark_filter">filtrar por marca</label>
+            <select
+              name="trademark_filter"
+              id="trademark_filter"
+              wire:model.live="trademark_filter"
+              wire:click="resetPagination"
+              class="text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
 
-            <option value="">seleccione una marca ...</option>
+              <option value="">seleccione una marca ...</option>
 
-            @forelse ($trademarks as $trademark)
-              <option value="{{ $trademark->id }}">{{ $trademark->provision_trademark_name }}</option>
-            @empty
-              <option value="">sin marcas ...</option>
-            @endforelse
+              @forelse ($trademarks as $trademark)
+                <option value="{{ $trademark->id }}">{{ $trademark->provision_trademark_name }}</option>
+              @empty
+                <option value="">sin marcas ...</option>
+              @endforelse
 
-          </select>
+            </select>
+          </div>
 
           {{-- filtro de tipo --}}
-          <select
-            name="type_filter"
-            id="type_filter"
-            wire:model.live="type_filter"
-            wire:click="resetPagination"
-            class="w-1/4 shrink text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
+          <div class="flex flex-col w-1/4">
+            <label for="type_filter">filtrar por tipo</label>
+            <select
+              name="type_filter"
+              id="type_filter"
+              wire:model.live="type_filter"
+              wire:click="resetPagination"
+              class="text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
 
-            <option value="">seleccione un tipo ...</option>
+              <option value="">seleccione un tipo ...</option>
 
-            @forelse ($provision_types as $type)
-              <option value="{{ $type->id }}">{{ $type->provision_type_name }}</option>
-            @empty
-              <option value="">sin tipos ...</option>
-            @endforelse
+              @forelse ($provision_types as $type)
+                <option value="{{ $type->id }}">{{ $type->provision_type_name }}</option>
+              @empty
+                <option value="">sin tipos ...</option>
+              @endforelse
 
-          </select>
+            </select>
+          </div>
 
-        </form>
+          {{-- cambiar a lista de precios de packs --}}
+          <div class="self-end justify-self-end">
+            <div class="inline-flex items-center gap-1 p-1 border border-neutral-200 bg-neutral-100 rounded-md cursor-pointer">
+              <label for="toggle">precios de packs</label>
+              <input type="checkbox" wire:click="toggleSearch" name="toggle" id="toggle" class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
+            </div>
+          </div>
+
+        </div>
+
       </x-slot:header>
 
       <x-slot:content class="w-full flex-col">
@@ -124,53 +144,99 @@
             </tr>
           </x-slot:tablehead>
           <x-slot:tablebody>
-            @forelse ($provisions_with_price as $pwp)
-              <tr class="border" wire:key="{{ $pwp->id }}">
-                <x-table-td class="text-end">
-                  {{ $pwp->id }}
-                </x-table-td>
-                <x-table-td class="text-start">
-                  {{ $pwp->provision_name }}
-                </x-table-td>
-                <x-table-td class="text-start">
-                  {{ $pwp->trademark->provision_trademark_name }}
-                </x-table-td>
-                <x-table-td class="text-start">
-                  {{ $pwp->type->provision_type_name }}
-                </x-table-td>
-                <x-table-td class="text-end">
-                  {{ $pwp->provision_quantity }}({{ $pwp->measure->measure_abrv }})
-                </x-table-td>
-                <x-table-td class="text-end">
-                  $&nbsp;{{ $pwp->pivot->price }}
-                </x-table-td>
-                <x-table-td class="text-start">
+            @if ($toggle)
+              {{-- lista de packs --}}
+              @forelse ($packs_with_price as $pwp)
+                <tr class="border" wire:key="{{ $pwp->id }}">
+                  <x-table-td class="text-end">
+                    {{ $pwp->id }}
+                  </x-table-td>
+                  <x-table-td class="text-start">
+                    {{ $pwp->pack_name }}
+                  </x-table-td>
+                  <x-table-td class="text-start">
+                    {{ $pwp->provision->trademark->provision_trademark_name }}
+                  </x-table-td>
+                  <x-table-td class="text-start">
+                    {{ $pwp->provision->type->provision_type_name }}
+                  </x-table-td>
+                  <x-table-td class="text-end">
+                    {{ $pwp->pack_quantity }}({{ $pwp->provision->measure->measure_abrv }})
+                  </x-table-td>
+                  <x-table-td class="text-end">
+                    $&nbsp;{{ $pwp->pivot->price }}
+                  </x-table-td>
+                  <x-table-td class="text-start">
 
-                  <x-btn-button
-                    type="button"
-                    wire:navigate
-                    wire:click="delete({{ $pwp->id }})"
-                    color="red"
-                    wire:confirm="¿Desea borrar el registro?, eliminará el precio del proveedor: {{ $supplier->company_name }}, para el suministro: {{ $pwp->provision_name }} {{ $pwp->trademark->provision_trademark_name }} de {{ $pwp->provision_quantity }}({{ $pwp->measure->measure_abrv }})"
-                    >eliminar
-                  </x-btn-button>
+                    <x-btn-button
+                      type="button"
+                      wire:navigate
+                      wire:click="deletePack({{ $pwp->id }})"
+                      color="red"
+                      wire:confirm="¿Desea borrar el registro?, eliminará el precio del proveedor: {{ $supplier->company_name }}, para el pack: {{ $pwp->pack_name }} {{ $pwp->provision->trademark->provision_trademark_name }} de {{ $pwp->pack_quantity }}({{ $pwp->provision->measure->measure_abrv }})"
+                      >eliminar
+                    </x-btn-button>
 
-                </x-table-td>
-              </tr>
-            @empty
-              <tr class="border">
-                <td colspan="7">sin registros!</td>
-              </tr>
-            @endforelse
+                  </x-table-td>
+                </tr>
+              @empty
+                <tr class="border">
+                  <td colspan="7">¡sin registros!</td>
+                </tr>
+              @endforelse
+            @else
+              {{-- lista de suministros --}}
+              @forelse ($provisions_with_price as $pwp)
+                <tr class="border" wire:key="{{ $pwp->id }}">
+                  <x-table-td class="text-end">
+                    {{ $pwp->id }}
+                  </x-table-td>
+                  <x-table-td class="text-start">
+                    {{ $pwp->provision_name }}
+                  </x-table-td>
+                  <x-table-td class="text-start">
+                    {{ $pwp->trademark->provision_trademark_name }}
+                  </x-table-td>
+                  <x-table-td class="text-start">
+                    {{ $pwp->type->provision_type_name }}
+                  </x-table-td>
+                  <x-table-td class="text-end">
+                    {{ $pwp->provision_quantity }}({{ $pwp->measure->measure_abrv }})
+                  </x-table-td>
+                  <x-table-td class="text-end">
+                    $&nbsp;{{ $pwp->pivot->price }}
+                  </x-table-td>
+                  <x-table-td class="text-start">
+
+                    <x-btn-button
+                      type="button"
+                      wire:navigate
+                      wire:click="deleteProvision({{ $pwp->id }})"
+                      color="red"
+                      wire:confirm="¿Desea borrar el registro?, eliminará el precio del proveedor: {{ $supplier->company_name }}, para el suministro: {{ $pwp->provision_name }} {{ $pwp->trademark->provision_trademark_name }} de {{ $pwp->provision_quantity }}({{ $pwp->measure->measure_abrv }})"
+                      >eliminar
+                    </x-btn-button>
+
+                  </x-table-td>
+                </tr>
+              @empty
+                <tr class="border">
+                  <td colspan="7">¡sin registros!</td>
+                </tr>
+              @endforelse
+            @endif
           </x-slot:tablebody>
         </x-table-base>
       </x-slot:content>
 
       <x-slot:footer class="py-2">
-        {{-- paginacion --}}
-        {{ $provisions_with_price->links() }}
-        <!-- grupo de botones -->
-        <div class="flex"></div>
+        @if ($toggle)
+          {{-- paginacion de packs --}}
+          {{ $packs_with_price->links() }}
+        @else
+          {{-- paginacion de suministros --}}
+          {{ $provisions_with_price->links() }}
+        @endif
       </x-slot:footer>
 
     </x-content-section>
