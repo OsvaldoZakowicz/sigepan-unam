@@ -33,7 +33,7 @@
 
         {{-- lista de suministros elegidos --}}
         <div class="flex flex-col gap-1 w-full">
-          <span class="font-semibold capitalize">lista de suministros elegidos para el alta</span>
+          <span class="font-semibold capitalize">lista de suministros y/o packs elegidos para el alta</span>
           <div class="max-h-72 overflow-y-auto overflow-x-hidden">
             <x-table-base>
               <x-slot:tablehead>

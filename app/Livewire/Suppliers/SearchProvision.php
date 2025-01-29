@@ -158,13 +158,32 @@ class SearchProvision extends Component
   {
     if ($this->is_editing) {
 
+      // buscar packs del proveedor
+      $result = $this->supplier->packs()
+        ->has('provision') // incluir suministro del pack
+        ->when($this->search_pack, function ($query) {
+          $query->where('pack_name', 'like', '%' . $this->search_pack . '%');
+        })
+        ->when($this->search_tr_pack, function ($query) {
+          $query->whereHas('provision', function ($q) {
+            $q->where('provision_trademark_id', $this->search_tr_pack);
+          });
+        })
+        ->when($this->search_ty_pack, function ($query) {
+          $query->whereHas('provision', function ($q) {
+            $q->where('provision_type_id', $this->search_ty_pack);
+          });
+        })
+        ->orderBy('id', 'desc')
+        ->paginate((int) $this->paginas);
 
     } else {
 
+      // buscar pack que no tiene el proveedor
       $result = Pack::whereDoesntHave('suppliers', function ($query) {
           $query->where('supplier_id', $this->supplier->id);
         })
-        ->has('provision')  // solo packs con suministros
+        ->has('provision')  // incluir suministro del pack
         ->when($this->search_pack, function ($query) {
           $query->where('pack_name', 'like', '%' . $this->search_pack . '%');
         })

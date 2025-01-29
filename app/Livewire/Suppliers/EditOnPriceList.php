@@ -4,6 +4,7 @@ namespace App\Livewire\Suppliers;
 
 use App\Models\Supplier;
 use App\Models\Provision;
+use App\Models\Pack;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
@@ -22,17 +23,17 @@ class EditOnPriceList extends Component
 
   // reglas
   protected $rules = [
-    'prices.*.provision_id'  =>  'required',
-    'prices.*.price'         =>  ['required',  'numeric', 'regex:/^\d{1,6}(\.\d{1,2})?$/', 'min:1'],
+    'prices.*.provision_id'  => 'nullable',
+    'prices.*.pack_id'       => 'nullable',
+    'prices.*.price'         => ['required',  'numeric', 'regex:/^\d{1,6}(\.\d{1,2})?$/', 'min:1'],
   ];
 
   // mensajes
   protected $messages = [
-    'prices.*.provision_id.required'  =>  'Debe elegir al menos un suministro',
-    'prices.*.price.required'         =>  'El precio es obligatorio',
-    'prices.*.price.numeric' => 'El precio es debe ser un número',
-    'prices.*.price.regex' => 'El precio puede ser de hasta $999999.99',
-    'prices.*.price.min' => 'El precio puede ser de minimo $1',
+    'prices.*.price.required' => 'El precio es obligatorio',
+    'prices.*.price.numeric'  => 'El precio es debe ser un número',
+    'prices.*.price.regex'    => 'El precio puede ser de hasta $999999.99',
+    'prices.*.price.min'      => 'El precio puede ser de minimo $1',
   ];
 
   /**
@@ -60,10 +61,11 @@ class EditOnPriceList extends Component
 
   /**
    * * agregar suministros a la lista de precios
-   * provision_id, para mantener el id del suministro en el request.
+   * provision_id, para mantener el id del suministro en el request
+   * pack_id, para mantener el id del pack en el request
    * * el evento proviene de SearchProvision::class
-   * @param Provision $provision un suministro.
-   * @return void.
+   * @param Provision $provision
+   * @return void
   */
   #[On('add-provision')]
   public function addToPricesList(Provision $provision): void
@@ -75,7 +77,7 @@ class EditOnPriceList extends Component
         $this->dispatch('toast-event', toast_data: [
           'event_type' => 'info',
           'title_toast' => toastTitle('',true),
-          'descr_toast' => 'ya existe en la lista de suministros!'
+          'descr_toast' => 'el suministro ya existe en la lista de edicion!'
         ]);
 
         return;
@@ -90,7 +92,47 @@ class EditOnPriceList extends Component
     $this->prices->push([
       'provision'     =>  $provision,
       'provision_id'  =>  $provision->id,
-      'price'         =>  $price,
+      'pack'          =>  null,
+      'pack_id'       =>  null,
+      'price'         =>  $price
+    ]);
+  }
+
+  /**
+   * * agregar packs a la lista de precios
+   * provision_id, para mantener el id del suministro en el request
+   * pack_id, para mantener el id del pack en el request
+   * * el evento proviene de SearchProvision::class
+   * @param Pack $pack
+   * @return void
+  */
+  #[On('add-pack')]
+  public function addPackToPriceList(Pack $pack): void
+  {
+    foreach ($this->prices as $price) {
+      if ($price['pack_id'] == $pack->id) {
+
+        $this->dispatch('toast-event', toast_data: [
+          'event_type' => 'info',
+          'title_toast' => toastTitle('',true),
+          'descr_toast' => 'el pack ya existe en la lista de edicion!'
+        ]);
+
+        return;
+      }
+    }
+
+    // obtener el precio
+    $price = $pack->suppliers()
+      ->wherePivot('supplier_id', $this->supplier->id)
+      ->first()->pivot->price;
+
+    $this->prices->push([
+      'provision'     =>  null,
+      'provision_id'  =>  null,
+      'pack'          =>  $pack,
+      'pack_id'       =>  $pack->id,
+      'price'         =>  $price
     ]);
   }
 
@@ -122,20 +164,36 @@ class EditOnPriceList extends Component
       return;
     }
 
-    // validated_prices = [ ["provision_id" => 16, "price" => "123"], [], ... ]
     $validated_prices = $this->validate()['prices'];
 
+    //dd($validated_prices);
+
     try {
-      // guardar precios para los suministros del proveedor
+
+      // editar precios para los suministros y packs del proveedor
       foreach ($validated_prices as $price) {
-        $this->supplier->provisions()
-          ->updateExistingPivot($price['provision_id'], ['price' => $price['price']]);
+
+        if ($price['provision_id'] !== null) {
+
+          // es un suministro
+          $this->supplier->provisions()
+            ->updateExistingPivot($price['provision_id'], ['price' => $price['price']]);
+
+        } else {
+
+          // es un pack
+          $this->supplier->packs()
+            ->updateExistingPivot($price['pack_id'], ['price' => $price['price']]);
+
+        }
+
       }
 
       $this->setPricesList();
 
       session()->flash('operation-success', 'Los precios fueron editados correctamente');
       $this->redirectRoute('suppliers-suppliers-price-index', ['id' => $this->supplier->id], navigate: true);
+
     } catch (\Exception $e) {
 
       $this->dispatch('toast-event', toast_data: [
@@ -143,6 +201,7 @@ class EditOnPriceList extends Component
         'title_toast' => toastTitle('fallida'),
         'descr_toast' => 'error: ' . $e->getMessage() . ', contacte al Administrador'
       ]);
+
     }
   }
 

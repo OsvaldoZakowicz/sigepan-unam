@@ -64,6 +64,7 @@ class AddToPriceList extends Component
   /**
    * * agregar suministros a la lista de precios
    * provision_id, para mantener el id del suministro en el request
+   * pack_id, para mantener el id del pack en el request
    * * el evento proviene de SearchProvision::class
    * @param Provision $provision un suministro
    * @return void
@@ -78,7 +79,7 @@ class AddToPriceList extends Component
         $this->dispatch('toast-event', toast_data: [
           'event_type' => 'info',
           'title_toast' => toastTitle('',true),
-          'descr_toast' => 'ya existe en la lista de suministros!'
+          'descr_toast' => 'el suministro ya existe en la lista de alta!'
         ]);
 
         return;
@@ -111,7 +112,7 @@ class AddToPriceList extends Component
         $this->dispatch('toast-event', toast_data: [
           'event_type' => 'info',
           'title_toast' => toastTitle('',true),
-          'descr_toast' => 'ya existe en la lista de suministros!'
+          'descr_toast' => 'el pack ya existe en la lista de alta!'
         ]);
 
         return;
@@ -156,8 +157,6 @@ class AddToPriceList extends Component
     }
 
     $validated_prices = $this->validate()['prices'];
-
-    //dd($validated_prices);
 
     try {
 

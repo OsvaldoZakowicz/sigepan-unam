@@ -33,7 +33,7 @@
 
         {{-- lista de suministros elegidos --}}
         <div class="flex flex-col gap-1 w-full">
-          <span class="font-semibold capitalize">lista de suministros elegidos para la edicion.</span>
+          <span class="font-semibold capitalize">lista de suministros y/o packs elegidos para la edicion.</span>
           <div class="max-h-72 overflow-y-auto overflow-x-hidden">
             <x-table-base>
               {{-- cabecera de la tabla --}}
@@ -47,61 +47,109 @@
                     <span>volumen</span>
                     <x-quest-icon title="kilogramos (kg), litros (lts) o unidades (un)"/>
                   </x-table-th>
-                  <x-table-th class="text-end w-1/3">$&nbsp;precio <span class="text-red-400">*</span> </x-table-th>
+                  <x-table-th class="text-end w-1/3">
+                    <span>$&nbsp;precio</span>
+                    <span class="text-red-400">*</span>
+                  </x-table-th>
                   <x-table-th class="text-start w-16">quitar</x-table-th>
                 </tr>
               </x-slot:tablehead>
               <x-slot:tablebody>
                 @forelse ($prices as $key => $price_item)
-                  <tr wire:key="{{ $key }}">
-                    <x-table-td class="text-end">
-                      {{ $price_item['provision']->id }}
-                    </x-table-td>
-                    <x-table-td
-                      title="{{ $price_item['provision']->provision_short_description }}"
-                      class="cursor-pointer text-start">
-                      {{ $price_item['provision']->provision_name }}
-                    </x-table-td>
-                    <x-table-td class="text-start">
-                      {{ $price_item['provision']->trademark->provision_trademark_name }}
-                    </x-table-td>
-                    <x-table-td class="text-start">
-                      {{ $price_item['provision']->type->provision_type_name }}
-                    </x-table-td>
-                    <x-table-td class="text-end">
-                      {{ $price_item['provision']->provision_quantity }}&nbsp;
-                      ({{ $price_item['provision']->measure->measure_abrv }})
-                    </x-table-td>
-                    <x-table-td class="text-start">
-                      {{-- input precio --}}
-                      @error('prices.'.$key.'.price')<span class="text-red-400 text-xs capitalize">{{ $message }}</span>@enderror
-                      <div class="flex justify-start items-center">
-                        {{-- simbolo de $ --}}
-                        <span>$&nbsp;</span>
-                        {{-- precio --}}
-                        <x-text-input
-                          id="prices_{{ $key }}_price"
-                          wire:model.defer="prices.{{ $key }}.price"
-                          name="prices.{{ $key }}.price"
-                          value=""
-                          type="text"
-                          placeholder="precio ..."
-                          class="w-full text-right"/>
-                      </div>
-                    </x-table-td>
-                    <x-table-td class="text-start">
-                      {{-- boton para quitar de la lista --}}
-                      <span
-                        title="quitar de la lista."
-                        wire:click="removeFromPriceList({{ $key }})"
-                        class="font-semibold cursor-pointer leading-none p-1 bg-red-200 text-neutral-600 border-red-300 rounded-sm"
-                        >&times;
-                      </span>
-                    </x-table-td>
-                  </tr>
+                  @if ($price_item['provision'] !== null)
+                    {{-- renglon es suministro --}}
+                    <tr wire:key="{{ $key }}">
+                      <x-table-td class="text-end">
+                        {{ $price_item['provision']->id }}
+                      </x-table-td>
+                      <x-table-td
+                        title="{{ $price_item['provision']->provision_short_description }}"
+                        class="cursor-pointer text-start">
+                        {{ $price_item['provision']->provision_name }}
+                      </x-table-td>
+                      <x-table-td class="text-start">
+                        {{ $price_item['provision']->trademark->provision_trademark_name }}
+                      </x-table-td>
+                      <x-table-td class="text-start">
+                        {{ $price_item['provision']->type->provision_type_name }}
+                      </x-table-td>
+                      <x-table-td class="text-end">
+                        {{ $price_item['provision']->provision_quantity }}&nbsp;
+                        ({{ $price_item['provision']->measure->measure_abrv }})
+                      </x-table-td>
+                      <x-table-td class="text-start">
+                        {{-- input precio --}}
+                        @error('prices.'.$key.'.price')<span class="text-red-400 text-xs capitalize">{{ $message }}</span>@enderror
+                        <div class="flex justify-start items-center">
+                          {{-- simbolo de $ --}}
+                          <span>$&nbsp;</span>
+                          {{-- precio --}}
+                          <x-text-input
+                            id="prices_{{ $key }}_price"
+                            wire:model.defer="prices.{{ $key }}.price"
+                            type="text"
+                            placeholder="precio ..."
+                            class="w-full text-right"/>
+                        </div>
+                      </x-table-td>
+                      <x-table-td class="text-start">
+                        {{-- boton para quitar de la lista --}}
+                        <span
+                          title="quitar de la lista."
+                          wire:click="removeFromPriceList({{ $key }})"
+                          class="font-semibold cursor-pointer leading-none p-1 bg-red-200 text-neutral-600 border-red-300 rounded-sm"
+                          >&times;
+                        </span>
+                      </x-table-td>
+                    </tr>
+                  @else
+                    {{-- renglon es pack --}}
+                    <tr wire:key="{{ $key }}">
+                      <x-table-td class="text-end">
+                        {{ $price_item['pack']->id }}
+                      </x-table-td>
+                      <x-table-td class="text-start">
+                        {{ $price_item['pack']->pack_name }}
+                      </x-table-td>
+                      <x-table-td class="text-start">
+                        {{ $price_item['pack']->provision->trademark->provision_trademark_name }}
+                      </x-table-td>
+                      <x-table-td class="text-start">
+                        {{ $price_item['pack']->provision->type->provision_type_name }}
+                      </x-table-td>
+                      <x-table-td class="text-end">
+                        {{ $price_item['pack']->pack_quantity }}&nbsp;
+                        ({{ $price_item['pack']->provision->measure->measure_abrv }})
+                      </x-table-td>
+                      <x-table-td class="text-start">
+                        {{-- input precio --}}
+                        @error('prices.'.$key.'.price')<span class="text-red-400 text-xs capitalize">{{ $message }}</span>@enderror
+                        <div class="flex justify-start items-center">
+                          {{-- simbolo de $ --}}
+                          <span>$&nbsp;</span>
+                          {{-- precio --}}
+                          <x-text-input
+                            id="prices_{{ $key }}_price"
+                            wire:model.defer="prices.{{ $key }}.price"
+                            type="text"
+                            placeholder="precio ..."
+                            class="w-full text-right"/>
+                        </div>
+                      </x-table-td>
+                      <x-table-td class="text-start">
+                        {{-- boton para quitar de la lista --}}
+                        <span
+                          title="quitar de la lista."
+                          wire:click="removeFromPriceList({{ $key }})"
+                          class="font-semibold cursor-pointer leading-none p-1 bg-red-200 text-neutral-600 border-red-300 rounded-sm"
+                          >&times;
+                        </span>
+                      </x-table-td>
+                    </tr>
+                  @endif
                 @empty
                   <tr class="border">
-                    <td colspan="3">¡lista vacia!</td>
+                    <td colspan="7">¡lista vacia!</td>
                   </tr>
                 @endforelse
               </x-slot:tablebody>

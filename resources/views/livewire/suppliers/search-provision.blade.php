@@ -146,9 +146,9 @@
                     {{ $pack->pack_quantity }}&nbsp;({{ $pack->provision->measure->measure_abrv }})
                   </x-table-td>
                   @if ($is_editing)
-                  <x-table-td class="text-end">
-                    $precio
-                  </x-table-td>
+                    <x-table-td class="text-end">
+                      <span>$&nbsp;{{ $pack->pivot->price }}</span>
+                    </x-table-td>
                   @endif
                   <x-table-td class="text-start">
                     <div class="w-full inline-flex gap-1 justify-start items-center">
@@ -276,7 +276,9 @@
                   <span>volumen</span>
                   <x-quest-icon title="kilogramos (kg), litros (lts) o unidades (un)"/>
                 </x-table-th>
-                @if ($is_editing) <x-table-th class="text-end w-1/3">$&nbsp;precio</x-table-th> @endif
+                @if ($is_editing)
+                  <x-table-th class="text-end w-1/3">$&nbsp;precio</x-table-th>
+                @endif
                 <x-table-th class="text-start w-16">elegir</x-table-th>
               </tr>
             </x-slot:tablehead>
