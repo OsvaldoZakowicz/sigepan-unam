@@ -6,6 +6,7 @@ use App\Models\Provision;
 use App\Models\ProvisionTrademark;
 use App\Models\ProvisionType;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use Livewire\Component;
 use Livewire\Attributes\Url;
@@ -38,7 +39,7 @@ class ListProvisions extends Component
   }
 
   /**
-   * borrar suministro
+   * SOFT DELETE: borrar suministro
    * solo cuando no este asociado a proveedores
    * @param Provision $provision
    * @return void
@@ -47,6 +48,7 @@ class ListProvisions extends Component
   {
     // todo: cuando el suministro se use en recetas, no permitir el borrado
 
+    // si el suministro esta en listas de precios, no borrar
     if ($provision->suppliers->count() > 0) {
 
       $this->dispatch('toast-event', toast_data: [
@@ -58,6 +60,7 @@ class ListProvisions extends Component
       return;
     }
 
+    // si el suministro tiene packs, no borrar
     if ($provision->packs->count() > 0) {
 
       $this->dispatch('toast-event', toast_data: [
@@ -71,6 +74,22 @@ class ListProvisions extends Component
 
     $provision->delete();
 
+  }
+
+  /**
+   * restaurar un suministro borrado
+   * @param int $id del suministro
+   * @return void
+  */
+  public function restore(int $id): void
+  {
+    Provision::withTrashed()->where('id', $id)->restore();
+
+    $this->dispatch('toast-event', toast_data: [
+      'event_type'  =>  'success',
+      'title_toast' =>  toastTitle('exitosa'),
+      'descr_toast' =>  'El suministro fue restaurado.'
+    ]);
   }
 
   /**
@@ -109,7 +128,8 @@ class ListProvisions extends Component
   */
   public function searchProvision()
   {
-    return Provision::when($this->search, function ($query) {
+    return Provision::withTrashed()
+      ->when($this->search, function ($query) {
         $query->where('id',$this->search)
               ->orWhere('provision_name', 'like', '%' . $this->search . '%');
       })
@@ -119,6 +139,7 @@ class ListProvisions extends Component
       ->when($this->type_filter, function ($query) {
         $query->where('provision_type_id', $this->type_filter);
       })
+      ->orderBy('deleted_at', 'asc') // primero los NO borrados (deleted_at null)
       ->orderBy('id', 'desc')->paginate(10);
   }
 

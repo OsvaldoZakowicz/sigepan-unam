@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -13,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Provision extends Model
 {
   use HasFactory;
+  use SoftDeletes;
 
   protected $fillable = [
     'provision_name',
@@ -22,6 +25,17 @@ class Provision extends Model
     'provision_type_id',
     'measure_id',
   ];
+
+  /**
+   * obtener atributo deleted_at, y presentarlo
+   * deleted_at es una fecha o null, cuando tiene una fecha indica el borrado
+  */
+  protected function deletedAt(): Attribute
+  {
+    return Attribute::make(
+      get: fn (string|null $value) => $value ? 'borrado' : 'activo'
+    );
+  }
 
   // * un suministro pertenece a una marca
   public function trademark(): BelongsTo

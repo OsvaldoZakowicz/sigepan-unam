@@ -18,6 +18,7 @@
     <x-content-section>
 
       <x-slot:header>
+
         {{-- busqueda --}}
         <div class="flex gap-1 justify-start items-start grow">
 
@@ -110,12 +111,13 @@
                 <span>packs disponibles</span>
                 <x-quest-icon title="packs en los que se puede encontrar el suministro" />
               </x-table-th>
+              <x-table-th class="text-start w-24">estado</x-table-th>
               <x-table-th class="text-start w-24">acciones</x-table-th>
             </tr>
           </x-slot:tablehead>
           <x-slot:tablebody>
             @forelse ($provisions as $provision)
-              <tr wire:key="{{$provision->id}}" class="border">
+              <tr wire:key="{{$provision->id}}" class="border @if ($provision->deleted_at === 'borrado') text-neutral-400 @endif">
                 <x-table-td class="text-end">
                   {{ $provision->id }}
                 </x-table-td>
@@ -149,30 +151,54 @@
                     <span>ninguno</span>
                   @endif
                 </x-table-td>
+                <x-table-td class="text-start text-neutral-700">
+                  @if ($provision->deleted_at === 'borrado')
+                    <span class="font-semibold text-neutral-600" >{{ $provision->deleted_at }}</span>
+                  @else
+                    <span class="font-semibold text-emerald-600">{{ $provision->deleted_at }}</span>
+                  @endif
+                </x-table-td>
                 <x-table-td class="text-start">
                   <div class="w-full inline-flex gap-1 justify-start items-center">
+                    @if ($provision->deleted_at === 'activo')
 
-                    <x-a-button
-                      wire:click="edit({{ $provision->id }})"
-                      href="#"
-                      bg_color="neutral-100"
-                      border_color="neutral-200"
-                      text_color="neutral-600"
-                      >editar</x-a-button>
+                      <x-a-button
+                        wire:click="edit({{ $provision->id }})"
+                        href="#"
+                        bg_color="neutral-100"
+                        border_color="neutral-200"
+                        text_color="neutral-600"
+                        >editar
+                      </x-a-button>
 
-                    <x-btn-button
-                      type="button"
-                      wire:click="delete({{ $provision->id }})"
-                      wire:confirm="¿Desea borrar el registro?, eliminar un suministro hará que no este disponible para asignar a ningún proveedor."
-                      color="red"
-                      >eliminar</x-btn-button>
+                      <x-btn-button
+                        type="button"
+                        wire:click="delete({{ $provision->id }})"
+                        wire:confirm="¿Desea borrar el registro?, eliminar un suministro hará que no este disponible para asignar a ningún proveedor o crear packs."
+                        color="red"
+                        >eliminar
+                      </x-btn-button>
 
+                    @else
+
+                      <x-a-button
+                        wire:click="restore({{ $provision->id }})"
+                        href="#"
+                        bg_color="neutral-100"
+                        border_color="neutral-200"
+                        text_color="neutral-600"
+                        title="revertir el borrado de este suministro."
+                        wire:confirm="¿Desea restaurar el registro?, el mismo volverá a estar disponible para proveedores y packs."
+                        >restaurar
+                      </x-a-button>
+
+                    @endif
                   </div>
                 </x-table-td>
               </tr>
             @empty
             <tr class="border">
-              <td colspan="7">sin registros!</td>
+              <td colspan="7">¡sin registros!</td>
             </tr>
             @endforelse
           </x-slot:tablebody>
