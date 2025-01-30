@@ -23,6 +23,7 @@ return new class extends Migration
             $table->foreign('provision_id')->references('id')->on('provisions')->restrictOnDelete();
 
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

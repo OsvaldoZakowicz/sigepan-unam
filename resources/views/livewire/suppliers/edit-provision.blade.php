@@ -39,7 +39,7 @@
                 wire:model="provision_name"
                 name="provision_name"
                 type="text"
-                readonly="{{ $can_edit }}"
+                @readonly(!$can_edit)
                 class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300 @if (!$can_edit)bg-neutral-100 @endif"
               />
             </div>
@@ -152,7 +152,7 @@
                 wire:model="provision_quantity"
                 name="provision_quantity"
                 type="text"
-                readonly="{{ $can_edit }}"
+                @readonly(!$can_edit)
                 class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300 @if (!$can_edit)bg-neutral-100 @endif"
               />
             </div>
@@ -196,7 +196,7 @@
                   </select>
                   <x-a-button
                     href="#"
-                    wire:click="addPackUnits()"
+                    wire:click="createPack()"
                     bg_color="neutral-100"
                     border_color="neutral-100"
                     text_color="neutral-600"
@@ -211,12 +211,20 @@
                 <div class="flex justify-start items-center gap-1 ml-2 p-1 h-8 border border-dashed border-neutral-200 leading-none">
 
                   {{-- packs creados --}}
-                  {{-- mostrar en neutral --}}
                   @foreach ($packs as $key => $pack)
-                    <div class="flex items-center justify-start gap-1 border border-neutral-300 bg-neutral-200 py-px px-1 rounded-lg">
-                      <span class="text-xs uppercase font-semibold">creado</span>
+                    <div class="flex items-center justify-start gap-1 border border-emerald-600 bg-emerald-400 py-px px-1 rounded-lg">
+                      <span class="text-xs uppercase font-semibold">activo</span>
                       <span class="text-sm text-neutral-600 lowercase">pack de {{ $pack->pack_units }}</span>
-                      <span wire:click="deletePackUnits({{ $pack->id }}, {{ $key }})" class="text-lg leading-none cursor-pointer text-red-400 hover:text-red-600 hover:font-semibold" title="eliminar este pack">&times;</span>
+                      <span wire:click="deletePack({{ $pack->id }}, {{ $key }})" class="text-lg leading-none cursor-pointer text-red-400 hover:text-red-600 hover:font-semibold" title="eliminar este pack">&times;</span>
+                    </div>
+                  @endforeach
+
+                  {{-- packs borrados con soft delete --}}
+                  @foreach ($soft_deleted_packs as $key => $sd_pack)
+                    <div class="flex items-center justify-start gap-1 border border-neutral-300 bg-neutral-50 py-px px-1 rounded-lg text-neutral-500">
+                      <span class="text-xs uppercase font-semibold">borrado</span>
+                      <span class="text-sm text-neutral-600 lowercase">pack de {{ $sd_pack->pack_units }}</span>
+                      <span wire:click="restoreSoftDeleted({{ $sd_pack->id }}, {{ $key }})" class="text-lg leading-none cursor-pointer text-red-400 hover:text-red-600 hover:font-semibold" title="restaurar este pack">&times;</span>
                     </div>
                   @endforeach
 
@@ -225,7 +233,16 @@
                     <div class="flex items-center justify-start gap-1 border border-blue-300 bg-blue-200 py-px px-1 rounded-lg">
                       <span class="text-xs uppercase font-semibold">crear</span>
                       <span class="text-sm text-neutral-600 lowercase">pack de {{ $pack }}</span>
-                      <span wire:click="removePackUnits({{ $key }})" class="text-lg leading-none cursor-pointer text-red-400 hover:text-red-600 hover:font-semibold" title="cancelar creación">&times;</span>
+                      <span wire:click="cancelPackCreation({{ $key }})" class="text-lg leading-none cursor-pointer text-red-400 hover:text-red-600 hover:font-semibold" title="cancelar creación">&times;</span>
+                    </div>
+                  @endforeach
+
+                  {{-- packs a restaurar del soft delete --}}
+                  @foreach ($packs_to_restore as $key => $pack)
+                    <div class="flex items-center justify-start gap-1 border border-blue-300 bg-blue-200 py-px px-1 rounded-lg">
+                      <span class="text-xs uppercase font-semibold">restaurar</span>
+                      <span class="text-sm text-neutral-600 lowercase">pack de {{ $pack->pack_units }}</span>
+                      <span wire:click="cancelRestoreSoftDeleted({{ $key }})" class="text-lg leading-none cursor-pointer text-red-400 hover:text-red-600 hover:font-semibold" title="cancelar creación">&times;</span>
                     </div>
                   @endforeach
 
@@ -234,7 +251,7 @@
                     <div class="flex items-center justify-start gap-1 border border-red-300 bg-red-200 py-px px-1 rounded-lg">
                       <span class="text-xs uppercase font-semibold">eliminar</span>
                       <span class="text-sm text-neutral-600 lowercase">pack de {{ $pack->pack_units }}</span>
-                      <span wire:click="restorePackUnits({{ $pack->id }}, {{ $key }})" class="text-lg leading-none cursor-pointer text-red-400 hover:text-red-600 hover:font-semibold" title="cancelar eliminación">&times;</span>
+                      <span wire:click="cancelPackElimination({{ $pack->id }}, {{ $key }})" class="text-lg leading-none cursor-pointer text-red-400 hover:text-red-600 hover:font-semibold" title="cancelar eliminación">&times;</span>
                     </div>
                   @endforeach
 

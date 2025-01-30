@@ -2,14 +2,17 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Pack extends Model
 {
   use HasFactory;
+  use SoftDeletes;
 
   protected $fillable = [
     'pack_name',
@@ -17,6 +20,17 @@ class Pack extends Model
     'pack_quantity',
     'provision_id'
   ];
+
+  /**
+   * obtener atributo deleted_at, y presentarlo
+   * deleted_at es una fecha o null, cuando tiene una fecha indica el borrado
+  */
+  protected function deletedAt(): Attribute
+  {
+    return Attribute::make(
+      get: fn (string|null $value) => $value ? 'borrado' : 'activo'
+    );
+  }
 
   // * un pack pertenece a un suministro
   // o un pack se forma con unidades de un mismo suministro
