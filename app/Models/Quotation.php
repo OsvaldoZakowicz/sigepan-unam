@@ -36,7 +36,7 @@ class Quotation extends Model
   public function provisions(): BelongsToMany
   {
     return $this->belongsToMany(Provision::class)
-      ->withPivot(['has_stock', 'price'])
+      ->withPivot(['has_stock', 'quantity', 'unit_price', 'total_price'])
       ->withTimestamps();
   }
 }

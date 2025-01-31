@@ -23,7 +23,9 @@ return new class extends Migration
       $table->foreign('provision_id')->references('id')->on('provisions')->restrictOnDelete();
 
       $table->boolean('has_stock')->default(false);
-      $table->decimal('price')->nullable();
+      $table->smallInteger('quantity', false, true);
+      $table->decimal('unit_price')->nullable();
+      $table->decimal('total_price')->nullable();
 
       $table->timestamps();
     });
