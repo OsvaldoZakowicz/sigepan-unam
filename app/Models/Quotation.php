@@ -39,4 +39,12 @@ class Quotation extends Model
       ->withPivot(['has_stock', 'quantity', 'unit_price', 'total_price'])
       ->withTimestamps();
   }
+
+  //* un presupuesto tiene muchos packs
+  public function packs(): BelongsToMany
+  {
+    return $this->belongsToMany(Pack::class)
+      ->withPivot(['has_stock', 'quantity', 'unit_price', 'total_price'])
+      ->withTimestamps();
+  }
 }
