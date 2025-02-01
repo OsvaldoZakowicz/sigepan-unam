@@ -90,11 +90,11 @@
               <span class="text-sm text-neutral-600">se presupuestarán suministros y packs de proveedores <span class="font-semibold text-emerald-600">activos.</span></span>
             </x-slot:subtitle>
 
-            {{-- @if ()
+            @error('provisions_and_packs*')
               <x-slot:messages class="my-2">
                 <span class="text-red-400">¡hay errores en esta seccion!</span>
               </x-slot:messages>
-            @endif --}}
+            @enderror
 
             {{-- cuadro de busqueda --}}
             @livewire('suppliers.search-provision-period', ['is_editing' => false])
@@ -102,9 +102,9 @@
             {{-- leyenda --}}
             <div class="py-1">
               <span class="text-sm text-neutral-600">Lista de suministros y packs a presupuestar.</span>
-              {{-- @if ($period_provisions_error)
-                <span class="text-red-400 text-xs capitalize">{{ $period_provisions_error_msj }}</span>
-              @endif --}}
+              @error('provisions_and_packs')
+                <span class="text-red-400 text-xs">{{ $message }}</span>
+              @enderror
             </div>
 
             {{-- lista de seleccion, con scroll --}}
@@ -128,84 +128,105 @@
                   </tr>
                 </x-slot:tablehead>
                 <x-slot:tablebody>
-                  @if (!$period_provisions->isEmpty() || !$period_packs->isEmpty())
-                    {{-- suministros --}}
-                    @foreach ($period_provisions as $period_provision_key => $provision)
-                      <tr wire:key="{{$provision->id}}" class="border">
-                        <x-table-td class="text-end">
-                          {{ $provision->id }}
-                        </x-table-td>
-                        <x-table-td
-                          title="{{ $provision->provision_short_description }}"
-                          class="cursor-pointer text-start">
-                          <span class="font-semibold">suministro:&nbsp;</span>
-                          {{ $provision->provision_name }}
+                  @forelse ($provisions_and_packs as $key => $item )
+                    <tr wire:key="{{ $key }}" class="border">
+
+                      @if ($item['item_type'] === 'suministro')
+                        {{-- suministro --}}
+                        <x-table-td class="text-end w-12">
+                          {{ $item['item_object']->id }}
                         </x-table-td>
                         <x-table-td class="text-start">
-                          {{ $provision->trademark->provision_trademark_name }}
+                          <span class="font-semibold">{{ $item['item_type'] }}&nbsp;</span>
+                          {{ $item['item_object']->provision_name }}
                         </x-table-td>
                         <x-table-td class="text-start">
-                          {{ $provision->type->provision_type_name }}
+                          {{ $item['item_object']->trademark->provision_trademark_name }}
+                        </x-table-td>
+                        <x-table-td class="text-start">
+                          {{ $item['item_object']->type->provision_type_name }}
                         </x-table-td>
                         <x-table-td class="text-end">
-                          {{ $provision->provision_quantity }}&nbsp;({{ $provision->measure->measure_abrv }})
+                          {{ $item['item_object']->provision_quantity }}
+                          {{ $item['item_object']->measure->measure_abrv }}
                         </x-table-td>
-                        {{-- cantidad a presupuestar?? --}}
                         <x-table-td class="text-end w-56">
-                          <input type="number" name="" id="" value="1" step="1" min="1" max="99" class="w-full p-1 text-sm text-right border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
+                          {{-- cantidad --}}
+                          @error('provisions_and_packs.'.$key.'.item_quantity')
+                            <span class="text-red-400 text-xs">{{ $message }}</span>
+                          @enderror
+                          <input
+                            type="text"
+                            id="provisions_and_packs_{{ $key }}_item_quantity"
+                            wire:model.defer="provisions_and_packs.{{ $key }}.item_quantity"
+                            placeholder="cantidad"
+                            class="w-full p-1 text-sm text-right border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                            />
                         </x-table-td>
                         <x-table-td class="text-start">
+                          {{-- quitar --}}
                           <div class="w-full inline-flex gap-1 justify-start items-center">
                             <span
-                              wire:click="removeProvision({{ $period_provision_key }})"
+                              wire:click="removeItemFromList({{ $key }})"
                               title="quitar de la lista"
-                              class="font-bold leading-none text-center p-1 cursor-pointer bg-red-300 border border-red-300 rounded-sm"
+                              class="font-bold leading-none text-center p-1 cursor-pointer bg-red-100 border border-red-200 rounded-sm"
                               >&times;
                             </span>
                           </div>
                         </x-table-td>
-                      </tr>
-                    @endforeach
-                    {{-- packs --}}
-                    @foreach ($period_packs as $period_pack_key => $pack )
-                      <tr wire:key="{{$pack->id}}" class="border">
-                        <x-table-td class="text-end">
-                          {{ $pack->id }}
-                        </x-table-td>
-                        <x-table-td class="cursor-pointer text-start">
-                          <span class="font-semibold">pack:&nbsp;</span>
-                          {{ $pack->pack_name }}
+                      @else
+                        {{-- pack --}}
+                        <x-table-td class="text-end w-12">
+                          {{ $item['item_object']->id }}
                         </x-table-td>
                         <x-table-td class="text-start">
-                          {{ $pack->provision->trademark->provision_trademark_name }}
+                          <span class="font-semibold">{{ $item['item_type'] }}&nbsp;</span>
+                          {{ $item['item_object']->pack_name }}
                         </x-table-td>
                         <x-table-td class="text-start">
-                          {{ $pack->provision->type->provision_type_name }}
+                          {{ $item['item_object']->provision->trademark->provision_trademark_name }}
+                        </x-table-td>
+                        <x-table-td class="text-start">
+                          {{ $item['item_object']->provision->type->provision_type_name }}
                         </x-table-td>
                         <x-table-td class="text-end">
-                          {{ $pack->pack_quantity }}&nbsp;({{ $pack->provision->measure->measure_abrv }})
+                          {{ $item['item_object']->pack_quantity }}
+                          {{ $item['item_object']->provision->measure->measure_abrv }}
                         </x-table-td>
-                        {{-- cantidad a presupuestar?? --}}
                         <x-table-td class="text-end w-56">
-                          <input type="number" name="" id="" min="1" max="99" class="w-full p-1 text-sm text-right border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
+                          {{-- cantidad --}}
+                          @error('provisions_and_packs.'.$key.'.item_quantity')
+                            <span class="text-red-400 text-xs">{{ $message }}</span>
+                          @enderror
+                          <input
+                            type="text"
+                            id="provisions_and_packs_{{ $key }}_item_quantity"
+                            wire:model.defer="provisions_and_packs.{{ $key }}.item_quantity"
+                            placeholder="cantidad"
+                            class="w-full p-1 text-sm text-right border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                            />
                         </x-table-td>
                         <x-table-td class="text-start">
+                          {{-- quitar --}}
                           <div class="w-full inline-flex gap-1 justify-start items-center">
                             <span
-                              wire:click="removePack({{ $period_pack_key }})"
+                              wire:click="removeItemFromList({{ $key }})"
                               title="quitar de la lista"
-                              class="font-bold leading-none text-center p-1 cursor-pointer bg-red-300 border border-red-300 rounded-sm"
+                              class="font-bold leading-none text-center p-1 cursor-pointer bg-red-100 border border-red-200 rounded-sm"
                               >&times;
                             </span>
                           </div>
                         </x-table-td>
-                      </tr>
-                    @endforeach
-                  @else
-                    <tr class="border">
-                      <td colspan="6">¡sin registros!</td>
+                      @endif
+
                     </tr>
-                  @endif
+                  @empty
+                    <tr class="border">
+                      <td colspan="7">
+                        <span>¡sin registros!</span>
+                      </td>
+                    </tr>
+                  @endforelse
                 </x-slot:tablebody>
               </x-table-base>
             </div>
@@ -217,7 +238,7 @@
                 bg_color="neutral-100"
                 border_color="neutral-200"
                 text_color="neutral-600"
-                wire:click="refreshLists()"
+                wire:click="removeAllItemsFromList()"
                 >vaciar lista
               </x-a-button>
             </div>

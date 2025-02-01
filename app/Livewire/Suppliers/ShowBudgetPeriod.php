@@ -84,9 +84,13 @@ class ShowBudgetPeriod extends Component
   */
   public function render(): View
   {
+    // suministros y packs de interes para el periodo
     $period_provisions = $this->period->provisions()->paginate(5);
+    $period_packs = $this->period->packs()->paginate(5);
+
+    // presupuestos del periodo
     $period_quotations = $this->period->quotations()->paginate(5);
 
-    return view('livewire.suppliers.show-budget-period', compact('period_provisions', 'period_quotations'));
+    return view('livewire.suppliers.show-budget-period', compact('period_provisions', 'period_packs', 'period_quotations'));
   }
 }

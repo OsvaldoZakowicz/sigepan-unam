@@ -67,6 +67,7 @@ class Provision extends Model
   public function periods(): BelongsToMany
   {
     return $this->belongsToMany(RequestForQuotationPeriod::class, 'period_provision', 'provision_id', 'period_id')
+      ->withPivot('quantity')
       ->withTimestamps();
   }
 

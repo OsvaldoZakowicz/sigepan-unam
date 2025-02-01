@@ -82,7 +82,7 @@ class SearchProvisionPeriod extends Component
 
   /**
   * enviar la provision elegida mediante un evento
-  * @param Provision $provision suministro
+  * @param Provision $provision
   * @return void
   */
   public function addProvision(Provision $provision): void
@@ -91,7 +91,7 @@ class SearchProvisionPeriod extends Component
   }
 
    /**
-   * enviar un pack de la lista de busqueda a la lista de precios
+   * enviar el pack elegido mediante un evento
    * @param Pack $pack
    * @return void
   */

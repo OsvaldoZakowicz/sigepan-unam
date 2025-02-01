@@ -20,10 +20,11 @@ class CreateBudgetPeriod extends Component
   public $period_end_at;
   public $period_short_description;
 
-  // array de suministros para el periodo
-  public Collection $period_provisions;
-  // array de packs para el periodo
-  public Collection $period_packs;
+  // array de packs y suministros para el periodo
+  public Collection $provisions_and_packs;
+
+  // error en coleccion
+  public $error_coleccion;
 
   // configuracion de input de tipo date
   public string $min_date;
@@ -46,23 +47,21 @@ class CreateBudgetPeriod extends Component
    */
   public function mount(): void
   {
-    // array de suministros para el periodo
-    $this->period_provisions = collect();
-    // array de packs para el periodo
-    $this->period_packs = collect();
+    // ['provisions_and_packs' => [...]]
+    $this->fill(['provisions_and_packs' => collect([])]);
+    $this->error_coleccion = false;
   }
 
 
   /**
    * agregar suministros a la lista del periodo
-   * responde al evento 'add-provision'
+   * responde al evento 'add-provision' de SearchProvisionPeriod::class
    * @param Provision $provision suministro
    */
   #[On('add-provision')]
-  public function onAppendEvent(Provision $provision)
+  public function onAddProvisionEvent(Provision $provision)
   {
-    // si no esta en la lista, agregar
-    if ($this->period_provisions->contains('id', $provision->id)) {
+    if ($this->provisions_and_packs->contains('item_id', 'suministro_' . $provision->id)) {
 
       $this->dispatch('toast-event', toast_data: [
         'event_type' => 'info',
@@ -73,29 +72,24 @@ class CreateBudgetPeriod extends Component
       return;
     }
 
-    $this->period_provisions->prepend($provision);
-  }
+    $this->provisions_and_packs->push([
+      'item_type'     => 'suministro',
+      'item_id'       => 'suministro_' . $provision->id,
+      'item_object'   => $provision,
+      'item_quantity' => "1",
+    ]);
 
-  /**
-   * quitar suministros con el $index dado de la lista
-   * @param int $index del suministro a quitar
-   * @return void
-   */
-  public function removeProvision(int $index): void
-  {
-    $this->period_provisions->forget($index);
   }
 
   /**
    * agregar packs a la lista del periodo
-   * responde al evento 'add-pack'
-   * @param Pack $pack pack
+   * responde al evento 'add-pack' de SearchProvisionPeriod::class
+   * @param Pack $pack
    */
   #[On('add-pack')]
-  public function addPack(Pack $pack): void
+  public function onAddPackEvent(Pack $pack)
   {
-    // si no esta en la lista, agregar
-    if ($this->period_packs->contains('id', $pack->id)) {
+    if ($this->provisions_and_packs->contains('item_id', 'pack_' . $pack->id)) {
 
       $this->dispatch('toast-event', toast_data: [
         'event_type' => 'info',
@@ -106,68 +100,31 @@ class CreateBudgetPeriod extends Component
       return;
     }
 
-    $this->period_packs->prepend($pack);
+    $this->provisions_and_packs->push([
+      'item_type'     => 'pack',
+      'item_id'       => 'pack_' . $pack->id,
+      'item_object'   => $pack,
+      'item_quantity' => "1",
+    ]);
   }
 
   /**
-   * quitar packs con el $index dado de la lista
-   * @param int $index del pack a quitar
-   * @return void
-   */
-  public function removePack(int $index): void
-  {
-    $this->period_packs->forget($index);
-  }
-
-  /**
-   * vaciar las listas de packs y suministros
+   * quitar suministro o pack de la lista
+   * @param int $index
    * @return void
   */
-  public function refreshLists(): void
+  public function removeItemFromList(int $index): void
   {
-    $this->period_provisions = collect();
-    $this->period_packs = collect();
+    $this->provisions_and_packs->forget($index);
   }
 
   /**
-   * reglas de validacion
-   * @return array reglas de validacion
-   */
-  protected function getValidationRules(): array
+   * vaciar lista completa
+   * @return void
+  */
+  public function removeAllItemsFromList(): void
   {
-    return [
-      'period_start_at'           =>  ['required', 'date', 'after_or_equal:' . $this->min_date],
-      'period_end_at'             =>  ['required', 'date', 'after:period_start_at'],
-      'period_short_description'  =>  ['nullable', 'regex:/^[A-Za-z\s]+$/', 'max:150'],
-    ];
-  }
-
-  /**
-   * mensajes de validacion
-   * @return array mensajes de validacion
-   */
-  protected function getValidationMessages(): array
-  {
-    return [
-      'period_start_at.required'        =>  'La :attribute es obligatoria',
-      'period_start_at.after_or_equal'  =>  'La :attribute debe ser a partir de hoy como mínimo',
-      'period_end_at.required'          =>  'La :attribute es obligatoria',
-      'period_end_at.after'             =>  'La :attribute debe estar después de la fecha de inicio',
-      'period_short_description.regex'  =>  'La :attribute solo permite letras y espacios'
-    ];
-  }
-
-  /**
-   * atributos de validacion
-   * @return array atributos de validacion
-   */
-  protected function getValidationAttributes(): array
-  {
-    return [
-      'period_start_at'           =>  'fecha de inicio',
-      'period_end_at'             =>  'fecha de cierre',
-      'period_short_description'  =>  'descripción corta',
-    ];
+    $this->provisions_and_packs = collect([]);
   }
 
   /**
@@ -175,44 +132,77 @@ class CreateBudgetPeriod extends Component
    * @param QuotationPeriodService $quotation_period_service
    * @return void
    */
-  public function save(QuotationPeriodService $quotation_period_service): void
+  public function save(QuotationPeriodService $qps): void
   {
-    // todo validar lista de suministros a presupuestar (debe estar antes de validate())
-
     // validar parametros del formulario
     $validated = $this->validate(
-      $this->getValidationRules(),
-      $this->getValidationMessages(),
-      $this->getValidationAttributes()
+      [
+        'period_start_at'           =>  ['required', 'date', 'after_or_equal:' . $this->min_date],
+        'period_end_at'             =>  ['required', 'date', 'after:period_start_at'],
+        'period_short_description'  =>  ['nullable', 'regex:/^[A-Za-z\s]+$/', 'max:150'],
+        'provisions_and_packs'      =>  ['required'],
+        'provisions_and_packs.*.item_type'     => ['nullable'], // necesario en el request
+        'provisions_and_packs.*.item_id'       => ['nullable'], // necesario en el request
+        'provisions_and_packs.*.item_quantity' => ['required', 'numeric', 'min:1', 'max:99'],
+      ],[
+        'period_start_at.required'        =>  'La :attribute es obligatoria',
+        'period_start_at.after_or_equal'  =>  'La :attribute debe ser a partir de hoy como mínimo',
+        'period_end_at.required'          =>  'La :attribute es obligatoria',
+        'period_end_at.after'             =>  'La :attribute debe estar después de la fecha de inicio',
+        'period_short_description.regex'  =>  'La :attribute solo permite letras y espacios',
+        'provisions_and_packs.required'                 => 'La lista debe tener al menos un suministro o pack',
+        'provisions_and_packs.*.item_quantity.required' => 'La :attribute es obligatoria',
+        'provisions_and_packs.*.item_quantity.min'      => 'La :attribute debe ser minimo 1',
+        'provisions_and_packs.*.item_quantity.max'      => 'La :attribute debe ser maximo 99',
+      ], [
+        'period_start_at'           =>  'fecha de inicio',
+        'period_end_at'             =>  'fecha de cierre',
+        'period_short_description'  =>  'descripción corta',
+        'provisions_and_packs.*.item_quantity' => 'cantidad'
+      ]
     );
 
     try {
 
-      // construyo el codigo del periodo de solicitud de presupuestos
-      $validated += [
-        'period_code' => $quotation_period_service->getPeriodCodePrefix() . str_replace(':', '', now()->format('H:i:s'))
-      ];
+      $validated = Arr::add(
+        $validated,
+        'period_code',
+        $qps->getPeriodCodePrefix() . str_replace(':', '', now()->format('H:i:s'))
+      );
 
-      // inicialmente el estado del periodo es: planificado
-      $validated += [
-        'period_status_id' => $quotation_period_service->getStatusScheduled(),
-      ];
+      $validated = Arr::add(
+        $validated,
+        'period_status_id',
+        $qps->getStatusScheduled()
+      );
 
       // guardar periodo
       $period = RequestForQuotationPeriod::create($validated);
 
       // asignar suministros que deben presupuestarse en el periodo
-      //$provisions_ids = Arr::map($this->period_provisions, fn($pr) => $pr->id);
-      //$period->provisions()->attach($provisions_ids);
+      $this->provisions_and_packs->each(function ($item) use ($period) {
+
+        if ($item['item_type'] === 'suministro') {
+          $period->provisions()->attach($item['item_object']->id, ['quantity' => $item['item_quantity']]);
+        }
+
+        if ($item['item_type'] === 'pack') {
+          $period->packs()->attach($item['item_object']->id, ['quantity' => $item['item_quantity']]);
+        }
+
+      });
+
 
       $this->reset();
 
       session()->flash('operation-success', toastSuccessBody('periodo de solicitud', 'creado y programado'));
       $this->redirectRoute('suppliers-budgets-periods-index');
+
     } catch (\Exception $e) {
 
       session()->flash('operation-error', 'error: ' . $e->getMessage() . ', contacte al Administrador');
       $this->redirectRoute('suppliers-budgets-periods-index');
+
     }
   }
 

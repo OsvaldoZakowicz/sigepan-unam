@@ -108,10 +108,9 @@
 
       <x-slot:content class="flex-col">
 
-        {{-- todo: mostrar aviso de que se puede calcular el ranking de presupuestos --}}
         @if ($period_status === $closed and $count_quotations !== 0)
           <div class="w-full flex justify-between items-center p-2 bg-emerald-100 border border-emerald-500 rounded-md">
-            <span>Se ha calculado una comparativa de precios por suministros para cada proveedor <strong>usando los presupuestos respondidos</strong> .</span>
+            <span>Se ha calculado una comparativa de precios por suministros para cada proveedor <strong>usando los presupuestos respondidos</strong></span>
             <x-a-button
               href="{{ route('suppliers-budgets-ranking', $period->id) }}"
               wire:navigate
@@ -136,13 +135,16 @@
             <x-slot:tablehead>
               <tr class="border bg-neutral-100">
                 <x-table-th class="text-end w-12">id</x-table-th>
-                <x-table-th class="text-start">nombre</x-table-th>
+                <x-table-th class="text-start w-56">nombre</x-table-th>
                 <x-table-th class="text-start">marca</x-table-th>
                 <x-table-th class="text-end">
                   <span>volumen</span>
                   <x-quest-icon title="kilogramos (kg), litros (lts) o unidades (un)"/>
                 </x-table-th>
-                <x-table-th class="text-start">cantidad</x-table-th>
+                <x-table-th class="text-end">
+                  <span>cantidad a presupuestar</span>
+                  <x-quest-icon title="cantidad de unidades de cada pack o de cada suministro que desea presupuestar"/>
+                </x-table-th>
               </tr>
             </x-slot:tablehead>
             <x-slot:tablebody>
@@ -160,9 +162,8 @@
                   <x-table-td class="text-end">
                     {{ $provision->provision_quantity }}&nbsp;{{ $provision->measure->measure_abrv }}
                   </x-table-td>
-                  <x-table-td class="text-start">
-                    {{-- todo: agregar si es unidad o pack --}}
-                    <span class="font-semibold">unidad/pack</span>
+                  <x-table-td class="text-end">
+                    {{ $provision->pivot->quantity }}
                   </x-table-td>
                 </tr>
               @empty
@@ -177,6 +178,64 @@
             {{ $period_provisions->links() }}
           </div>
         </x-div-toggle>
+
+        {{-- packs --}}
+        <x-div-toggle x-data="{ open: false }" title="packs de interés para este período:" class="p-2">
+
+          {{-- leyenda --}}
+          <x-slot:subtitle>
+            <span>lista de packs de los que se espera recibir presupuestos</span>
+          </x-slot:subtitle>
+
+          {{-- tabla de packs --}}
+          <x-table-base>
+            <x-slot:tablehead>
+              <tr class="border bg-neutral-100">
+                <x-table-th class="text-end w-12">id</x-table-th>
+                <x-table-th class="text-start w-56">nombre</x-table-th>
+                <x-table-th class="text-start">marca</x-table-th>
+                <x-table-th class="text-end">
+                  <span>volumen</span>
+                  <x-quest-icon title="kilogramos (kg), litros (lts) o unidades (un)"/>
+                </x-table-th>
+                <x-table-th class="text-end">
+                  <span>cantidad a presupuestar</span>
+                  <x-quest-icon title="cantidad de unidades de cada pack o de cada suministro que desea presupuestar"/>
+                </x-table-th>
+              </tr>
+            </x-slot:tablehead>
+            <x-slot:tablebody>
+              @forelse ($period_packs as $pack)
+                <tr wire:key="{{ $pack->id }}" class="border">
+                  <x-table-td class="text-end">
+                    {{ $pack->id }}
+                  </x-table-td>
+                  <x-table-td class="text-start">
+                    {{ $pack->pack_name }}
+                  </x-table-td>
+                  <x-table-td class="text-start">
+                    {{ $pack->provision->trademark->provision_trademark_name }}
+                  </x-table-td>
+                  <x-table-td class="text-end">
+                    {{ $pack->pack_quantity }}&nbsp;{{ $pack->provision->measure->measure_abrv }}
+                  </x-table-td>
+                  <x-table-td class="text-end">
+                    {{ $pack->pivot->quantity }}
+                  </x-table-td>
+                </tr>
+              @empty
+                <tr class="border">
+                  <td colspan="5">¡sin registros!</td>
+                </tr>
+              @endforelse
+            </x-slot:tablebody>
+          </x-table-base>
+          {{-- paginacion --}}
+          <div class="w-full flex justify-end items-center gap-1 mt-1">
+            {{ $period_packs->links() }}
+          </div>
+        </x-div-toggle>
+
 
         {{-- presupuestos --}}
         <x-div-toggle x-data="{ open: true }" title="presupuestos solicitados en este período:" class="p-2">

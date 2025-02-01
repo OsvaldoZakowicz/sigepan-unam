@@ -11,18 +11,18 @@ return new class extends Migration
    */
   public function up(): void
   {
-    Schema::create('period_provision', function (Blueprint $table) {
+    Schema::create('pack_period', function (Blueprint $table) {
       $table->id();
 
       // fk periodo de peticion de suministros
-      // no puedo borrar un periodo asociado a suministros
+      // no puedo borrar un periodo asociado a packs
       $table->unsignedBigInteger('period_id');
       $table->foreign('period_id')->references('id')->on('request_for_quotation_periods')->restrictOnDelete();
 
-      //fk suministros
-      // no puedo borrar un suministro asociado a un periodo
-      $table->unsignedBigInteger('provision_id');
-      $table->foreign('provision_id')->references('id')->on('provisions')->restrictOnDelete();
+      //fk packs
+      // no puedo borrar un pack asociado a un periodo
+      $table->unsignedBigInteger('pack_id');
+      $table->foreign('pack_id')->references('id')->on('packs')->restrictOnDelete();
 
       // cantidad a presupuestar
       $table->smallInteger('quantity', false, true);
@@ -36,6 +36,6 @@ return new class extends Migration
    */
   public function down(): void
   {
-    Schema::dropIfExists('period_provision');
+    Schema::dropIfExists('pack_period');
   }
 };

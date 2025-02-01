@@ -46,4 +46,13 @@ class Pack extends Model
     return $this->belongsToMany(Supplier::class)
       ->withPivot('price')->withTimestamps();
   }
+
+  //* un pack participa en muchas solicitudes de presupuesto
+  // packs n : n request_for_quotation_periods
+  public function periods(): BelongsToMany
+  {
+    return $this->belongsToMany(RequestForQuotationPeriod::class, 'pack_period', 'pack_id', 'period_id')
+      ->withPivot('quantity')
+      ->withTimestamps();
+  }
 }

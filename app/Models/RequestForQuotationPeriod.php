@@ -40,10 +40,20 @@ class RequestForQuotationPeriod extends Model
   }
 
   //* un periodo de peticion de presupuestos se realiza para muchos suministros
-  // mi kf es: period_id
+  // fk es: period_id
   public function provisions(): BelongsToMany
   {
     return $this->belongsToMany(Provision::class, 'period_provision', 'period_id', 'provision_id')
+      ->withPivot('quantity')
+      ->withTimestamps();
+  }
+
+  //* un periodo de peticion de presupuestos se realiza para muchos packs
+  // fk es: period_id
+  public function packs(): BelongsToMany
+  {
+    return $this->belongsToMany(Pack::class, 'pack_period', 'period_id', 'pack_id')
+      ->withPivot('quantity')
       ->withTimestamps();
   }
 
