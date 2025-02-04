@@ -39,8 +39,19 @@ class ShowBudgetResponse extends Component
   public function render(): View
   {
     $provisions = $this->quotation->provisions()->paginate(8);
-    $total_price = $this->quotation->provisions()->where('has_stock',true)->sum('price');
+    $packs = $this->quotation->packs()->paginate(8);
 
-    return view('livewire.suppliers.show-budget-response', compact('provisions', 'total_price'));
+    $provisions_total_price = $this->quotation->provisions()->where('has_stock',true)->sum('total_price');
+    $packs_total_price = $this->quotation->packs()->where('has_stock',true)->sum('total_price');
+
+    $total = $provisions_total_price + $packs_total_price;
+
+    return view('livewire.suppliers.show-budget-response', compact(
+      'provisions',
+      'packs',
+      'provisions_total_price',
+      'packs_total_price',
+      'total'
+    ));
   }
 }

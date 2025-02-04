@@ -219,7 +219,7 @@
 
                 {{-- tabla de datos: mobile first, display hasta 1023px de ancho --}}
                 {{-- listado de productos --}}
-                <x-table-base class="lg:hidden">
+                {{-- <x-table-base class="lg:hidden">
                   <x-slot:tablehead>
                     <tr class="border bg-neutral-100 p-2">
                       <x-table-th colspan="2" class="text-start text-xl md:text-base">lista de productos:</x-table-th>
@@ -229,7 +229,7 @@
 
                     @foreach ($inputs as $key => $input)
 
-                      {{-- cabecera de producto, titulo y errores --}}
+
                       <tr class="borde text-xl md:text-base lg:text-sm bg-neutral-100">
                         <x-table-td>renglon:&nbsp;#{{ $key+1 }}</x-table-td>
                         <x-table-td class="text-end">
@@ -242,7 +242,7 @@
                         </x-table-td>
                       </tr>
 
-                      {{-- datos del producto --}}
+
                       <tr class="border text-xl md:text-base lg:text-sm">
                         <x-table-td>nombre:</x-table-td>
                         <x-table-td class="text-end">
@@ -260,7 +260,7 @@
                           {{ $input['provision_quantity'] }},&nbsp;{{ $input['provision_quantity_abrv'] }}
                         </x-table-td>
                       </tr>
-                      {{-- todo: indicar unidad o pack --}}
+
                       <tr class="border text-xl md:text-base lg:text-sm">
                         <x-table-td>cantidad:</x-table-td>
                         <x-table-td class="text-end">unidad/pack</x-table-td>
@@ -302,7 +302,7 @@
                     @endforeach
 
                   </x-slot:tablebody>
-                </x-table-base>
+                </x-table-base> --}}
 
               </div>
 
@@ -316,9 +316,10 @@
                     <x-table-th class="text-start">nombre</x-table-th>
                     <x-table-th class="text-start">marca</x-table-th>
                     <x-table-th class="text-end">volumen</x-table-th>
-                    <x-table-th class="text-start">cantidad</x-table-th>
-                    <x-table-th class="text-end w-1/6">tiene stock?</x-table-th>
-                    <x-table-th class="text-end w-1/4">$&nbsp;precio<span class="text-red-400">*</span></x-table-th>
+                    <x-table-th class="text-start">cantidad a presupuestar</x-table-th>
+                    <x-table-th class="text-end">tiene stock?</x-table-th>
+                    <x-table-th class="text-end">$&nbsp;precio unitario<span class="text-red-400">*</span></x-table-th>
+                    <x-table-th class="text-end">$&nbsp;precio total<span class="text-red-400">*</span></x-table-th>
                   </tr>
                 </x-slot:tablehead>
                 <x-slot:tablebody>
@@ -327,50 +328,142 @@
                     <x-table-td class="text-end">
                       #{{ $key+1 }}
                     </x-table-td>
-                    <x-table-td class="text-start">
-                      {{ $input['provision_name'] }}
-                    </x-table-td>
-                    <x-table-td class="text-start">
-                      {{ $input['provision_trademark'] }}
-                    </x-table-td>
-                    <x-table-td class="text-end">
-                      {{ $input['provision_quantity'] }}&nbsp;({{ $input['provision_quantity_abrv'] }}),&nbsp;
-                    </x-table-td>
-                    <x-table-td class="text-start">
-                      <span class="font-semibold">unidad/pack</span>
-                    </x-table-td>
-                    <x-table-td class="text-end">
-                      <div class="flex justify-end items-center gap-1 w-full">
-                        @error('inputs.{{ $key }}.has_stock')
-                          <span class="text-xs text-red-400">{{ $message }}</span>
-                        @enderror
-                        <input
-                            type="checkbox"
-                            id="input_{{ $key }}_has_stock"
-                            @checked(true)
-                            wire:model.defer="inputs.{{ $key }}.has_stock"
-                            class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
-                          />
-                      </div>
-                    </x-table-td>
-                    <x-table-td class="text-end">
-                      <div class="flex flex-col gap-1 w-full">
-                        @error('inputs.' . $key . '.price')
-                          <span class="text-xs text-red-400">{{ $message }}</span>
-                        @enderror
-                        <div class="flex w-full gap-1 items-center justify-start">
-                          <span>$&nbsp;</span>
+                    @if ($input['item_type'] === 'suministro')
+                      {{-- mostrar suministro --}}
+                      <x-table-td class="text-start">
+                        {{ $input['item_object']->provision_name }}
+                      </x-table-td>
+                      <x-table-td class="text-start">
+                        {{ $input['item_object']->trademark->provision_trademark_name }}
+                      </x-table-td>
+                      <x-table-td class="text-end">
+                        {{ $input['item_object']->provision_quantity }}&nbsp;({{ $input['item_object']->measure->measure_abrv }}),&nbsp;
+                      </x-table-td>
+                      <x-table-td class="text-start">
+                        {{ $input['item_quantity'] }}
+                      </x-table-td>
+                      {{-- stock --}}
+                      <x-table-td class="text-end">
+                        <div class="flex justify-end items-center gap-1 w-full">
+                          @error('inputs.{{ $key }}.item_has_stock')
+                            <span class="text-xs text-red-400">{{ $message }}</span>
+                          @enderror
                           <input
-                            type="text"
-                            id="input_{{ $key }}_price"
-                            wire:model.defer="inputs.{{ $key }}.price"
-                            class="grow text-right p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
-                            placeholder="precio unitario"
-                            autocomplete="off"
-                          />
+                              type="checkbox"
+                              id="input_{{ $key }}_item_has_stock"
+                              @checked(true)
+                              wire:model.defer="inputs.{{ $key }}.item_has_stock"
+                              class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                            />
                         </div>
-                      </div>
-                    </x-table-td>
+                      </x-table-td>
+                      {{-- precio unitario --}}
+                      <x-table-td class="text-end">
+                        <div class="flex flex-col gap-1 w-full">
+                          @error('inputs.' . $key . '.item_unit_price')
+                            <span class="text-xs text-red-400">{{ $message }}</span>
+                          @enderror
+                          <div class="flex w-full gap-1 items-center justify-start">
+                            <span>$&nbsp;</span>
+                            <input
+                              type="text"
+                              id="input_{{ $key }}_item_unit_price"
+                              wire:model.defer="inputs.{{ $key }}.item_unit_price"
+                              class="grow text-right p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                              placeholder="precio unitario"
+                              autocomplete="off"
+                            />
+                          </div>
+                        </div>
+                      </x-table-td>
+                      {{-- precio total --}}
+                      <x-table-td class="text-end">
+                        <div class="flex flex-col gap-1 w-full">
+                          @error('inputs.' . $key . '.item_total_price')
+                            <span class="text-xs text-red-400">{{ $message }}</span>
+                          @enderror
+                          <div class="flex w-full gap-1 items-center justify-start">
+                            <span>$&nbsp;</span>
+                            <input
+                              type="text"
+                              id="input_{{ $key }}_item_total_price"
+                              wire:model.defer="inputs.{{ $key }}.item_total_price"
+                              class="grow text-right p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                              placeholder="precio total"
+                              autocomplete="off"
+                            />
+                          </div>
+                        </div>
+                      </x-table-td>
+                    @else
+                      {{-- mostrar pack --}}
+                      <x-table-td class="text-start">
+                        {{ $input['item_object']->pack_name }}
+                      </x-table-td>
+                      <x-table-td class="text-start">
+                        {{ $input['item_object']->provision->trademark->provision_trademark_name }}
+                      </x-table-td>
+                      <x-table-td class="text-end">
+                        {{ $input['item_object']->pack_quantity }}&nbsp;({{ $input['item_object']->provision->measure->measure_abrv }}),&nbsp;
+                      </x-table-td>
+                      <x-table-td class="text-start">
+                        {{ $input['item_quantity'] }}
+                      </x-table-td>
+                      {{-- stock --}}
+                      <x-table-td class="text-end">
+                        <div class="flex justify-end items-center gap-1 w-full">
+                          @error('inputs.{{ $key }}.item_has_stock')
+                            <span class="text-xs text-red-400">{{ $message }}</span>
+                          @enderror
+                          <input
+                              type="checkbox"
+                              id="input_{{ $key }}_item_has_stock"
+                              @checked(true)
+                              wire:model.defer="inputs.{{ $key }}.item_has_stock"
+                              class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                            />
+                        </div>
+                      </x-table-td>
+                      {{-- precio unitario --}}
+                      <x-table-td class="text-end">
+                        <div class="flex flex-col gap-1 w-full">
+                          @error('inputs.' . $key . '.item_unit_price')
+                            <span class="text-xs text-red-400">{{ $message }}</span>
+                          @enderror
+                          <div class="flex w-full gap-1 items-center justify-start">
+                            <span>$&nbsp;</span>
+                            <input
+                              type="text"
+                              id="input_{{ $key }}_item_unit_price"
+                              wire:model.defer="inputs.{{ $key }}.item_unit_price"
+                              class="grow text-right p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                              placeholder="precio unitario"
+                              autocomplete="off"
+                            />
+                          </div>
+                        </div>
+                      </x-table-td>
+                      {{-- precio total --}}
+                      <x-table-td class="text-end">
+                        <div class="flex flex-col gap-1 w-full">
+                          @error('inputs.' . $key . '.item_total_price')
+                            <span class="text-xs text-red-400">{{ $message }}</span>
+                          @enderror
+                          <div class="flex w-full gap-1 items-center justify-start">
+                            <span>$&nbsp;</span>
+                            <input
+                              type="text"
+                              id="input_{{ $key }}_item_total_price"
+                              wire:model.defer="inputs.{{ $key }}.item_total_price"
+                              class="grow text-right p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                              placeholder="precio total"
+                              autocomplete="off"
+                            />
+                          </div>
+                        </div>
+                      </x-table-td>
+                    @endif
+
                   </tr>
                   @empty
                   <tr class="border">
@@ -388,7 +481,7 @@
           <x-slot:footer class="my-2">
 
             {{-- botones de guardado: mobile first, display hasta 1023px --}}
-            <div class="flex lg:hidden w-full justify-between mt-4">
+            {{-- <div class="flex lg:hidden w-full justify-between mt-4">
 
               <a
                 wire:navigate
@@ -404,7 +497,7 @@
                 >presupuestar
               </button>
 
-            </div>
+            </div> --}}
 
             {{-- botones de guardado: desktop, display desde 1024px --}}
             <div class="hidden lg:flex w-full justify-end gap-2 mt-2">

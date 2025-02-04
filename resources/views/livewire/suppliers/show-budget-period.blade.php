@@ -110,7 +110,9 @@
 
         @if ($period_status === $closed and $count_quotations !== 0)
           <div class="w-full flex justify-between items-center p-2 bg-emerald-100 border border-emerald-500 rounded-md">
+
             <span>Se ha calculado una comparativa de precios por suministros para cada proveedor <strong>usando los presupuestos respondidos</strong></span>
+
             <x-a-button
               href="{{ route('suppliers-budgets-ranking', $period->id) }}"
               wire:navigate
@@ -119,6 +121,7 @@
               text_color="neutral-100"
               >ver
             </x-a-button>
+
           </div>
         @endif
 

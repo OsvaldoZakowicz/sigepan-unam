@@ -136,67 +136,6 @@ class QuotationPeriodService
   }
 
   /**
-   * obtener comparativa de precios de presupuestos
-   * @param int $period_id id del periodo a consultar
-   * @return array $comparePrices array de comparativa de precios
-  */
-  public function comparePricesBetweenQuotations(int $period_id): array
-  {
-    $period = RequestForQuotationPeriod::with(['quotations.supplier', 'quotations.provisions'])
-      ->where('id', $period_id)
-      ->where('period_status_id', $this->getStatusClosed())
-      ->first();
-
-    $comparePrices = [];
-
-    foreach ($period->quotations as $quotation) {
-
-      foreach ($quotation->provisions as $provision) {
-
-        if (!isset($comparePrices[$provision->id])) {
-
-          /* un suministro */
-          $comparePrices[$provision->id] = [
-              'id_suministro'         => $provision->id,
-              'nombre_suministro'     => $provision->provision_name,
-              'marca'                 => $provision->trademark->provision_trademark_name,
-              'tipo'                  => $provision->type->provision_type_name,
-              'volumen'               => $provision->provision_quantity,
-              'volumen_tag'           => $provision->measure->measure_abrv,
-              'cantidad'              => 'unidad/pack',
-              'precios_por_proveedor' => []
-          ];
-
-        }
-
-        /* por suministro: proveedor, precio, stock, presupuesto */
-        $comparePrices[$provision->id]['precios_por_proveedor'][] = [
-          'id_proveedor'    => $quotation->supplier->id,
-          'id_presupuesto'  => $quotation->id,
-          'proveedor'       => $quotation->supplier->company_name,
-          'cuit'            => $quotation->supplier->company_cuit,
-          'precio'          => $provision->pivot->price,
-          'tiene_stock'     => $provision->pivot->has_stock
-        ];
-
-      }
-    }
-
-    // Calcular estadísticas por suministro
-    foreach ($comparePrices as &$comparePrice) {
-      $prices = array_column($comparePrice['precios_por_proveedor'], 'precio');
-      $comparePrice['estadisticas'] = [
-        'precio_minimo' => min($prices),
-        'precio_maximo' => max($prices),
-        'precio_promedio' => array_sum($prices) / count($prices),
-        'cantidad_proveedores' => count($prices)
-      ];
-    }
-
-    return $comparePrices;
-  }
-
-  /**
    * contar cuantos presupuestos fueron respondidos
    * en un periodo presupuestario.
    * @param int $period_id id del periodo sobre el que consultar
@@ -208,4 +147,193 @@ class QuotationPeriodService
       ->where('is_completed', true)
       ->count();
   }
+
+  /**
+   * obtener comparativa de precios de presupuestos
+   * @param int $period_id id del periodo a consultar
+   * @return array array de comparativa de precios
+  */
+  public function comparePricesBetweenQuotations(int $period_id): array
+  {
+    $period = RequestForQuotationPeriod::with(['quotations.supplier', 'quotations.provisions'])
+      ->where('id', $period_id)
+      ->where('period_status_id', $this->getStatusClosed())
+      ->first();
+
+    $compare_provision_prices = [];
+    $compare_pack_prices = [];
+
+    // por cada presupuesto, preparar suministros y packs con proveedores y precios
+    foreach ($period->quotations as $quotation) {
+
+      // suministros
+      foreach ($quotation->provisions as $provision) {
+
+        /* asegurar suministros no duplicados */
+        if (!isset($compare_provision_prices[$provision->id])) {
+
+          /* suministro */
+          $compare_provision_prices[$provision->id] = [
+              'id_suministro'         => $provision->id,
+              'nombre_suministro'     => $provision->provision_name,
+              'marca'                 => $provision->trademark->provision_trademark_name,
+              'tipo'                  => $provision->type->provision_type_name,
+              'volumen'               => $provision->provision_quantity,
+              'volumen_tag'           => $provision->measure->measure_abrv,
+              'cantidad'              => $provision->pivot->quantity,
+              'precios_por_proveedor' => []
+          ];
+
+        }
+
+        /* por suministro: proveedor, precio, stock, presupuesto */
+        $compare_provision_prices[$provision->id]['precios_por_proveedor'][] = [
+          'id_proveedor'    => $quotation->supplier->id,
+          'id_presupuesto'  => $quotation->id,
+          'proveedor'       => $quotation->supplier->company_name,
+          'cuit'            => $quotation->supplier->company_cuit,
+          'tiene_stock'     => $provision->pivot->has_stock,
+          'cantidad'        => $provision->pivot->quantity,
+          'precio_unitario' => $provision->pivot->unit_price,
+          'precio_total'    => $provision->pivot->total_price,
+        ];
+
+      }
+
+      // packs
+      foreach ($quotation->packs as $pack) {
+
+        /* asegurar packs no duplicados */
+        if (!isset($compare_pack_prices[$pack->id])) {
+
+          /* pack */
+          $compare_pack_prices[$pack->id] = [
+              'id_pack'               => $pack->id,
+              'nombre_pack'           => $pack->pack_name,
+              'marca'                 => $pack->provision->trademark->provision_trademark_name,
+              'tipo'                  => $pack->provision->type->provision_type_name,
+              'volumen'               => $pack->pack_quantity,
+              'volumen_tag'           => $pack->provision->measure->measure_abrv,
+              'cantidad'              => $pack->pivot->quantity,
+              'precios_por_proveedor' => []
+          ];
+
+        }
+
+        /* por pack: proveedor, precio, stock, presupuesto */
+        $compare_pack_prices[$pack->id]['precios_por_proveedor'][] = [
+          'id_proveedor'    => $quotation->supplier->id,
+          'id_presupuesto'  => $quotation->id,
+          'proveedor'       => $quotation->supplier->company_name,
+          'cuit'            => $quotation->supplier->company_cuit,
+          'tiene_stock'     => $pack->pivot->has_stock,
+          'cantidad'        => $pack->pivot->quantity,
+          'precio_unitario' => $pack->pivot->unit_price,
+          'precio_total'    => $pack->pivot->total_price,
+        ];
+
+      }
+    }
+
+    // calcular estadísticas por suministro
+    foreach ($compare_provision_prices as &$provision_price) {
+
+      // filtrar solo precios del cada suministro del que se tenga precio unitario, precio total y stock
+      $valid_prices = array_filter($provision_price['precios_por_proveedor'], function($item) {
+        return $item['tiene_stock'] === 1 && $item['precio_unitario'] > 0 && $item['precio_total'] > 0;
+      });
+
+      // capturo la columna de precios unitarios
+      $unit_prices = array_column($valid_prices, 'precio_unitario');
+
+      // estadisticas de precio unitario
+      if (count($unit_prices) > 0) {
+        $provision_price['estadisticas_precio_unitario'] = [
+          'precio_minimo'        => min($unit_prices),
+          'precio_maximo'        => max($unit_prices),
+          'precio_promedio'      => array_sum($unit_prices) / count($unit_prices),
+          'cantidad_proveedores' => count($unit_prices)
+        ];
+      } else {
+        $provision_price['estadisticas_precio_unitario'] = [
+          'precio_minimo'        => 0,
+          'precio_maximo'        => 0,
+          'precio_promedio'      => 0,
+          'cantidad_proveedores' => 0
+        ];
+      }
+
+      // capturo la columna de precios totales
+      $total_prices = array_column($valid_prices, 'precio_total');
+
+      // estadisticas de precio total
+      if (count($total_prices) > 0) {
+        $provision_price['estadisticas_precio_total'] = [
+          'precio_minimo'        => min($total_prices),
+          'precio_maximo'        => max($total_prices),
+          'precio_promedio'      => array_sum($total_prices) / count($total_prices),
+          'cantidad_proveedores' => count($total_prices)
+        ];
+      } else {
+        $provision_price['estadisticas_precio_total'] = [
+          'precio_minimo'        => 0,
+          'precio_maximo'        => 0,
+          'precio_promedio'      => 0,
+          'cantidad_proveedores' => 0
+        ];
+      }
+    }
+
+    // Calcular estadísticas por pack
+    foreach ($compare_pack_prices as &$pack_price) {
+
+      // filtrar solo precios del cada pack del que se tenga precio unitario, precio total y stock
+      $valid_prices = array_filter($pack_price['precios_por_proveedor'], function($item) {
+        return $item['tiene_stock'] === 1 && $item['precio_unitario'] > 0 && $item['precio_total'];
+      });
+
+      // capturo la columna de precios unitarios
+      $unit_prices = array_column($valid_prices, 'precio_unitario');
+
+      // estadisticas de precios unitarios
+      if (count($unit_prices) > 0) {
+        $pack_price['estadisticas_precio_unitario'] = [
+          'precio_minimo'        => min($unit_prices),
+          'precio_maximo'        => max($unit_prices),
+          'precio_promedio'      => array_sum($unit_prices) / count($unit_prices),
+          'cantidad_proveedores' => count($unit_prices)
+        ];
+      } else {
+        $pack_price['estadisticas_precio_unitario'] = [
+          'precio_minimo'        => 0,
+          'precio_maximo'        => 0,
+          'precio_promedio'      => 0,
+          'cantidad_proveedores' => 0
+        ];
+      }
+
+      // capturo la columna de precios totales
+      $total_prices = array_column($valid_prices, 'precio_total');
+
+      // estadisticas de precios totales
+      if (count($total_prices) > 0) {
+        $pack_price['estadisticas_precio_total'] = [
+          'precio_minimo'        => min($total_prices),
+          'precio_maximo'        => max($total_prices),
+          'precio_promedio'      => array_sum($total_prices) / count($total_prices),
+          'cantidad_proveedores' => count($total_prices)
+        ];
+      } else {
+        $pack_price['estadisticas_precio_total'] = [
+          'precio_minimo'        => 0,
+          'precio_maximo'        => 0,
+          'precio_promedio'      => 0,
+          'cantidad_proveedores' => 0
+        ];
+      }
+    }
+
+    return ['provisions' => $compare_provision_prices, 'packs' => $compare_pack_prices];
+  }
+
 }

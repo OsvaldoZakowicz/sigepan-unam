@@ -83,84 +83,183 @@
 
       </x-slot:header>
 
+      {{-- todo: ver ejemplo --}}
+      {{-- https://getquipu.com/wp-content/uploads/2023/01/03135440/plantilla-presupuesto-word-1-724x1024.png --}}
+
       <x-slot:content class="flex-col max-h-80 overflow-y-auto overflow-x-hidden">
 
-        <span class="font-semibold my-2">suministros solicitados:</span>
+        <x-div-toggle x-data="{ open: true }" title="suministros solicitados:" class="p-2">
 
-        {{-- suministros presupuestados --}}
-        {{-- todo: ver ejemplo --}}
-        {{-- https://getquipu.com/wp-content/uploads/2023/01/03135440/plantilla-presupuesto-word-1-724x1024.png --}}
-
-        <x-table-base>
-          <x-slot:tablehead>
-            <tr class="border bg-neutral-100">
-              <x-table-th class="text-end w-12">id:</x-table-th>
-              <x-table-th class="text-start">nombre</x-table-th>
-              <x-table-th class="text-start">marca</x-table-th>
-              <x-table-th class="text-end">
-                <span>volumen</span>
-                <x-quest-icon title="kilogramos (kg), litros (lts) o unidades (un)"/>
-              </x-table-th>
-              <x-table-th class="text-start">cantidad</x-table-th>
-              <x-table-th class="text-start w-48">stock</x-table-th>
-              <x-table-th class="text-end w-48">precio</x-table-th>
-            </tr>
-          </x-slot:tablehead>
-          <x-slot:tablebody>
-            @forelse ($provisions as $provision)
-              <tr wire:key="{{ $provision->id }}" class="border">
-                <x-table-td class="text-end">
-                  {{ $provision->id }}
-                </x-table-td>
-                <x-table-td class="text-start">
-                  {{ $provision->provision_name }}
-                </x-table-td>
-                <x-table-td class="text-start">
-                  {{ $provision->trademark->provision_trademark_name }}
-                </x-table-td>
-                <x-table-td class="text-end">
-                  {{ $provision->provision_quantity }}&nbsp;{{ $provision->measure->measure_abrv }}
-                </x-table-td>
-                <x-table-td class="text-start">
-                  {{-- todo: agregar si es unidad o pack --}}
-                  <span class="font-semibold">unidad/pack</span>
-                </x-table-td>
-                <x-table-td class="text-start">
-                  @if ($quotation->is_completed)
-                    @if ($provision->pivot->has_stock)
-                      <span class="bg-emerald-200 text-emerald-700 font-light px-1">disponible</span>
+          {{-- suministros presupuestados --}}
+          <x-table-base>
+            <x-slot:tablehead>
+              <tr class="border bg-neutral-100">
+                <x-table-th class="text-end w-12">id:</x-table-th>
+                <x-table-th class="text-start">nombre</x-table-th>
+                <x-table-th class="text-start">marca</x-table-th>
+                <x-table-th class="text-end">
+                  <span>volumen</span>
+                  <x-quest-icon title="kilogramos (kg), litros (lts) o unidades (un)"/>
+                </x-table-th>
+                <x-table-th class="text-start">cantidad presupuestada</x-table-th>
+                <x-table-th class="text-start w-48">en stock</x-table-th>
+                <x-table-th class="text-end w-48">precio unitario</x-table-th>
+                <x-table-th class="text-end w-48">precio total</x-table-th>
+              </tr>
+            </x-slot:tablehead>
+            <x-slot:tablebody>
+              @forelse ($provisions as $provision)
+                <tr wire:key="{{ $provision->id }}" class="border">
+                  <x-table-td class="text-end">
+                    {{ $provision->id }}
+                  </x-table-td>
+                  <x-table-td class="text-start">
+                    {{ $provision->provision_name }}
+                  </x-table-td>
+                  <x-table-td class="text-start">
+                    {{ $provision->trademark->provision_trademark_name }}
+                  </x-table-td>
+                  <x-table-td class="text-end">
+                    {{ $provision->provision_quantity }}&nbsp;{{ $provision->measure->measure_abrv }}
+                  </x-table-td>
+                  <x-table-td class="text-start">
+                    {{ $provision->pivot->quantity }}
+                  </x-table-td>
+                  <x-table-td class="text-start">
+                    @if ($quotation->is_completed)
+                      @if ($provision->pivot->has_stock)
+                        <span class="bg-emerald-200 text-emerald-700 font-light px-1">disponible</span>
+                      @else
+                        <span class="bg-red-200 text-red-600 font-light px-1">sin stock</span>
+                      @endif
                     @else
-                      <span class="bg-red-200 text-red-600 font-light px-1">sin stock</span>
+                      <span class="font-semibold text-red-400">-</span>
                     @endif
-                  @else
-                    <span class="font-semibold text-red-400">-</span>
-                  @endif
-                </x-table-td>
-                <x-table-td class="text-end">
-                  @if ($quotation->is_completed)
-                    <span>$&nbsp;{{ $provision->pivot->price }}</span>
-                  @else
-                    <span class="font-semibold text-red-400">-</span>
-                  @endif
-                </x-table-td>
+                  </x-table-td>
+                  <x-table-td class="text-end">
+                    @if ($quotation->is_completed)
+                      <span>$&nbsp;{{ $provision->pivot->unit_price }}</span>
+                    @else
+                      <span class="font-semibold text-red-400">-</span>
+                    @endif
+                  </x-table-td>
+                  <x-table-td class="text-end">
+                    @if ($quotation->is_completed)
+                      <span>$&nbsp;{{ $provision->pivot->total_price }}</span>
+                    @else
+                      <span class="font-semibold text-red-400">-</span>
+                    @endif
+                  </x-table-td>
+                </tr>
+                @if ($loop->last)
+                  <x-table-td class="text-end font-semibold capitalize" colspan="7">sub total</x-table-td>
+                  <x-table-td class="text-end font-semibold">$&nbsp;{{ $provisions_total_price }}</x-table-td>
+                @endif
+              @empty
+                <tr class="border">
+                  <td colspan="7">sin registros!</td>
+                </tr>
+              @endforelse
+            </x-slot:tablebody>
+          </x-table-base>
+
+          <div class="my-2">
+            {{-- paginacion --}}
+            {{ $provisions->links() }}
+          </div>
+        </x-div-toggle>
+
+        <x-div-toggle x-data="{ open: true }" title="packs solicitados:" class="p-2">
+
+          {{-- packs presupuestados --}}
+          <x-table-base>
+            <x-slot:tablehead>
+              <tr class="border bg-neutral-100">
+                <x-table-th class="text-end w-12">id:</x-table-th>
+                <x-table-th class="text-start">nombre</x-table-th>
+                <x-table-th class="text-start">marca</x-table-th>
+                <x-table-th class="text-end">
+                  <span>volumen</span>
+                  <x-quest-icon title="kilogramos (kg), litros (lts) o unidades (un)"/>
+                </x-table-th>
+                <x-table-th class="text-start">cantidad presupuestada</x-table-th>
+                <x-table-th class="text-start w-48">en stock</x-table-th>
+                <x-table-th class="text-end w-48">precio unitario</x-table-th>
+                <x-table-th class="text-end w-48">precio total</x-table-th>
               </tr>
-              @if ($loop->last)
-                <x-table-td class="text-end font-semibold capitalize" colspan="6">total</x-table-td>
-                <x-table-td class="text-end font-semibold">$&nbsp;{{ $total_price }}</x-table-td>
-              @endif
-            @empty
-              <tr class="border">
-                <td colspan="7">sin registros!</td>
-              </tr>
-            @endforelse
-          </x-slot:tablebody>
-        </x-table-base>
+            </x-slot:tablehead>
+            <x-slot:tablebody>
+              @forelse ($packs as $pack)
+                <tr wire:key="{{ $pack->id }}" class="border">
+                  <x-table-td class="text-end">
+                    {{ $pack->id }}
+                  </x-table-td>
+                  <x-table-td class="text-start">
+                    {{ $pack->pack_name }}
+                  </x-table-td>
+                  <x-table-td class="text-start">
+                    {{ $pack->provision->trademark->provision_trademark_name }}
+                  </x-table-td>
+                  <x-table-td class="text-end">
+                    {{ $pack->provision_quantity }}&nbsp;{{ $pack->provision->measure->measure_abrv }}
+                  </x-table-td>
+                  <x-table-td class="text-start">
+                    {{ $pack->pivot->quantity }}
+                  </x-table-td>
+                  <x-table-td class="text-start">
+                    @if ($quotation->is_completed)
+                      @if ($pack->pivot->has_stock)
+                        <span class="bg-emerald-200 text-emerald-700 font-light px-1">disponible</span>
+                      @else
+                        <span class="bg-red-200 text-red-600 font-light px-1">sin stock</span>
+                      @endif
+                    @else
+                      <span class="font-semibold text-red-400">-</span>
+                    @endif
+                  </x-table-td>
+                  <x-table-td class="text-end">
+                    @if ($quotation->is_completed)
+                      <span>$&nbsp;{{ $pack->pivot->unit_price }}</span>
+                    @else
+                      <span class="font-semibold text-red-400">-</span>
+                    @endif
+                  </x-table-td>
+                  <x-table-td class="text-end">
+                    @if ($quotation->is_completed)
+                      <span>$&nbsp;{{ $pack->pivot->total_price }}</span>
+                    @else
+                      <span class="font-semibold text-red-400">-</span>
+                    @endif
+                  </x-table-td>
+                </tr>
+                @if ($loop->last)
+                  <x-table-td class="text-end font-semibold capitalize" colspan="7">sub total</x-table-td>
+                  <x-table-td class="text-end font-semibold">$&nbsp;{{ $packs_total_price }}</x-table-td>
+                @endif
+              @empty
+                <tr class="border">
+                  <td colspan="7">sin registros!</td>
+                </tr>
+              @endforelse
+            </x-slot:tablebody>
+          </x-table-base>
+
+          <div class="my-2">
+            {{-- paginacion --}}
+            {{ $packs->links() }}
+          </div>
+        </x-div-toggle>
+
+        {{-- total --}}
+        <div class="">
+          <div class="py-1 px-2 border borde-neutral-300 text-right">
+            <span class="font-semibold uppercase">total:&nbsp;${{ $total }}</span>
+          </div>
+        </div>
 
       </x-slot:content>
 
       <x-slot:footer class="my-2">
-        {{-- paginacion --}}
-        {{ $provisions->links() }}
       </x-slot:footer>
 
     </x-content-section>
