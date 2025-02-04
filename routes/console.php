@@ -1,9 +1,12 @@
 <?php
 
 use App\Jobs\CloseQuotationPeriodJob;
+use App\Jobs\NotifySuppliersRequestForQuotationClosedJob;
+use App\Jobs\NotifySuppliersRequestForQuotationReceivedJob;
 use App\Services\Supplier\QuotationPeriodService;
 use App\Jobs\OpenQuotationPeriodJob;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Bus;
 
 /**
  * * clousure commands.
@@ -33,7 +36,10 @@ Artisan::command('budget-periods:open', function (QuotationPeriodService $quotat
   if (count($periods_to_open) != 0) {
     // cada periodo debe abrirse y procesarse
     foreach ($periods_to_open as $period) {
-      OpenQuotationPeriodJob::dispatch($period);
+      Bus::chain([
+        OpenQuotationPeriodJob::dispatch($period),
+        NotifySuppliersRequestForQuotationReceivedJob::dispatch($period)
+      ]);
     }
   }
 })->purpose('abrir periodos de solicitud de presupuestos')->everyMinute();
@@ -50,7 +56,10 @@ Artisan::command('budget-periods:close', function (QuotationPeriodService $quota
   if (count($periods_to_close) != 0) {
     // cada periodo debe cerrarse y procesarse
     foreach ($periods_to_close as $period) {
-      CloseQuotationPeriodJob::dispatch($period);
+      Bus::chain([
+        CloseQuotationPeriodJob::dispatch($period),
+        NotifySuppliersRequestForQuotationClosedJob::dispatch($period),
+      ]);
     }
   }
 })->purpose('cerrar periodos de solicitud de presupuestos')->everyTwoMinutes();

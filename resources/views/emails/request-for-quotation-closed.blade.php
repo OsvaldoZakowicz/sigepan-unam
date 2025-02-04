@@ -1,20 +1,24 @@
 @extends('emails.email-layout')
 
 @section('header')
-  <h1>Nueva solicitud de presupuesto recibida</h1>
-  <p>Se ha recibido una nueva solicitud de presupuesto de parte de la panadería <i>nombre</i>.</p>
+  <h1>¡La solicitud de presupuestos ha cerrado!</h1>
   <p><strong>Código de presupuesto:</strong>&nbsp;<span>{{ $quotation->quotation_code }}</span></p>
-  <p><strong>disponible hasta:</strong>&nbsp;<span>{{ formatDateTime($quotation->period->period_end_at, 'd-m-Y') }}</span></p>
+  <p><strong>Finalizó el día:</strong>&nbsp;<span>{{ formatDateTime($quotation->period->period_end_at, 'd-m-Y') }}</span></p>
 @endsection
 
 @section('content')
-  <p>Para ver los detalles de la solicitud y enviar su cotización, ingrese a su cuenta en el sistema de gestión de panaderías.</p>
+  @if ($quotation->is_completed)
+    <p style="color: #588b53; font-weight: 600;">Hemos recibido su respuesta!</p>
+  @else
+    <p style="color: #3b3b3b; font-weight: 600;">No hemos recibido su respuesta!</p>
+  @endif
+  <p>Para ver los detalles de la solicitud, ingrese a su cuenta en el sistema de gestión de panaderías.</p>
   <p>Luego diríjase al apartado de presupuestos.</p>
-  <a href="http://localhost/login" target="_blank">Ingresar a mi cuenta y responder</a>
+  <a href="http://localhost/login" target="_blank">Ingresar a mi cuenta</a>
 @endsection
 
 @section('footer')
-  <p>¡Gracias por ser parte de nosotros!, <strong>esperamos su respuesta.</strong></p>
+  <p>¡Gracias por ser parte de nosotros!</p>
   <p>Si tiene alguna duda o pregunta, no dude en contactarnos:</p>
 
   {{-- seccion de contacto, mostrar telefono e email ficticios --}}

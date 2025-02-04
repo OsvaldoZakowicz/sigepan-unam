@@ -11,7 +11,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class NewRequestForQuotationReceived extends Mailable
+class RequestForQuotationClosed extends Mailable
 {
   use Queueable, SerializesModels;
 
@@ -23,29 +23,29 @@ class NewRequestForQuotationReceived extends Mailable
   /**
    * asunto del correo
    * @return Envelope
-  */
+   */
   public function envelope(): Envelope
   {
     return new Envelope(
-      subject: '¡Nueva solicitud de presupuesto recibida!',
+      subject: '¡Solicitud de presupuestos cerrada!',
     );
   }
 
   /**
    * cuerpo del correo
    * @return Content
-  */
+   */
   public function content(): Content
   {
     return new Content(
-      view: 'emails.new-request-for-quotation-received',
+      view: 'emails.request-for-quotation-closed',
     );
   }
 
   /**
    * Get the attachments for the message.
    * @return array<int, \Illuminate\Mail\Mailables\Attachment>
-  */
+   */
   public function attachments(): array
   {
     return [];

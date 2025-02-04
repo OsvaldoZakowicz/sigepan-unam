@@ -34,7 +34,8 @@ class SendEmailJob implements ShouldQueue
 
   /**
    * crear una nueva instancia de trabajo.
-   * @return void
+   * @param string $recipient correo electronico
+   * @param Mailable $mailable
    */
   public function __construct(string $recipient, Mailable $mailable)
   {
@@ -44,6 +45,7 @@ class SendEmailJob implements ShouldQueue
 
   /**
    * Ejecutar el trabajo.
+   * Enviar el email
    * @return void
    */
   public function handle(): void

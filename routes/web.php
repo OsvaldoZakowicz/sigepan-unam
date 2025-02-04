@@ -185,29 +185,5 @@ Route::middleware(['can:cliente'])->group(function () {
 
 });
 
-// test de renderizado en el navegador para los envios de correos
-Route::group(['prefix' => 'mail'], function () {
-
-  // test de envio de correo de registro de proveedor
-  Route::get('supplier/registered', function () {
-
-    // obtener el primer proveedor
-    $supplier = App\Models\Supplier::first();
-    // obtener su usuario
-    $user = $supplier->user;
-
-    return new App\Mail\SupplierRegistered($user, '12345678', $supplier);
-  });
-
-  // test de envio de correo de solicitud de presupuesto recibida
-  Route::get('quotation/received', function () {
-
-    // obtener el primer proveedor
-    $supplier = App\Models\Supplier::first();
-
-    return new App\Mail\NewRequestForQuotationReceived($supplier);
-  });
-
-});
 
 require __DIR__.'/auth.php';

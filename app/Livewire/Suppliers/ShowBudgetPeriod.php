@@ -3,10 +3,13 @@
 namespace App\Livewire\Suppliers;
 
 use App\Jobs\CloseQuotationPeriodJob;
+use App\Jobs\NotifySuppliersRequestForQuotationClosedJob;
+use App\Jobs\NotifySuppliersRequestForQuotationReceivedJob;
 use App\Jobs\OpenQuotationPeriodJob;
 use App\Models\RequestForQuotationPeriod;
 use App\Services\Supplier\QuotationPeriodService;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\View\View;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -66,7 +69,11 @@ class ShowBudgetPeriod extends Component
   {
     $this->period->period_start_at = Carbon::now()->format('Y-m-d');
     $this->period->save();
-    OpenQuotationPeriodJob::dispatch($this->period);
+
+    Bus::chain([
+      OpenQuotationPeriodJob::dispatch($this->period),
+      NotifySuppliersRequestForQuotationReceivedJob::dispatch($this->period),
+    ]);
   }
 
   /**
@@ -75,7 +82,13 @@ class ShowBudgetPeriod extends Component
   */
   public function closePeriod(): void
   {
-    CloseQuotationPeriodJob::dispatch($this->period);
+    $this->period->period_end_at = Carbon::now()->format('Y-m-d');
+    $this->period->save();
+
+    Bus::chain([
+      CloseQuotationPeriodJob::dispatch($this->period),
+      NotifySuppliersRequestForQuotationClosedJob::dispatch($this->period),
+    ]);
   }
 
   /**
