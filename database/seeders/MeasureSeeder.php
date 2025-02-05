@@ -15,27 +15,27 @@ class MeasureSeeder extends Seeder
 
     DB::table('measures')->insert([
       [
-        'measure_name' => 'kilogramos',
-        'measure_abrv' => 'kg',
-        'measure_base' => 1.000,
+        'measure_name'      => 'kilogramos',
+        'measure_abrv'      => 'kg',
+        'measure_base'      => 1.000,
+        'measure_base_abrv' => 'g',
         'measure_short_description' => 'mil gramos',
-        'measure_is_editable' => false,
         'created_at' => now()
       ],
       [
-        'measure_name' => 'litros',
-        'measure_abrv' => 'lts',
-        'measure_base' => 1.000,
+        'measure_name'      => 'litros',
+        'measure_abrv'      => 'lts',
+        'measure_base'      => 1.000,
+        'measure_base_abrv' => 'mL',
         'measure_short_description' => 'mil mililitros',
-        'measure_is_editable' => false,
         'created_at' => now()
       ],
       [
-        'measure_name' => 'unidad',
-        'measure_abrv' => 'un',
-        'measure_base' => 1.000,
+        'measure_name'      => 'unidad',
+        'measure_abrv'      => 'un',
+        'measure_base'      => 1.000,
+        'measure_base_abrv' => 'un',
         'measure_short_description' => 'una unidad',
-        'measure_is_editable' => false,
         'created_at' => now()
       ],
     ]);
