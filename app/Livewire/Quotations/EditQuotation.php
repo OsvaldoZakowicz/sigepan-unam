@@ -2,15 +2,15 @@
 
 namespace App\Livewire\Quotations;
 
-use App\Models\Provision;
-use App\Models\Pack;
-use App\Models\Quotation;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Arr;
+use App\Models\Quotation;
+use App\Models\Provision;
+use App\Models\Pack;
 use Illuminate\View\View;
 use Livewire\Component;
 
-class RespondQuotation extends Component
+class EditQuotation extends Component
 {
   // presupuesto
   public $quotation;
@@ -30,7 +30,7 @@ class RespondQuotation extends Component
     $this->quotation = Quotation::findOrFail($id);
 
     if ($this->quotation->period->period_status_id === 3) {
-      session()->flash('operation-info', 'El periodo de este presupuesto ha cerrado el ' . formatDateTime($this->quotation->period->period_end_at, 'd-m-Y') . ', ya no puede responderse');
+      session()->flash('operation-info', 'El periodo de este presupuesto ha cerrado el ' . formatDateTime($this->quotation->period->period_end_at, 'd-m-Y') . ', ya no puede modificarse');
       $this->redirectRoute('quotations-quotations-index');
     }
 
@@ -57,8 +57,6 @@ class RespondQuotation extends Component
 
   /**
    * agregar un suministro al array de inputs
-   * * el precio debe ser "vacio": price => ''
-   * * el stock se establece a true: has_stock => true
    * @param Provision | Pack $item es un suministro o pack
    * @return void
   */
@@ -71,9 +69,9 @@ class RespondQuotation extends Component
       'item_id'       => $item->id,
       'item_object'   => $item,
       'item_quantity' => $item->pivot->quantity,
-      'item_has_stock'   => true,
-      'item_unit_price'  => '',
-      'item_total_price' => '',
+      'item_has_stock'   => $item->pivot->has_stock,
+      'item_unit_price'  => $item->pivot->unit_price,
+      'item_total_price' => $item->pivot->total_price,
     ]);
   }
 
@@ -151,7 +149,7 @@ class RespondQuotation extends Component
 
       $this->reset();
 
-      session()->flash('operation-success', toastSuccessBody('presupuesto', 'completado y enviado'));
+      session()->flash('operation-success', toastSuccessBody('presupuesto', 'modificado y enviado'));
       $this->redirectRoute('quotations-quotations-index');
 
     } catch (\Exception $e) {
@@ -165,10 +163,10 @@ class RespondQuotation extends Component
 
   /**
    * renderizar vista
-   * @return view
+   * @return View
   */
   public function render(): View
   {
-    return view('livewire.quotations.respond-quotation');
+    return view('livewire.quotations.edit-quotation');
   }
 }

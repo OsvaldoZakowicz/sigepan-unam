@@ -155,6 +155,9 @@ Route::middleware(['auth', 'verified', 'can:presupuestos'])->group(function () {
   Route::get('quotations/respond/{id}', [QuotationController::class, 'quotations_respond'])
     ->name('quotations-quotations-respond');
 
+  Route::get('quotations/edit/{id}', [QuotationController::class, 'quotations_edit'])
+    ->name('quotations-quotations-edit');
+
 });
 
 //* modulo de stock
