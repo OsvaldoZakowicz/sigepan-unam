@@ -194,7 +194,7 @@
 
                       <x-a-button
                         wire:navigate
-                        href="#"
+                        href="{{ route('quotations-quotations-show', $quotation->id) }}"
                         bg_color="neutral-100"
                         border_color="neutral-200"
                         text_color="neutral-600"

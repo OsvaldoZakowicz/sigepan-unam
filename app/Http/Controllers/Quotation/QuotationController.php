@@ -29,4 +29,10 @@ class QuotationController extends Controller
   {
     return view('quotations.quotations-edit', ['id' => $id]);
   }
+
+  //* ver respuesta de una solicitud de presupuesto
+  public function quotations_show($id): View
+  {
+    return view('quotations.quotations-show', ['id' => $id]);
+  }
 }
