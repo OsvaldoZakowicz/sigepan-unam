@@ -17,7 +17,6 @@ class Measure extends Model implements Auditable
     'measure_abrv',
     'measure_base',
     'measure_short_description',
-    'measure_is_editable',
   ];
 
   // * una unidad de medida esta presente en muchos suministros
