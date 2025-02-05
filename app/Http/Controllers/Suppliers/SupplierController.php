@@ -87,6 +87,12 @@ class SupplierController extends Controller
     return view('suppliers.trademarks-create');
   }
 
+  //* editar marca de suministros
+  public function trademarks_edit($id): View
+  {
+    return view('suppliers.trademarks-edit', ['id' => $id]);
+  }
+
   //* listar periodos de peticion de presupuestos
   public function budget_periods_index(): View
   {

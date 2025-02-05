@@ -124,6 +124,9 @@ Route::middleware(['auth', 'verified', 'can:proveedores'])->group(function () {
   Route::get('suppliers/trademark/create', [SupplierController::class, 'trademarks_create'])
     ->name('suppliers-trademarks-create');
 
+  Route::get('suppliers/trademark/edit/{id}', [SupplierController::class, 'trademarks_edit'])
+    ->name('suppliers-trademarks-edit');
+
   // NOTA: listar periodos de presupuestos (presupuesto = budget, periodo = period)
   Route::get('suppliers/budgets/periods', [SupplierController::class, 'budget_periods_index'])
     ->name('suppliers-budgets-periods-index');
