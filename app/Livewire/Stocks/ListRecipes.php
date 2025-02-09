@@ -13,7 +13,6 @@ class ListRecipes extends Component
   public function render()
   {
     $recipes = Recipe::paginate(10);
-
     return view('livewire.stocks.list-recipes', compact('recipes'));
   }
 }

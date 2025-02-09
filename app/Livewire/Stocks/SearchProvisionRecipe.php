@@ -2,12 +2,14 @@
 
 namespace App\Livewire\Stocks;
 
+use App\Models\Provision;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\Url;
 use Livewire\Attributes\On;
 use App\Models\ProvisionTrademark;
 use App\Models\ProvisionType;
+use App\Models\Recipe;
 
 class SearchProvisionRecipe extends Component
 {
@@ -15,51 +17,78 @@ class SearchProvisionRecipe extends Component
 
   #[Url]
   public $search = '';
-  #[Url]
-  public $search_tr = '';
+
   #[Url]
   public $search_ty = '';
 
-  // marcas de suministros
-  public $trademarks;
+  #[Url]
+  public $paginas = '5';
+
   // tipos de suministros
   public $provision_types;
 
   // busqueda de edicion
   public $is_editing;
-  public $recipe_id;
+  public $recipe;
 
-  // montar datos
-  public function mount($recipe_id = null, $is_editing = false)
+  /**
+   * montar datos
+   * @param int $recipe_id id de receta
+   * @param bool $is_editing indica el modo de busqueda
+   * @return void
+  */
+  public function mount($recipe_id = null, $is_editing = false): void
   {
-    $this->trademarks = ProvisionTrademark::all();
     $this->provision_types = ProvisionType::all();
-    $this->is_editing = $is_editing;
-    $this->recipe_id = $recipe_id;
+
+    if ($recipe_id) {
+      $this->recipe = Recipe::findOrFail($recipe_id);
+      $this->is_editing = $is_editing;
+    }
   }
 
-  // reiniciar la paginacion al buscar
-  public function resetPagination()
+  /**
+   * reiniciar la paginacion al buscar
+   * @return void
+  */
+  public function resetPagination(): void
   {
     $this->resetPage();
   }
 
-  //* enviar la provision elegida mediante un evento
-  // notifica al componente livewire CreateRecipe
-  public function addProvision($id)
+  /**
+   * enviar la provision elegida mediante un evento
+   * notifica al componente livewire CreateRecipe::class
+   * @param int $id id del suministro
+   * @return void
+  */
+  public function addProvision(Provision $provision): void
   {
-    $this->dispatch('append-provision', id: $id)->to(CreateRecipe::class);
+    $this->dispatch('add-provision', provision: $provision)
+      ->to(CreateRecipe::class);
   }
 
-  // buscar suministros
+  /**
+   * buscar suministros
+   * @return mixed
+  */
   public function searchProvisions()
   {
     if ($this->is_editing) {
       // todo: buscar suministros asociados a la receta
 
     } else {
-      // todo: buscar suministros no asociados a la receta
+      // suministros no asociados a la receta
+      $provisions = Provision::when($this->search, function ($query) {
+          $query->where('provision_name', 'like', '%' . $this->search . '%');
+        })
+        ->when($this->search_ty, function ($query) {
+          $query->where('provision_type_id', $this->search_ty);
+        })
+        ->orderBy('id', 'desc')
+        ->paginate($this->paginas);
 
+      return $provisions;
     }
 
   }
@@ -67,8 +96,7 @@ class SearchProvisionRecipe extends Component
   #[On('refresh-search')]
   public function render()
   {
-    // todo: buscar y enviar a la vista
-
-    return view('livewire.stocks.search-provision-recipe');
+    $provisions = $this->searchProvisions();
+    return view('livewire.stocks.search-provision-recipe', compact('provisions'));
   }
 }

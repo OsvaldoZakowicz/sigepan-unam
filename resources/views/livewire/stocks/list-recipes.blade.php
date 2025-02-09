@@ -10,15 +10,7 @@
     {{-- cuerpo --}}
     <x-content-section>
 
-      <x-slot:header>
-        {{-- <span class="text-sm capitalize">buscar receta:</span> --}}
-        {{-- formulario de busqueda --}}
-        {{-- termino de busqueda --}}
-        {{-- <form class="grow">
-          <input type="text" wire:model.live="search" name="search" placeholder="ingrese un id, o término de busqueda ..." class="w-1/4 shrink text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
-        </form> --}}
-        <!-- grupo de botones -->
-        <div class="flex"></div>
+      <x-slot:header class="hidden">
       </x-slot:header>
 
       <x-slot:content>
@@ -45,11 +37,20 @@
                 <x-table-td class="text-start">
                   <div class="flex justify-start gap-1">
 
-                   {{--  <x-a-button wire:navigate href="#" bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600">preparacion</x-a-button> --}}
+                    <x-a-button
+                      wire:navigate
+                      href="#"
+                      bg_color="neutral-100"
+                      border_color="neutral-200"
+                      text_color="neutral-600"
+                      >editar
+                    </x-a-button>
 
-                   {{--  <x-a-button wire:navigate href="#" bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600">editar</x-a-button> --}}
-
-                    {{-- <x-btn-button btn_type="button" color="red">eliminar</x-btn-button> --}}
+                    <x-btn-button
+                      btn_type="button"
+                      color="red"
+                      >eliminar
+                    </x-btn-button>
 
                   </div>
                 </x-table-td>
