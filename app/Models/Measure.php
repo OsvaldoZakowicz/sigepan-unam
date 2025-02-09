@@ -16,6 +16,7 @@ class Measure extends Model implements Auditable
     'measure_name',
     'measure_abrv',
     'measure_base',
+    'measure_base_abrv',
     'measure_short_description',
   ];
 
