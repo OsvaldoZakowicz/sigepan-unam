@@ -85,4 +85,12 @@ class Provision extends Model
   {
     return $this->hasMany(Pack::class);
   }
+
+  // * un suministro puede usarse en muchas recetas
+  public function recipes(): BelongsToMany
+  {
+    return $this->belongsToMany(Recipe::class, 'provision_recipe')
+      ->withPivot('recipe_quantity')
+      ->withTimestamps();
+  }
 }
