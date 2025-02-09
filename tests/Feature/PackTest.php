@@ -37,11 +37,11 @@ class PackTest extends TestCase
 
   // unidad de medida
   public $measure_data = [
-    'measure_name' => 'gramos',
-    'measure_abrv' => 'gr',
-    'measure_base' => 1000,
-    'measure_short_description' => 'unidad de medida en gramos',
-    'measure_is_editable' => false
+    'measure_name'              => 'kilogramos',
+    'measure_abrv'              => 'kg',
+    'measure_base'              => 1000,
+    'measure_base_abrv'         => 'g',
+    'measure_short_description' => 'unidad de medida en kilogramos'
   ];
 
   // suministro
