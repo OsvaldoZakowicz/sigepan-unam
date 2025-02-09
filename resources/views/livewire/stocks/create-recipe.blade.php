@@ -77,20 +77,35 @@
               {{-- tiempo de preparacion de la receta --}}
               <div class="flex flex-col gap-1 min-h-fit w-full md:w-1/2 lg:w-1/4">
                 <span>
-                  <label for="recipe_preparation_time">tiempo de preparación (minutos)</label>
+                  <label for="">tiempo de preparación, horas y minutos</label>
                   <span class="text-red-600">*</span>
                 </span>
-                @error('recipe_preparation_time')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
-                <input
-                  wire:model="recipe_preparation_time"
-                  name="recipe_preparation_time"
-                  id="recipe_preparation_time"
+                @error('time_h')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
+                @error('time_m')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
+                <div class="flex gap-1 items-center justify-start">
+                  {{-- horas --}}
+                  <input
+                    type="number"
+                    wire:model.live="time_h"
+                    min="0"
+                    max="12"
+                    step="1"
+                    placeholder="HH"
+                    class="w-full p-1 text-sm text-right border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                  />
+                  <span>horas&nbsp;:&nbsp;</span>
+                  {{-- minutos --}}
+                  <input
                   type="number"
+                  wire:model.live="time_m"
                   min="1"
-                  max="720"
+                  max="59"
                   step="1"
-                  class="p-1 text-sm w-full border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
-                />
+                  placeholder="mm"
+                  class="w-full p-1 text-sm text-right border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                  />
+                  <span>minutos</span>
+                </div>
               </div>
             </div>
 
