@@ -37,4 +37,16 @@ class StockController extends Controller
   {
     return view('stocks.recipes-create');
   }
+
+  //* lista de productos
+  public function products_index(): View
+  {
+    return view('stocks.products-index');
+  }
+
+  //* crear producto
+  public function products_create(): View
+  {
+    return view('stocks.products-create');
+  }
 }
