@@ -20,4 +20,10 @@ class ProvisionType extends Model
   {
     return $this->hasMany(Provision::class, 'provision_type_id', 'id');
   }
+
+  // * un tipo de suministro se asocia a muchas categorias de suministro
+  public function provision_categories(): HasMany
+  {
+    return $this->hasMany(ProvisionCategory::class, 'provision_type_id', 'id');
+  }
 }

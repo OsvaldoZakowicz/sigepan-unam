@@ -20,6 +20,7 @@ class Provision extends Model
     'provision_quantity',
     'provision_short_description',
     'provision_trademark_id',
+    'provision_category_id',
     'provision_type_id',
     'measure_id',
   ];
@@ -82,5 +83,11 @@ class Provision extends Model
   public function packs(): HasMany
   {
     return $this->hasMany(Pack::class);
+  }
+
+  // * un suministro tiene una categoria
+  public function provision_category(): BelongsTo
+  {
+    return $this->belongsTo(ProvisionCategory::class, 'provision_category_id', 'id');
   }
 }

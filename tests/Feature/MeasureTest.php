@@ -13,17 +13,19 @@ class MeasureTest extends TestCase
   use RefreshDatabase;
 
   public $measure_data = [
-    'measure_name'              => 'kilogramos',
-    'measure_abrv'              => 'kg',
-    'measure_base'              => 1000,
-    'measure_base_abrv'         => 'g',
-    'measure_short_description' => 'unidad de medida en kilogramos'
+    'unit_name' => 'litro',
+    'base_value' => 1,
+    'unit_symbol' => 'L',
+    'conversion_unit' => 'mililitros',
+    'conversion_factor' => 1000,
+    'conversion_symbol' => 'mL',
+    'short_description' => 'unidad de medida en litros'
   ];
 
   /**
-   * crear unidad de medida
+   * test crear unidad de medida
    * @return void
-  */
+   */
   public function test_crear_unidad_de_medida()
   {
     DB::table('measures')->insert($this->measure_data);
@@ -32,9 +34,9 @@ class MeasureTest extends TestCase
   }
 
   /**
-   * existe el modelo de unidad de medida
+   * test existe el modelo de unidad de medida
    * @return void
-  */
+   */
   public function test_existe_modelo_unidad_de_medida()
   {
     $measure = \App\Models\Measure::create($this->measure_data);
@@ -43,7 +45,7 @@ class MeasureTest extends TestCase
   }
 
   /**
-   * eliminar unidad de medida
+   * test eliminar unidad de medida
    * @return void
    */
   public function test_eliminar_unidad_de_medida()
@@ -56,13 +58,24 @@ class MeasureTest extends TestCase
   }
 
   /**
-   * una unidad de medida se usa en muchos suministros
+   * test una unidad de medida se usa en muchos suministros
    * @return void
-  */
+   */
   public function test_una_unidad_de_medida_se_usa_es_muchos_suministros()
   {
     $measure = \App\Models\Measure::create($this->measure_data);
 
     $this->assertInstanceOf(HasMany::class, $measure->provisions());
+  }
+
+  /**
+   * test una unidad de medida se asocia a multiples categorias de suministro
+   * @return void
+   */
+  public function test_una_unidad_de_medida_se_asocia_a_categorias_de_suministro(): void
+  {
+    $measure = \App\Models\Measure::create($this->measure_data);
+
+    $this->assertInstanceOf(HasMany::class, $measure->provision_categories());
   }
 }

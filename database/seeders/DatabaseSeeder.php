@@ -22,6 +22,8 @@ class DatabaseSeeder extends Seeder
       UserSeeder::class,
       MeasureSeeder::class,
       ProvisionTypeSeeder::class,
+      // categorias de suministros siempr despues de unidad de medida y tipo
+      ProvisionCategorySeeder::class,
       ProvisionTrademarkSeeder::class,
       PeriodStatusSeeder::class,
       IvaConditionSeeder::class,

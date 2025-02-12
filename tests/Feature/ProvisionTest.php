@@ -9,6 +9,7 @@ use App\Models\Measure;
 use App\Models\Provision;
 use App\Models\User;
 use App\Models\Address;
+use App\Models\ProvisionCategory;
 use App\Models\Supplier;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -20,7 +21,7 @@ class ProvisionTest extends TestCase
   use RefreshDatabase;
 
   public $trademark_data = [
-    'provision_trademark_name' => 'blancaflor'
+    'provision_trademark_name' => 'marolio'
   ];
 
   public $provision_type_data = [
@@ -29,11 +30,13 @@ class ProvisionTest extends TestCase
   ];
 
   public $measure_data = [
-    'measure_name'              => 'kilogramos',
-    'measure_abrv'              => 'kg',
-    'measure_base'              => 1000,
-    'measure_base_abrv'         => 'g',
-    'measure_short_description' => 'unidad de medida en kilogramos'
+    'unit_name' => 'litro',
+    'base_value' => 1,
+    'unit_symbol' => 'L',
+    'conversion_unit' => 'mililitros',
+    'conversion_factor' => 1000,
+    'conversion_symbol' => 'mL',
+    'short_description' => 'unidad de medida en litros'
   ];
 
   public $provision_data = [
@@ -52,17 +55,21 @@ class ProvisionTest extends TestCase
     'street' => 'calle1',
     'number' => '123',
     'postal_code' => '3350',
-    'city' => 'apotoles',
+    'city' => 'apostoles',
   ];
 
   public  $supplier_data = [
-    'company_name' => 'arcor',
+    'company_name' => 'almacen el amigo',
     'company_cuit' => '12345678912',
     'iva_condition' => 'monotributista',
     'phone_number' => '3755121447',
     'short_description' => 'description',
     'status_is_active' => true,
     'status_description' => 'dscription',
+  ];
+
+  public $category_data = [
+    'provision_category_name' => 'aceite',
   ];
 
   /**
@@ -93,17 +100,33 @@ class ProvisionTest extends TestCase
   }
 
   /**
-   * crear un suministro
-   * @param ProvisionTrademark $Trademark
+   * crear una categoria de suministro
    * @param ProvisionType $Type
    * @param Measure $Measure
+   * @return ProvisionCategory
+  */
+  public function crearCategoriaDeSuministro($type, $measure)
+  {
+    $this->category_data = Arr::add($this->category_data, 'measure_id', $measure->id);
+    $this->category_data = Arr::add($this->category_data, 'provision_type_id', $type->id);
+
+    return ProvisionCategory::create($this->category_data);
+  }
+
+  /**
+   * crear un suministro
+   * @param ProvisionTrademark $trademark
+   * @param ProvisionType $type
+   * @param Measure $measure
+   * @param ProvisionCategory $category
    * @return Provision
   */
-  public function crearSuministro($Trademark, $Type, $Measure)
+  public function crearSuministro($trademark, $type, $measure, $category)
   {
-    $this->provision_data = Arr::add($this->provision_data, 'provision_trademark_id', $Trademark->id);
-    $this->provision_data = Arr::add($this->provision_data, 'provision_type_id', $Type->id);
-    $this->provision_data = Arr::add($this->provision_data, 'measure_id', $Measure->id);
+    $this->provision_data = Arr::add($this->provision_data, 'provision_trademark_id', $trademark->id);
+    $this->provision_data = Arr::add($this->provision_data, 'provision_type_id', $type->id);
+    $this->provision_data = Arr::add($this->provision_data, 'measure_id', $measure->id);
+    $this->provision_data = Arr::add($this->provision_data, 'provision_category_id', $category->id);
 
     return Provision::create($this->provision_data);
   }
@@ -135,7 +158,8 @@ class ProvisionTest extends TestCase
     $trademark      = $this->crearMarca();
     $provision_type = $this->crearTipo();
     $measure        = $this->crearMedida();
-    $provision      = $this->crearSuministro($trademark, $provision_type, $measure);
+    $category       = $this->crearCategoriaDeSuministro($provision_type, $measure);
+    $provision      = $this->crearSuministro($trademark, $provision_type, $measure,$category);
 
     $this->assertDatabaseHas('provisions', $this->provision_data);
     $this->assertInstanceOf(Provision::class, $provision);
@@ -150,7 +174,8 @@ class ProvisionTest extends TestCase
     $trademark      = $this->crearMarca();
     $provision_type = $this->crearTipo();
     $measure        = $this->crearMedida();
-    $provision      = $this->crearSuministro($trademark, $provision_type, $measure);
+    $category       = $this->crearCategoriaDeSuministro($provision_type, $measure);
+    $provision      = $this->crearSuministro($trademark, $provision_type, $measure,$category);
 
     $provision->delete();
 
@@ -166,7 +191,8 @@ class ProvisionTest extends TestCase
     $trademark      = $this->crearMarca();
     $provision_type = $this->crearTipo();
     $measure        = $this->crearMedida();
-    $provision      = $this->crearSuministro($trademark, $provision_type, $measure);
+    $category       = $this->crearCategoriaDeSuministro($provision_type, $measure);
+    $provision      = $this->crearSuministro($trademark, $provision_type, $measure,$category);
 
     $provision = Provision::create($this->provision_data);
 
@@ -182,7 +208,8 @@ class ProvisionTest extends TestCase
     $trademark      = $this->crearMarca();
     $provision_type = $this->crearTipo();
     $measure        = $this->crearMedida();
-    $provision      = $this->crearSuministro($trademark, $provision_type, $measure);
+    $category       = $this->crearCategoriaDeSuministro($provision_type, $measure);
+    $provision      = $this->crearSuministro($trademark, $provision_type, $measure,$category);
 
     $this->assertInstanceOf(BelongsTo::class, $provision->type());
   }
@@ -196,9 +223,25 @@ class ProvisionTest extends TestCase
     $trademark      = $this->crearMarca();
     $provision_type = $this->crearTipo();
     $measure        = $this->crearMedida();
-    $provision      = $this->crearSuministro($trademark, $provision_type, $measure);
+    $category       = $this->crearCategoriaDeSuministro($provision_type, $measure);
+    $provision      = $this->crearSuministro($trademark, $provision_type, $measure,$category);
 
     $this->assertInstanceOf(BelongsTo::class, $provision->measure());
+  }
+
+  /**
+   * un suministro es de una categoria
+   * @return void
+  */
+  public function test_un_suministro_tiene_una_categoria()
+  {
+    $trademark      = $this->crearMarca();
+    $provision_type = $this->crearTipo();
+    $measure        = $this->crearMedida();
+    $category       = $this->crearCategoriaDeSuministro($provision_type, $measure);
+    $provision      = $this->crearSuministro($trademark, $provision_type, $measure,$category);
+
+    $this->assertInstanceOf(BelongsTo::class, $provision->provision_category());
   }
 
   /**
@@ -210,7 +253,8 @@ class ProvisionTest extends TestCase
     $trademark      = $this->crearMarca();
     $provision_type = $this->crearTipo();
     $measure        = $this->crearMedida();
-    $provision      = $this->crearSuministro($trademark, $provision_type, $measure);
+    $category       = $this->crearCategoriaDeSuministro($provision_type, $measure);
+    $provision      = $this->crearSuministro($trademark, $provision_type, $measure,$category);
     $supplier       = $this->crearProveedor();
 
     $supplier->provisions()->attach($provision->id, ['price' => 100]);
