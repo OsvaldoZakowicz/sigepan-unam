@@ -24,15 +24,6 @@ class Recipe extends Model implements Auditable
     'product_id',
   ];
 
-  //* una receta tiene muchos suministros
-  // recipes n:n provisions
-  public function provisions(): BelongsToMany
-  {
-    return $this->belongsToMany(Provision::class, 'provision_recipe')
-      ->withPivot('recipe_quantity')
-      ->withTimestamps();
-  }
-
   //* una receta pertenece a un producto
   public function product(): BelongsTo
   {

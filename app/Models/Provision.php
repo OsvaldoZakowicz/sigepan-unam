@@ -10,8 +10,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-// todo: auditar
-
 class Provision extends Model
 {
   use HasFactory;
@@ -84,13 +82,5 @@ class Provision extends Model
   public function packs(): HasMany
   {
     return $this->hasMany(Pack::class);
-  }
-
-  // * un suministro puede usarse en muchas recetas
-  public function recipes(): BelongsToMany
-  {
-    return $this->belongsToMany(Recipe::class, 'provision_recipe')
-      ->withPivot('recipe_quantity')
-      ->withTimestamps();
   }
 }

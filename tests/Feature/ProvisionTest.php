@@ -202,20 +202,6 @@ class ProvisionTest extends TestCase
   }
 
   /**
-   * un suministro pertenece muchas recetas
-   * @return void
-  */
-  public function test_un_suministro_pertenece_a_recetas()
-  {
-    $trademark      = $this->crearMarca();
-    $provision_type = $this->crearTipo();
-    $measure        = $this->crearMedida();
-    $provision      = $this->crearSuministro($trademark, $provision_type, $measure);
-
-    $this->assertInstanceOf(BelongsToMany::class, $provision->recipes());
-  }
-
-  /**
    * asignar suministro a un proveedor
    * @return void
   */
