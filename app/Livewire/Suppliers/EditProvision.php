@@ -274,8 +274,8 @@ class EditProvision extends Component
       if ($this->provision_quantity !== $this->provision->provision_quantity || $this->provision_name !== $this->provision->provision_name) {
 
         $this->packs->each(function ($pack) {
+          $pack->pack_name     = 'pack de ' . $this->provision->provision_name . ' x ' . $pack . ' ' . $this->provision->trademark->provision_trademark_name;
           $pack->pack_quantity = $this->provision_quantity * $pack->pack_units;
-          $pack->pack_name = 'pack de ' . $this->provision_name . ' x ' . $pack->pack_units;
           $pack->save();
         });
 
@@ -292,8 +292,8 @@ class EditProvision extends Component
         if ($this->provision_quantity !== $this->provision->provision_quantity || $this->provision_name !== $this->provision->provision_name) {
 
           $this->packs_to_restore->each(function ($pack) {
+            $pack->pack_name     = 'pack de ' . $this->provision->provision_name . ' x ' . $pack . ' ' . $this->provision->trademark->provision_trademark_name;
             $pack->pack_quantity = $this->provision_quantity * $pack->pack_units;
-            $pack->pack_name = 'pack de ' . $this->provision_name . ' x ' . $pack->pack_units;
             $pack->save();
           });
 
@@ -314,7 +314,7 @@ class EditProvision extends Component
       $this->new_packs->each(function ($pack_units) {
 
         $this->provision->packs()->create([
-          'pack_name'     => 'pack de ' . $this->provision->provision_name . ' x ' . $pack_units,
+          'pack_name'     => 'pack de ' . $this->provision->provision_name . ' x ' . $pack_units . ' ' . $this->provision->trademark->provision_trademark_name,
           'pack_units'    => $pack_units,
           'pack_quantity' => $this->provision->provision_quantity * $pack_units
         ]);

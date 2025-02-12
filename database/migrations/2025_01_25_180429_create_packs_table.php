@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('packs', function (Blueprint $table) {
             $table->id();
-            $table->string('pack_name', 45)->unique();
+            $table->string('pack_name', 100);
             $table->unsignedSmallInteger('pack_units');
             $table->decimal('pack_quantity', 6, 2);
 

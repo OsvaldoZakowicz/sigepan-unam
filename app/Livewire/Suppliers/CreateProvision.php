@@ -116,7 +116,7 @@ class CreateProvision extends Component
         foreach ($this->packs as $pack) {
 
           $provision->packs()->create([
-            'pack_name'     => 'pack de ' . $provision->provision_name . ' x ' . $pack,
+            'pack_name'     => 'pack de ' . $provision->provision_name . ' x ' . $pack . ' ' . $provision->trademark->provision_trademark_name,
             'pack_units'    => $pack,
             'pack_quantity' => $provision->provision_quantity * $pack
           ]);
