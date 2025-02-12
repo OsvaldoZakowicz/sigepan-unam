@@ -4,6 +4,7 @@ namespace App\Livewire\Stocks;
 
 use App\Models\Provision;
 use App\Models\Recipe;
+use App\Models\Product;
 use Illuminate\Support\Carbon;
 use Livewire\Attributes\On;
 use Illuminate\Support\Collection;
@@ -11,7 +12,11 @@ use Livewire\Component;
 
 class CreateRecipe extends Component
 {
+  //productos
+  public $products;
+
   // datos generales de la receta
+  public $product_id;
   public $recipe_title;
   public $recipe_yields; // rendimiento en unidades
   public $recipe_portions; // rendimiento en porciones por unidad
@@ -61,6 +66,15 @@ class CreateRecipe extends Component
       // Formatear con ceros a la izquierda
       $this->time_m = str_pad($value, 2, '0', STR_PAD_LEFT);
     }
+  }
+
+  /**
+   * boot de datos
+   * @return void
+  */
+  public function boot(): void
+  {
+    $this->products = Product::all();
   }
 
   /**
@@ -135,6 +149,7 @@ class CreateRecipe extends Component
   public function save()
   {
     $validated = $this->validate([
+      'product_id'                =>  ['required'],
       'recipe_title'              =>  ['required', 'unique:recipes,recipe_title', 'regex:/^[\p{L}\s0-9]+$/', 'min:5', 'max:50'],
       'recipe_yields'             =>  ['required', 'numeric', 'min:1', 'max:99'],
       'recipe_portions'           =>  ['required', 'numeric', 'min:1', 'max:99'],
@@ -144,16 +159,18 @@ class CreateRecipe extends Component
       'provisions'                =>  ['required'],
       'provisions.*.quantity'     =>  ['required', 'numeric', 'min:0.01', 'max:99.99'],
     ], [
+      'product_id.required'            => ':attribute es obligatorio',
       'recipe_title.unique'            => 'Ya existe una receta con el mismo titulo',
-      'recipe_title.regex'             => 'El :attribute solo puede tener, letras y numeros',
-      'recipe_title.min'               => 'El :attribute debe ser de 5 o mas caracteres',
-      'recipe_title.max'               => 'El :attribute puede ser de hasta 50 caracteres',
-      'provisions.required'            => 'La :attribute debe tener al menos un suministro',
-      'provisions.*.quantity.required' => 'La :attribute es obligatoria',
-      'provisions.*.quantity.numeric'  => 'La :attribute debe ser un numero',
-      'provisions.*.quantity.min'      => 'La :attribute debe ser minimo :min',
-      'provisions.*.quantity.max'      => 'La :attribute debe ser maximo :max',
+      'recipe_title.regex'             => ':attribute solo puede tener, letras y numeros',
+      'recipe_title.min'               => ':attribute debe ser de 5 o mas caracteres',
+      'recipe_title.max'               => ':attribute puede ser de hasta 50 caracteres',
+      'provisions.required'            => ':attribute debe tener al menos un suministro',
+      'provisions.*.quantity.required' => ':attribute es obligatorio',
+      'provisions.*.quantity.numeric'  => ':attribute debe ser un numero',
+      'provisions.*.quantity.min'      => ':attribute debe ser minimo :min',
+      'provisions.*.quantity.max'      => ':attribute debe ser maximo :max',
     ], [
+      'product_id'              => 'producto de la receta',
       'recipe_title'            => 'titulo',
       'recipe_yields'           => 'rendimiento',
       'recipe_portions'         => 'porciones',
@@ -162,7 +179,6 @@ class CreateRecipe extends Component
       'provisions'              => 'lista de suministros',
       'provisions.*.quantity'   => 'cantidad requerida',
     ]);
-
 
     try {
 

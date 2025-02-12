@@ -36,7 +36,11 @@
               <tr wire:key="{{ $product->id }}" class="border">
                 <x-table-td class="text-end">{{ $product->id }}</x-table-td>
                 <x-table-td class="text-start">{{ $product->product_name }}</x-table-td>
-                <x-table-td class="text-end">-</x-table-td>
+                <x-table-td class="text-end">
+                  @foreach ($product->recipes as $recipe)
+                    <span>{{ $recipe->recipe_title }},&nbsp;</span>
+                  @endforeach
+                </x-table-td>
                 <x-table-td class="text-end">{{ $product->product_price }}</x-table-td>
                 <x-table-td class="text-end">{{ formatDateTime($product->created_at, 'd-m-Y') }}</x-table-td>
                 <x-table-td class="text-start">

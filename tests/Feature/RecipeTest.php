@@ -11,18 +11,27 @@ use App\Models\Provision;
 use App\Models\ProvisionTrademark;
 use App\Models\ProvisionType;
 use App\Models\Measure;
+use App\Models\Product;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Tests\TestCase;
 
 class RecipeTest extends TestCase
 {
   use RefreshDatabase;
 
+  public $product_data = [
+    'product_name' => 'torta alemana',
+    'product_price' => 4500,
+    'product_short_description' => 'lorem ipsup description piola',
+  ];
+
   public $recipe_data = [
-    'recipe_title'              =>  'pan',
-    'recipe_yields'             =>  10,
-    'recipe_portions'           =>  8,
-    'recipe_preparation_time'   =>  '00:25:00', //HH:mm:ss
-    'recipe_instructions'       =>  'lorem ipsum'
+    'recipe_title'            => 'pan',
+    'recipe_yields'           => 10,
+    'recipe_portions'         => 8,
+    'recipe_preparation_time' => '00:25:00', //HH:mm:ss
+    'recipe_instructions'     => 'lorem ipsum',
+    'product_id'              => '',
   ];
 
   public $trademark_data = [
@@ -92,11 +101,22 @@ class RecipeTest extends TestCase
   }
 
   /**
+   * crear producto
+   * @return Product
+  */
+  public function crearProducto(): Product
+  {
+    return Product::create($this->product_data);
+  }
+
+  /**
    * crear receta
    * @return void
   */
   public function test_crear_receta()
   {
+    $product = $this->crearProducto();
+    $this->recipe_data['product_id'] = $product->id;
     DB::table('recipes')->insert($this->recipe_data);
 
     $this->assertDatabaseHas('recipes', $this->recipe_data);
@@ -108,6 +128,8 @@ class RecipeTest extends TestCase
   */
   public function test_existe_modelo_receta()
   {
+    $product = $this->crearProducto();
+    $this->recipe_data['product_id'] = $product->id;
     $recipe = \App\Models\Recipe::create($this->recipe_data);
 
     $this->assertInstanceOf(\App\Models\Recipe::class, $recipe);
@@ -119,6 +141,8 @@ class RecipeTest extends TestCase
   */
   public function test_una_receta_tiene_muchos_suministros()
   {
+    $product = $this->crearProducto();
+    $this->recipe_data['product_id'] = $product->id;
     $recipe = \App\Models\Recipe::create($this->recipe_data);
 
     $this->assertInstanceOf(BelongsToMany::class, $recipe->provisions());
@@ -134,6 +158,10 @@ class RecipeTest extends TestCase
     $provision_type = $this->crearTipo();
     $measure        = $this->crearMedida();
     $provision      = $this->crearSuministro($trademark, $provision_type, $measure);
+
+    $product        = $this->crearProducto();
+    $this->recipe_data['product_id'] = $product->id;
+
     $recipe         = \App\Models\Recipe::create($this->recipe_data);
 
     $recipe->provisions()->attach($provision->id, ['recipe_quantity' => 1.5]);
@@ -145,6 +173,20 @@ class RecipeTest extends TestCase
     ]);
 
     $this->assertInstanceOf(BelongsToMany::class, $provision->recipes());
+  }
+
+  /**
+   * una receta pertenece a un producto
+   * @return void
+  */
+  public function test_una_receta_es_de_un_producto()
+  {
+    $product = $this->crearProducto();
+    $this->recipe_data['product_id'] = $product->id;
+    $recipe = \App\Models\Recipe::create($this->recipe_data);
+
+    $this->assertDatabaseHas('recipes', $this->recipe_data);
+    $this->assertInstanceOf(BelongsTo::class, $recipe->product());
   }
 
 }

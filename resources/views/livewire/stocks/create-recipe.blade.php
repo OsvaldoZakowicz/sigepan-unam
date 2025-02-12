@@ -28,98 +28,121 @@
               </x-slot:messages>
             @enderror
 
-            <div class="flex gap-4 min-h-fit">
-              {{-- titulo de la receta --}}
-              <div class="flex flex-col gap-1 min-h-fit w-full md:w-1/2 lg:w-1/4">
-                <span>
-                  <label for="recipe_title">titulo de la receta</label>
-                  <span class="text-red-600">*</span>
-                </span>
-                @error('recipe_title')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
-                <input
-                  name="recipe_title"
-                  id="recipe_title"
-                  wire:model="recipe_title"
-                  type="text"
-                  class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
-                />
-              </div>
-              {{-- rendimiento en unidades de la receta --}}
-              <div class="flex flex-col gap-1 min-h-fit w-full md:w-1/2 lg:w-1/4">
-                <span>
-                  <label for="recipe_yields">rendimiento en unidades</label>
-                  <span class="text-red-600">*</span>
-                </span>
-                @error('recipe_yields')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
-                <input
-                  name="recipe_yields"
-                  id="recipe_yields"
-                  wire:model="recipe_yields"
-                  type="text"
-                  class="p-1 text-sm w-full border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
-                />
-              </div>
-              {{-- rendimiento en porciones de la receta --}}
-              <div class="flex flex-col gap-1 min-h-fit w-full md:w-1/2 lg:w-1/4">
-                <span>
-                  <label for="recipe_portions">porciones por unidad</label>
-                  <span class="text-red-600">*</span>
-                </span>
-                @error('recipe_portions')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
-                <input
-                  type="text"
-                  wire:model="recipe_portions"
-                  name="recipe_portions"
-                  id="recipe_portions"
-                  class="p-1 text-sm w-full border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
-                />
-              </div>
-              {{-- tiempo de preparacion de la receta --}}
-              <div class="flex flex-col gap-1 min-h-fit w-full md:w-1/2 lg:w-1/4">
-                <span>
-                  <label for="">tiempo de preparación, horas y minutos</label>
-                  <span class="text-red-600">*</span>
-                </span>
-                @error('time_h')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
-                @error('time_m')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
-                <div class="flex gap-1 items-center justify-start">
-                  {{-- horas --}}
+            <div class="flex flex-col gap-4">
+              <div class="flex gap-4 min-h-fit">
+                {{-- producto de la receta --}}
+                <div class="flex flex-col gap-1 min-h-fit w-full md:w-1/2">
+                  <span>
+                    <label for="">producto de la receta</label>
+                    <span class="text-red-600">*</span>
+                  </span>
+                  <select
+                    name="product_id"
+                    wire:model="product_id"
+                    class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                    >
+                    <option value="">seleccione un producto ...</option>
+                    @foreach ($products as $product)
+                      <option value="{{ $product->id }}">{{ $product->product_name }}</option>
+                    @endforeach
+                  </select>
+                </div>
+                {{-- titulo de la receta --}}
+                <div class="flex flex-col gap-1 min-h-fit w-full md:w-1/2">
+                  <span>
+                    <label for="recipe_title">titulo de la receta</label>
+                    <span class="text-red-600">*</span>
+                  </span>
+                  @error('recipe_title')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
                   <input
+                    name="recipe_title"
+                    id="recipe_title"
+                    wire:model="recipe_title"
+                    type="text"
+                    class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                  />
+                </div>
+              </div>
+
+              <div class="flex gap-4 min-h-fil">
+                {{-- rendimiento en unidades de la receta --}}
+                <div class="flex flex-col gap-1 min-h-fit w-full md:w-1/2 lg:w-1/3">
+                  <span>
+                    <label for="recipe_yields">rendimiento en unidades</label>
+                    <span class="text-red-600">*</span>
+                  </span>
+                  @error('recipe_yields')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
+                  <input
+                    name="recipe_yields"
+                    id="recipe_yields"
+                    wire:model="recipe_yields"
+                    type="text"
+                    class="p-1 text-sm w-full border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                  />
+                </div>
+                {{-- rendimiento en porciones de la receta --}}
+                <div class="flex flex-col gap-1 min-h-fit w-full md:w-1/2 lg:w-1/3">
+                  <span>
+                    <label for="recipe_portions">porciones por unidad</label>
+                    <span class="text-red-600">*</span>
+                  </span>
+                  @error('recipe_portions')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
+                  <input
+                    type="text"
+                    wire:model="recipe_portions"
+                    name="recipe_portions"
+                    id="recipe_portions"
+                    class="p-1 text-sm w-full border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                  />
+                </div>
+                {{-- tiempo de preparacion de la receta --}}
+                <div class="flex flex-col gap-1 min-h-fit w-full md:w-1/2 lg:w-1/3">
+                  <span>
+                    <label for="">tiempo de preparación, horas y minutos</label>
+                    <span class="text-red-600">*</span>
+                  </span>
+                  @error('time_h')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
+                  @error('time_m')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
+                  <div class="flex gap-1 items-center justify-start">
+                    {{-- horas --}}
+                    <input
+                      type="number"
+                      wire:model.live="time_h"
+                      min="0"
+                      max="12"
+                      step="1"
+                      placeholder="HH"
+                      class="w-full p-1 text-sm text-right border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                    />
+                    <span>horas&nbsp;:&nbsp;</span>
+                    {{-- minutos --}}
+                    <input
                     type="number"
-                    wire:model.live="time_h"
-                    min="0"
-                    max="12"
+                    wire:model.live="time_m"
+                    min="1"
+                    max="59"
                     step="1"
-                    placeholder="HH"
+                    placeholder="mm"
                     class="w-full p-1 text-sm text-right border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
-                  />
-                  <span>horas&nbsp;:&nbsp;</span>
-                  {{-- minutos --}}
-                  <input
-                  type="number"
-                  wire:model.live="time_m"
-                  min="1"
-                  max="59"
-                  step="1"
-                  placeholder="mm"
-                  class="w-full p-1 text-sm text-right border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
-                  />
-                  <span>minutos</span>
+                    />
+                    <span>minutos</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex min-h-fit">
+                {{-- instrucciones de preparacion corta --}}
+                <div class="flex flex-col gap-1 min-h-fit w-full">
+                  <span>
+                    <label for="recipe_instructions">instrucciones de preparación</label>
+                    <span class="text-red-600">*</span>
+                  </span>
+                  @error('recipe_instructions')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
+                  <textarea wire:model="recipe_instructions" name="recipe_instructions" rows="2" cols="10" class="p-1 text-sm w-full border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"></textarea>
                 </div>
               </div>
             </div>
 
-            <div class="flex min-h-fit">
-              {{-- instrucciones de preparacion corta --}}
-              <div class="flex flex-col gap-1 min-h-fit w-full">
-                <span>
-                  <label for="recipe_instructions">instrucciones de preparación</label>
-                  <span class="text-red-600">*</span>
-                </span>
-                @error('recipe_instructions')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
-                <textarea wire:model="recipe_instructions" name="recipe_instructions" rows="2" cols="10" class="p-1 text-sm w-full border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"></textarea>
-              </div>
-            </div>
 
           </x-div-toggle>
 
