@@ -132,8 +132,8 @@
                 <x-table-td class="text-start">
                   {{ $provision->type->provision_type_name }}
                 </x-table-td>
-                <x-table-td class="text-end">
-                  {{ $provision->provision_quantity }}&nbsp;({{ $provision->measure->measure_abrv }})
+                <x-table-td class="text-end capitalize">
+                  {{ $provision->provision_quantity }}&nbsp;({{ $provision->measure->unit_symbol }})
                 </x-table-td>
                 <x-table-td class="text-start">
                   @php
@@ -143,7 +143,7 @@
                     @foreach ($packs as $pack)
                     <div
                       class="inline-flex items-center justify-start gap-1 border border-blue-300 bg-blue-200 px-1 rounded-lg cursor-pointer"
-                      title="volumen total:&nbsp;{{ $pack->pack_quantity }}{{ $provision->measure->measure_abrv }}">
+                      title="volumen total:&nbsp;{{ $pack->pack_quantity }}{{ $provision->measure->unit_symbol }}">
                       <span>&times;{{ $pack->pack_units }}</span>
                     </div>
                     @endforeach

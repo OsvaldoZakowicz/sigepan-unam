@@ -4,6 +4,7 @@ namespace App\Livewire\Suppliers;
 
 use App\Models\Measure;
 use App\Models\Provision;
+use App\Models\ProvisionCategory;
 use App\Models\ProvisionTrademark;
 use App\Models\ProvisionType;
 use Illuminate\Support\Arr;
@@ -12,16 +13,15 @@ use Livewire\Component;
 
 class CreateProvision extends Component
 {
+  public $categories;
   public $trademarks;
-  public $measures;
-  public $provision_types;
 
-  public $provision_name;
-  public $provision_quantity;
-  public $provision_short_description = 'sin descripcion';
+  public $provision_category_id;
   public $provision_trademark_id;
-  public $provision_type_id;
-  public $measure_id;
+  public $provision_type;
+  public $measure;
+  public $provision_quantity;
+  public $provision_short_description;
 
   public $pack_units;
   public $packs;
@@ -32,9 +32,8 @@ class CreateProvision extends Component
   */
   public function boot(): void
   {
+    $this->categories = ProvisionCategory::all();
     $this->trademarks = ProvisionTrademark::all();
-    $this->measures = Measure::all();
-    $this->provision_types = ProvisionType::all();
   }
 
   /**
@@ -44,6 +43,23 @@ class CreateProvision extends Component
   public function mount(): void
   {
     $this->packs = collect();
+  }
+
+  /**
+   * Actualiza los campos relacionados cuando cambia la categoría seleccionada
+   * Obtiene la unidad de medida y el tipo de suministro asociados a la categoría
+   * @return void
+  */
+  public function updatedProvisionCategoryId()
+  {
+    if ($this->provision_category_id) {
+      $category = ProvisionCategory::findOrFail($this->provision_category_id);
+      $this->measure = $category->measure->unit_name;
+      $this->provision_type = $category->provision_type->provision_type_name;
+    } else {
+      $this->measure = '';
+      $this->provision_type = '';
+    }
   }
 
   /**
@@ -90,39 +106,51 @@ class CreateProvision extends Component
   public function save()
   {
     $validated = $this->validate([
-      'provision_name'              =>  ['required', 'string', 'max:50'],
+      'provision_category_id'       =>  ['required'],
       'provision_trademark_id'      =>  ['required'],
-      'provision_type_id'           =>  ['required'],
-      'measure_id'                  =>  ['required'],
-      'provision_quantity'          =>  ['required', 'numeric', 'between:0.1,9999'],
-      'provision_short_description' =>  ['nullable', 'string', 'max:150'],
-    ], [], [
-      'provision_name'              =>  'nombre del suministro',
-      'provision_trademark_id'      =>  'marca',
-      'provision_type_id'           =>  'tipo',
-      'measure_id'                  =>  'unidad de medida',
-      'provision_quantity'          =>  'volumen',
-      'provision_short_description' =>  'descripcion',
+      'provision_quantity'          =>  ['required', 'numeric', 'min:0.1', 'max:99'],
+      'provision_short_description' =>  ['nullable', 'regex:/^[\p{L}\s0-9]+$/', 'min:15', 'max:150'],
+    ],[
+      'provision_category_id.required'  => 'elija una :attribute para el suministro',
+      'provision_trademark_id.required' => 'elija una :attribute para el suministro',
+      'provision_quantity.required'     => 'la :attribute es obligatoria',
+      'provision_quantity.numeric'      => 'la :attribute debe ser un numero',
+      'provision_quantity.min'          => 'la :attribute puede ser de minimo :min',
+      'provision_quantity.max'          => 'la :attribute puede ser de maximo :max',
+      'provision_short_description.regex' => 'la :attribute solo puede tener, letras y numeros',
+      'provision_short_description.min' => 'la :attribute debe tener como minimo :min caracteres',
+      'provision_short_description.max' => 'la :attribute debe tener como maximo :max caracteres',
+    ],[
+      'provision_category_id'       => 'categoria',
+      'provision_name'              => 'nombre del suministro',
+      'provision_trademark_id'      => 'marca',
+      'provision_type_id'           => 'tipo',
+      'measure_id'                  => 'unidad de medida',
+      'provision_quantity'          => 'cantidad de la unidad',
+      'provision_short_description' => 'descripcion',
     ]);
 
     try {
+
+      $category  = ProvisionCategory::findOrFail($validated['provision_category_id']);
+      $trademark = ProvisionTrademark::findOrFail($validated['provision_trademark_id']);
+
+      $validated['provision_type_id'] = $category->provision_type->id;
+      $validated['measure_id']        = $category->measure->id;
+      $validated['provision_name']    = $category->provision_category_name . ' - ' . $trademark->provision_trademark_name;
 
       // suministro
       $provision = Provision::create($validated);
 
       // packs
       if (count($this->packs) > 0) {
-
         foreach ($this->packs as $pack) {
-
           $provision->packs()->create([
-            'pack_name'     => 'pack de ' . $provision->provision_name . ' x ' . $pack . ' ' . $provision->trademark->provision_trademark_name,
+            'pack_name'     => 'pack de ' . $provision->provision_name . ' x ' . $pack . ' - ' . $provision->trademark->provision_trademark_name,
             'pack_units'    => $pack,
             'pack_quantity' => $provision->provision_quantity * $pack
           ]);
-
         }
-
       }
 
       $this->reset();
