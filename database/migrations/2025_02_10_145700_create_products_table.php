@@ -16,6 +16,8 @@ return new class extends Migration
       $table->string('product_name', 50)->unique();
       $table->decimal('product_price');
       $table->string('product_short_description', 150);
+      $table->smallInteger('product_expires_in', false, true);
+      $table->boolean('product_in_store')->default(false);
       $table->timestamps();
       $table->softDeletes();
     });

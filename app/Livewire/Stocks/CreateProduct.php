@@ -16,6 +16,8 @@ class CreateProduct extends Component
   public $product_name;
   public $product_short_description;
   public $product_price;
+  public $product_expires_in;
+  public $product_in_store = false;
 
   // tags del producto
   public $selected_id_tag = '';
@@ -90,6 +92,8 @@ class CreateProduct extends Component
       'product_name'              => ['required', 'unique:recipes,recipe_title', 'regex:/^[a-zA-ZáéíóúñÁÉÍÓÚÑ0-9\s,\.]+$/u', 'min:5', 'max:50'],
       'product_short_description' => ['required', 'regex:/^[a-zA-ZáéíóúñÁÉÍÓÚÑ0-9\s,\.]+$/u', 'min:15', 'max:150'],
       'product_price'             => ['required', 'numeric', 'regex:/^\d{1,6}(\.\d{1,2})?$/', 'min:1'],
+      'product_expires_in'        => ['required'],
+      'product_in_store'          => ['required'],
       'tags_list'                 => ['required'],
     ], [
       '*.required'                => ':attribute es obligatorio',
@@ -104,15 +108,21 @@ class CreateProduct extends Component
       'product_price.numeric'     => ':attribute es debe ser un número',
       'product_price.min'         => ':attribute puede ser de minimo $1',
       'product_price.regex'       => ':attribute puede ser de hasta $999999.99',
-      'tags_list'                 => 'Elija al menos una etiqueta que describa el producto',
+      'tags_list.required'        => 'Elija al menos una etiqueta que describa el producto',
+      'product_expires_in.required' => 'indique la cantidad de :attribute',
+      ''
     ], [
       'product_name'              => 'nombre del producto',
       'product_short_description' => 'descripcion corta',
       'product_price'             => 'precio del producto',
       'tags_list'                 => 'etiquetas de clasificacion',
+      'product_expires_in'        => 'dias de vencimiento',
+      'product_in_store'          => 'publicar en tienda',
     ]);
 
     try {
+
+      //dd($validated);
 
       $product = Product::create($validated);
 

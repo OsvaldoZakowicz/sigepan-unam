@@ -17,6 +17,8 @@ class Product extends Model
     'product_name',
     'product_price',
     'product_short_description',
+    'product_expires_in',
+    'product_in_store'
   ];
 
   //* un producto tiene muchos tags de producto

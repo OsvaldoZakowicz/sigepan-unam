@@ -146,3 +146,14 @@ function randomPassword(int $length = 8)
 
   return $password;
 }
+
+/**
+ * * limitar un string a los primeros 20 caracteres
+ * seguido de puntos suspensivos
+ * @param string $text texto a limitar
+ * @return string texto limitado
+ */
+function limitText($text)
+{
+  return Str::limit($text, 20, '...');
+}

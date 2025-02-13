@@ -22,6 +22,8 @@ class ProductTest extends TestCase
     'product_name' => 'torta alemana',
     'product_price' => 4500,
     'product_short_description' => 'lorem ipsup description piola',
+    'product_expires_in' => 2,
+    'product_in_store' => true,
   ];
 
   public $recipe_data = [
