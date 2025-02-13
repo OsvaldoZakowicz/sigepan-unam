@@ -22,26 +22,35 @@
 
           <x-fieldset-base tema="suministro individual" class="w-full">
 
-            {{-- nombre --}}
+            {{-- categoria --}}
             <div class="flex flex-col gap-1 p-2 w-full md:w-1/2 lg:w-1/4">
               <span>
                 <x-input-label
-                  for="provision_name"
+                  for="provision_category_id"
                   class="font-normal"
-                  >nombre del suministro
+                  >categoria
                 </x-input-label>
                 <span class="text-red-600">*</span>
               </span>
-              @error('provision_name')
+              @error('provision_category_id')
                 <span class="text-red-400 text-xs">{{ $message }}</span>
               @enderror
-              <input
-                wire:model="provision_name"
-                name="provision_name"
-                type="text"
-                @readonly(!$can_edit)
-                class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300 @if (!$can_edit)bg-neutral-100 @endif"
-              />
+              <select
+                name="provision_category_id"
+                wire:model.live="provision_category_id"
+                id="provision_category_id"
+                disabled
+                class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300 bg-neutral-100">
+
+                <option value="" selected>seleccione una categoria ...</option>
+
+                @foreach ($categories as $category)
+                  <option value="{{ $category->id }}" class="cursor-pointer">
+                    {{ $category->provision_category_name }}
+                  </option>
+                @endforeach
+
+              </select>
             </div>
 
             {{-- marca --}}
@@ -77,62 +86,44 @@
             <div class="flex flex-col gap-1 p-2 w-full md:w-1/2 lg:w-1/4">
               <span>
                 <x-input-label
-                  for="provision_type_id"
+                  for="provision_type"
                   class="font-normal"
                   >tipo
                 </x-input-label>
                 <span class="text-red-600">*</span>
               </span>
-              @error('provision_type_id')
+              @error('provision_type')
                 <span class="text-red-400 text-xs">{{ $message }}</span>
               @enderror
-              <select
-                name="provision_type_id"
-                wire:model="provision_type_id"
-                id="provision_type_id"
-                @if (!$can_edit) disabled @endif
-                class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300 @if (!$can_edit) bg-neutral-100 @endif">
-
-                <option value="" selected>seleccione un tipo ...</option>
-
-                @foreach ($provision_types as $type)
-                  <option value="{{ $type->id }}">{{ $type->provision_type_name }}</option>
-                @endforeach
-
-              </select>
+              <input
+                type="text"
+                name="provision_type"
+                wire:model="provision_type"
+                class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300 bg-neutral-100"
+                readonly
+              />
             </div>
 
             {{-- unidad de medida --}}
             <div class="flex flex-col gap-1 p-2 w-full md:w-1/2 lg:w-1/4">
               <span>
                 <x-input-label
-                  for="measure_id"
+                  for="measure"
                   class="font-normal"
                   >unidad de medida
                 </x-input-label>
                 <span class="text-red-600">*</span>
               </span>
-              @error('measure_id')
+              @error('measure')
                 <span class="text-red-400 text-xs">{{ $message }}</span>
               @enderror
-              <select
-                name="measure_id"
-                wire:model="measure_id"
-                id="measure_id"
-                @if (!$can_edit) disabled @endif
-                class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300 @if (!$can_edit) bg-neutral-100 @endif">
-
-                <option value="" selected>seleccione una unidad ...</option>
-
-                @foreach ($measures as $measure)
-                  <option
-                    value="{{ $measure->id }}"
-                    title="{{ $measure->measure_short_description }}" class="cursor-pointer">
-                    {{ $measure->measure_name }}({{ $measure->measure_abrv }})
-                  </option>
-                @endforeach
-
-              </select>
+              <input
+                type="text"
+                name="measure"
+                wire:model="measure"
+                class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300 bg-neutral-100"
+                readonly
+              />
             </div>
 
             {{-- cantidad --}}
@@ -141,7 +132,7 @@
                 <x-input-label
                   for="provision_quantity"
                   class="font-normal"
-                  >volumen
+                  >cantidad
                 </x-input-label>
                 <span class="text-red-600">*</span>
               </span>

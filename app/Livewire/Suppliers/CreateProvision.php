@@ -2,12 +2,9 @@
 
 namespace App\Livewire\Suppliers;
 
-use App\Models\Measure;
 use App\Models\Provision;
 use App\Models\ProvisionCategory;
 use App\Models\ProvisionTrademark;
-use App\Models\ProvisionType;
-use Illuminate\Support\Arr;
 use Illuminate\View\View;
 use Livewire\Component;
 
@@ -20,6 +17,7 @@ class CreateProvision extends Component
   public $provision_trademark_id;
   public $provision_type;
   public $measure;
+  public $input_quantity_placeholder;
   public $provision_quantity;
   public $provision_short_description;
 
@@ -53,12 +51,22 @@ class CreateProvision extends Component
   public function updatedProvisionCategoryId()
   {
     if ($this->provision_category_id) {
+
       $category = ProvisionCategory::findOrFail($this->provision_category_id);
-      $this->measure = $category->measure->unit_name;
-      $this->provision_type = $category->provision_type->provision_type_name;
+
+      $this->measure                    = $category->measure->unit_name;
+      $this->provision_type             = $category->provision_type->provision_type_name;
+
+      // placeholder de la cantidad esperada
+      $this->input_quantity_placeholder = 'cantidad en ' . $category->measure->unit_name .
+        ($category->measure->conversion_unit ? ' o ' . $category->measure->conversion_unit : '');
+
     } else {
-      $this->measure = '';
-      $this->provision_type = '';
+
+      $this->measure                    = '';
+      $this->input_quantity_placeholder = '';
+      $this->provision_type             = '';
+
     }
   }
 
@@ -122,10 +130,7 @@ class CreateProvision extends Component
       'provision_short_description.max' => 'la :attribute debe tener como maximo :max caracteres',
     ],[
       'provision_category_id'       => 'categoria',
-      'provision_name'              => 'nombre del suministro',
       'provision_trademark_id'      => 'marca',
-      'provision_type_id'           => 'tipo',
-      'measure_id'                  => 'unidad de medida',
       'provision_quantity'          => 'cantidad de la unidad',
       'provision_short_description' => 'descripcion',
     ]);
@@ -146,7 +151,7 @@ class CreateProvision extends Component
       if (count($this->packs) > 0) {
         foreach ($this->packs as $pack) {
           $provision->packs()->create([
-            'pack_name'     => 'pack de ' . $provision->provision_name . ' x ' . $pack . ' - ' . $provision->trademark->provision_trademark_name,
+            'pack_name'     => 'pack de ' . $provision->provision_name . ' x ' . $pack,
             'pack_units'    => $pack,
             'pack_quantity' => $provision->provision_quantity * $pack
           ]);

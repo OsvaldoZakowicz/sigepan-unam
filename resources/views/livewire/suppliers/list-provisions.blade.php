@@ -143,7 +143,7 @@
                     @foreach ($packs as $pack)
                     <div
                       class="inline-flex items-center justify-start gap-1 border border-blue-300 bg-blue-200 px-1 rounded-lg cursor-pointer"
-                      title="volumen total:&nbsp;{{ $pack->pack_quantity }}{{ $provision->measure->unit_symbol }}">
+                      title="cantidad total:&nbsp;{{ $pack->pack_quantity }}{{ $provision->measure->unit_symbol }}">
                       <span>&times;{{ $pack->pack_units }}</span>
                     </div>
                     @endforeach

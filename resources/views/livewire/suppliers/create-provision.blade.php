@@ -120,20 +120,25 @@
               />
             </div>
 
-            {{-- volumen --}}
+            {{-- cantidad --}}
             <div class="flex flex-col gap-1 p-2 w-full md:w-1/2 lg:w-1/4">
               <span>
                 <x-input-label
                   for="provision_quantity"
                   class="font-normal"
-                  >volumen
+                  >cantidad
                 </x-input-label>
                 <span class="text-red-600">*</span>
               </span>
               @error('provision_quantity')
                 <span class="text-red-400 text-xs">{{ $message }}</span>
               @enderror
-              <x-text-input wire:model="provision_quantity" name="provision_quantity" />
+              <x-text-input
+                wire:model="provision_quantity"
+                name="provision_quantity"
+                placeholder="{{ $input_quantity_placeholder }}"
+                class="text-right"
+              />
             </div>
 
             {{-- descripcion --}}

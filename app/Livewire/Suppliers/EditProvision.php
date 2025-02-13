@@ -4,27 +4,25 @@ namespace App\Livewire\Suppliers;
 
 use App\Models\Provision;
 use App\Models\ProvisionTrademark;
-use App\Models\ProvisionType;
-use App\Models\Measure;
 use App\Models\Pack;
+use App\Models\ProvisionCategory;
 use Illuminate\View\View;
 use Livewire\Component;
 
 class EditProvision extends Component
 {
   public $provision;
+  public $categories;
   public $trademarks;
-  public $measures;
-  public $provision_types;
 
   // suministro
-  public $provision_name;
+  public $provision_category_id;
   public $provision_quantity;
   public $provision_short_description;
   public $provision_trademark_id;
-  public $provision_type_id;
-  public $measure_id;
-  public $show_pack_form;
+  public $provision_type;
+  public $measure;
+  public $input_quantity_placeholder;
 
   // pack
   public $pack_units;
@@ -40,39 +38,37 @@ class EditProvision extends Component
   /**
    * preparar constantes
    * @return void
-  */
+   */
   public function boot(): void
   {
+    $this->categories = ProvisionCategory::all();
     $this->trademarks = ProvisionTrademark::all();
-    $this->measures = Measure::all();
-    $this->provision_types = ProvisionType::all();
   }
 
   /**
    * montar datos
+   * * No se permite la edicion de categoria
    * @param int $id del suministro
    * @return void
    *
-  */
+   */
   public function mount(int $id)
   {
     // suministro
     $this->provision = Provision::findOrFail($id);
 
     // puedo editar el suministro
-    if ($this->provision->suppliers->count() > 0) {
-      $this->can_edit = false;
-    } else {
-      $this->can_edit = true;
-    }
+    $this->can_edit = ($this->provision->suppliers->count() > 0) ? false : true;
 
-    // datos a editar
-    $this->provision_name               = $this->provision->provision_name;
+    // datos a visualizar
+    $this->provision_category_id        = $this->provision->provision_category->id;
+    $this->provision_type               = $this->provision->provision_category->provision_type->provision_type_name;
+    $this->measure                      = $this->provision->provision_category->measure->unit_name;
+
+    // datos a editar: cantidad, marca y descripcion
     $this->provision_quantity           = $this->provision->provision_quantity;
-    $this->provision_short_description  = $this->provision->provision_short_description;
     $this->provision_trademark_id       = $this->provision->provision_trademark_id;
-    $this->provision_type_id            = $this->provision->provision_type_id;
-    $this->measure_id                   = $this->provision->measure_id;
+    $this->provision_short_description  = $this->provision->provision_short_description;
 
     // packs creados del suministro y activos
     $this->packs = collect($this->provision->packs);
@@ -93,11 +89,37 @@ class EditProvision extends Component
   }
 
   /**
+   * Actualiza los campos relacionados cuando cambia la categoría seleccionada
+   * Obtiene la unidad de medida y el tipo de suministro asociados a la categoría
+   * @return void
+  */
+  public function updatedProvisionCategoryId()
+  {
+    if ($this->provision_category_id) {
+
+      $category             = ProvisionCategory::findOrFail($this->provision_category_id);
+
+      $this->measure        = $category->measure->unit_name;
+      $this->provision_type = $category->provision_type->provision_type_name;
+
+      // placeholder de la cantidad esperada
+      $this->input_quantity_placeholder = 'cantidad en ' . $category->measure->unit_name .
+        ($category->measure->conversion_unit ? ' o ' . $category->measure->conversion_unit : '');
+
+    } else {
+
+      $this->measure                    = '';
+      $this->provision_type             = '';
+      $this->input_quantity_placeholder = '';
+    }
+  }
+
+  /**
    * agregar packs a la lista
    * agregar packs de unidades a la lista de packs a crear
    * siempre que el pack no este creado, no este borrado con soft delete, o no haya sido elegido.
    * @return void
-  */
+   */
   public function createPack(): void
   {
 
@@ -164,7 +186,7 @@ class EditProvision extends Component
    * remueve packs seleccionados para su creacion.
    * @param int $index indice del elemento a remover
    * @return void
-  */
+   */
   public function cancelPackCreation($index)
   {
     $this->new_packs->forget($index);
@@ -176,7 +198,7 @@ class EditProvision extends Component
    * @param Pack $pack id del pack a eliminar
    * @param int $index indice del pack en la lista
    * @return void
-  */
+   */
   public function deletePack(Pack $pack, $index): void
   {
     // si el pack esta asignado a uno o mas proveedores no se puede eliminar
@@ -201,7 +223,7 @@ class EditProvision extends Component
    * @param Pack $pack cuya eliminacion se cancela
    * @param int $index indice del pack en la lista
    * @return void
-  */
+   */
   public function cancelPackElimination(Pack $pack, $index): void
   {
     $this->packs_to_delete->forget($index);
@@ -214,7 +236,7 @@ class EditProvision extends Component
    * @param int $id del pack a restaurar
    * @param int $index del pack en la lista
    * @return void
-  */
+   */
   public function restoreSoftDeleted(int $id, int $index): void
   {
     $pack = $this->soft_deleted_packs[$index];
@@ -227,7 +249,7 @@ class EditProvision extends Component
    * cancelar la restauracion de un pack soft deleted
    * @param int $index del pack en la lista
    * @return void
-  */
+   */
   public function cancelRestoreSoftDeleted(int $index): void
   {
     $pack = $this->packs_to_restore[$index];
@@ -239,87 +261,83 @@ class EditProvision extends Component
   /**
    * guardar suministro
    * @return void
-  */
+   */
   public function save()
   {
-    $this->validate([
-      'provision_name'              =>  ['required', 'string', 'max:50'],
+    $validated = $this->validate([
       'provision_trademark_id'      =>  ['required'],
-      'provision_type_id'           =>  ['required'],
-      'measure_id'                  =>  ['required'],
-      'provision_quantity'          =>  ['required', 'numeric', 'between:0.1,9999'],
-      'provision_short_description' =>  ['nullable', 'string', 'max:150'],
-    ], [], [
-      'provision_name'              =>  'nombre del suministro',
-      'provision_trademark_id'      =>  'marca',
-      'provision_type_id'           =>  'tipo',
-      'measure_id'                  =>  'unidad de medida',
-      'provision_quantity'          =>  'cantidad',
-      'provision_short_description' =>  'descripcion',
+      'provision_quantity'          =>  ['required', 'numeric', 'min:0.1', 'max:99'],
+      'provision_short_description' =>  ['nullable', 'regex:/^[\p{L}\s0-9]+$/', 'min:15', 'max:150'],
+    ],[
+      'provision_trademark_id.required'   => 'elija una :attribute para el suministro',
+      'provision_quantity.required'       => 'la :attribute es obligatoria',
+      'provision_quantity.numeric'        => 'la :attribute debe ser un numero',
+      'provision_quantity.min'            => 'la :attribute puede ser de minimo :min',
+      'provision_quantity.max'            => 'la :attribute puede ser de maximo :max',
+      'provision_short_description.regex' => 'la :attribute solo puede tener, letras y numeros',
+      'provision_short_description.min'   => 'la :attribute debe tener como minimo :min caracteres',
+      'provision_short_description.max'   => 'la :attribute debe tener como maximo :max caracteres',
+    ],[
+      'provision_trademark_id'      => 'marca',
+      'provision_quantity'          => 'cantidad de la unidad',
+      'provision_short_description' => 'descripcion',
     ]);
 
     try {
 
-      // packs a eliminar
-      // soft deletes
+      // * verificar si hay packs que borrar
       if ($this->packs_to_delete->count() > 0) {
-
         $this->packs_to_delete->each(function ($pack) {
-          $pack->delete();
+          $pack->delete(); // soft delete
         });
-
       }
 
-      // si el volumen del suministro o su nombre cambio, se deben modificar los packs existentes
-      if ($this->provision_quantity !== $this->provision->provision_quantity || $this->provision_name !== $this->provision->provision_name) {
+      // * si la marca cambio, obtener nueva marca y construir nombre del suministro
+      if ($validated['provision_trademark_id'] !== $this->provision->provision_trademark_id) {
+        $trademark      = ProvisionTrademark::findOrFail($validated['provision_trademark_id']);
+        $provision_name = $this->provision->provision_category->provision_category_name . ' - ' . $trademark->provision_trademark_name;
 
-        $this->packs->each(function ($pack) {
-          $pack->pack_name     = 'pack de ' . $this->provision->provision_name . ' x ' . $pack . ' ' . $this->provision->trademark->provision_trademark_name;
-          $pack->pack_quantity = $this->provision_quantity * $pack->pack_units;
-          $pack->save();
-        });
-
+        $this->provision->provision_name         = $provision_name;
+        $this->provision->provision_trademark_id = $validated['provision_trademark_id'];
       }
 
-      // packs a restaurar
-      // si el volumen del suministro o su nombre cambio, se deben modificar los packs restaurados
-      if ($this->packs_to_restore->count() > 0) {
-
-        $this->packs_to_restore->each( function ($pack) {
-          $pack->restore();
-        });
-
-        if ($this->provision_quantity !== $this->provision->provision_quantity || $this->provision_name !== $this->provision->provision_name) {
-
-          $this->packs_to_restore->each(function ($pack) {
-            $pack->pack_name     = 'pack de ' . $this->provision->provision_name . ' x ' . $pack . ' ' . $this->provision->trademark->provision_trademark_name;
-            $pack->pack_quantity = $this->provision_quantity * $pack->pack_units;
-            $pack->save();
-          });
-
-        }
-
+      // * si la cantidad cambio
+      if ($validated['provision_quantity'] !== $this->provision->provision_quantity) {
+        $this->provision->provision_quantity = $validated['provision_quantity'];
       }
 
-      // actualizar el suministro
-      $this->provision->provision_name              = $this->provision_name;
-      $this->provision->provision_quantity          = $this->provision_quantity;
-      $this->provision->provision_short_description = $this->provision_short_description;
-      $this->provision->provision_trademark_id      = $this->provision_trademark_id;
-      $this->provision->provision_type_id           = $this->provision_type_id;
-      $this->provision->measure_id                  = $this->measure_id;
+      $this->provision->provision_short_description = $validated['provision_short_description'];
       $this->provision->save();
 
-      // packs a crear
-      $this->new_packs->each(function ($pack_units) {
+      // * verificar si hay packs borrados a restaurar
+      if ($this->packs_to_restore->count() > 0) {
+        $this->packs_to_restore->each(function ($pack) {
+          $pack->restore();
+          $pack->pack_name      = 'pack de ' . $this->provision->provision_name . ' x ' . $pack->pack_units;
+          $pack->pack_quantity  = $this->provision->provision_quantity * $pack->pack_units;
+          $pack->save();
+        });
+      }
 
-        $this->provision->packs()->create([
-          'pack_name'     => 'pack de ' . $this->provision->provision_name . ' x ' . $pack_units . ' ' . $this->provision->trademark->provision_trademark_name,
-          'pack_units'    => $pack_units,
-          'pack_quantity' => $this->provision->provision_quantity * $pack_units
-        ]);
+      // * verificar si hay packs activos a editar
+      if ($this->packs->count() > 0) {
+        $this->packs->each(function ($pack) {
+          $pack->pack_name      = 'pack de ' . $this->provision->provision_name . ' x ' . $pack->pack_units;
+          $pack->pack_quantity  = $this->provision->provision_quantity * $pack->pack_units;
+          $pack->save();
+        });
+      }
 
-      });
+      // * verificar si hay packs a crear
+      if ($this->new_packs->count() > 0) {
+        $this->new_packs->each(function ($pack) {
+          $this->provision->packs()->create([
+            'pack_name'     => 'pack de ' . $this->provision->provision_name . ' x ' . $pack,
+            'pack_units'    => $pack,
+            'pack_quantity' => $this->provision->provision_quantity * $pack
+          ]);
+        });
+      }
 
       $this->reset();
 
@@ -337,7 +355,7 @@ class EditProvision extends Component
   /**
    * renderizar vista
    * @return View
-  */
+   */
   public function render(): View
   {
     return view('livewire.suppliers.edit-provision');
