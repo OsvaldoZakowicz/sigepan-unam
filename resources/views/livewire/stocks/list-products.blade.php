@@ -3,7 +3,7 @@
   <article class="m-2 border rounded-sm border-neutral-200">
 
     {{-- barra de titulo --}}
-    <x-title-section title="lista de recetas">
+    <x-title-section title="lista de productos">
       <x-a-button
         wire:navigate
         href="{{ route('stocks-products-create') }}"

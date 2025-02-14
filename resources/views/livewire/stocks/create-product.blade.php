@@ -134,8 +134,8 @@
                     name="product_in_store"
                     wire:model="product_in_store"
                     class="grow p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
-                    <option value="false">no publicar</option>
-                    <option value="true">publicar</option>
+                    <option value="0">no publicar</option>
+                    <option value="1">publicar</option>
                   </select>
                 </div>
                 {{-- decripcion corta --}}
