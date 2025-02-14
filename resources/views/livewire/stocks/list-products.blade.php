@@ -25,7 +25,6 @@
             <tr class="border bg-neutral-100">
               <x-table-th class="text-end w-12">id</x-table-th>
               <x-table-th class="text-start">producto</x-table-th>
-              <x-table-th class="text-start">descripcion</x-table-th>
               <x-table-th class="text-start">recetas</x-table-th>
               <x-table-th class="text-end">$&nbsp;precio</x-table-th>
               <x-table-th class="text-start">
@@ -44,10 +43,6 @@
                 </x-table-td>
                 <x-table-td class="text-start">
                   {{ $product->product_name }}
-                </x-table-td>
-                <x-table-td class="text-start">
-                  {{ limitText($product->product_short_description) }}
-                  <span class="font-semibold text-blue-300 cursor-pointer">leer mas</span>
                 </x-table-td>
                 <x-table-td class="text-start">
                   @if ($product->recipes->count() > 0 )
@@ -73,6 +68,15 @@
                 </x-table-td>
                 <x-table-td class="text-start">
                   <div class="flex justify-start gap-1">
+
+                    <x-a-button
+                      wire:navigate
+                      href="{{ route('stocks-products-show', $product->id) }}"
+                      bg_color="neutral-100"
+                      border_color="neutral-200"
+                      text_color="neutral-600"
+                      >ver
+                    </x-a-button>
 
                     <x-a-button
                       wire:navigate

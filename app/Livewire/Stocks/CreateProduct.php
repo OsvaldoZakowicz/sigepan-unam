@@ -6,10 +6,13 @@ use App\Models\Tag;
 use App\Models\Product;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
+use Livewire\WithFileUploads;
 use Livewire\Component;
 
 class CreateProduct extends Component
 {
+  use WithFileUploads;
+
   public Collection $tags;
 
   // datos del producto
@@ -17,7 +20,8 @@ class CreateProduct extends Component
   public $product_short_description;
   public $product_price;
   public $product_expires_in;
-  public $product_in_store = false;
+  public $product_in_store;
+  public $product_image;
 
   // tags del producto
   public $selected_id_tag = '';
@@ -94,9 +98,9 @@ class CreateProduct extends Component
       'product_price'             => ['required', 'numeric', 'regex:/^\d{1,6}(\.\d{1,2})?$/', 'min:1'],
       'product_expires_in'        => ['required'],
       'product_in_store'          => ['required'],
+      'product_image'             => ['required', 'image', 'max:4096', 'mimes:jpeg,png,jpg'],
       'tags_list'                 => ['required'],
     ], [
-      '*.required'                => ':attribute es obligatorio',
       'product_name.unique'       => 'Ya existe un producto con el mismo nombre',
       'product_name.regex'        => ':attribute solo puede tener, letras y numeros',
       'product_name.min'          => ':attribute debe ser de una longitud minima de :min',
@@ -108,9 +112,13 @@ class CreateProduct extends Component
       'product_price.numeric'     => ':attribute es debe ser un número',
       'product_price.min'         => ':attribute puede ser de minimo $1',
       'product_price.regex'       => ':attribute puede ser de hasta $999999.99',
-      'tags_list.required'        => 'Elija al menos una etiqueta que describa el producto',
+      'product_in_store.required' => 'indique si desea publicar en la tienda este producto',
+      'tags_list.required'        => 'elija al menos una etiqueta que describa el producto',
       'product_expires_in.required' => 'indique la cantidad de :attribute',
-      ''
+      'product_image.required'    => 'la :attribute es obligatoria para publicar el producto',
+      'product_image.image'       => 'la :attribute debe ser una imagen',
+      'product_image.max'         => 'la :attribute puede ser de hasta 4Mb',
+      'product_image.mime'        => 'la :attribute puede ser jpeg, png, jpg',
     ], [
       'product_name'              => 'nombre del producto',
       'product_short_description' => 'descripcion corta',
@@ -118,11 +126,14 @@ class CreateProduct extends Component
       'tags_list'                 => 'etiquetas de clasificacion',
       'product_expires_in'        => 'dias de vencimiento',
       'product_in_store'          => 'publicar en tienda',
+      'product_image'             => 'imagen del producto',
     ]);
 
     try {
 
-      //dd($validated);
+
+      $product_image_path = $this->product_image->store('productos', 'public');
+      $validated['product_image_path'] = $product_image_path;
 
       $product = Product::create($validated);
 

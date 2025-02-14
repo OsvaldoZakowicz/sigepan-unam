@@ -18,7 +18,8 @@ class Product extends Model
     'product_price',
     'product_short_description',
     'product_expires_in',
-    'product_in_store'
+    'product_in_store',
+    'product_image_path',
   ];
 
   //* un producto tiene muchos tags de producto

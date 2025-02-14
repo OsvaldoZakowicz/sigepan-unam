@@ -1,6 +1,6 @@
 <div>
-   {{-- componente crear producto --}}
-   <article class="m-2 border rounded-sm border-neutral-200">
+  {{-- componente crear producto --}}
+  <article class="m-2 border rounded-sm border-neutral-200">
 
     {{-- barra de titulo --}}
     <x-title-section title="crear producto"></x-title-section>
@@ -31,22 +31,22 @@
             <div class="flex justify-start items-stretch gap-4">
 
               <div class="flex flex-col gap-4 w-1/2">
-                {{-- nombre del producto --}}
-                <div class="flex flex-col gap-1 min-h-fit w-full">
-                  <span>
-                    <label for="product_name">nombre del producto</label>
-                    <span class="text-red-600">*</span>
-                  </span>
-                  @error('product_name')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
-                  <input
-                    name="product_name"
-                    id="product_name"
-                    wire:model="product_name"
-                    type="text"
-                    class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
-                  />
-                </div>
                 <div class="flex gap-4">
+                  {{-- nombre del producto --}}
+                  <div class="flex flex-col gap-1 min-h-fit w-full">
+                    <span>
+                      <label for="product_name">nombre del producto</label>
+                      <span class="text-red-600">*</span>
+                    </span>
+                    @error('product_name')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
+                    <input
+                      name="product_name"
+                      id="product_name"
+                      wire:model="product_name"
+                      type="text"
+                      class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                    />
+                  </div>
                   {{-- precio --}}
                   <div class="flex flex-col gap-1 min-h-fit w-full">
                     <span>
@@ -63,10 +63,13 @@
                       class="p-1 text-sm text-right border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
                     />
                   </div>
+                </div>
+                <div class="flex gap-4">
                   {{-- vencimiento luego de elaboracion  --}}
                   <div class="flex flex-col gap-1 min-h-fit w-full">
                     <span>
-                      <label for="product_expires_in">Días de vencimiento a partir de la elaboración</label>
+                      <label for="product_expires_in">Vencimiento despúes de elaborarse</label>
+                      <x-quest-icon title="Una vez que se prepare este producto, ¿cuántos dias se mantiene fresco para la venta?"/>
                       <span class="text-red-600">*</span>
                     </span>
                     @error('product_expires_in')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
@@ -79,6 +82,37 @@
                       class="p-1 text-sm text-right border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
                     />
                   </div>
+                  {{-- publicar en tienda --}}
+                  <div class="flex flex-col gap-1 min-h-fit w-full">
+                    <span>
+                      <label for="product_in_store">publicar este producto en la tienda?</label>
+                      <span class="text-red-600">*</span>
+                    </span>
+                    @error('product_in_store')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
+                    <select
+                      name="product_in_store"
+                      wire:model="product_in_store"
+                      class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
+                      <option value="">seleccione una opcion ...</option>
+                      <option value="1">publicar</option>
+                      <option value="0">no publicar</option>
+                    </select>
+                  </div>
+                </div>
+                {{-- decripcion corta --}}
+                <div class="flex flex-col gap-1 min-h-fit w-full">
+                  <span>
+                    <label for="product_short_description">descripción corta del producto</label>
+                    <span class="text-red-600">*</span>
+                  </span>
+                  @error('product_short_description')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
+                  <textarea
+                    wire:model="product_short_description"
+                    name="product_short_description"
+                    rows="3"
+                    cols="10"
+                    class="p-1 text-sm w-full border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
+                  </textarea>
                 </div>
                 {{-- etiquetas --}}
                 <div class="flex flex-col gap-1 min-h-fit w-full">
@@ -120,33 +154,28 @@
                   </div>
                 </div>
               </div>
-
               <div class="flex flex-col gap-4 w-1/2">
-                {{-- publicar en tienda --}}
+                {{-- imagen del producto --}}
                 <div class="flex flex-col gap-1 min-h-fit w-full">
                   <span>
-                    <label for="product_in_store">publicar este producto en la tienda?</label>
+                    <label for="product_image">imagen del producto</label>
                     <span class="text-red-600">*</span>
                   </span>
-                  @error('product_in_store')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
-                  {{-- elegir etiquetas --}}
-                  <select
-                    name="product_in_store"
-                    wire:model="product_in_store"
-                    class="grow p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
-                    <option value="0">no publicar</option>
-                    <option value="1">publicar</option>
-                  </select>
+                  @error('product_image')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
+                  <input
+                    type="file"
+                    wire:model="product_image"
+                    id="product_image"
+                    accept="image/*"
+                    class="p-1 text-sm w-full border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                    >
                 </div>
-                {{-- decripcion corta --}}
-                <div class="flex flex-col gap-1 min-h-fit w-full">
-                  <span>
-                    <label for="product_short_description">descripción corta del producto</label>
-                    <span class="text-red-600">*</span>
-                  </span>
-                  @error('product_short_description')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
-                  <textarea wire:model="product_short_description" name="product_short_description" rows="3" cols="10" class="p-1 text-sm w-full border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"></textarea>
-                </div>
+                {{-- vista previa de la imagen --}}
+                @if ($product_image)
+                  <div class="flex flex-col gap-1 min-h-fit w-full">
+                    <img src="{{ $product_image->temporaryUrl() }}" class="max-w-xs border-2 border-dashed border-neutral-300">
+                  </div>
+                @endif
               </div>
 
             </div>

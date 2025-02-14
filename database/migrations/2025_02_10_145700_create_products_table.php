@@ -18,6 +18,7 @@ return new class extends Migration
       $table->string('product_short_description', 150);
       $table->smallInteger('product_expires_in', false, true);
       $table->boolean('product_in_store')->default(false);
+      $table->string('product_image_path')->nullable();
       $table->timestamps();
       $table->softDeletes();
     });

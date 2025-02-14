@@ -49,4 +49,10 @@ class StockController extends Controller
   {
     return view('stocks.products-create');
   }
+
+  //* ver un producto
+  public function products_show(int $id): View
+  {
+    return view('stocks.products-show', ['id' => $id]);
+  }
 }

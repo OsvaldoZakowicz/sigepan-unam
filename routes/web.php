@@ -190,6 +190,9 @@ Route::middleware(['auth', 'verified', 'can:stock'])->group(function () {
   Route::get('stocks/products/create', [StockController::class, 'products_create'])
     ->name('stocks-products-create');
 
+  Route::get('stocks/products/show/{id}', [StockController::class, 'products_show'])
+    ->name('stocks-products-show');
+
 });
 
 //* modulo de clientes
