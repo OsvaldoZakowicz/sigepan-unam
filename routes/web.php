@@ -10,7 +10,22 @@ use App\Http\Controllers\Stocks\StockController;
 
 
 //* layout publico
+// retorna la vista welcome y tienda
 Route::view('/', 'welcome')->name('welcome');
+
+//* modulo de clientes
+// acceso solo a rol cliente
+Route::middleware(['can:tienda'])->group(function () {
+
+  // acceso a la ruta para la tienda
+
+  // acceso a la ruta para perfil de cliente en tienda
+
+  // * redirecciona a / y retorna 'welcome'
+  Route::get('client/logout', ClientLogOutController::class)
+    ->name('client-logout');
+
+});
 
 //* layout interno panel
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -192,14 +207,6 @@ Route::middleware(['auth', 'verified', 'can:stock'])->group(function () {
 
   Route::get('stocks/products/show/{id}', [StockController::class, 'products_show'])
     ->name('stocks-products-show');
-
-});
-
-//* modulo de clientes
-Route::middleware(['can:cliente'])->group(function () {
-
-  Route::get('client/logout', ClientLogOutController::class)
-    ->name('client-logout');
 
 });
 

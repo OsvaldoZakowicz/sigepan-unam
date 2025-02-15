@@ -19,17 +19,18 @@
 
 {{-- vista de bienvenida --}}
 <body class="antialiased font-sans">
-  <div class="bg-neutral-200 px-2">
+
+  <div class="bg-neutral-200 py-4 px-2">
     <header class="">
       @if (Route::has('login'))
         {{-- navegacion de bienvenida --}}
-        <livewire:welcome.navigation />
+        @livewire('welcome.navigation')
       @endif
     </header>
   </div>
-  {{-- ?podria poner toda la tienda en esta vista? --}}
-  {{-- !no olvidar los permisos a las acciones --}}
-  <p>Vista de bienvenida, y tienda para cliente</p>
+
+  {{-- tienda --}}
+  @livewire('store.store')
 
   {{-- livewire --}}
   @livewireScripts()

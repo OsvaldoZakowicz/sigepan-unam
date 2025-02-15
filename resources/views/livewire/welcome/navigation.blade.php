@@ -1,8 +1,7 @@
 <nav class="mx-3 flex flex-1 justify-end gap-4">
-  {{-- navegacion de la vista bienvenida --}}
+  {{-- * navegacion de la vista bienvenida --}}
+  {{-- * una vez autenticados, mostrar segun rol dashboard o tienda --}}
   @auth
-
-    {{-- una vez autenticados, mostrar segun rol dashboard o tienda --}}
 
     @can('panel')
       <a wire:navigate href="{{ url('/dashboard') }}" class="capitalize">
@@ -10,14 +9,20 @@
       </a>
     @endcan
 
-    @can('cliente')
+    @can('tienda')
       <a wire:navigate href="#" class="capitalize">
         <span>tienda</span>
       </a>
+    @endcan
+
+    @can('tienda-perfil')
       <a wire:navigate href="#" class="capitalize">
         <span>mi perfil</span>
       </a>
-      {{-- logout manual del cliente --}}
+    @endcan
+
+    {{-- logout manual del cliente --}}
+    @can('tienda')
       <form action="{{ route('client-logout') }}">
         @csrf
         <button type="submit" class="capitalize">cerrar sesión</button>
@@ -26,7 +31,7 @@
 
   @else
 
-    {{-- nadie autenticado, mostrar login y register --}}
+    {{-- * nadie autenticado, mostrar login y register --}}
 
     <a wire:navigate href="{{ route('login') }}" class="capitalize">
       {{__('Log in')}}
