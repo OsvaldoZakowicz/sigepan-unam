@@ -20,8 +20,18 @@ new #[Layout('layouts.guest')] class extends Component
 
     Session::regenerate();
 
-    /* redirigir a vista de bienvenida, pero ya autenticado */
-    $this->redirectIntended(default: route('welcome', absolute: false), navigate: true);
+    if(auth()->user()->hasRole('cliente')) {
+
+      /* redirigir a vista de bienvenida, pero ya autenticado */
+      $this->redirectIntended(default: route('welcome', absolute: false), navigate: true);
+
+    } else {
+
+      /* redirigir a vista de panel, pero ya autenticado */
+      $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
+
+    }
+
   }
 }; ?>
 
