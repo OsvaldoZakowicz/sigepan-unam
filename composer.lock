@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "93316e4c08389c1962809eaa7600969e",
+    "content-hash": "dd7065c6fc9d64e6e2fd8413f470033f",
     "packages": [
         {
             "name": "archtechx/enums",
@@ -3558,6 +3558,45 @@
                 "source": "https://github.com/livewire/volt"
             },
             "time": "2024-05-31T19:07:20+00:00"
+        },
+        {
+            "name": "mercadopago/dx-php",
+            "version": "3.0.8",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mercadopago/sdk-php.git",
+                "reference": "b03c3c789c7d4fedfcf7d54cf57993e77c95aabb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mercadopago/sdk-php/zipball/b03c3c789c7d4fedfcf7d54cf57993e77c95aabb",
+                "reference": "b03c3c789c7d4fedfcf7d54cf57993e77c95aabb",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.2"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.22",
+                "phpunit/phpunit": "^10.2",
+                "squizlabs/php_codesniffer": "3.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "MercadoPago\\": "src/MercadoPago"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Mercado Pago PHP SDK",
+            "homepage": "https://github.com/mercadopago/sdk-php",
+            "support": {
+                "source": "https://github.com/mercadopago/sdk-php/tree/3.0.8"
+            },
+            "time": "2024-09-03T12:26:16+00:00"
         },
         {
             "name": "monolog/monolog",
