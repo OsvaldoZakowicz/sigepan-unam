@@ -90,6 +90,56 @@ class Store extends Component
   }
 
   /**
+   * intercepta cualquier cambio en las cantidades del carrito
+   * @param string $name nombre del input cantidad del carrito para cada item
+   * @param $value valor del input
+   * @return void
+   */
+  public function updated($name, $value): void
+  {
+    if (str_starts_with($name, 'cart.') && str_ends_with($name, '.quantity')) {
+      $parts = explode('.', $name);
+      $index = $parts[1];
+      $product_id = $this->cart[$index]['id'];
+
+      // Validar que sea numérico y convertir a entero
+      if (!is_numeric($value) || (int) $value <= 0) {
+        $this->fixCartItemQuantity($index, $product_id);
+        return;
+      }
+    }
+  }
+
+  /**
+   * manejar la corrección de valores invalidos
+   * @param $index
+   * @param $product_id
+   * @return void
+   */
+  private function fixCartItemQuantity($index, $product_id): void
+  {
+    $currentItem = $this->cart->firstWhere('id', $product_id);
+    // Asegurar que sea numérico y al menos 1
+    $valid_quantity = is_numeric($currentItem['quantity']) ?
+      max(1, (int) $currentItem['quantity']) : 1;
+
+    $this->cart = $this->cart->map(function ($item, $key) use ($index, $product_id, $valid_quantity) {
+      if ($key == $index && $item['id'] === $product_id) {
+        return [
+          'id' => $item['id'],
+          'product' => $item['product'],
+          'quantity' => $valid_quantity,
+          'subtotal' => $item['product']->product_price * $valid_quantity
+        ];
+      }
+      return $item;
+    })->values();
+
+    $this->calculateTotal();
+    $this->dispatch('quantity-error', 'Por favor, ingrese solo números mayores a 0');
+  }
+
+  /**
    * Actualiza la cantidad de un producto en el carrito y recalcula el subtotal
    * @param int $product_id ID del producto a actualizar
    * @param int $quantity Nueva cantidad del producto
@@ -97,25 +147,28 @@ class Store extends Component
    */
   public function updateQuantity($product_id, $quantity): void
   {
-    if ($quantity > 0) {
-
-      $this->cart = $this->cart->map(function ($item) use ($product_id, $quantity) {
-
-        if ($item['id'] === $product_id) {
-
-          return [
-            'id' => $item['id'],
-            'product' => $item['product'],
-            'quantity' => $quantity,
-            'subtotal' => $item['product']->product_price * $quantity,
-          ];
-        }
-
-        return $item;
-      })->values();
-
-      $this->calculateTotal();
+    // Validar que sea numérico
+    if (!is_numeric($quantity)) {
+      return;
     }
+
+    $quantity = max(1, (int) $quantity);
+
+    $this->cart = $this->cart->map(function($item) use ($product_id, $quantity) {
+
+      if ($item['id'] === $product_id) {
+        return [
+          'id' => $item['id'],
+          'product' => $item['product'],
+          'quantity' => $quantity,
+          'subtotal' => $item['product']->product_price * $quantity
+        ];
+      }
+
+      return $item;
+    })->values();
+
+    $this->calculateTotal();
   }
 
   /**
@@ -171,7 +224,7 @@ class Store extends Component
       ->where('product_in_store', true)
       ->when($this->search_products, function ($query) {
         $query->where('product_name', 'like', '%' . $this->search_products . '%')
-              ->orWhere('product_price', '<=', (float) $this->search_products);
+          ->orWhere('product_price', '<=', (float) $this->search_products);
       })
       ->when($this->search_by_tag, function ($query) {
         $query->whereHas('tags', function ($q) {

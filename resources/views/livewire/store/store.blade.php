@@ -137,14 +137,29 @@
                 </div>
 
                 <div class="flex items-center space-x-4">
-                  <input
-                    type="number"
-                    wire:model.live="cart.{{ $loop->index }}.quantity"
-                    wire:change="updateQuantity({{ $item['id'] }}, $event.target.value)"
-                    value="{{ $item['quantity'] }}"
-                    min="1"
-                    class="w-24 rounded-md text-lg bg-orange-100 text-orange-800 font-light border-orange-600 focus:ring-orange-800 focus:border-orange-800 focus:outline-none"
-                  />
+                  <div class="relative">
+                    <input
+                      type="number"
+                      wire:model.live="cart.{{ $loop->index }}.quantity"
+                      wire:change="updateQuantity({{ $item['id'] }}, $event.target.value)"
+                      class="w-20 p-1 border rounded"
+                      min="1"
+                      onkeypress="return (event.charCode >= 48 && event.charCode <= 57)"
+                      oninput="this.value = this.value.replace(/[^0-9]/g, ''); this.value = this.value <= 0 ? 1 : this.value"
+                      value="{{ $item['quantity'] }}"
+                      title="Por favor ingrese un número entero positivo mayor a cero"
+                      class="w-24 rounded-md text-lg bg-orange-100 text-orange-800 font-light border-orange-600 focus:ring-orange-800 focus:border-orange-800 focus:outline-none"
+                    />
+                    <div
+                      x-data="{ show: false, message: '' }"
+                      x-on:quantity-error.window="message = $event.detail; show = true; setTimeout(() => show = false, 3000)"
+                      x-show="show"
+                      x-transition
+                      class="absolute top-full left-0 mt-1 text-red-500 text-sm"
+                      x-cloak
+                      ><span x-text="message"></span>
+                    </div>
+                  </div>
 
                   <p class="font-semibold">${{ number_format($item['subtotal'], 2) }}</p>
 
