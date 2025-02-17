@@ -20,14 +20,12 @@
 {{-- vista de bienvenida --}}
 <body class="antialiased font-sans">
 
-  <div class="bg-neutral-200 py-4 px-2">
-    <header class="">
-      @if (Route::has('login'))
-        {{-- navegacion de bienvenida --}}
-        @livewire('welcome.navigation')
-      @endif
-    </header>
-  </div>
+  <header class="">
+    @if (Route::has('login'))
+      {{-- navegacion de bienvenida --}}
+      @livewire('welcome.navigation')
+    @endif
+  </header>
 
   {{-- tienda --}}
   @livewire('store.store')

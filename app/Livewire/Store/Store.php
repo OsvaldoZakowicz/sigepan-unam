@@ -3,8 +3,10 @@
 namespace App\Livewire\Store;
 
 use App\Models\Product;
+use App\Models\Tag;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
+use Livewire\Attributes\Url;
 use Livewire\WithPagination;
 use Livewire\Component;
 
@@ -13,10 +15,27 @@ class Store extends Component
 
   use WithPagination;
 
+  // busquedas
+  #[Url]
+  public $search_products = '';
+
+  #[Url]
+  public $search_by_tag = '';
+
   public Collection $cart;
   public bool $show_cart_modal = false;
   public float $cart_total = 0;
   public int $cart_total_items = 0;
+  public Collection $tags;
+
+  /**
+   * boot de constantes
+   * @return void
+   */
+  public function boot(): void
+  {
+    $this->tags = Tag::all();
+  }
 
   /**
    * montar datos
@@ -41,7 +60,7 @@ class Store extends Component
    * agregar un item producto al carrito
    * @param Product $product
    * @return void
-  */
+   */
   public function addToCart(Product $product): void
   {
     if (!$this->cart->contains('id', $product->id)) {
@@ -61,35 +80,55 @@ class Store extends Component
   }
 
   /**
+   * vaciar el carrito
+   * @return void
+   */
+  public function resetCart(): void
+  {
+    $this->cart = collect();
+    $this->cart_total_items = 0;
+  }
+
+  /**
    * Actualiza la cantidad de un producto en el carrito y recalcula el subtotal
-   * @param int $productId ID del producto a actualizar
+   * @param int $product_id ID del producto a actualizar
    * @param int $quantity Nueva cantidad del producto
    * @return void
-  */
-  public function updateQuantity($productId, $quantity): void
+   */
+  public function updateQuantity($product_id, $quantity): void
   {
     if ($quantity > 0) {
-      $this->cart = $this->cart->map(function ($item) use ($productId, $quantity) {
 
-        if ($item['id'] === $productId) {
-          $item['quantity'] = $quantity;
-          $item['subtotal'] = $item['product']->product_price * $quantity;
+      $this->cart = $this->cart->map(function ($item) use ($product_id, $quantity) {
+
+        if ($item['id'] === $product_id) {
+
+          return [
+            'id' => $item['id'],
+            'product' => $item['product'],
+            'quantity' => $quantity,
+            'subtotal' => $item['product']->product_price * $quantity,
+          ];
         }
 
         return $item;
-      });
+      })->values();
+
       $this->calculateTotal();
     }
   }
 
   /**
    * Elimina un objeto del carrito de compras.
-   * @param int $key del producto que se desea eliminar del carrito
+   * @param int $product_id id del producto a eliminar
    * @return void
    */
-  public function removeFromCart(int $key): void
+  public function removeFromCart(int $product_id): void
   {
-    $this->cart->forget($key);
+    $this->cart = $this->cart->filter(function ($item) use ($product_id) {
+      return $item['id'] !== $product_id;
+    })->values();
+
     $this->cart_total_items--;
     $this->calculateTotal();
   }
@@ -104,12 +143,41 @@ class Store extends Component
   }
 
   /**
+   * reiniciar paginacion
+   * @return void
+   */
+  public function resetPagination(): void
+  {
+    $this->resetPage();
+  }
+
+  /**
+   * limpiar filtros de busqueda
+   * @return void
+   */
+  public function resetSearchInputs(): void
+  {
+    $this->reset(['search_products', 'search_by_tag']);
+    $this->resetPagination();
+  }
+
+  /**
    * buscar productos
    * @return mixed
    */
   public function searchProducts()
   {
-    $products = Product::where('product_in_store', true)
+    $products = Product::with('tags')
+      ->where('product_in_store', true)
+      ->when($this->search_products, function ($query) {
+        $query->where('product_name', 'like', '%' . $this->search_products . '%')
+              ->orWhere('product_price', '<=', (float) $this->search_products);
+      })
+      ->when($this->search_by_tag, function ($query) {
+        $query->whereHas('tags', function ($q) {
+          $q->where('tags.id', (int) $this->search_by_tag);
+        });
+      })
       ->orderBy('id', 'desc')
       ->paginate(10);
 
