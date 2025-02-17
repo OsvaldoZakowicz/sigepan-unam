@@ -11,6 +11,9 @@
   <link rel="preconnect" href="https://fonts.bunny.net">
   <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
 
+  {{-- MP --}}
+  <script src="https://sdk.mercadopago.com/js/v2"></script>
+
   {{-- livewire --}}
   @livewireStyles()
   <!-- Styles -->

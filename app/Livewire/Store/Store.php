@@ -4,6 +4,10 @@ namespace App\Livewire\Store;
 
 use App\Models\Product;
 use App\Models\Tag;
+use MercadoPago\MercadoPagoConfig;
+use MercadoPago\Client\Preference\PreferenceClient;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
 use Livewire\Attributes\Url;
@@ -28,6 +32,9 @@ class Store extends Component
   public int $cart_total_items = 0;
   public Collection $tags;
 
+  // preferencia de pago MP
+  public ?string $preference_id = null;
+
   /**
    * boot de constantes
    * @return void
@@ -43,7 +50,139 @@ class Store extends Component
    */
   public function mount(): void
   {
-    $this->cart = collect();
+    try {
+      $access_token = config('services.mercadopago.access_token');
+
+      if (empty($access_token)) {
+        Log::error('MP Access Token no configurado');
+        throw new \Exception('Token de acceso no configurado');
+      }
+
+      // Configurar SDK de Mercado Pago
+      MercadoPagoConfig::setAccessToken($access_token);
+
+      // Debug de configuración
+      Log::info('MP Config:', [
+        'access_token_configured' => !empty($access_token),
+        'access_token_length' => strlen($access_token)
+      ]);
+
+      $this->cart = collect();
+    } catch (\Exception $e) {
+      Log::error('Error en mount:', [
+        'error' => $e->getMessage()
+      ]);
+    }
+  }
+
+  /**
+   * crear preferencia de pago
+   * @return void
+   */
+  public function createPreference(): void
+  {
+    if ($this->cart->isEmpty()) {
+      $this->dispatch('payment-error', 'El carrito está vacío');
+      return;
+    }
+
+    try {
+      // Verificar configuración de MP
+      if (!config('services.mercadopago.access_token')) {
+        throw new \Exception('Token de acceso de Mercado Pago no configurado');
+      }
+
+      $client = new PreferenceClient();
+
+      // Debug inicial con configuración
+      $this->dispatch('console-log', [
+        'message' => 'Configuración MP',
+        'data' => [
+          'access_token_configured' => !empty(config('services.mercadopago.access_token')),
+          'cart_items' => $this->cart->count(),
+          'total' => $this->cart_total
+        ]
+      ]);
+
+      // Mapear items con validación
+      $items = $this->cart->map(function ($item) {
+        if (!isset($item['product']) || !isset($item['quantity'])) {
+          throw new \Exception('Datos del producto incompletos');
+        }
+
+        $price = floatval($item['product']->product_price);
+        if ($price <= 0) {
+          throw new \Exception('Precio inválido para ' . $item['product']->product_name);
+        }
+
+        return [
+          'title' => $item['product']->product_name,
+          'quantity' => (int)$item['quantity'],
+          'unit_price' => $price,
+          'currency_id' => 'ARS',
+          'picture_url' => url(Storage::url($item['product']->product_image_path)),
+          'description' => $item['product']->product_short_description,
+          'category_id' => 'products',
+        ];
+      })->toArray();
+
+      $preferenceData = [
+        'items' => $items,
+        'back_urls' => [
+          'success' => route('payment.success'),
+          'failure' => route('payment.failure'),
+          'pending' => route('payment.pending'),
+        ],
+        'auto_return' => 'approved',
+        'statement_descriptor' => config('app.name'),
+        'external_reference' => 'ORDER-' . time(),
+        'notification_url' => route('payment.webhook'),
+        'expires' => true,
+        'expiration_date_to' => now()->addDays(1)->format('Y-m-d\TH:i:s.000P'),
+        'payment_methods' => [
+          'excluded_payment_methods' => [],
+          'excluded_payment_types' => [],
+          'installments' => 12
+        ]
+      ];
+
+      // Debug de datos a enviar
+      $this->dispatch('console-log', [
+        'message' => 'Datos de preferencia',
+        'data' => $preferenceData
+      ]);
+
+      try {
+        $preference = $client->create($preferenceData);
+        $this->preference_id = $preference->id;
+
+        $this->dispatch('console-log', [
+          'message' => 'Preferencia creada exitosamente',
+          'data' => [
+            'preference_id' => $this->preference_id,
+            'init_point' => $preference->init_point ?? null
+          ]
+        ]);
+      } catch (\MercadoPago\Exceptions\MPApiException $e) {
+        Log::error('Error API Mercado Pago:', [
+          'status' => $e->getApiResponse()->getStatusCode(),
+          'response' => $e->getApiResponse()->getContent()
+        ]);
+        throw $e;
+      }
+    } catch (\Exception $e) {
+      Log::error('Error Mercado Pago:', [
+        'error' => $e->getMessage(),
+        'trace' => $e->getTraceAsString()
+      ]);
+
+      $this->dispatch('console-log', [
+        'message' => 'Error en createPreference',
+        'error' => $e->getMessage()
+      ]);
+
+      $this->dispatch('payment-error', 'Error al crear la preferencia de pago: ' . $e->getMessage());
+    }
   }
 
   /**
@@ -154,7 +293,7 @@ class Store extends Component
 
     $quantity = max(1, (int) $quantity);
 
-    $this->cart = $this->cart->map(function($item) use ($product_id, $quantity) {
+    $this->cart = $this->cart->map(function ($item) use ($product_id, $quantity) {
 
       if ($item['id'] === $product_id) {
         return [

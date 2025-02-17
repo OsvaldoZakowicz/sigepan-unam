@@ -1,4 +1,32 @@
 <div class="bg-gradient-to-r from-orange-100 via-amber-200 to-orange-900">
+
+  {{-- * LOG --}}
+  <script>
+    document.addEventListener('livewire:initialized', () => {
+        // Evento para logs generales
+        Livewire.on('console-log', (payload) => {
+            console.group('=== Debug Log ===');
+            if (typeof payload === 'object') {
+                console.log('Mensaje:', payload.message);
+                if (payload.data) {
+                    console.log('Datos:', payload.data);
+                }
+                if (payload.error) {
+                    console.error('Error:', payload.error);
+                }
+            } else {
+                console.log('Payload raw:', payload);
+            }
+            console.groupEnd();
+        });
+
+        // Evento específico para errores
+        Livewire.on('payment-error', (message) => {
+            console.error('Error de Pago:', message);
+        });
+    });
+  </script>
+
   {{-- navegacion de busqueda e icono de carrito --}}
   <header class="max-w-5xl mx-auto p-6 flex justify-between items-center">
 
@@ -186,24 +214,71 @@
                 <p class="text-2xl font-bold text-orange-800">${{ number_format($cart_total, 2) }}</p>
               </div>
 
+              {{-- botones de carrito y pago --}}
               <div class="flex justify-between items-center">
-                {{-- boton para limpiar todo el carrito --}}
+                {{-- Botón vaciar carrito --}}
                 <button
-                  wire:click="resetCart()"
-                  class="inline-flex justify-between items-center mt-auto py-2 px-4 rounded border-2 border-orange-950 bg-orange-200 text-orange-800"
-                  >vaciar carrito
-                  <span class="text-red-500">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </span>
+                    wire:click="resetCart()"
+                    class="inline-flex justify-between items-center mt-auto py-2 px-4 rounded border-2 border-orange-950 bg-orange-200 text-orange-800"
+                    >
+                    vaciar carrito
+                    <span class="text-red-500">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </span>
                 </button>
 
-                {{-- boton para pedir y pagar con mercado pago --}}
+                {{-- Contenedor para el botón de MP --}}
+                {{-- Contenedor para el botón de MP --}}
+                <div
+                x-data="{
+                    preference_id: @entangle('preference_id'),
+                    initMercadoPago() {
+                        console.log('Iniciando MP con preference_id:', this.preference_id); // Debug
+                        if (this.preference_id) {
+                            const mp = new MercadoPago('{{ config('services.mercadopago.public_key') }}', {
+                                locale: 'es-AR'
+                            });
+
+                            mp.checkout({
+                                preference: {
+                                    id: this.preference_id
+                                },
+                                render: {
+                                    container: '.cho-container',
+                                    label: 'Pagar ahora',
+                                }
+                            });
+                        }
+                    }
+                }"
+                x-init="$watch('preference_id', value => {
+                    console.log('Preference ID changed:', value); // Debug
+                    if(value) initMercadoPago();
+                })"
+                class="flex flex-col items-center gap-4"
+                >
+                {{-- Botón para crear preferencia --}}
                 <button
-                  class="mt-auto bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors"
-                  >hacer pedido
+                    x-show="!preference_id"
+                    wire:click="createPreference"
+                    wire:loading.attr="disabled"
+                    class="w-full bg-blue-500 text-white py-3 px-4 rounded-lg hover:bg-blue-600 transition-colors"
+                >
+                    <span wire:loading.remove>Proceder al pago</span>
+                    <span wire:loading>Procesando...</span>
                 </button>
+
+                {{-- Contenedor del botón de MP --}}
+                <div
+                    x-show="preference_id"
+                    class="cho-container w-full"
+                ></div>
+
+                {{-- Debug info --}}
+                <div x-show="preference_id" x-text="'ID: ' + preference_id" class="text-sm text-gray-500"></div>
+                </div>
               </div>
 
             @endif

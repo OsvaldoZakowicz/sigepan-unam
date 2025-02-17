@@ -14,6 +14,11 @@ return [
     |
     */
 
+    'mercadopago' => [
+      'public_key' => env('MERCADO_PAGO_PUBLIC_KEY'),
+      'access_token' => env('MERCADO_PAGO_ACCESS_TOKEN'),
+    ],
+
     'postmark' => [
         'token' => env('POSTMARK_TOKEN'),
     ],
