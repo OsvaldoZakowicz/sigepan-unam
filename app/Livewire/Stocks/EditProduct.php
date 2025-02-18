@@ -2,16 +2,22 @@
 
 namespace App\Livewire\Stocks;
 
-use App\Models\Tag;
 use App\Models\Product;
-use Illuminate\Support\Collection;
+use App\Models\Tag;
+use Illuminate\Auth\Events\Validated;
 use Illuminate\View\View;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Arr;
+use Illuminate\Validation\Rule;
 use Livewire\WithFileUploads;
 use Livewire\Component;
 
-class CreateProduct extends Component
+class EditProduct extends Component
 {
   use WithFileUploads;
+
+  public $product;
 
   public Collection $tags;
 
@@ -21,14 +27,17 @@ class CreateProduct extends Component
   public $product_price;
   public $product_expires_in;
   public $product_in_store;
-  public $product_image;
+  public $product_image_path;
+
+  // nueva imagen
+  public $new_product_image;
 
   // tags del producto
   public $selected_id_tag = '';
   public Collection $tags_list;
 
   /**
-   * boot de datos
+   * boot de datos constantes
    * @return void
    */
   public function boot(): void
@@ -40,9 +49,26 @@ class CreateProduct extends Component
    * montar datos
    * @return void
    */
-  public function mount()
+  public function mount(int $id): void
   {
+    $this->product = Product::findOrFail($id);
+
+    $this->product_name              = $this->product->product_name;
+    $this->product_short_description = $this->product->product_short_description;
+    $this->product_price             = $this->product->product_price;
+    $this->product_expires_in        = $this->product->product_expires_in;
+    $this->product_in_store          = $this->product->product_in_store;
+    $this->product_image_path        = $this->product->product_image_path;
+
+    // coleccion de tags asignadas al producto
     $this->fill(['tags_list' => collect()]);
+
+    $this->product->tags->each(function ($tag) {
+      $this->tags_list->push([
+        'tag_id'  =>  'tag_' . $tag->id,
+        'tag'     =>  $tag,
+      ]);
+    });
   }
 
   /**
@@ -88,17 +114,24 @@ class CreateProduct extends Component
   }
 
   /**
-   * guardar producto
+   * editar producto
   */
   public function save()
   {
     $validated = $this->validate([
-      'product_name'              => ['required', 'unique:recipes,recipe_title', 'regex:/^[a-zA-ZáéíóúñÁÉÍÓÚÑ0-9\s,\.]+$/u', 'min:5', 'max:50'],
+      'product_name'              => [
+        'required',
+        Rule::unique('products', 'product_name')->ignore($this->product->id),
+        'regex:/^[a-zA-ZáéíóúñÁÉÍÓÚÑ0-9\s,\.]+$/u',
+        'min:5',
+        'max:50'
+      ],
       'product_short_description' => ['required', 'regex:/^[a-zA-ZáéíóúñÁÉÍÓÚÑ0-9\s,\.]+$/u', 'min:15', 'max:150'],
       'product_price'             => ['required', 'numeric', 'regex:/^\d{1,6}(\.\d{1,2})?$/', 'min:1'],
       'product_expires_in'        => ['required'],
       'product_in_store'          => ['required'],
-      'product_image'             => ['required', 'image', 'max:4096', 'mimes:jpeg,png,jpg'],
+      'product_image_path'        => ['required'],
+      'new_product_image'         => ['nullable', 'image', 'max:4096', 'mimes:jpeg,png,jpg'],
       'tags_list'                 => ['required'],
     ], [
       'product_name.unique'       => 'Ya existe un producto con el mismo nombre',
@@ -114,11 +147,10 @@ class CreateProduct extends Component
       'product_price.regex'       => ':attribute puede ser de hasta $999999.99',
       'product_in_store.required' => 'indique si desea publicar en la tienda este producto',
       'tags_list.required'        => 'elija al menos una etiqueta que describa el producto',
-      'product_expires_in.required' => 'indique la cantidad de :attribute',
-      'product_image.required'    => 'la :attribute es obligatoria para publicar el producto',
-      'product_image.image'       => 'la :attribute debe ser una imagen',
-      'product_image.max'         => 'la :attribute puede ser de hasta 4Mb',
-      'product_image.mimes'       => 'la :attribute puede ser jpeg, png, jpg',
+      'product_expires_in.required'   => 'indique la cantidad de :attribute',
+      'new_product_image.image'       => 'la :attribute debe ser una imagen',
+      'new_product_image.max'         => 'la :attribute puede ser de hasta 4Mb',
+      'new_product_image.mimes'       => 'la :attribute puede ser jpeg, png, jpg',
     ], [
       'product_name'              => 'nombre del producto',
       'product_short_description' => 'descripcion corta',
@@ -131,19 +163,33 @@ class CreateProduct extends Component
 
     try {
 
+      // nueva imagen de producto
+      if ($validated['new_product_image']) {
 
-      $product_image_path = $this->product_image->store('productos', 'public');
-      $validated['product_image_path'] = $product_image_path;
+        // eliminar imagen anterior
+        Storage::delete($this->product->product_image_path);
 
-      $product = Product::create($validated);
+        // almacenar imagen nueva
+        $product_image_path = $this->new_product_image->store('productos', 'public');
+        $validated['product_image_path'] = $product_image_path;
 
-      foreach ($validated['tags_list'] as $tag_item) {
-        $product->tags()->attach($tag_item['tag']->id);
       }
+
+      $this->product->product_name              = $validated['product_name'];
+      $this->product->product_short_description = $validated['product_short_description'];
+      $this->product->product_price             = $validated['product_price'];
+      $this->product->product_expires_in        = $validated['product_expires_in'];
+      $this->product->product_in_store          = $validated['product_in_store'];
+      $this->product->product_image_path        = $validated['product_image_path'];
+      $this->product->save();
+
+      // sincronizar tags
+      $tags_to_sync = Arr::map($validated['tags_list'], function ($tag) { return $tag['tag']->id; });
+      $this->product->tags()->sync($tags_to_sync);
 
       $this->reset();
 
-      session()->flash('operation-success', toastSuccessBody('producto', 'creado'));
+      session()->flash('operation-success', toastSuccessBody('producto', 'actualizado'));
       $this->redirectRoute('stocks-products-index');
 
     } catch (\Exception $e) {
@@ -160,6 +206,6 @@ class CreateProduct extends Component
    */
   public function render(): View
   {
-    return view('livewire.stocks.create-product');
+    return view('livewire.stocks.edit-product');
   }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -21,6 +22,17 @@ class Product extends Model
     'product_in_store',
     'product_image_path',
   ];
+
+  /**
+   * obtener atributo deleted_at, y presentarlo
+   * deleted_at es una fecha o null, cuando tiene una fecha indica el borrado
+  */
+  protected function deletedAt(): Attribute
+  {
+    return Attribute::make(
+      get: fn (string|null $value) => $value ? 'borrado' : 'activo'
+    );
+  }
 
   //* un producto tiene muchos tags de producto
   public function tags(): BelongsToMany
