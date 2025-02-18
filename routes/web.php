@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Users\UserController;
-use App\Http\Controllers\Store\PaymentController;
 use App\Http\Controllers\Clients\ClientLogOutController;
 use App\Http\Controllers\Audits\AuditController;
 use App\Http\Controllers\Quotation\QuotationController;
@@ -22,21 +21,7 @@ Route::middleware(['can:tienda'])->group(function () {
 
   // acceso a la ruta para perfil de cliente en tienda
 
-  // mercado pago tienda
-  Route::get('/payment/success', [PaymentController::class, 'success'])
-    ->name('payment.success')
-    ->middleware('web');
-
-  Route::get('/payment/failure', [PaymentController::class, 'failure'])
-      ->name('payment.failure')
-      ->middleware('web');
-
-  Route::get('/payment/pending', [PaymentController::class, 'pending'])
-      ->name('payment.pending')
-      ->middleware('web');
-
-  Route::post('/payment/webhook', [PaymentController::class, 'webhook'])
-      ->name('payment.webhook');
+  // carrito de compras
 
   // * redirecciona a / y retorna 'welcome'
   Route::get('client/logout', ClientLogOutController::class)
