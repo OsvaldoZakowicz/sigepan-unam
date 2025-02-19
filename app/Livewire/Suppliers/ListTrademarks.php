@@ -54,6 +54,12 @@ class ListTrademarks extends Component
     }
 
     $trademark->delete();
+
+    $this->dispatch('toast-event', toast_data: [
+      'event_type'  =>  'success',
+      'title_toast' =>  toastTitle('exitosa'),
+      'descr_toast' =>  toastSuccessBody('marca', 'eliminada'),
+    ]);
   }
 
   /**

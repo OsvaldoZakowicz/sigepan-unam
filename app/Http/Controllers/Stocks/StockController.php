@@ -61,4 +61,22 @@ class StockController extends Controller
   {
     return view('stocks.products-edit', ['id' => $id]);
   }
+
+  //* lista de tags
+  public function tags_index(): View
+  {
+    return view('stocks.tags-index');
+  }
+
+  //* crear tag
+  public function tags_create(): View
+  {
+    return view('stocks.tags-create');
+  }
+
+  //* editar un tag
+  public function tags_edit(int $id): View
+  {
+    return view('stocks.tags-edit', ['id' => $id]);
+  }
 }
