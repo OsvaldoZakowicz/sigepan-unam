@@ -135,6 +135,15 @@ Route::middleware(['auth', 'verified', 'can:proveedores'])->group(function () {
   Route::get('suppliers/prices', [SupplierController::class, 'suppliers_all_prices_list'])
     ->name('suppliers-suppliers-price-all');
 
+  Route::get('suppliers/categories', [SupplierController::class, 'categories_index'])
+    ->name('suppliers-categories-index');
+
+  Route::get('suppliers/category/create', [SupplierController::class, 'categories_create'])
+    ->name('suppliers-categories-create');
+
+  Route::get('suppliers/category/edit/{id}', [SupplierController::class, 'categories_edit'])
+    ->name('suppliers-categories-edit');
+
   Route::get('suppliers/trademarks', [SupplierController::class, 'trademarks_index'])
     ->name('suppliers-trademarks-index');
 

@@ -75,6 +75,24 @@ class SupplierController extends Controller
     return view('suppliers.provisions-edit', ['id' => $id]);
   }
 
+  //* ver categorias de suministros
+  public function categories_index(): View
+  {
+    return view('suppliers.categories-index');
+  }
+
+  //* crear categoria de suministros
+  public function categories_create(): View
+  {
+    return view('suppliers.categories-create');
+  }
+
+  //* editar categoria de suministros
+  public function categories_edit($id): View
+  {
+    return view('suppliers.categories-edit', ['id' => $id]);
+  }
+
   //* ver marcas de suministros
   public function trademarks_index(): View
   {

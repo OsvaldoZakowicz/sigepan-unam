@@ -24,6 +24,13 @@
 
   <x-nav-link
     wire:navigate
+    :href="route('suppliers-categories-index')"
+    :active="request()->routeIs('suppliers-categories-*')"
+    >categorias
+  </x-nav-link>
+
+  <x-nav-link
+    wire:navigate
     :href="route('suppliers-trademarks-index')"
     :active="request()->routeIs('suppliers-trademarks-*')"
     >marcas
