@@ -23,6 +23,23 @@ class EditTrademark extends Component
   public function mount(int $id)
   {
     $this->trademark = ProvisionTrademark::findOrFail($id);
+
+    if (!$this->trademark->provision_trademark_is_editable) {
+
+      session()->flash('operation-info', 'No se puede editar la marca, la misma es propia del sistema');
+      $this->redirectRoute('suppliers-trademarks-index');
+
+      return;
+    }
+
+    if ($this->trademark->provisions->count() > 0) {
+
+      session()->flash('operation-info', 'No se puede editar la marca, la misma se usa en suministros');
+      $this->redirectRoute('suppliers-trademarks-index');
+
+      return;
+    }
+
     $this->provision_trademark_name = $this->trademark->provision_trademark_name;
   }
 

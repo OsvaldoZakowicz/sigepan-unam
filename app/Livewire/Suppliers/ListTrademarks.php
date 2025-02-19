@@ -31,11 +31,23 @@ class ListTrademarks extends Component
    */
   public function delete(ProvisionTrademark $trademark): void
   {
-    if ($trademark->provisions->count() > 0) {
+    if (!$trademark->provision_trademark_is_editable) {
+
       $this->dispatch('toast-event', toast_data: [
         'event_type'  =>  'info',
         'title_toast' =>  toastTitle('', true),
-        'descr_toast' =>  'No se puede eliminar la marca, porque tiene suministros asociados',
+        'descr_toast' =>  'No se puede eliminar la marca, la misma es propia del sistema',
+      ]);
+
+      return;
+    }
+
+    if ($trademark->provisions->count() > 0) {
+
+      $this->dispatch('toast-event', toast_data: [
+        'event_type'  =>  'info',
+        'title_toast' =>  toastTitle('', true),
+        'descr_toast' =>  'No se puede eliminar la marca, la misma tiene suministros asociados',
       ]);
 
       return;
@@ -51,7 +63,19 @@ class ListTrademarks extends Component
    */
   public function edit(ProvisionTrademark $trademark): void
   {
+    if (!$trademark->provision_trademark_is_editable) {
+
+      $this->dispatch('toast-event', toast_data: [
+        'event_type'  =>  'info',
+        'title_toast' =>  toastTitle('', true),
+        'descr_toast' =>  'No se puede editar la marca, la misma es propia del sistema',
+      ]);
+
+      return;
+    }
+
     if ($trademark->provisions->count() > 0) {
+
       $this->dispatch('toast-event', toast_data: [
         'event_type'  =>  'info',
         'title_toast' =>  toastTitle('', true),
