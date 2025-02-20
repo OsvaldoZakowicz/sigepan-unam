@@ -31,10 +31,8 @@ class ListMeasures extends Component
   public function searchMeasures()
   {
     return Measure::when($this->search, function ($query) {
-      $query->where('measure_name', 'like', '%' . $this->search . '%')
-        ->orWhere('measure_abrv', 'like', '%' . $this->search . '%')
-        ->orWhere('measure_base', 'like', $this->search);
-    })
+        $query->where('unit_name', 'like', '%' . $this->search . '%');
+      })
       ->orderBy('id', 'desc')
       ->paginate(5);
   }

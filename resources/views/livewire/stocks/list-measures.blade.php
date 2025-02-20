@@ -36,9 +36,9 @@
             <tr class="border bg-neutral-100">
               <x-table-th class="text-end w-12">id</x-table-th>
               <x-table-th class="text-start">medida</x-table-th>
-              <x-table-th class="text-start">abreviación</x-table-th>
               <x-table-th class="text-end">cantidad base</x-table-th>
-              <x-table-th class="text-end">abreviación base</x-table-th>
+              <x-table-th class="text-start">conversion</x-table-th>
+              <x-table-th class="text-end">factor de conversion</x-table-th>
               <x-table-th class="text-start">descripcion corta</x-table-th>
               <x-table-th class="text-end">fecha de creacion</x-table-th>
             </tr>
@@ -49,20 +49,20 @@
                 <x-table-td class="text-end">
                   {{ $measure->id }}
                 </x-table-td>
-                <x-table-td class="text-start">
-                  {{ $measure->measure_name }}
-                </x-table-td>
-                <x-table-td class="text-start">
-                  {{ $measure->measure_abrv }}
+                <x-table-td class="text-start capitalize">
+                  {{ $measure->unit_name }}&nbsp;({{ $measure->unit_symbol }})
                 </x-table-td>
                 <x-table-td class="text-end">
-                  {{ $measure->measure_base }}
+                  {{ $measure->base_value }}
                 </x-table-td>
                 <x-table-td class="text-start">
-                  {{ $measure->measure_base_abrv }}
+                  {{ $measure->conversion_unit ?? '-' }}&nbsp;{{ ($measure->conversion_symbol) ? '(' . $measure->conversion_symbol . ')' : '' }}
+                </x-table-td>
+                <x-table-td class="text-end">
+                  {{ $measure->conversion_factor ?? '-' }}
                 </x-table-td>
                 <x-table-td class="text-start">
-                  {{ $measure->measure_short_description }}
+                  {{ $measure->short_description }}
                 </x-table-td>
                 <x-table-td class="text-end">
                   {{ formatDateTime($measure->created_at, 'd-m-Y') }}
