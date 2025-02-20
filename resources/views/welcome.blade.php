@@ -30,72 +30,80 @@
     @endif
   </header>
 
+  {{-- notificaciones toast, llamadas 'toast-event' --}}
+  <div x-cloak x-data="{
+    showToast: false,
+    toastData: null,
+    toastIcon: '',
+    getToastClasses() {
+        const types = {
+            success: 'bg-emerald-100 border-emerald-500',
+            info: 'bg-blue-100 border-blue-500',
+            error: 'bg-red-100 border-red-500'
+        };
+        return `${types[this.toastData?.event_type] || ''} `;
+    },
+    setToastIcon() {
+        const icons = {
+            success: '&#10003;',
+            info: '&#33;',
+            error: '&#10007;'
+        };
+        this.toastIcon = icons[this.toastData?.event_type] || '';
+    },
+    init() {
+        window.addEventListener('toast-event', (event) => {
+            this.toastData = event.detail.toast_data;
+            this.setToastIcon();
+            this.showToast = true;
+            //setTimeout(() => this.showToast = false, 5000);
+        });
+    }
+  }">
+    {{-- visualizacion y posicion del toast --}}
+    <div x-show="showToast"
+          x-transition
+          class="absolute z-50 top-32 left-2 lg:inset-x-1/3">
+        <div
+          :class="'relative flex gap-3 p-4 rounded-lg border max-w-lg' + ' ' + getToastClasses()">
+          <div class="mt-0.5">
+            <span x-text="toastIcon" class="text-xl"></span>
+          </div>
+
+          <div class="flex flex-col gap-1">
+            <h3 x-text="toastData?.title_toast" class="text-sm font-medium text-neutral-800"></h3>
+            <p x-text="toastData?.descr_toast" class="text-sm text-neutral-600"></p>
+            <span x-on:click="showToast = false" class="absolute top-2 right-2 cursor-pointer">&#10005;</span>
+          </div>
+        </div>
+    </div>
+  </div>
+
+  {{-- notificaciones recibidas a traves de la sesion --}}
+  <div>
+    {{-- mensaje toast exito, recibido por session --}}
+    @if (session('operation-success'))
+      <x-session-toast type="success" msg="{{ session('operation-success') }}" />
+    @endif
+
+    {{-- mensaje toast info, recibido por sesion --}}
+    @if (session('operation-info'))
+      <x-session-toast type="info" msg="{{ session('operation-info') }}" />
+    @endif
+
+    {{-- mensaje toast error, recibido por sesion --}}
+    @if (session('operation-error'))
+      <x-session-toast type="error" msg="{{ session('operation-error') }}" />
+    @endif
+  </div>
+
   {{-- tienda --}}
-  @livewire('store.store')
-
-  @php
-
-    /* prueba de mercado pago */
-
-    // SDK
-    use MercadoPago\MercadoPagoConfig;
-    use MercadoPago\Client\Preference\PreferenceClient;
-
-    MercadoPagoConfig::setAccessToken(env('MERCADO_PAGO_ACCESS_TOKEN'));
-
-    $client = new PreferenceClient();
-
-    $preference = $client->create([
-      "items"=> array(
-        array(
-          "title" => "Mi producto",
-          "quantity" => 1,
-          "unit_price" => 2000
-        )
-      )
-    ]);
-
-    $preference_id = $preference->id
-
-  @endphp
-
-  <div id="wallet_container"></div>
+  <div class="w-full">
+    @yield('view_content')
+  </div>
 
   {{-- livewire --}}
   @livewireScripts()
-
-  <script>
-
-    document.addEventListener('DOMContentLoaded', function() {
-      // Verificar que todos los scripts estén cargados
-
-      window.onload = function() {
-
-        // El DOM y todos los recursos están cargados
-        console.log('DOM y scripts cargados completamente');
-
-
-        const mp = new MercadoPago('APP_USR-1175ee28-0ac9-44ff-a9fe-97fb067bf07b');
-        const bricksBuilder = mp.bricks();
-
-
-        mp.bricks().create("wallet", "wallet_container", {
-          initialization: {
-              preferenceId: "{{ $preference_id }}",
-              redirectMode: "blank"
-          },
-          customization: {
-            texts: {
-              valueProp: 'smart_option',
-            },
-          },
-        });
-
-      };
-    });
-
-
-  </script>
 
 </body>
 

@@ -50,8 +50,8 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
         </svg>
       </span>
-      @if ($cart_total_items > 0)
-        <span title="tiene elementos en el carrito" class="inline-flex items-center justify-center h-6 w-6 rounded-full bg-orange-100 text-orange-800 border-2 border-orange-900">{{ $cart_total_items }}</span>
+      @if ($cart->count() > 0)
+        <span title="tiene elementos en el carrito" class="inline-flex items-center justify-center h-6 w-6 rounded-full bg-orange-100 text-orange-800 border-2 border-orange-900">{{ $cart->count() }}</span>
       @endif
     </button>
 
@@ -201,11 +201,13 @@
                     </span>
                 </button>
 
-                <button
-                  wire:click=""
+                <a
+                  wire:navigate
+                  href="#"
+                  wire:click="proceedToCheckout()"
                   class="inline-flex justify-between items-center mt-auto py-2 px-4 rounded border-2 border-orange-950 bg-orange-800 text-orange-100"
                   >proceder al pedido
-                </button>
+                </a>
 
               </div>
             @endif

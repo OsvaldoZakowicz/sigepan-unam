@@ -7,21 +7,24 @@ use App\Http\Controllers\Audits\AuditController;
 use App\Http\Controllers\Quotation\QuotationController;
 use App\Http\Controllers\Suppliers\SupplierController;
 use App\Http\Controllers\Stocks\StockController;
-
+use App\Http\Controllers\Store\PaymentController;
+use App\Http\Controllers\Store\StoreController;
 
 //* layout publico
-// retorna la vista welcome y tienda
-Route::view('/', 'welcome')->name('welcome');
+// retorna la vista tienda publica
+Route::get('store', [StoreController::class, 'store_index'])
+  ->name('store-store-index');
 
 //* modulo de clientes
 // acceso solo a rol cliente
-Route::middleware(['can:tienda'])->group(function () {
-
-  // acceso a la ruta para la tienda
+Route::middleware(['auth', 'can:tienda'])->group(function () {
 
   // acceso a la ruta para perfil de cliente en tienda
 
-  // carrito de compras
+  // carrito de compras para el pago
+  Route::get('store/cart', [PaymentController::class, 'cart_index'])
+    ->middleware('verified')
+    ->name('store-store-cart-index');
 
   // * redirecciona a / y retorna 'welcome'
   Route::get('client/logout', ClientLogOutController::class)

@@ -20,6 +20,6 @@ class ClientLogOutController extends Controller
 
     $request->session()->regenerateToken();
 
-    return redirect('/');
+    return redirect('store');
   }
 }

@@ -4,7 +4,10 @@ namespace App\Livewire\Store;
 
 use App\Models\Product;
 use App\Models\Tag;
+use App\Models\User;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Livewire\Attributes\Url;
 use Livewire\WithPagination;
@@ -31,6 +34,12 @@ class Store extends Component
   // preferencia de pago MP
   public ?string $preference_id = null;
 
+  // existe usuario en sesion
+  public $is_logged_in = false;
+
+  // usuario
+  public User|null $user = null;
+
   /**
    * boot de constantes
    * @return void
@@ -46,10 +55,20 @@ class Store extends Component
    */
   public function mount(): void
   {
+    // existe usuario en sesion
+    $this->is_logged_in = Auth::check();
+
+    // capturar usuario
+    ($this->is_logged_in) ? $this->user = Auth::user() : null;
+
     // iniciar carrito de compras vacio
     $this->cart = collect();
-  }
 
+    // Verificar si existe un carrito en la sesion
+    if (Session::has('cart')) {
+      $this->cart = collect(Session::get('cart'));
+    }
+  }
 
   /**
    * Muestra el modal del carrito de compras
@@ -58,6 +77,17 @@ class Store extends Component
    */
   public function showCartModal(): void
   {
+    if (!$this->is_logged_in) {
+
+      $this->dispatch('toast-event', toast_data: [
+        'event_type' => 'info',
+        'title_toast' => toastTitle('', true),
+        'descr_toast' => 'Para poder usar el carrito y hacer pedidos debe registrarse e iniciar sesión.'
+      ]);
+
+      return;
+    }
+
     $this->show_cart_modal = true;
   }
 
@@ -68,6 +98,17 @@ class Store extends Component
    */
   public function addToCart(Product $product): void
   {
+    if (!$this->is_logged_in) {
+
+      $this->dispatch('toast-event', toast_data: [
+        'event_type' => 'info',
+        'title_toast' => toastTitle('', true),
+        'descr_toast' => 'Para poder usar el carrito y hacer pedidos debe registrarse e iniciar sesión.'
+      ]);
+
+      return;
+    }
+
     if (!$this->cart->contains('id', $product->id)) {
 
       $this->cart->push([
@@ -76,12 +117,30 @@ class Store extends Component
         'quantity' => 1,
         'subtotal' => $product->product_price
       ]);
-
-      $this->cart_total_items++;
     }
 
     $this->calculateTotal();
     $this->showCartModal();
+  }
+
+  /**
+   * proceder al pedido y pago del carrito
+   */
+  public function proceedToCheckout()
+  {
+    if ($this->user->email_verified_at === null) {
+
+      // Guardar el carrito con una duración específica (e.g., 24 horas)
+      Session::put('cart', $this->cart);
+
+      // Redireccionar a la verificación de email
+      return redirect()->route('verification.notice');
+    }
+
+    // Si ya está verificado, proceder normalmente
+    Session::put('cart', $this->cart);
+
+    return redirect()->route('store-store-cart-index');
   }
 
   /**
@@ -91,7 +150,7 @@ class Store extends Component
   public function resetCart(): void
   {
     $this->cart = collect();
-    $this->cart_total_items = 0;
+    Session::forget('cart');
   }
 
   /**
@@ -187,7 +246,6 @@ class Store extends Component
       return $item['id'] !== $product_id;
     })->values();
 
-    $this->cart_total_items--;
     $this->calculateTotal();
   }
 
