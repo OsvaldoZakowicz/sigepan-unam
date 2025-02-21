@@ -22,4 +22,38 @@ class PaymentController extends Controller
 
     return view('store.cart-index', compact('cart'));
   }
+
+  // * pago exitoso
+  public function payment_success(Request $request): View
+  {
+    Log::info('Pago exitoso', $request->all());
+
+    // limpiar carrito y regenerar sesión
+    Session::forget('cart');
+    Session::regenerate();
+
+    dd('exitoso:', 'carrito;', Session::get('cart'), $request->all());
+
+    return view('store.payment-success');
+  }
+
+  // * pago fallido
+  public function payment_failure(Request $request): View
+  {
+    Log::info('Pago fallido', $request->all());
+
+    dd('fallido: ', $request->all());
+
+    return view('store.payment-failure');
+  }
+
+  // * pago pendiente
+  public function payment_pending(Request $request): View
+  {
+    Log::info('Pago pendiente', $request->all());
+
+    dd('pendiente: ',$request->all());
+
+    return view('store.payment-pending');
+  }
 }

@@ -246,6 +246,12 @@ class Store extends Component
       return $item['id'] !== $product_id;
     })->values();
 
+    // al modificar el carrito, se elimina de sesion.
+    // cuando se proceda al checkout de compra, se crea nuevamente en sesion
+    if (Session::has('cart')) {
+      Session::forget('cart');
+    }
+
     $this->calculateTotal();
   }
 

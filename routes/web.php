@@ -26,6 +26,21 @@ Route::middleware(['auth', 'can:tienda'])->group(function () {
     ->middleware('verified')
     ->name('store-store-cart-index');
 
+  // compra exitosa
+  Route::get('store/payment/success', [PaymentController::class, 'payment_success'])
+    ->middleware('verified')
+    ->name('store-store-payment-success');
+
+  // compra fallida
+  Route::get('store/payment/failure', [PaymentController::class, 'payment_failure'])
+    ->middleware('verified')
+    ->name('store-store-payment-failure');
+
+  // compra pendiente
+  Route::get('store/payment/pending', [PaymentController::class, 'payment_pending'])
+    ->middleware('verified')
+    ->name('store-store-payment-pending');
+
   // * redirecciona a / y retorna 'welcome'
   Route::get('client/logout', ClientLogOutController::class)
     ->name('client-logout');
