@@ -310,5 +310,11 @@
     "number": "numero de calle",
     "postal_code": "codigo postal",
     "city": "ciudad",
-    "profile_id": "id de perfil"
+    "profile_id": "id de perfil",
+
+    "approve": "Aprobar",
+    "approved": "Aprobado",
+    "pending": "Pendiente",
+    "rejected": "Rechazado",
+    "reject": "Rechazar"
 }

@@ -12,6 +12,9 @@ class Order extends Model
 {
   use HasFactory;
 
+  public const WEB = 'WEB';
+  public const PRESENCIAL = 'PRESENCIAL';
+
   protected $fillable = [
     'order_code',
     'order_status_id',

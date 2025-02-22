@@ -10,6 +10,12 @@ class OrderStatus extends Model
 {
   use HasFactory;
 
+  public const PENDIENTE = 'pendiente';
+  public const EN_PROCESO = 'en proceso';
+  public const FINALIZADO = 'finalizado';
+  public const ENTREGADO = 'entregado';
+  public const CANCELADO = 'cancelado';
+
   protected $fillable = [
     'id',
     'status',
