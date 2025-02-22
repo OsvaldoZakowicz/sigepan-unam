@@ -108,10 +108,14 @@
 
       <x-slot:content class="flex-col">
 
+        {{-- aviso segun respuesta de proveedores --}}
         @if ($period_status === $closed and $count_quotations !== 0)
           <div class="w-full flex justify-between items-center p-2 bg-emerald-100 border border-emerald-500 rounded-md">
 
-            <span>Se ha calculado una comparativa de precios por suministros para cada proveedor <strong>usando los presupuestos respondidos</strong></span>
+            <span>
+              <span>Se ha calculado una comparativa de precios por suministros para cada proveedor</span>
+              <strong>usando los presupuestos respondidos</strong>
+            </span>
 
             <x-a-button
               href="{{ route('suppliers-budgets-ranking', $period->id) }}"
@@ -123,6 +127,28 @@
             </x-a-button>
 
           </div>
+
+        @elseif ($period_status === $closed and $count_quotations === 0)
+
+          <div class="w-full flex justify-between items-center p-2 bg-red-100 border border-red-500 rounded-md">
+
+            <span>
+              <span>¡No se han recibido presupuestos de los proveedores!</span>
+              <span>¿Re abrir periodo?</span>
+            </span>
+
+            <x-a-button
+              wire:navigate
+              href="{{ route('suppliers-budgets-periods-edit', $period->id) }}"
+              wire:click=""
+              bg_color="neutral-100"
+              border_color="neutral-200"
+              text_color="neutral-600"
+              >configurar y reabrir
+            </x-a-button>
+
+          </div>
+
         @endif
 
         {{-- suministros --}}

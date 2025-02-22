@@ -123,6 +123,12 @@ class SupplierController extends Controller
     return view('suppliers.budgets-periods-create');
   }
 
+  //* editar y reabrir periodo presupuestario
+  public function budget_periods_edit($id): View
+  {
+    return view('suppliers.budget-periods-edit', ['id' => $id]);
+  }
+
   //* ver periodo de peticion de presupuestos
   public function budget_periods_show($id): View
   {

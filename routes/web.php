@@ -188,6 +188,10 @@ Route::middleware(['auth', 'verified', 'can:proveedores'])->group(function () {
   Route::get('suppliers/budget/periods/show/{id}', [SupplierController::class, 'budget_periods_show'])
     ->name('suppliers-budgets-periods-show');
 
+  // NOTA: editar periodo de presupuesto y reabrirlo
+  Route::get('suppliers/budget/periods/edit/{id}', [SupplierController::class, 'budget_periods_edit'])
+    ->name('suppliers-budgets-periods-edit');
+
   // NOTA: ver respuesta de un proveedor a un presupuesto en el periodo
   Route::get('suppliers/budget/response/{id}', [SupplierController::class, 'budget_response'])
     ->name('suppliers-budgets-response');

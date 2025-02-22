@@ -3,7 +3,7 @@
   <article class="m-2 border rounded-sm border-neutral-200">
 
     {{-- barra de titulo --}}
-    <x-title-section title="crear periodo de petición de presupuestos"></x-title-section>
+    <x-title-section title="extender el periodo de petición de presupuestos y reabrirlo"></x-title-section>
 
     {{-- cuerpo --}}
     <x-content-section>
@@ -20,7 +20,7 @@
 
             {{-- leyenda --}}
             <x-slot:subtitle>
-              <span class="text-sm text-neutral-600">Establezca el dia en que abrirá y cerrará el periodo.</span>
+              <span class="text-sm text-neutral-600">Para reabrir el periodo, extienda la fecha de cierre.</span>
             </x-slot:subtitle>
 
             @error('period_*')
@@ -36,16 +36,15 @@
                 <span>
                   <x-input-label for="period_start_at" class="font-normal">fecha de inicio</x-input-label>
                   <span class="text-red-600">*</span>
-                  @error('period_start_at') <span class="text-red-400 text-xs">{{ $message }}</span> @enderror
                 </span>
+                @error('period_start_at') <span class="text-red-400 text-xs">{{ $message }}</span> @enderror
                 <input
                   type="date"
                   name="period_start_at"
                   id="period_start_at"
                   wire:model="period_start_at"
-                  min="{{ $min_date }}"
-                  max="{{ $max_date }}"
-                  class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"/>
+                  @readonly(true)
+                  class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300 bg-neutral-200"/>
               </div>
 
               {{-- fecha de cierre --}}
@@ -53,15 +52,15 @@
                 <span>
                   <x-input-label for="period_end_at" class="font-normal">fecha de cierre</x-input-label>
                   <span class="text-red-600">*</span>
-                  @error('period_end_at') <span class="text-red-400 text-xs">{{ $message }}</span> @enderror
                 </span>
+                @error('period_end_at') <span class="text-red-400 text-xs">{{ $message }}</span> @enderror
                 <input
                   type="date"
                   name="period_end_at"
                   id="period_end_at"
                   wire:model="period_end_at"
                   min="{{ $min_date }}"
-                  max="{{ $max_date }}"
+                  max="{{ $max_date}}"
                   class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300" />
               </div>
 
@@ -69,8 +68,8 @@
               <div class="flex flex-col gap-1 min-h-fit w-full md:w-1/2 lg:grow">
                 <span>
                   <x-input-label for="period_short_description" class="font-normal">descripcion corta</x-input-label>
-                  @error('period_short_description') <span class="text-red-400 text-xs">{{ $message }}</span> @enderror
                 </span>
+                @error('period_short_description') <span class="text-red-400 text-xs">{{ $message }}</span> @enderror
                 <input
                   type="text"
                   name="period_short_description"
@@ -90,21 +89,9 @@
               <span class="text-sm text-neutral-600">se presupuestarán suministros y packs de proveedores <span class="font-semibold text-emerald-600">activos.</span></span>
             </x-slot:subtitle>
 
-            @error('provisions_and_packs*')
-              <x-slot:messages class="my-2">
-                <span class="text-red-400">¡hay errores en esta seccion!</span>
-              </x-slot:messages>
-            @enderror
-
-            {{-- cuadro de busqueda --}}
-            @livewire('suppliers.search-provision-period', ['is_editing' => false])
-
             {{-- leyenda --}}
             <div class="py-1">
               <span class="text-sm text-neutral-600">Lista de suministros y packs a presupuestar.</span>
-              @error('provisions_and_packs')
-                <span class="text-red-400 text-xs">{{ $message }}</span>
-              @enderror
             </div>
 
             {{-- lista de seleccion, con scroll --}}
@@ -124,7 +111,6 @@
                       <span>cantidad a presupuestar</span>
                       <x-quest-icon title="cantidad de unidades de cada pack o de cada suministro que desea presupuestar"/>
                     </x-table-th>
-                    <x-table-th class="text-start w-16">quitar</x-table-th>
                   </tr>
                 </x-slot:tablehead>
                 <x-slot:tablebody>
@@ -132,7 +118,6 @@
                     <tr wire:key="{{ $key }}" class="border">
 
                       @if ($item['item_type'] === 'suministro')
-                        {{-- suministro --}}
                         <x-table-td class="text-end w-12">
                           {{ $item['item_object']->id }}
                         </x-table-td>
@@ -147,35 +132,12 @@
                           {{ $item['item_object']->type->provision_type_name }}
                         </x-table-td>
                         <x-table-td class="text-end">
-                          {{ $item['item_object']->provision_quantity }}
-                          {{ $item['item_object']->measure->measure_abrv }}
+                          {{ convert_measure($item['item_object']->provision_quantity, $item['item_object']->measure)}}
                         </x-table-td>
                         <x-table-td class="text-end w-56">
-                          {{-- cantidad --}}
-                          @error('provisions_and_packs.'.$key.'.item_quantity')
-                            <span class="text-red-400 text-xs">{{ $message }}</span>
-                          @enderror
-                          <input
-                            type="text"
-                            id="provisions_and_packs_{{ $key }}_item_quantity"
-                            wire:model.defer="provisions_and_packs.{{ $key }}.item_quantity"
-                            placeholder="cantidad"
-                            class="w-full p-1 text-sm text-right border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
-                            />
-                        </x-table-td>
-                        <x-table-td class="text-start">
-                          {{-- quitar --}}
-                          <div class="w-full inline-flex gap-1 justify-start items-center">
-                            <span
-                              wire:click="removeItemFromList({{ $key }})"
-                              title="quitar de la lista"
-                              class="font-bold leading-none text-center p-1 cursor-pointer bg-red-100 border border-red-200 rounded-sm"
-                              >&times;
-                            </span>
-                          </div>
+                          {{ $item['item_quantity'] }}
                         </x-table-td>
                       @else
-                        {{-- pack --}}
                         <x-table-td class="text-end w-12">
                           {{ $item['item_object']->id }}
                         </x-table-td>
@@ -190,32 +152,10 @@
                           {{ $item['item_object']->provision->type->provision_type_name }}
                         </x-table-td>
                         <x-table-td class="text-end">
-                          {{ $item['item_object']->pack_quantity }}
-                          {{ $item['item_object']->provision->measure->measure_abrv }}
+                          {{ convert_measure($item['item_object']->pack_quantity, $item['item_object']->provision->measure) }}
                         </x-table-td>
                         <x-table-td class="text-end w-56">
-                          {{-- cantidad --}}
-                          @error('provisions_and_packs.'.$key.'.item_quantity')
-                            <span class="text-red-400 text-xs">{{ $message }}</span>
-                          @enderror
-                          <input
-                            type="text"
-                            id="provisions_and_packs_{{ $key }}_item_quantity"
-                            wire:model.defer="provisions_and_packs.{{ $key }}.item_quantity"
-                            placeholder="cantidad"
-                            class="w-full p-1 text-sm text-right border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
-                            />
-                        </x-table-td>
-                        <x-table-td class="text-start">
-                          {{-- quitar --}}
-                          <div class="w-full inline-flex gap-1 justify-start items-center">
-                            <span
-                              wire:click="removeItemFromList({{ $key }})"
-                              title="quitar de la lista"
-                              class="font-bold leading-none text-center p-1 cursor-pointer bg-red-100 border border-red-200 rounded-sm"
-                              >&times;
-                            </span>
-                          </div>
+                          {{ $item['item_quantity'] }}
                         </x-table-td>
                       @endif
 
@@ -255,7 +195,7 @@
 
           <x-a-button
             wire:navigate
-            href="{{ route('suppliers-budgets-periods-index') }}"
+            href="{{ route('suppliers-budgets-periods-show', $period->id) }}"
             bg_color="neutral-600"
             border_color="neutral-600"
             >cancelar
@@ -264,8 +204,8 @@
           <x-btn-button
             type="button"
             wire:click="save()"
-            wire:confirm="¿Crear periodo?, una vez creado no podrá modificarlo. Si la fecha de inicio es el dia de hoy, el periodo abrira inmediatamente y se contactará a los proveedores activos."
-            >guardar
+            wire:confirm="¿Volver a abrir el periodo?, una vez creado no podrá modificarlo. El periodo volverá a abrirse."
+            >guardar y re abrir
           </x-btn-button>
 
         </div>
