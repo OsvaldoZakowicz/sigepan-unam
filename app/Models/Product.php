@@ -46,4 +46,12 @@ class Product extends Model
   {
     return $this->hasMany(Recipe::class, 'product_id', 'id');
   }
+
+  //* un producto tiene muchas ordenes
+  public function orders(): BelongsToMany
+  {
+    return $this->belongsToMany(Order::class, 'order_product')
+      ->withPivot('quantity', 'unit_price', 'subtotal_price')
+      ->withTimestamps();
+  }
 }

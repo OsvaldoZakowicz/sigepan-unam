@@ -28,6 +28,7 @@ class DatabaseSeeder extends Seeder
       PeriodStatusSeeder::class,
       IvaConditionSeeder::class,
       TagSeeder::class,
+      OrderStatusSeeder::class,
     ]);
 
   }
