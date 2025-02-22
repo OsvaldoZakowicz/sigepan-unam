@@ -21,9 +21,9 @@
 </head>
 
 {{-- vista de bienvenida --}}
-<body class="antialiased font-sans">
+<body class="antialiased font-sans min-h-screen flex flex-col">
 
-  <header class="">
+  <header class="fixed top-0 w-full bg-white z-40">
     @if (Route::has('login'))
       {{-- navegacion de bienvenida --}}
       @livewire('welcome.navigation')
@@ -98,9 +98,13 @@
   </div>
 
   {{-- tienda --}}
-  <div class="w-full">
+  <main class="w-full">
     @yield('view_content')
-  </div>
+  </main>
+
+  <footer class="w-full h-60 bg-neutral-900">
+
+  </footer>
 
   {{-- livewire --}}
   @livewireScripts()

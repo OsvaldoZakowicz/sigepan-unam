@@ -11,10 +11,12 @@ use Illuminate\Support\Facades\Log;
 class PaymentController extends Controller
 {
   // * mostrar carrito y preparar pago
-  public function cart_index(): View
+  public function cart_index()
   {
     // Verificar si hay un carrito en la sesión
     if (!Session::has('cart')) {
+
+      // Si no hay carrito, redirigir a la tienda
       return redirect()->route('store-store-index');
     }
 
@@ -29,10 +31,15 @@ class PaymentController extends Controller
     Log::info('Pago exitoso', $request->all());
 
     // limpiar carrito y regenerar sesión
+    // todo: verificar
     Session::forget('cart');
     Session::regenerate();
 
-    dd('exitoso:', 'carrito;', Session::get('cart'), $request->all());
+    // todo: manejar datos del pago
+    // todo: manejar pedido
+    // todo: falta algo mas?
+
+    //dd('exitoso:', 'carrito;', Session::get('cart'), $request->all());
 
     return view('store.payment-success');
   }

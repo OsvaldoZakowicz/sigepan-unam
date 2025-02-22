@@ -1,4 +1,4 @@
-<div class="bg-gradient-to-r from-orange-100 via-amber-200 to-orange-900">
+<div class="mt-24 bg-gradient-to-r from-orange-100 via-amber-200 to-orange-900">
 
   {{-- navegacion de busqueda e icono de carrito --}}
   <header class="max-w-5xl mx-auto mb-6 p-6 flex justify-between items-center">
@@ -223,8 +223,4 @@
       {{ $products->links() }}
     </div>
   </div>
-
-  <footer role="pie-de-pagina" class="w-full bg-neutral-800 text-white p-4 h-96 mt-20">
-    {{-- todo --}}
-  </footer>
 </div>

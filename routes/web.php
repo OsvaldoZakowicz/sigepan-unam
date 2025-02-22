@@ -26,6 +26,11 @@ Route::middleware(['auth', 'can:tienda'])->group(function () {
     ->middleware('verified')
     ->name('store-store-cart-index');
 
+  // pedidos del cliente
+  Route::get('store/orders', [StoreController::class, 'orders_list'])
+    ->middleware('verified')
+    ->name('store-store-orders-list');
+
   // compra exitosa
   Route::get('store/payment/success', [PaymentController::class, 'payment_success'])
     ->middleware('verified')

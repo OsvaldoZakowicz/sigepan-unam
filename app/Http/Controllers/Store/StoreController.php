@@ -13,4 +13,10 @@ class StoreController extends Controller
   {
     return view('store.store-index');
   }
+
+  // * mostrar pedidos del cliente
+  public function orders_list(): View
+  {
+    return view('store.orders-index');
+  }
 }

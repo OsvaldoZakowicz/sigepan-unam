@@ -1,4 +1,4 @@
-<div class="bg-gradient-to-r from-orange-100 via-amber-200 to-orange-900 h-screen">
+<div class="mt-24 pt-5 bg-gradient-to-r from-orange-100 via-amber-200 to-orange-900 h-screen">
 
   {{-- componente de carrito final --}}
 	<div class="bg-white rounded-lg flex justify-between gap-8 items-start w-full max-w-6xl mx-auto p-6 h-4/5">
@@ -77,10 +77,6 @@
     </div>
 
   </div>
-
-  <footer role="pie-de-pagina" class="w-full bg-neutral-800 text-white p-4 mt-20 h-1/5">
-    {{-- todo --}}
-  </footer>
 
   {{-- inicializacion del boton de MP --}}
   <script>
