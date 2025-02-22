@@ -132,8 +132,8 @@
                 <x-table-td class="text-start">
                   {{ $provision->type->provision_type_name }}
                 </x-table-td>
-                <x-table-td class="text-end capitalize">
-                  {{ $provision->provision_quantity }}&nbsp;({{ $provision->measure->unit_symbol }})
+                <x-table-td class="text-end">
+                  {{ convert_measure($provision->provision_quantity, $provision->measure) }}
                 </x-table-td>
                 <x-table-td class="text-start">
                   @php
@@ -142,8 +142,8 @@
                   @if (count($packs) > 0)
                     @foreach ($packs as $pack)
                     <div
-                      class="inline-flex items-center justify-start gap-1 border border-blue-300 bg-blue-200 px-1 rounded-lg cursor-pointer"
-                      title="cantidad total:&nbsp;{{ $pack->pack_quantity }}{{ $provision->measure->unit_symbol }}">
+                      class="inline-flex items-center lowercase justify-start gap-1 border border-blue-300 bg-blue-200 px-1 rounded-lg cursor-pointer"
+                      title="cantidad total:&nbsp;{{ convert_measure($pack->pack_quantity, $pack->provision->measure) }}">
                       <span>&times;{{ $pack->pack_units }}</span>
                     </div>
                     @endforeach

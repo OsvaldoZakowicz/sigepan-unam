@@ -44,8 +44,8 @@
                   <x-table-th class="text-start">marca</x-table-th>
                   <x-table-th class="text-start">tipo</x-table-th>
                   <x-table-th class="text-end">
-                    <span>volumen</span>
-                    <x-quest-icon title="kilogramos (kg), litros (lts) o unidades (un)"/>
+                    <span>cantidad</span>
+                    <x-quest-icon title="kilogramos (kg), gramos (g), litros (l), mililitros (ml), metro (m), centimetro (cm), unidad (u)"/>
                   </x-table-th>
                   <x-table-th class="text-end w-1/3">
                     <span>$&nbsp;precio</span>
@@ -74,8 +74,7 @@
                         {{ $price_item['provision']->type->provision_type_name }}
                       </x-table-td>
                       <x-table-td class="text-end">
-                        {{ $price_item['provision']->provision_quantity }}&nbsp;
-                        ({{ $price_item['provision']->measure->measure_abrv }})
+                        {{ convert_measure($price_item['provision']->provision_quantity, $price_item['provision']->measure) }}
                       </x-table-td>
                       <x-table-td class="text-start">
                         {{-- input precio --}}
@@ -118,8 +117,7 @@
                         {{ $price_item['pack']->provision->type->provision_type_name }}
                       </x-table-td>
                       <x-table-td class="text-end">
-                        {{ $price_item['pack']->pack_quantity }}&nbsp;
-                        ({{ $price_item['pack']->provision->measure->measure_abrv }})
+                        {{ convert_measure($price_item['pack']->pack_quantity, $price_item['pack']->provision->measure) }}
                       </x-table-td>
                       <x-table-td class="text-start">
                         {{-- input precio --}}

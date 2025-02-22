@@ -113,11 +113,7 @@
                 <x-table-th class="text-start">tipo</x-table-th>
                 <x-table-th class="text-end">
                   <span>cantidad</span>
-                  <x-quest-icon title="indica si se trata de una unidad (1), o pack de unidades (mas de uno)"/>
-                </x-table-th>
-                <x-table-th class="text-end">
-                  <span>volumen</span>
-                  <x-quest-icon title="kilogramos (kg), litros (lts) o unidades (un)"/>
+                  <x-quest-icon title="kilogramos (kg), gramos (g), litros (l), mililitros (ml), metro (m), centimetro (cm), unidad (u)"/>
                 </x-table-th>
                 @if ($is_editing) <x-table-th class="text-end w-1/3">$&nbsp;precio</x-table-th> @endif
                 <x-table-th class="text-start w-16">elegir</x-table-th>
@@ -140,10 +136,7 @@
                     {{ $pack->provision->type->provision_type_name }}
                   </x-table-td>
                   <x-table-td class="text-end">
-                    pack x {{ $pack->pack_units }}
-                  </x-table-td>
-                  <x-table-td class="text-end">
-                    {{ $pack->pack_quantity }}&nbsp;({{ $pack->provision->measure->measure_abrv }})
+                    {{ convert_measure($pack->pack_quantity, $pack->provision->measure) }}
                   </x-table-td>
                   @if ($is_editing)
                     <x-table-td class="text-end">
@@ -270,11 +263,7 @@
                 <x-table-th class="text-start">tipo</x-table-th>
                 <x-table-th class="text-end">
                   <span>cantidad</span>
-                  <x-quest-icon title="indica si se trata de una unidad (1), o pack de unidades (mas de uno)"/>
-                </x-table-th>
-                <x-table-th class="text-end">
-                  <span>volumen</span>
-                  <x-quest-icon title="kilogramos (kg), litros (lts) o unidades (un)"/>
+                  <x-quest-icon title="kilogramos (kg), gramos (g), litros (l), mililitros (ml), metro (m), centimetro (cm), unidad (u)"/>
                 </x-table-th>
                 @if ($is_editing)
                   <x-table-th class="text-end w-1/3">$&nbsp;precio</x-table-th>
@@ -300,10 +289,7 @@
                     {{ $provision->type->provision_type_name }}
                   </x-table-td>
                   <x-table-td class="text-end">
-                    <span>1</span>
-                  </x-table-td>
-                  <x-table-td class="text-end">
-                    {{ $provision->provision_quantity }}&nbsp;({{ $provision->measure->measure_abrv }})
+                    {{ convert_measure($provision->provision_quantity, $provision->measure) }}
                   </x-table-td>
                   @if ($is_editing)
                   <x-table-td class="text-end">

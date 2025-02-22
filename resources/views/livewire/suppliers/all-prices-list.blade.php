@@ -114,8 +114,8 @@
                 <x-table-th class="text-start">tipo</x-table-th>
                 <x-table-th class="text-start">proveedor</x-table-th>
                 <x-table-th class="text-end">
-                  <span>volumen</span>
-                  <x-quest-icon title="kilogramos (kg), litros (lts) o unidades (un)"/>
+                  <span>cantidad</span>
+                  <x-quest-icon title="kilogramos (kg), gramos (g), litros (l), mililitros (ml), metro (m), centimetro (cm), unidad (u)"/>
                 </x-table-th>
                 <x-table-th class="text-end">$&nbsp;precio</x-table-th>
                 <x-table-th class="text-start w-48">acciones</x-table-th>
@@ -148,7 +148,7 @@
                         {{ $supplier->company_name }}
                       </x-table-td>
                       <x-table-td class="text-end">
-                        {{ $pack->pack_quantity }}({{ $pack->provision->measure->measure_abrv }})
+                        {{ convert_measure($pack->pack_quantity, $pack->provision->measure) }}
                       </x-table-td>
                       <x-table-td class="text-end">
                         $&nbsp;{{ $supplier->pivot->price }}
@@ -172,7 +172,7 @@
                   @endforeach
                 @empty
                   <tr class="border">
-                    <td colspan="8">sin registros!</td>
+                    <td colspan="8">¡sin registros!</td>
                   </tr>
                 @endforelse
               @else
@@ -201,7 +201,7 @@
                         {{ $supplier->company_name }}
                       </x-table-td>
                       <x-table-td class="text-end">
-                        {{ $provision->provision_quantity }}({{ $provision->measure->measure_abrv }})
+                        {{ convert_measure($provision->provision_quantity, $provision->measure) }}
                       </x-table-td>
                       <x-table-td class="text-end">
                         $&nbsp;{{ $supplier->pivot->price }}
@@ -225,7 +225,7 @@
                   @endforeach
                 @empty
                   <tr class="border">
-                    <td colspan="8">sin registros!</td>
+                    <td colspan="8">¡sin registros!</td>
                   </tr>
                 @endforelse
               @endif

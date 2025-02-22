@@ -142,8 +142,8 @@
               <x-table-th class="text-start">marca</x-table-th>
               <x-table-th class="text-start">tipo</x-table-th>
               <x-table-th class="text-end">
-                <span>volumen</span>
-                <x-quest-icon title="kilogramos (kg), litros (lts) o unidades (un)"/>
+                <span>cantidad</span>
+                <x-quest-icon title="kilogramos (kg), gramos (g), litros (l), mililitros (ml), metro (m), centimetro (cm), unidad (u)"/>
               </x-table-th>
               <x-table-th class="text-end">$&nbsp;precio</x-table-th>
               <x-table-th class="text-start w-48">acciones</x-table-th>
@@ -167,7 +167,7 @@
                     {{ $pwp->provision->type->provision_type_name }}
                   </x-table-td>
                   <x-table-td class="text-end">
-                    {{ $pwp->pack_quantity }}({{ $pwp->provision->measure->measure_abrv }})
+                    {{ convert_measure($pwp->pack_quantity, $pwp->provision->measure) }}
                   </x-table-td>
                   <x-table-td class="text-end">
                     $&nbsp;{{ $pwp->pivot->price }}
@@ -179,7 +179,7 @@
                       wire:navigate
                       wire:click="deletePack({{ $pwp->id }})"
                       color="red"
-                      wire:confirm="¿Desea borrar el registro?, eliminará el precio del proveedor: {{ $supplier->company_name }}, para el pack: {{ $pwp->pack_name }} {{ $pwp->provision->trademark->provision_trademark_name }} de {{ $pwp->pack_quantity }}({{ $pwp->provision->measure->measure_abrv }})"
+                      wire:confirm="¿Desea borrar el registro?, eliminará el precio del proveedor: {{ $supplier->company_name }}, para el pack: {{ $pwp->pack_name }} {{ $pwp->provision->trademark->provision_trademark_name }} de {{ $pwp->pack_quantity }}({{ $pwp->provision->measure->unit_symbol }})"
                       >eliminar
                     </x-btn-button>
 
@@ -207,7 +207,7 @@
                     {{ $pwp->type->provision_type_name }}
                   </x-table-td>
                   <x-table-td class="text-end">
-                    {{ $pwp->provision_quantity }}({{ $pwp->measure->measure_abrv }})
+                    {{ convert_measure($pwp->provision_quantity, $pwp->measure) }}
                   </x-table-td>
                   <x-table-td class="text-end">
                     $&nbsp;{{ $pwp->pivot->price }}
@@ -219,7 +219,7 @@
                       wire:navigate
                       wire:click="deleteProvision({{ $pwp->id }})"
                       color="red"
-                      wire:confirm="¿Desea borrar el registro?, eliminará el precio del proveedor: {{ $supplier->company_name }}, para el suministro: {{ $pwp->provision_name }} {{ $pwp->trademark->provision_trademark_name }} de {{ $pwp->provision_quantity }}({{ $pwp->measure->measure_abrv }})"
+                      wire:confirm="¿Desea borrar el registro?, eliminará el precio del proveedor: {{ $supplier->company_name }}, para el suministro: {{ $pwp->provision_name }} {{ $pwp->trademark->provision_trademark_name }} de {{ $pwp->provision_quantity }}({{ $pwp->measure->unit_symbol }})"
                       >eliminar
                     </x-btn-button>
 

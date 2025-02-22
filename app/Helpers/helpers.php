@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Carbon;
+use App\Models\Measure;
 use Illuminate\Support\Str;
 
 /**
@@ -73,10 +74,10 @@ function modelPathFromPlural($plural_name)
  * * formato ejemplo: 'Operacion $estado!' o 'Información:'
  * @param string $estado de la opracion, ejemplo: 'exitosa', 'fallida', 'incompleta', 'cancelada'.
  * @param bool $default si es verdadero, se devuelve 'Información:'.
-*/
-function toastTitle($estado = 'exitosa', $default = false )
+ */
+function toastTitle($estado = 'exitosa', $default = false)
 {
-  if($default) {
+  if ($default) {
     return 'Información:';
   }
 
@@ -88,7 +89,7 @@ function toastTitle($estado = 'exitosa', $default = false )
  * * formato ejemplo: 'El $modelo fue $operacion correctamente'
  * @param string $modelo nombre del modelo o clase principal de la operacion.
  * @param string $operacion nombre de la operacion realizada, ejemplo: 'creado', 'actualizado', 'eliminado'.
-*/
+ */
 function toastSuccessBody($modelo = 'modelo', $operacion = 'creado')
 {
   return 'El ' . $modelo . ' fue ' . $operacion . ' correctamente.';
@@ -101,7 +102,7 @@ function toastSuccessBody($modelo = 'modelo', $operacion = 'creado')
  * @param string $modelo nombre del modelo o clase principal de la operacion.
  * @param string $operacion nombre de la operacion realizada, ejemplo: 'crear', 'actualizar', 'eliminar'.
  * @param string $detalle detalles adicionales del error.
-*/
+ */
 function toastErrorBody($modelo = 'modelo', $operacion = 'crear', $detalle = '')
 {
   return 'No se pudo ' . $operacion . ' el ' . $modelo . '.' . $detalle . '.';
@@ -111,7 +112,7 @@ function toastErrorBody($modelo = 'modelo', $operacion = 'crear', $detalle = '')
  * * retornar un cuerpo de mensaje de informacion para mensajes toast.
  * * formato ejemplo: '$detalle!'
  * @param string $detalle detalles adicionales del mensaje.
-*/
+ */
 function toastInfoBody($detalle = '')
 {
   return $detalle . '!';
@@ -139,7 +140,7 @@ function randomPassword(int $length = 8)
   $cant_numbers = 3;
   $cant_lower_letters = $length - $cant_upper_letters - $cant_numbers;
 
-  $regex = '[A-Z]{'.$cant_upper_letters.'}[a-z]{'.$cant_lower_letters.'}[0-9]{'.$cant_numbers.'}';
+  $regex = '[A-Z]{' . $cant_upper_letters . '}[a-z]{' . $cant_lower_letters . '}[0-9]{' . $cant_numbers . '}';
 
   // obtener un string regex valido y mezclarlo
   $password = fake()->shuffle(fake()->regexify($regex));
@@ -156,4 +157,45 @@ function randomPassword(int $length = 8)
 function limitText($text)
 {
   return Str::limit($text, 20, '...');
+}
+
+/**
+ * Convierte una cantidad según la unidad de medida proporcionada
+ * @param float $quantity Cantidad a convertir
+ * @param Measure $measure Instancia del modelo Measure
+ * @return string Cantidad convertida con su unidad
+ */
+function convert_measure(float $quantity, Measure $measure): string
+{
+  // Si es una unidad simple o la cantidad es mayor o igual a 1
+  if (is_null($measure->conversion_factor) || $quantity >= 1) {
+    return number_format($quantity, 2) . ' ' . $measure->unit_symbol;
+  }
+
+  // Convertir a la unidad menor
+  $convertedQuantity = $quantity * $measure->conversion_factor;
+  return number_format($convertedQuantity, 2) . ' ' . $measure->conversion_symbol;
+}
+
+/**
+ * Convierte una cantidad según la unidad de medida y retorna un array con el símbolo y valor
+ * @param float $quantity Cantidad a convertir
+ * @param Measure $measure Instancia del modelo Measure
+ * @return array{symbol: string, value: float} Array con el símbolo y el valor convertido
+ */
+function convert_measure_value(float $quantity, Measure $measure): array
+{
+  // Si es una unidad simple o la cantidad es mayor o igual a 1
+  if (is_null($measure->conversion_factor) || $quantity >= 1) {
+    return [
+      'symbol' => $measure->unit_symbol,
+      'value' => $quantity
+    ];
+  }
+
+  // Convertir a la unidad menor
+  return [
+    'symbol' => $measure->conversion_symbol,
+    'value' => $quantity * $measure->conversion_factor
+  ];
 }
