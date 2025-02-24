@@ -13,6 +13,7 @@ use App\Models\ProvisionTrademark;
 use App\Models\Measure;
 use App\Models\ProvisionType;
 use App\Models\Provision;
+use App\Models\ProvisionCategory;
 use App\Models\Pack;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -37,11 +38,13 @@ class PackTest extends TestCase
 
   // unidad de medida
   public $measure_data = [
-    'measure_name'              => 'kilogramos',
-    'measure_abrv'              => 'kg',
-    'measure_base'              => 1000,
-    'measure_base_abrv'         => 'g',
-    'measure_short_description' => 'unidad de medida en kilogramos'
+    'unit_name' => 'litro',
+    'base_value' => 1,
+    'unit_symbol' => 'L',
+    'conversion_unit' => 'mililitros',
+    'conversion_factor' => 1000,
+    'conversion_symbol' => 'mL',
+    'short_description' => 'unidad de medida en litros'
   ];
 
   // suministro
@@ -49,6 +52,13 @@ class PackTest extends TestCase
     'provision_name' => 'aceite',
     'provision_quantity' => 900,
     'provision_short_description' => 'descripcion',
+  ];
+
+  public $provision_category_data = [
+    'provision_category_name'        => 'aceite mezcla',
+    'provision_category_is_editable' => false,
+    'measure_id'                     => '',
+    'provision_type_id'              => ''
   ];
 
   // pack
@@ -112,17 +122,33 @@ class PackTest extends TestCase
   }
 
   /**
+   * crear categoria con medida y tipo
+   * @param Measure $measure
+   * @param ProvisionType $type
+   * @return ProvisionCategory
+   */
+  public function crearCategoriaDeSuministro($measure, $type): ProvisionCategory
+  {
+    $this->provision_category_data['measure_id'] = $measure->id;
+    $this->provision_category_data['provision_type_id'] = $type->id;
+
+    return ProvisionCategory::create($this->provision_category_data);
+  }
+
+  /**
    * crear un suministro
    * @param ProvisionTrademark $Trademark
    * @param ProvisionType $Type
    * @param Measure $Measure
+   * @param ProvisionCategory $category
    * @return Provision
   */
-  public function crearSuministro($Trademark, $Type, $Measure)
+  public function crearSuministro($Trademark, $Type, $Measure, $category)
   {
     $this->provision_data = Arr::add($this->provision_data, 'provision_trademark_id', $Trademark->id);
     $this->provision_data = Arr::add($this->provision_data, 'provision_type_id', $Type->id);
     $this->provision_data = Arr::add($this->provision_data, 'measure_id', $Measure->id);
+    $this->provision_data = Arr::add($this->provision_data, 'provision_category_id', $category->id);
 
     return Provision::create($this->provision_data);
   }
@@ -166,7 +192,8 @@ class PackTest extends TestCase
     $trademark      = $this->crearMarca();
     $provision_type = $this->crearTipo();
     $measure        = $this->crearMedida();
-    $provision      = $this->crearSuministro($trademark, $provision_type, $measure);
+    $category       = $this->crearCategoriaDeSuministro($measure, $provision_type);
+    $provision      = $this->crearSuministro($trademark, $provision_type, $measure, $category);
 
     $pack           = $this->crearPack($provision);
 
@@ -182,7 +209,8 @@ class PackTest extends TestCase
     $trademark      = $this->crearMarca();
     $provision_type = $this->crearTipo();
     $measure        = $this->crearMedida();
-    $provision      = $this->crearSuministro($trademark, $provision_type, $measure);
+    $category       = $this->crearCategoriaDeSuministro($measure, $provision_type);
+    $provision      = $this->crearSuministro($trademark, $provision_type, $measure, $category);
 
     $pack           = $this->crearPack($provision);
 
@@ -197,7 +225,9 @@ class PackTest extends TestCase
     $trademark      = $this->crearMarca();
     $provision_type = $this->crearTipo();
     $measure        = $this->crearMedida();
-    $provision      = $this->crearSuministro($trademark, $provision_type, $measure);
+    $category       = $this->crearCategoriaDeSuministro($measure, $provision_type);
+    $provision      = $this->crearSuministro($trademark, $provision_type, $measure, $category);
+
     $pack           = $this->crearPack($provision);
 
     $this->assertInstanceOf(HasMany::class, $provision->packs());
@@ -211,7 +241,8 @@ class PackTest extends TestCase
     $trademark      = $this->crearMarca();
     $provision_type = $this->crearTipo();
     $measure        = $this->crearMedida();
-    $provision      = $this->crearSuministro($trademark, $provision_type, $measure);
+    $category       = $this->crearCategoriaDeSuministro($measure, $provision_type);
+    $provision      = $this->crearSuministro($trademark, $provision_type, $measure, $category);
     $pack           = $this->crearPack($provision);
     $supplier       = $this->crearProveedor();
 

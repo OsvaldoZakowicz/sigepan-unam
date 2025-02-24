@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 // todo: auditar
 class RequestForQuotationPeriod extends Model
@@ -61,5 +62,12 @@ class RequestForQuotationPeriod extends Model
   public function quotations(): HasMany
   {
     return $this->hasMany(Quotation::class, 'period_id', 'id');
+  }
+
+  //* un periodo de peticion de presupuestos puede tener un periodo de pre orden
+  // request_for_quotation_period 1:0..1 pre_order_period
+  public function preorder_period(): HasOne
+  {
+    return $this->hasOne(PreOrderPeriod::class, 'quotation_period_id', 'id');
   }
 }

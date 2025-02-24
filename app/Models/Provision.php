@@ -90,4 +90,12 @@ class Provision extends Model
   {
     return $this->belongsTo(ProvisionCategory::class, 'provision_category_id', 'id');
   }
+
+  //* un suministro tiene muchas pre ordenes
+  public function pre_orders(): BelongsToMany
+  {
+    return $this->belongsToMany(PreOrder::class, 'pre_order_provision', 'provision_id', 'pre_order_id')
+      ->withPivot(['has_stock', 'quantity', 'unit_price', 'total_price'])
+      ->withTimestamps();
+  }
 }

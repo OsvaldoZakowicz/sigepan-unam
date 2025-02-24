@@ -63,4 +63,12 @@ class Pack extends Model
       ->withPivot(['has_stock', 'quantity', 'unit_price', 'total_price'])
       ->withTimestamps();
   }
+
+  //* un pack esta en muchas pre ordenes
+  public function pre_orders(): BelongsToMany
+  {
+    return $this->belongsToMany(PreOrder::class, 'pre_order_pack', 'pack_id', 'pre_order_id')
+      ->withPivot(['has_stock', 'quantity', 'unit_price', 'total_price'])
+      ->withTimestamps();
+  }
 }
