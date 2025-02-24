@@ -146,4 +146,22 @@ class SupplierController extends Controller
   {
     return view('suppliers.budget-ranking', ['id' => $id]);
   }
+
+  //* listar periodo de preordenes de compra
+  public function preorder_index(): View
+  {
+    return view('suppliers.preorders-index');
+  }
+
+  //* crear periodo de preorden de compra
+  public function preorder_create($id = null): View
+  {
+    return view('suppliers.preorders-create', ['id' => $id]);
+  }
+
+  //* ver periodo de preorden de compra
+  public function preorder_show($id): View
+  {
+    return view('suppliers.preorders-show', ['id' => $id]);
+  }
 }

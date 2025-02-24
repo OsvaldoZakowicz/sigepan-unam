@@ -35,4 +35,10 @@ class QuotationController extends Controller
   {
     return view('quotations.quotations-show', ['id' => $id]);
   }
+
+  //* ver lista de preordenes solicitadas al proveedor
+  public function preorders_index(): View
+  {
+    return view('quotations.preorders-index');
+  }
 }

@@ -200,9 +200,21 @@ Route::middleware(['auth', 'verified', 'can:proveedores'])->group(function () {
   Route::get('suppliers/budget/ranking/{id}', [SupplierController::class, 'budget_ranking'])
     ->name('suppliers-budgets-ranking');
 
+  // NOTA: listar periodos de pre orden
+  Route::get('suppliers/preorders', [SupplierController::class, 'preorder_index'])
+    ->name('suppliers-preorders-index');
+
+  // NOTA: crear periodo de pre ordenes, opcionalmente a partir de un periodo de presupuestos
+  Route::get('suppliers/preorders/create/{id?}', [SupplierController::class, 'preorder_create'])
+    ->name('suppliers-preorders-create');
+
+  // NOTA: ver periodo de pre ordenes
+  Route::get('suppliers/preorders/show/{id}', [SupplierController::class, 'preorder_show'])
+    ->name('suppliers-preorders-show');
+
 });
 
-//* seccion de presupuestos (quotations) para proveedores
+//* seccion de presupuestos (quotations) y preordenes para proveedores
 Route::middleware(['auth', 'verified', 'can:presupuestos'])->group(function () {
 
   Route::get('quotations', [QuotationController::class, 'quotations_index'])
@@ -216,6 +228,9 @@ Route::middleware(['auth', 'verified', 'can:presupuestos'])->group(function () {
 
   Route::get('quotations/show/{id}', [QuotationController::class, 'quotations_show'])
     ->name('quotations-quotations-show');
+
+  Route::get('preorders', [QuotationController::class, 'preorders_index'])
+    ->name('quotations-preorders-index');
 
 });
 

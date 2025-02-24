@@ -17,6 +17,13 @@
 
   <x-nav-link
     wire:navigate
+    :href="route('suppliers-preorders-index')"
+    :active="request()->routeIs('suppliers-preorders-*')"
+    >periodo de preordenes
+  </x-nav-linkwire>
+
+  <x-nav-link
+    wire:navigate
     :href="route('suppliers-provisions-index')"
     :active="request()->routeIs('suppliers-provisions-*')"
     >suministros

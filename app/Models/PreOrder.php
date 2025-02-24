@@ -15,8 +15,9 @@ class PreOrder extends Model
     'pre_order_period_id', // fk pre_order_periods
     'supplier_id', //fk suppliers
     'pre_order_code', //varchar unico
-    'quotation_reference', //varchar
+    'quotation_reference', //varchar nullable
     'status', //enum = ['pendiente', 'aprobado', 'rechazado']
+    'is_completed', // boolean
     'is_approved_by_supplier', //boolean
     'is_approved_by_buyer', //boolean
   ];

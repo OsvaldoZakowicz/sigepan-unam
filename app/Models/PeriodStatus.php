@@ -21,4 +21,10 @@ class PeriodStatus extends Model
   {
     return $this->hasMany(RequestForQuotationPeriod::class, 'period_status_id', 'id');
   }
+
+   //* un estado de periodo de solicitud tiene muchos periodos de preorden
+   public function preorder_periods(): HasMany
+   {
+     return $this->hasMany(PreOrderPeriod::class, 'period_status_id', 'id');
+   }
 }

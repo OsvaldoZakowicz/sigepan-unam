@@ -20,6 +20,12 @@ class PreOrderPeriod extends Model
     'period_status_id',
   ];
 
+  //* un periodo de pre ordenes tiene un estado
+  public function status(): BelongsTo
+  {
+    return $this->belongsTo(PeriodStatus::class, 'period_status_id', 'id');
+  }
+
   //* un periodo de pre ordenes puede pertenecer a un periodo de presupuestos
   public function quotation_period(): BelongsTo
   {

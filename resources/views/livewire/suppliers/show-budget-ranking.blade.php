@@ -17,12 +17,19 @@
 
     <x-content-section>
 
-      <x-slot:header class="hidden">
+      <x-slot:header class="">
+
+      <span class="font-semibold">precios por proveedor:</span>
+
+      <x-a-button
+        wire:navigate
+        href="{{ route('suppliers-preorders-create', $period->id) }}"
+        >crear preordenes de compra
+      </x-a-button>
+
       </x-slot:header>
 
       <x-slot:content class="flex flex-col gap-2 my-2">
-
-        <span class="font-semibold">precios por proveedor:</span>
 
         {{-- suministros --}}
         @foreach ($quotations_ranking['provisions'] as $key => $provision)

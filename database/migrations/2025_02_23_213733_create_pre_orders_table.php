@@ -19,6 +19,7 @@ return new class extends Migration
       $table->string('pre_order_code', 25)->unique();
       $table->string('quotation_reference', 25)->nullable();
       $table->enum('status', ['pendiente', 'aprobado', 'rechazado'])->default('pendiente');
+      $table->boolean('is_completed')->default(false);
       $table->boolean('is_approved_by_supplier')->default(false);
       $table->boolean('is_approved_by_buyer')->default(false);
       $table->timestamps();

@@ -8,4 +8,11 @@
     >mis presupuestos
   </x-nav-link>
 
+  <x-nav-link
+    wire:navigate
+    :href="route('quotations-preorders-index')"
+    :active="request()->routeIs('quotations-preorders-*')"
+    >mis preordenes
+  </x-nav-link>
+
 </div>
