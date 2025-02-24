@@ -133,7 +133,7 @@
                   {{ $audit->auditable_id }}
                 </x-table-td>
                 <x-table-td class="text-start">
-                  {{ $audit->user->name }}
+                  {{ $audit->user->name ?? '' }}
                 </x-table-td>
                 <x-table-td class="text-end">
                   {{ formatDateTime($audit->created_at)}}

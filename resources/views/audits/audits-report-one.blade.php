@@ -159,9 +159,9 @@
         <tr>
           <th scope="row" class="metadata">Responsable del cambio:</th>
           <td class="data">
-            <span>usuario:&nbsp;{{ $user_resp->name }},&nbsp;</span>
-            <span>rol:&nbsp;{{ $user_resp->getRolenames()->first() }},&nbsp;</span>
-            <span>correo electrónico:&nbsp;{{ $user_resp->email }}</span>
+            <span>usuario:&nbsp;{{ $user_resp->name ?? '' }},&nbsp;</span>
+            <span>rol:&nbsp;{{ ($user_resp) ? $user_resp->getRolenames()->first() : '' }},&nbsp;</span>
+            <span>correo electrónico:&nbsp;{{ $user_resp->email ?? '' }}</span>
           </td>
         </tr>
         <tr>
