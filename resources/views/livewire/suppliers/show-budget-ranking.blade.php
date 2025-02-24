@@ -4,6 +4,7 @@
 
     <x-title-section title="ranking de suministros del período presupuestario: {{ $period->period_code }}">
 
+     <div class="flex gap-2">
       <x-a-button
         wire:navigate
         href="{{ route('suppliers-budgets-periods-show', $period->id) }}"
@@ -13,20 +14,19 @@
         >volver
       </x-a-button>
 
-    </x-title-section>
-
-    <x-content-section>
-
-      <x-slot:header class="">
-
-      <span class="font-semibold">precios por proveedor:</span>
-
       <x-a-button
         wire:navigate
         href="{{ route('suppliers-preorders-create', $period->id) }}"
         >crear preordenes de compra
       </x-a-button>
+     </div>
 
+    </x-title-section>
+
+    <x-content-section>
+
+      <x-slot:header class="">
+        <span class="font-semibold">precios por proveedor:</span>
       </x-slot:header>
 
       <x-slot:content class="flex flex-col gap-2 my-2">

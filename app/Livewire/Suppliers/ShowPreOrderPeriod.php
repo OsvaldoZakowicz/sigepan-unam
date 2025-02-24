@@ -45,6 +45,8 @@ class ShowPreOrderPeriod extends Component
   */
   public function openPeriod(): void
   {
+    //todo: manejar con job para apertura
+    //todo: incluir job para notificar via email
     $this->preorder_period->period_start_at = Carbon::now()->format('Y-m-d');
     $this->preorder_period->period_status_id = 2; //abierto
     $this->preorder_period->save();
@@ -56,6 +58,8 @@ class ShowPreOrderPeriod extends Component
   */
   public function closePeriod(): void
   {
+    //todo: manejar con job para cierre
+    //todo: incluir job para notificar via email
     $this->preorder_period->period_end_at = Carbon::now()->format('Y-m-d');
     $this->preorder_period->period_status_id = 3; //cerrado
     $this->preorder_period->save();

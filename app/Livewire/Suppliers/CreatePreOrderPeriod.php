@@ -39,11 +39,16 @@ class CreatePreOrderPeriod extends Component
     $this->max_date = Carbon::now()->addDays(30)->format('Y-m-d');
   }
 
-  public function mount(QuotationPeriodService $qps, PreOrderPeriodService $pps, $id = null)
+  /**
+   * montar datos
+   * @return void
+   */
+  public function mount(QuotationPeriodService $qps, PreOrderPeriodService $pps, $id = null): void
   {
     ($id !== null) ? $this->period = RequestForQuotationPeriod::findOrFail($id) : null;
     ($id !== null) ? $this->quotations_ranking = $qps->comparePricesBetweenQuotations($this->period->id) : null;
 
+    // genera un preview de las pre ordenes a crear
     $this->preview_preorders = $pps->previewPreOrders($this->quotations_ranking);
   }
 
@@ -59,14 +64,13 @@ class CreatePreOrderPeriod extends Component
       [
         'period_start_at'           =>  ['required', 'date', 'after_or_equal:' . $this->min_date],
         'period_end_at'             =>  ['required', 'date', 'after:period_start_at'],
-        'period_short_description'  =>  ['nullable', 'regex:/^[A-Za-z\s]+$/', 'max:150'],
-      ],[
+        'period_short_description'  =>  ['nullable', 'regex:/^[A-Za-z\s]+$/', 'max:150'],],[
         'period_start_at.required'        =>  'La :attribute es obligatoria',
         'period_start_at.after_or_equal'  =>  'La :attribute debe ser a partir de hoy como mínimo',
         'period_end_at.required'          =>  'La :attribute es obligatoria',
         'period_end_at.after'             =>  'La :attribute debe estar después de la fecha de inicio',
         'period_short_description.regex'  =>  'La :attribute solo permite letras y espacios',
-      ], [
+      ],[
         'period_start_at'           =>  'fecha de inicio',
         'period_end_at'             =>  'fecha de cierre',
         'period_short_description'  =>  'descripción corta',
@@ -74,8 +78,6 @@ class CreatePreOrderPeriod extends Component
     );
 
     try {
-
-      //dd('validaciones:',$validated, 'periodo',$this->period);
 
       /**
        * 'quotation_period_id',
@@ -93,6 +95,7 @@ class CreatePreOrderPeriod extends Component
       $pre_order_period = PreOrderPeriod::create($validated);
 
       // crear preordenes
+      // todo: quitar de aca, delegar a un job
       $pps->generatePreOrders($pre_order_period->id, $this->quotations_ranking);
 
       $this->reset();

@@ -6,6 +6,8 @@
     {{-- barra de titulo --}}
     <x-title-section title="lista de periodos de petición de preordenes">
 
+      {{-- todo: crear periodo sin necesidad de presupuestos previos? --}}
+      {{-- todo: crear a partir de un presupuesto anterior? --}}
       {{-- <x-a-button
         wire:navigate
         href="{{route('suppliers-budgets-periods-create')}}"
@@ -163,7 +165,8 @@
                       bg_color="neutral-100"
                       border_color="neutral-200"
                       text_color="neutral-600"
-                      >ver</x-a-button>
+                      >ver
+                    </x-a-button>
 
                   </div>
                 </x-table-td>

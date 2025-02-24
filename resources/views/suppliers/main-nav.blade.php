@@ -19,7 +19,7 @@
     wire:navigate
     :href="route('suppliers-preorders-index')"
     :active="request()->routeIs('suppliers-preorders-*')"
-    >periodo de preordenes
+    >periodo de pre ordenes
   </x-nav-linkwire>
 
   <x-nav-link

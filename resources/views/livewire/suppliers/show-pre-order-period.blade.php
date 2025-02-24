@@ -1,9 +1,9 @@
 <div wire:poll>
-  {{-- componente ver periodo de peticion de preordenes --}}
+  {{-- componente ver periodo de peticion de pre ordenes --}}
   <article class="m-2 border rounded-sm border-neutral-200">
 
     {{-- barra de titulo --}}
-    <x-title-section title="ver periodo de preorden: {{ $preorder_period->period_code }}">
+    <x-title-section title="ver periodo de pre orden: {{ $preorder_period->period_code }}">
 
       <x-a-button
         wire:navigate
@@ -85,7 +85,7 @@
               bg_color="emerald-600"
               border_color="emerald-600"
               text_color="neutral-100"
-              wire:confirm="¿Abrir este período?, se enviarán las preordenes a los proveedores activos de los suministros de interés"
+              wire:confirm="¿Abrir este período?, se enviarán las pre ordenes a los proveedores activos de los suministros de interés"
               >abrir ahora
             </x-a-button>
           @elseif ($preorder_period->period_status_id === $opened)
@@ -95,7 +95,7 @@
               bg_color="red-600"
               border_color="red-600"
               text_color="neutral-100"
-              wire:confirm="¿Cerrar este período?, los proveedores con presupuesto sin responder quedarán fuera del periodo."
+              wire:confirm="¿Cerrar este período?, los proveedores con pre ordenes sin responder quedarán fuera del periodo."
               >cerrar ahora
             </x-a-button>
           @endif
@@ -149,19 +149,20 @@
 
         @endif --}}
 
+        {{-- todo: suministros y packs de interes --}}
 
-        {{-- preordenes --}}
-        <x-div-toggle x-data="{ open: true }" title="preordenes solicitadas en este período:" class="p-2">
+        {{-- pre ordenes --}}
+        <x-div-toggle x-data="{ open: true }" title="pre ordenes solicitadas en este período:" class="p-2">
 
           <x-slot:subtitle>
-            <span>lista de preordenes a la espera de ser respondidos en el período</span>
+            <span>lista de pre ordenes a la espera de ser respondidos en el período</span>
           </x-slot:subtitle>
 
           <x-table-base>
             <x-slot:tablehead>
               <tr class="border bg-neutral-100">
                 <x-table-th class="text-end w-12">id</x-table-th>
-                <x-table-th class="text-start">preorden</x-table-th>
+                <x-table-th class="text-start">pre orden</x-table-th>
                 <x-table-th class="text-start">proveedor</x-table-th>
                 <x-table-th class="text-start">estado</x-table-th>
                 <x-table-th class="text-end">
@@ -199,6 +200,8 @@
                   </x-table-td>
                   <x-table-td>
 
+                    {{-- todo, respuesta del proveedor --}}
+                    {{-- todo, vista parecida al preview? --}}
                     {{-- <x-a-button
                       wire:navigate
                       href="{{ route('suppliers-budgets-response', $quotation->id) }}"

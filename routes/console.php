@@ -64,3 +64,7 @@ Artisan::command('budget-periods:close', function (QuotationPeriodService $quota
     }
   }
 })->purpose('cerrar periodos de solicitud de presupuestos')->everyTwoMinutes();
+
+// todo: programar apertura de periodos de pre orden
+
+// todo: programar cierre de periodo de pre ordenes
