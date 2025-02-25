@@ -30,38 +30,32 @@
 
               @case(0)
                 {{-- programado --}}
-                <span
-                  class="font-semibold text-neutral-600 cursor-pointer"
+                <x-text-tag
                   title="{{ $preorder_period->status->status_short_description }}"
+                  color="neutral"
+                  class="cursor-pointer"
                   >{{ $preorder_period->status->status_name }}
-                </span>
-                {{-- mostrar cuanto falta para iniciar --}}
-                {{-- todo: corregir calculo --}}
-                {{-- <span>inicia en:</span>
-                <span>{{ diffInDays(null, $period->period_start_at) }}</span>
-                <span>días.</span> --}}
+                </x-text-tag>
                 @break
 
               @case(1)
                 {{-- abierto --}}
-                <span
-                  class="font-semibold text-emerald-600 cursor-pointer"
+                <x-text-tag
                   title="{{ $preorder_period->status->status_short_description }}"
+                  color="emerald"
+                  class="cursor-pointer"
                   >{{ $preorder_period->status->status_name }}
-                </span>
-                {{-- mostrar cuanto falta para cerrar --}}
-                {{-- <span>cierra en:</span>
-                <span>{{ diffInDays(null, $period->period_end_at) }}</span>
-                <span>días.</span> --}}
+                </x-text-tag>
                 @break
 
               @default
                 {{-- cerrado --}}
-                <span
-                  class="font-semibold text-red-400 cursor-pointer"
+                <x-text-tag
                   title="{{ $preorder_period->status->status_short_description }}"
+                  color="red"
+                  class="cursor-pointer"
                   >{{ $preorder_period->status->status_name }}
-                </span>
+                </x-text-tag>
 
             @endswitch
           </span>
@@ -110,7 +104,99 @@
 
       <x-slot:content class="flex-col">
 
-        {{-- todo: suministros y packs de interes --}}
+        {{--
+          todo: suministros y packs de interes
+          cuando el periodo de pre orden NO proviene de un previo
+          periodo presupuestario
+        --}}
+
+        @if ($preorder_period->quotation_period_id == null)
+
+          {{-- suministros de interes --}}
+          <x-div-toggle x-data="{ open: false }" title="suministros de interés para este período:" class="p-2">
+
+            {{-- leyenda --}}
+            <x-slot:subtitle>
+              <span>lista de suministros pre ordenados en el período</span>
+            </x-slot:subtitle>
+
+            {{-- tabla de suministros --}}
+            <x-table-base>
+              <x-slot:tablehead>
+                <tr class="border bg-neutral-100">
+                  <x-table-th class="text-end w-12">id</x-table-th>
+                  <x-table-th class="text-start w-56">nombre</x-table-th>
+                  <x-table-th class="text-start">marca</x-table-th>
+                  <x-table-th class="text-end">
+                    <span>cantidad</span>
+                    <x-quest-icon title=""/>
+                  </x-table-th>
+                  <x-table-th class="text-end">
+                    <span>cantidad pre ordenada</span>
+                    <x-quest-icon title="cantidad de unidades de cada suministro que fue pre ordenado"/>
+                  </x-table-th>
+                </tr>
+              </x-slot:tablehead>
+              <x-slot:tablebody>
+
+              </x-slot:tablebody>
+            </x-table-base>
+            {{-- paginacion --}}
+            <div class="w-full flex justify-end items-center gap-1 mt-1">
+
+            </div>
+          </x-div-toggle>
+
+          {{-- packs de interes --}}
+          <x-div-toggle x-data="{ open: false }" title="packs de interés para este período:" class="p-2">
+
+            {{-- leyenda --}}
+            <x-slot:subtitle>
+              <span>lista de packs pre ordenados en el período</span>
+            </x-slot:subtitle>
+
+            {{-- tabla de packs --}}
+            <x-table-base>
+              <x-slot:tablehead>
+                <tr class="border bg-neutral-100">
+                  <x-table-th class="text-end w-12">id</x-table-th>
+                  <x-table-th class="text-start w-56">nombre</x-table-th>
+                  <x-table-th class="text-start">marca</x-table-th>
+                  <x-table-th class="text-end">
+                    <span>cantidad</span>
+                    <x-quest-icon title=""/>
+                  </x-table-th>
+                  <x-table-th class="text-end">
+                    <span>cantidad pre ordenada</span>
+                    <x-quest-icon title="cantidad de unidades de cada pack que fue pre ordenado"/>
+                  </x-table-th>
+                </tr>
+              </x-slot:tablehead>
+              <x-slot:tablebody>
+              </x-slot:tablebody>
+            </x-table-base>
+            {{-- paginacion --}}
+            <div class="w-full flex justify-end items-center gap-1 mt-1">
+            </div>
+          </x-div-toggle>
+
+        @else
+        <div class="flex justify-between items-center mb-2 p-1 border border-neutral-200 bg-neutral-100 rounded-sm">
+          <span class="">
+            <span>pre ordenes creadas a partir del ranking de presupuestos</span>
+            <span>obtenidos en el periodo presupuestario: <span class="font-semibold">{{ $preorder_period->quotation_period->period_code }}</span>.</span>
+          </span>
+
+          <x-a-button
+            wire:navigate
+            href="{{ route('suppliers-budgets-ranking', $preorder_period->quotation_period->id) }}"
+            bg_color="neutral-100"
+            border_color="neutral-200"
+            text_color="neutral-600"
+            >ver ranking
+          </x-a-button>
+        </div>
+        @endif
 
         {{-- pre ordenes --}}
         <x-div-toggle x-data="{ open: true }" title="pre ordenes solicitadas en este período:" class="p-2">
@@ -147,30 +233,40 @@
                   </x-table-td>
                   <x-table-td class="text-start">
                     @if ($preorder->is_completed)
-                      <span class="font-semibold text-emerald-600">respondido</span>
+                      <x-text-tag
+                        title="el proveedor ha respondido"
+                        color="emerald"
+                        class="cursor-pointer"
+                        >respondido
+                      </x-text-tag>
                     @else
-                      <span class="font-semibold text-red-400">sin responder</span>
+                      <x-text-tag
+                        title="el proveedor no ha respondido"
+                        color="neutral"
+                        class="cursor-pointer"
+                        >sin responder
+                      </x-text-tag>
                     @endif
                   </x-table-td>
                   <x-table-td class="text-end">
                     @if ($preorder->is_completed)
                       {{ formatDateTime($preorder->updated_at, 'd-m-Y') }}
                     @else
-                      <span class="font-semibold text-red-400">-</span>
+                      <span class="font-semibold text-neutral-400">-</span>
                     @endif
                   </x-table-td>
                   <x-table-td>
 
                     {{-- todo, respuesta del proveedor --}}
                     {{-- todo, vista parecida al preview? --}}
-                    {{-- <x-a-button
+                    <x-a-button
                       wire:navigate
-                      href="{{ route('suppliers-budgets-response', $quotation->id) }}"
+                      href="#"
                       bg_color="neutral-100"
                       border_color="neutral-200"
                       text_color="neutral-600"
                       >ver
-                    </x-a-button> --}}
+                    </x-a-button>
 
                   </x-table-td>
                 </tr>

@@ -20,7 +20,7 @@
     {{-- cuerpo --}}
     <x-content-section>
 
-      <x-slot:header class="hidden">
+      <x-slot:header class="">
 
         {{-- busqueda --}}
         <div class="flex gap-1 justify-start items-start grow">
@@ -86,10 +86,6 @@
               <x-table-th class="text-end">fecha de inicio</x-table-th>
               <x-table-th class="text-end">fecha de cierre</x-table-th>
               <x-table-th class="text-start">estado</x-table-th>
-              <x-table-th class="text-start">
-                periodo presupuestario
-                <x-quest-icon title="si existe un código, indica que un periodo de preordenes se creo a partir de un periodo de peticion de presupuestos"/>
-              </x-table-th>
               <x-table-th class="text-end">fecha de creación</x-table-th>
               <x-table-th class="text-start w-48">acciones</x-table-th>
             </tr>
@@ -115,43 +111,34 @@
 
                     @case(0)
                       {{-- programado --}}
-                      <span
-                        class="font-semibold text-neutral-600 cursor-pointer"
+                      <x-text-tag
                         title="{{ $period->status->status_short_description }}"
+                        color="neutral"
+                        class="cursor-pointer"
                         >{{ $period->status->status_name }}
-                      </span>
-                      {{-- mostrar cuanto falta para iniciar --}}
-                      {{-- todo: corregir calculo --}}
-                      {{-- <span>inicia en:</span>
-                      <span>{{ diffInDays(null, $period->period_start_at) }}</span>
-                      <span>días.</span> --}}
+                      </x-text-tag>
                       @break
 
                     @case(1)
                       {{-- abierto --}}
-                      <span
-                        class="font-semibold text-emerald-600 cursor-pointer"
+                      <x-text-tag
                         title="{{ $period->status->status_short_description }}"
+                        color="emerald"
+                        class="cursor-pointer"
                         >{{ $period->status->status_name }}
-                      </span>
-                      {{-- mostrar cuanto falta para cerrar --}}
-                      {{-- <span>cierra en:</span>
-                      <span>{{ diffInDays(null, $period->period_end_at) }}</span>
-                      <span>días.</span> --}}
+                      </x-text-tag>
                       @break
 
                     @default
                       {{-- cerrado --}}
-                      <span
-                        class="font-semibold text-red-400 cursor-pointer"
+                      <x-text-tag
                         title="{{ $period->status->status_short_description }}"
+                        color="red"
+                        class="cursor-pointer"
                         >{{ $period->status->status_name }}
-                      </span>
+                      </x-text-tag>
 
                   @endswitch
-                </x-table-td>
-                <x-table-td class="text-start">
-                  {{ $period->quotation_period->period_code }}
                 </x-table-td>
                 <x-table-td class="text-end">
                   {{ formatDateTime($period->created_at, 'd-m-Y') }}

@@ -110,38 +110,32 @@
 
                     @case(0)
                       {{-- programado --}}
-                      <span
-                        class="font-semibold text-neutral-600 cursor-pointer"
+                      <x-text-tag
                         title="{{ $period->status->status_short_description }}"
+                        color="neutral"
+                        class="cursor-pointer"
                         >{{ $period->status->status_name }}
-                      </span>
-                      {{-- mostrar cuanto falta para iniciar --}}
-                      {{-- todo: corregir calculo --}}
-                      {{-- <span>inicia en:</span>
-                      <span>{{ diffInDays(null, $period->period_start_at) }}</span>
-                      <span>días.</span> --}}
-                      @break
+                      </x-text-tag>
+                    @break
 
                     @case(1)
                       {{-- abierto --}}
-                      <span
-                        class="font-semibold text-emerald-600 cursor-pointer"
+                      <x-text-tag
                         title="{{ $period->status->status_short_description }}"
+                        color="emerald"
+                        class="cursor-pointer"
                         >{{ $period->status->status_name }}
-                      </span>
-                      {{-- mostrar cuanto falta para cerrar --}}
-                      {{-- <span>cierra en:</span>
-                      <span>{{ diffInDays(null, $period->period_end_at) }}</span>
-                      <span>días.</span> --}}
+                      </x-text-tag>
                       @break
 
                     @default
                       {{-- cerrado --}}
-                      <span
-                        class="font-semibold text-red-400 cursor-pointer"
+                      <x-text-tag
                         title="{{ $period->status->status_short_description }}"
+                        color="red"
+                        class="cursor-pointer"
                         >{{ $period->status->status_name }}
-                      </span>
+                      </x-text-tag>
 
                   @endswitch
                 </x-table-td>
