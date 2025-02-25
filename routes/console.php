@@ -1,8 +1,10 @@
 <?php
 
 use App\Jobs\CloseQuotationPeriodJob;
+use App\Jobs\NotifySuppliersRequestForPreOrderReceivedJob;
 use App\Jobs\NotifySuppliersRequestForQuotationClosedJob;
 use App\Jobs\NotifySuppliersRequestForQuotationReceivedJob;
+use App\Jobs\OpenPreOrderPeriodJob;
 use App\Services\Supplier\QuotationPeriodService;
 use App\Jobs\OpenQuotationPeriodJob;
 use App\Services\Supplier\PreOrderPeriodService;
@@ -43,7 +45,8 @@ Artisan::command('budget-periods:open', function (QuotationPeriodService $quotat
       ]);
     }
   }
-})->purpose('abrir periodos de solicitud de presupuestos')->everyMinute();
+})->purpose('abrir periodos de solicitud de presupuestos')
+  ->everyMinute();
 
 /**
  * command: cerrar periodos de peticion de presupuesto.
@@ -63,8 +66,29 @@ Artisan::command('budget-periods:close', function (QuotationPeriodService $quota
       ]);
     }
   }
-})->purpose('cerrar periodos de solicitud de presupuestos')->everyTwoMinutes();
+})->purpose('cerrar periodos de solicitud de presupuestos')
+  ->everyTwoMinutes();
 
-// todo: programar apertura de periodos de pre orden
+/**
+ * command: abrir periodos de pre orden.
+ * @param string $signature
+ * @param \Closure $callback
+ */
+Artisan::command('preorder-periods:open', function (PreOrderPeriodService $preorder_period_service) {
+
+  $periods_to_open = $preorder_period_service->getPreOrderPeriodsToOpen();
+
+  if (count($periods_to_open) != 0) {
+    // cada periodo debe abrirse y procesarse
+    foreach ($periods_to_open as $preorder_period) {
+      Bus::chain([
+        OpenPreOrderPeriodJob::dispatch($preorder_period),
+        NotifySuppliersRequestForPreOrderReceivedJob::dispatch($preorder_period),
+      ]);
+    }
+  }
+
+})->purpose('abrir periodos de solicitud de pre ordenes')
+  ->everyMinute();
 
 // todo: programar cierre de periodo de pre ordenes

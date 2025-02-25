@@ -145,7 +145,7 @@ class PreOrderPeriodService
    * @param array $comparison_data Datos de la comparativa de precios
    * @return array Array de pre-ordenes generadas
    */
-  public function generatePreOrders(int $pre_order_period_id, array $comparison_data): array
+  public function generatePreOrdersFromRanking(int $pre_order_period_id, array $comparison_data): array
   {
     // Agrupar los mejores precios por proveedor
     $best_prices_by_supplier = $this->groupBestPricesBySupplier($comparison_data);
@@ -247,7 +247,7 @@ class PreOrderPeriodService
     int $pre_order_period_id,
     int $supplier_id,
     int $quotation_id
-  ): PreOrder {
+    ): PreOrder {
     return PreOrder::create([
       'pre_order_period_id' => $pre_order_period_id,
       'supplier_id' => $supplier_id,
