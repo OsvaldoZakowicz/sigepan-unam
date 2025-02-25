@@ -79,6 +79,7 @@
         <div class="w-2/3 flex justify-end items-center gap-2">
 
           @if ($preorder_period->period_status_id === $scheduled)
+
             <x-a-button
               href="#"
               wire:click="openPeriod()"
@@ -88,7 +89,9 @@
               wire:confirm="¿Abrir este período?, se enviarán las pre ordenes a los proveedores activos de los suministros de interés"
               >abrir ahora
             </x-a-button>
+
           @elseif ($preorder_period->period_status_id === $opened)
+
             <x-a-button
               href="#"
               wire:click="closePeriod()"
@@ -98,6 +101,7 @@
               wire:confirm="¿Cerrar este período?, los proveedores con pre ordenes sin responder quedarán fuera del periodo."
               >cerrar ahora
             </x-a-button>
+
           @endif
 
         </div>

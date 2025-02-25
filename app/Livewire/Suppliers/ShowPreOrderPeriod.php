@@ -2,9 +2,14 @@
 
 namespace App\Livewire\Suppliers;
 
+use App\Jobs\ClosePreOrderPeriodJob;
+use App\Jobs\NotifySuppliersRequestForPreOrderClosedJob;
+use App\Jobs\NotifySuppliersRequestForPreOrderReceivedJob;
+use App\Jobs\OpenPreOrderPeriodJob;
 use App\Models\PreOrderPeriod;
 use App\Services\Supplier\PreOrderPeriodService;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\View\View;
 use Livewire\WithPagination;
 use Livewire\Component;
@@ -51,13 +56,13 @@ class ShowPreOrderPeriod extends Component
   */
   public function openPeriod(): void
   {
-    return;
-
-    //todo: manejar con job para apertura
-    //todo: incluir job para notificar via email
     $this->preorder_period->period_start_at = Carbon::now()->format('Y-m-d');
-    $this->preorder_period->period_status_id = 2; //abierto
     $this->preorder_period->save();
+
+    Bus::chain([
+      OpenPreOrderPeriodJob::dispatch($this->preorder_period),
+      NotifySuppliersRequestForPreOrderReceivedJob::dispatch($this->preorder_period),
+    ]);
   }
 
   /**
@@ -66,13 +71,13 @@ class ShowPreOrderPeriod extends Component
   */
   public function closePeriod(): void
   {
-    return;
-
-    //todo: manejar con job para cierre
-    //todo: incluir job para notificar via email
     $this->preorder_period->period_end_at = Carbon::now()->format('Y-m-d');
-    $this->preorder_period->period_status_id = 3; //cerrado
     $this->preorder_period->save();
+
+    Bus::chain([
+      ClosePreOrderPeriodJob::dispatch($this->preorder_period),
+      NotifySuppliersRequestForPreOrderClosedJob::dispatch($this->preorder_period),
+    ]);
   }
 
   /**
