@@ -7,6 +7,7 @@ use App\Services\Supplier\QuotationPeriodService;
 use App\Services\Supplier\PreOrderPeriodService;
 use App\Models\PreOrderPeriod;
 use Illuminate\Support\Carbon;
+use Illuminate\View\View;
 use Livewire\Component;
 
 class CreatePreOrderPeriod extends Component
@@ -86,21 +87,16 @@ class CreatePreOrderPeriod extends Component
        * 'period_end_at',
        * 'period_short_description',
        * 'period_status_id',
-       */
-
+      */
       $validated['quotation_period_id'] = $this->period->id ?? null;
       $validated['period_code'] = $pps->getPeriodCodePrefix() . str_replace(':', '', now()->format('H:i:s'));
       $validated['period_status_id'] = $pps->getStatusScheduled();
 
-      $pre_order_period = PreOrderPeriod::create($validated);
-
-      // crear preordenes
-      // todo: quitar de aca, delegar a un job
-      $pps->generatePreOrders($pre_order_period->id, $this->quotations_ranking);
+      PreOrderPeriod::create($validated);
 
       $this->reset();
 
-      session()->flash('operation-success', toastSuccessBody('periodo de preordenes', 'creado y programado'));
+      session()->flash('operation-success', toastSuccessBody('periodo de pre ordenes', 'creado y programado'));
       $this->redirectRoute('suppliers-preorders-index');
 
     } catch (\Exception $e) {
@@ -111,7 +107,11 @@ class CreatePreOrderPeriod extends Component
     }
   }
 
-  public function render()
+  /**
+   * renderizar vista
+   * @return View
+   */
+  public function render(): View
   {
     return view('livewire.suppliers.create-pre-order-period');
   }
