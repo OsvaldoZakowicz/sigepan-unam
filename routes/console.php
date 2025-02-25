@@ -1,6 +1,8 @@
 <?php
 
+use App\Jobs\ClosePreOrderPeriodJob;
 use App\Jobs\CloseQuotationPeriodJob;
+use App\Jobs\NotifySuppliersRequestForPreOrderClosedJob;
 use App\Jobs\NotifySuppliersRequestForPreOrderReceivedJob;
 use App\Jobs\NotifySuppliersRequestForQuotationClosedJob;
 use App\Jobs\NotifySuppliersRequestForQuotationReceivedJob;
@@ -91,4 +93,24 @@ Artisan::command('preorder-periods:open', function (PreOrderPeriodService $preor
 })->purpose('abrir periodos de solicitud de pre ordenes')
   ->everyMinute();
 
-// todo: programar cierre de periodo de pre ordenes
+/**
+ * command: cerrar periodos de pre orden
+ * @param string $signature
+ * @param \Closure $callback
+ */
+Artisan::command('preorder-periods:close', function (PreOrderPeriodService $preorder_period_service) {
+
+  $periods_to_close = $preorder_period_service->getPreOrdersPeriodsToClose();
+
+  if (count($periods_to_close) != 0) {
+    foreach ($periods_to_close as $preorder_period) {
+      // cada periodo debe cerrarse
+      Bus::chain([
+        ClosePreOrderPeriodJob::dispatch($preorder_period),
+        NotifySuppliersRequestForPreOrderClosedJob::dispatch($preorder_period),
+      ]);
+    }
+  }
+
+})->purpose('cerrar periodos de solicitud de pre orden')
+  ->everyTwoMinutes();
