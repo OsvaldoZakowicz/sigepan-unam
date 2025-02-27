@@ -104,7 +104,7 @@
       <x-slot:content class="flex-col gap-1">
 
         {{-- texto descriptivo --}}
-        <p>La siguiente es una lista de pedidos de presupuesto que recibió de parte de la panadería <i>nombre</i> </p>
+        <p class="my-2 font-semibold">La siguiente es una lista de pedidos de presupuesto que recibió de parte de la panadería <i>nombre</i> </p>
 
         <x-table-base>
           <x-slot:tablehead>
