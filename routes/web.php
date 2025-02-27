@@ -232,6 +232,9 @@ Route::middleware(['auth', 'verified', 'can:presupuestos'])->group(function () {
   Route::get('preorders', [QuotationController::class, 'preorders_index'])
     ->name('quotations-preorders-index');
 
+  Route::get('preorders/respond/{id}', [QuotationController::class, 'preorders_respond'])
+    ->name('quotations-preorders-respond');
+
 });
 
 //* modulo de stock

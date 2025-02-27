@@ -5,14 +5,14 @@
     wire:navigate
     :href="route('quotations-quotations-index')"
     :active="request()->routeIs('quotations-quotations-*')"
-    >mis presupuestos
+    >presupuestos recibidos
   </x-nav-link>
 
   <x-nav-link
     wire:navigate
     :href="route('quotations-preorders-index')"
     :active="request()->routeIs('quotations-preorders-*')"
-    >mis preordenes
+    >pre ordenes recibidas
   </x-nav-link>
 
 </div>

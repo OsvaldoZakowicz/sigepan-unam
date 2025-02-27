@@ -41,4 +41,10 @@ class QuotationController extends Controller
   {
     return view('quotations.preorders-index');
   }
+
+  //* responder a una preorden
+  public function preorders_respond($id): View
+  {
+    return view('quotations.preorders-respond', ['id' => $id]);
+  }
 }

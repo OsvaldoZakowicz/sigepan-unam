@@ -3,37 +3,37 @@
   <article class="m-2 border rounded-sm border-neutral-200">
 
     {{-- barra de titulo --}}
-    <x-title-section title="lista de preordenes de compra recibidas:"></x-title-section>
+    <x-title-section title="lista de pre ordenes de compra recibidas:"></x-title-section>
 
     {{-- cuerpo --}}
     <x-content-section>
 
-      <x-slot:header class="hidden">
+      <x-slot:header class="">
 
         {{-- busqueda --}}
         <div class="flex gap-1 justify-start items-start grow">
 
           {{-- termino de busqueda --}}
           <div class="flex flex-col justify-end w-1/6">
-            <label for="search_word">buscar presupuesto</label>
+            <label for="search_word">buscar pre orden</label>
             <input
               type="text"
               name="search_word"
               id="search_word"
               wire:model.live="search_word"
               wire:click="resetPagination()"
-              placeholder="ingrese un id, codigo de presupuesto o de periodo ..."
+              placeholder="ingrese un id, codigo de pre orden o de periodo ..."
               class="w-full text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
             />
           </div>
 
-          {{-- estado del presupuesto --}}
+          {{-- estado de la pre orden --}}
           <div class="flex flex-col justify-end w-1/6">
-            <label for="quotation_status">estado del presupuesto</label>
+            <label for="preorder_status">estado de la pre prden</label>
             <select
-              name="quotation_status"
-              id="quotation_status"
-              wire:model.live="quotation_status"
+              name="preorder_status"
+              id="preorder_status"
+              wire:model.live="preorder_status"
               wire:click="resetPagination()"
               class="w-full text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
               >
@@ -104,14 +104,14 @@
       <x-slot:content class="flex-col gap-1">
 
         {{-- texto descriptivo --}}
-        <p>La siguiente es una lista de pedidos de preordenes de compra que recibió de parte de la panadería <i>nombre</i> </p>
+        <p class="my-2 font-semibold">La siguiente es una lista de pedidos de pre ordenes de compra que recibió de parte de la panadería <i>nombre</i> </p>
 
         <x-table-base>
           <x-slot:tablehead>
             <tr class="border bg-neutral-100">
               <x-table-th class="text-end w-12">id</x-table-th>
-              <x-table-th class="text-start">codigo de preorden</x-table-th>
-              <x-table-th class="text-start">estado de la preorden</x-table-th>
+              <x-table-th class="text-start">codigo de pre orden</x-table-th>
+              <x-table-th class="text-start">estado de la pre orden</x-table-th>
               <x-table-th class="text-start">periodo</x-table-th>
               <x-table-th class="text-start">recibido el</x-table-th>
               <x-table-th class="text-start">disponible hasta</x-table-th>
@@ -128,11 +128,19 @@
                   {{ $preorder->pre_order_code }}
                 </x-table-td>
                 <x-table-td class="text-start">
-                  {{-- estado del presupuesto --}}
+                  {{-- estado de la pre orden --}}
                   @if ($preorder->is_completed)
-                    <span class="font-semibold text-emerald-600">respondido</span>
+                    <x-text-tag
+                      color="emerald"
+                      title="ya has respondido a esta pre orden"
+                      >respondido
+                    </x-text-tag>
                   @else
-                    <span class="font-semibold text-red-400">sin responder</span>
+                  <x-text-tag
+                    color="red"
+                    title="no has respondido a esta pre orden"
+                    >sin responder
+                  </x-text-tag>
                   @endif
                 </x-table-td>
                 <x-table-td class="text-start">
@@ -140,18 +148,20 @@
                   {{-- estado del periodo --}}
                   @if ($preorder->pre_order_period->status->status_code == 1)
                     {{-- abierto --}}
-                    <span
-                      class="font-semibold text-emerald-600 cursor-pointer"
+                    <x-text-tag
+                      color="emerald"
                       title="{{ $preorder->pre_order_period->status->status_short_description }}"
+                      class="cursor-pointer"
                       >{{ $preorder->pre_order_period->status->status_name }}
-                    </span>
+                    </x-text-tag>
                   @else
                     {{-- cerrado --}}
-                    <span
-                      class="font-semibold text-red-400 cursor-pointer"
+                    <x-text-tag
+                      color="emerald"
                       title="{{ $preorder->pre_order_period->status->status_short_description }}"
+                      class="cursor-pointer"
                       >{{ $preorder->pre_order_period->status->status_name }}
-                    </span>
+                    </x-text-tag>
                   @endif
                 </x-table-td>
                 <x-table-td class="text-start">
@@ -163,43 +173,43 @@
                 <x-table-td>
                   <div class="flex justify-start gap-1">
                     {{-- si el periodo NO esta cerrado --}}
-                    @if ($preorder->pre_order_period->period_status_id !== 3)
+                    @if ($preorder->pre_order_period->period_status_id !== $status_closed)
 
                       {{-- responder si no esta completado, de lo contrario, editar --}}
                       @if ($preorder->is_completed)
 
-                        {{-- <x-a-button
+                        <x-a-button
                           wire:navigate
-                          href="{{ route('quotations-quotations-edit', $quotation->id) }}"
+                          href="#"
                           bg_color="neutral-100"
                           border_color="neutral-200"
                           text_color="neutral-600"
                           >modificar
-                        </x-a-button> --}}
+                        </x-a-button>
 
                       @else
 
-                       {{--  <x-a-button
+                        <x-a-button
                           wire:navigate
-                          href="{{ route('quotations-quotations-respond', $quotation->id) }}"
+                          href="{{ route('quotations-preorders-respond', $preorder->id) }}"
                           bg_color="neutral-100"
                           border_color="neutral-200"
                           text_color="neutral-600"
                           >responder
-                        </x-a-button> --}}
+                        </x-a-button>
 
                       @endif
 
                     @else
 
-                      {{-- <x-a-button
+                      <x-a-button
                         wire:navigate
-                        href="{{ route('quotations-quotations-show', $quotation->id) }}"
+                        href="#"
                         bg_color="neutral-100"
                         border_color="neutral-200"
                         text_color="neutral-600"
                         >ver
-                      </x-a-button> --}}
+                      </x-a-button>
 
                     @endif
                   </div>
@@ -207,7 +217,7 @@
               </tr>
             @empty
               <tr class="border">
-                <td colspan="7">¡sin registros! - aún no ha recibido pedidos de preorden de compra.</td>
+                <td colspan="7">¡sin registros!</td>
               </tr>
             @endforelse
           </x-slot:tablebody>
