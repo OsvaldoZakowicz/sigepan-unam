@@ -85,10 +85,10 @@ class ListPreOrders extends Component
                     ->orWhere('pre_order_code', 'like', '%' . $this->search_word .'%');
         });
       })
-      ->when(isset($this->preorder_status), function ($query) {
+      ->when(isset($this->preorder_status) && $this->preorder_status !== '', function ($query) {
         $query->where('is_completed', $this->preorder_status);
       })
-      ->when($this->period_status, function ($query) {
+      ->when(isset($this->period_status) && $this->period_status !== '', function ($query) {
         $query->whereHas('pre_order_period', function ($sub_query) {
           $sub_query->where('period_status_id', $this->period_status);
         });

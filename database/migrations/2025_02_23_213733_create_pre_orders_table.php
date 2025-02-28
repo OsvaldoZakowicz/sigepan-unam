@@ -22,6 +22,7 @@ return new class extends Migration
       $table->boolean('is_completed')->default(false);
       $table->boolean('is_approved_by_supplier')->default(false);
       $table->boolean('is_approved_by_buyer')->default(false);
+      $table->json('details')->nullable();
       $table->timestamps();
     });
   }

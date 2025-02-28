@@ -11,6 +11,10 @@ class PreOrder extends Model
 {
   use HasFactory;
 
+  protected const STATUS_PENDING = 'pendiente';
+  protected const STATUS_APPROVED = 'aprobado';
+  protected const STATUS_REJECTED = 'rechazado';
+
   protected $fillable = [
     'pre_order_period_id', // fk pre_order_periods
     'supplier_id', //fk suppliers
@@ -20,7 +24,36 @@ class PreOrder extends Model
     'is_completed', // boolean
     'is_approved_by_supplier', //boolean
     'is_approved_by_buyer', //boolean
+    'details', // json, detalles del acuerdo para pre orden
   ];
+
+
+  /**
+   * Get pending status
+   * @return string
+   */
+  public static function getPendingStatus(): string
+  {
+    return self::STATUS_PENDING;
+  }
+
+  /**
+   * Get approved status
+   * @return string
+   */
+  public static function getApprovedStatus(): string
+  {
+    return self::STATUS_APPROVED;
+  }
+
+  /**
+   * Get rejected status
+   * @return string
+   */
+  public static function getRejectedStatus(): string
+  {
+    return self::STATUS_REJECTED;
+  }
 
   //* una pre orden pertenece a un periodo de pre ordenes
   public function pre_order_period(): BelongsTo
