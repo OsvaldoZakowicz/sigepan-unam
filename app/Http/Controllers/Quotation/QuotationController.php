@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Quotation;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Contracts\View\View;
+use Illuminate\View\View;
 use Illuminate\Http\Request;
 
 /**

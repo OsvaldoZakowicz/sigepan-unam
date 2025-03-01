@@ -6,6 +6,7 @@ use App\Models\Supplier;
 use App\Models\PreOrder;
 use App\Services\Supplier\PreOrderPeriodService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 use Livewire\WithPagination;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -115,7 +116,11 @@ class ListPreOrders extends Component
     return $preorders;
   }
 
-  public function render()
+  /**
+   * renderizar vista
+   * @return View
+   */
+  public function render(): View
   {
     $preorders = $this->searchPreorders();
     return view('livewire.quotations.list-pre-orders', compact('preorders'));
