@@ -212,6 +212,10 @@ Route::middleware(['auth', 'verified', 'can:proveedores'])->group(function () {
   Route::get('suppliers/preorders/show/{id}', [SupplierController::class, 'preorder_show'])
     ->name('suppliers-preorders-show');
 
+  // NOTA: ver la respuesta de una pre orden del proveedor
+  Route::get('suppliers/preorders/response/{id}', [SupplierController::class, 'preorder_response'])
+    ->name('suppliers-preorders-response');
+
 });
 
 //* seccion de presupuestos (quotations) y preordenes para proveedores

@@ -232,6 +232,7 @@
                     {{ $preorder->supplier->company_name }},&nbsp;CUIT:&nbsp;{{ $preorder->supplier->company_cuit }}
                   </x-table-td>
                   <x-table-td class="text-start">
+                    {{-- proveedor respondio --}}
                     @if ($preorder->is_completed)
                       <x-text-tag
                         title="el proveedor ha respondido"
@@ -240,6 +241,7 @@
                         >respondido
                       </x-text-tag>
                     @else
+                      {{-- proveedor no respondio --}}
                       <x-text-tag
                         title="el proveedor no ha respondido"
                         color="neutral"
@@ -257,11 +259,9 @@
                   </x-table-td>
                   <x-table-td>
 
-                    {{-- todo, respuesta del proveedor --}}
-                    {{-- todo, vista parecida al preview? --}}
                     <x-a-button
                       wire:navigate
-                      href="#"
+                      href="{{ route('suppliers-preorders-response', $preorder->id) }}"
                       bg_color="neutral-100"
                       border_color="neutral-200"
                       text_color="neutral-600"

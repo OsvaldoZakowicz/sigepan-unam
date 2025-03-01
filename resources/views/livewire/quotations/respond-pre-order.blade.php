@@ -215,7 +215,7 @@
                   <tr>
                     <td colspan="6" class="px-3 py-2 text-normal font-medium text-neutral-800 text-right">Total:</td>
                     <td class="px-3 py-2 text-normal font-bold text-neutral-800 text-right">
-                      $ {{-- calcular --}}
+                      $ {{ number_format($total_price, 2) }}
                     </td>
                   </tr>
                 </tfoot>
@@ -387,5 +387,5 @@
 
     </x-content-section>
 
-</article>
+  </article>
 </div>

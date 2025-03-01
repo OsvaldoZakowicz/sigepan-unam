@@ -164,4 +164,10 @@ class SupplierController extends Controller
   {
     return view('suppliers.preorders-show', ['id' => $id]);
   }
+
+  //* ver respuesta de una pre orden de compra
+  public function preorder_response($id): View
+  {
+    return view('suppliers.preorder-response', ['id' => $id]);
+  }
 }

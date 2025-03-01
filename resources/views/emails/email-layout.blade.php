@@ -47,6 +47,19 @@
     a:hover {
       background-color: #2d3748;
     }
+    .download-button {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background-color: #f8f9fa;
+      cursor: pointer;
+    }
+    .download-button:hover {
+      background-color: #e9ecef;
+    }
   </style>
 
 </head>

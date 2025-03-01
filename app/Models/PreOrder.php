@@ -27,6 +27,11 @@ class PreOrder extends Model
     'details', // json, detalles del acuerdo para pre orden
   ];
 
+  // codificar y decodificar details
+  // json a array y viceversa
+  protected $casts = [
+    'details' => 'array'
+  ];
 
   /**
    * Get pending status
@@ -71,7 +76,7 @@ class PreOrder extends Model
   public function packs(): BelongsToMany
   {
     return $this->belongsToMany(Pack::class, 'pre_order_pack', 'pre_order_id', 'pack_id')
-      ->withPivot(['has_stock','quantity', 'unit_price', 'total_price'])
+      ->withPivot(['has_stock', 'quantity', 'unit_price', 'total_price'])
       ->withTimestamps();
   }
 
@@ -79,7 +84,7 @@ class PreOrder extends Model
   public function provisions(): BelongsToMany
   {
     return $this->belongsToMany(Provision::class, 'pre_order_provision', 'pre_order_id', 'provision_id')
-      ->withPivot(['has_stock','quantity', 'unit_price', 'total_price'])
+      ->withPivot(['has_stock', 'quantity', 'unit_price', 'total_price'])
       ->withTimestamps();
   }
 }

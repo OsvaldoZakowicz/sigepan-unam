@@ -24,6 +24,7 @@ class RespondPreOrder extends Component
 
   // coleccion de suministros o packs
   public Collection $items;
+  public float $total_price;
 
   protected $PROVISION = 'provision';
   protected $PACK = 'pack';
@@ -48,6 +49,7 @@ class RespondPreOrder extends Component
     $this->payment_method = [];
 
     $this->setProvisionsAndPacks();
+    $this->getTotalPrice();
   }
 
   /**
@@ -87,11 +89,23 @@ class RespondPreOrder extends Component
       'item_id'           =>  $item->id,
       'item_type'         =>  $type,
       'item_object'       =>  $item,
-      'item_has_stock'    =>  $item->pivot->has_stock, // true
+      'item_has_stock'    =>  $item->pivot->has_stock, // true, o false
       'item_quantity'     =>  $item->pivot->quantity,
       'item_unit_price'   =>  $item->pivot->unit_price,
       'item_total_price'  =>  $item->pivot->total_price,
     ]);
+  }
+
+   /**
+   * calcular precio total
+   * a partir de la coleccin de items, reduce de cada uno su 'item_total_price'
+   * @return void
+   */
+  public function getTotalPrice(): void
+  {
+    $this->total_price = $this->items->reduce(function ($acc, $item) {
+      return $acc + $item['item_total_price'];
+    }, 0);
   }
 
   /**
