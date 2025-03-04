@@ -178,8 +178,8 @@ class QuotationPeriodService
               'nombre_suministro'     => $provision->provision_name,
               'marca'                 => $provision->trademark->provision_trademark_name,
               'tipo'                  => $provision->type->provision_type_name,
-              'volumen'               => $provision->provision_quantity,
-              'volumen_tag'           => $provision->measure->measure_abrv,
+              'volumen'               => convert_measure($provision->provision_quantity, $provision->measure),
+              'volumen_tag'           => $provision->measure->unit_symbol,
               'cantidad'              => $provision->pivot->quantity,
               'precios_por_proveedor' => []
           ];
@@ -212,8 +212,8 @@ class QuotationPeriodService
               'nombre_pack'           => $pack->pack_name,
               'marca'                 => $pack->provision->trademark->provision_trademark_name,
               'tipo'                  => $pack->provision->type->provision_type_name,
-              'volumen'               => $pack->pack_quantity,
-              'volumen_tag'           => $pack->provision->measure->measure_abrv,
+              'volumen'               => convert_measure($pack->pack_quantity, $pack->provision->measure),
+              'volumen_tag'           => $pack->provision->measure->unit_symbol,
               'cantidad'              => $pack->pivot->quantity,
               'precios_por_proveedor' => []
           ];

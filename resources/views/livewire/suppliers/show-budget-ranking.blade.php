@@ -34,13 +34,14 @@
         {{-- suministros --}}
         @foreach ($quotations_ranking['provisions'] as $key => $provision)
         <div class="border border-neutral-300 rounded-md">
+
             {{-- cabecera de un suministro --}}
             <div class="bg-neutral-200 p-1">
               <span>
                 <span class="font-semibold">{{ $provision['tipo'] }}:&nbsp;</span>
                 <span>{{ $provision['nombre_suministro'] }},&nbsp;{{ $provision['marca'] }}&nbsp;</span>
                 <span class="font-semibold">por:&nbsp;</span>
-                <span>{{ $provision['volumen'] }}{{ $provision['volumen_tag'] }},&nbsp;</span>
+                <span class="lowercase">{{ $provision['volumen'] }},&nbsp;</span>
               </span>
             </div>
 
@@ -80,9 +81,19 @@
                       </x-table-td>
                       <x-table-td class="text-start">
                         @if ($precio['tiene_stock'])
-                          <span class="bg-emerald-200 text-emerald-700 font-light px-1">disponible</span>
+                          <x-text-tag
+                            color="emerald"
+                            class="cursor-pointer text-xs"
+                            title="el proveedor tiene stock disponible"
+                            >disponible
+                          </x-text-tag>
                         @else
-                          <span class="bg-red-200 text-red-600 font-light px-1">sin stock</span>
+                          <x-text-tag
+                            color="red"
+                            class="cursor-pointer text-xs"
+                            title="el proveedor no tiene stock disponible"
+                            >no disponible
+                          </x-text-tag>
                         @endif
                       </x-table-td>
                       <x-table-td class="text-end">
@@ -90,13 +101,23 @@
                       </x-table-td>
                       <x-table-td class="text-end">
                         @if ($provision['estadisticas_precio_unitario']['precio_minimo'] === $precio['precio_unitario'])
-                          <span class="font-light text-yellow-500">¡mejor precio!&nbsp;</span>
+                          <x-text-tag
+                            color="orange"
+                            class="cursor-pointer text-xs mx-1"
+                            title="este es el mejor precio"
+                            >¡mejor precio!
+                          </x-text-tag>
                         @endif
                         <span>$&nbsp;{{ $precio['precio_unitario'] }}</span>
                       </x-table-td>
                       <x-table-td class="text-end">
                         @if ($provision['estadisticas_precio_total']['precio_minimo'] === $precio['precio_total'])
-                          <span class="font-light text-yellow-500">¡mejor precio!&nbsp;</span>
+                          <x-text-tag
+                            color="orange"
+                            class="cursor-pointer text-xs mx-1"
+                            title="este es el mejor precio"
+                            >¡mejor precio!
+                          </x-text-tag>
                         @endif
                         <span>$&nbsp;{{ $precio['precio_total'] }}</span>
                       </x-table-td>
@@ -129,7 +150,7 @@
                 <span class="font-semibold">{{ $pack['tipo'] }}:&nbsp;</span>
                 <span>{{ $pack['nombre_pack'] }},&nbsp;{{ $pack['marca'] }}&nbsp;</span>
                 <span class="font-semibold">por:&nbsp;</span>
-                <span>{{ $pack['volumen'] }}{{ $pack['volumen_tag'] }},&nbsp;</span>
+                <span class="lowercase">{{ $pack['volumen'] }},&nbsp;</span>
               </span>
             </div>
 
