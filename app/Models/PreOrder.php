@@ -24,7 +24,7 @@ class PreOrder extends Model
     'is_completed', // boolean
     'is_approved_by_supplier', //boolean
     'is_approved_by_buyer', //boolean
-    'details', // json, detalles del acuerdo para pre orden
+    'details', // json, detalles del acuerdo para pre orden, nullable
   ];
 
   // codificar y decodificar details
@@ -76,7 +76,7 @@ class PreOrder extends Model
   public function packs(): BelongsToMany
   {
     return $this->belongsToMany(Pack::class, 'pre_order_pack', 'pre_order_id', 'pack_id')
-      ->withPivot(['has_stock', 'quantity', 'unit_price', 'total_price'])
+      ->withPivot(['has_stock', 'quantity', 'alternative_quantity', 'unit_price', 'total_price'])
       ->withTimestamps();
   }
 
@@ -84,7 +84,7 @@ class PreOrder extends Model
   public function provisions(): BelongsToMany
   {
     return $this->belongsToMany(Provision::class, 'pre_order_provision', 'pre_order_id', 'provision_id')
-      ->withPivot(['has_stock', 'quantity', 'unit_price', 'total_price'])
+      ->withPivot(['has_stock', 'quantity', 'alternative_quantity', 'unit_price', 'total_price'])
       ->withTimestamps();
   }
 }

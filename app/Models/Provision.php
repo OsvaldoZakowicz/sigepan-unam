@@ -95,7 +95,7 @@ class Provision extends Model
   public function pre_orders(): BelongsToMany
   {
     return $this->belongsToMany(PreOrder::class, 'pre_order_provision', 'provision_id', 'pre_order_id')
-      ->withPivot(['has_stock', 'quantity', 'unit_price', 'total_price'])
+      ->withPivot(['has_stock', 'quantity', 'alternative_quantity', 'unit_price', 'total_price'])
       ->withTimestamps();
   }
 }

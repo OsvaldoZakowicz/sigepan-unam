@@ -243,6 +243,7 @@ class PreOrderPeriodService
    * 'status', //enum = ['pendiente', 'aprobado', 'rechazado']
    * 'is_approved_by_supplier', //boolean
    * 'is_approved_by_buyer', //boolean
+   * 'details', //json, nullable
    */
   private function createPreOrder(
     int $pre_order_period_id,
@@ -258,6 +259,7 @@ class PreOrderPeriodService
       'is_completed' => false,
       'is_approved_by_supplier' => false,
       'is_approved_by_buyer' => false,
+      'details' => null
     ]);
   }
 
@@ -269,6 +271,7 @@ class PreOrderPeriodService
       $pre_order->provisions()->attach($item_data['id'], [
         'has_stock' => true,
         'quantity' => $item_data['quantity'],
+        'alternative_quantity' => 0,
         'unit_price' => $item_data['unit_price'],
         'total_price' => $item_data['total_price']
       ]);
@@ -280,6 +283,7 @@ class PreOrderPeriodService
       $pre_order->packs()->attach($item_data['id'], [
         'has_stock' => true,
         'quantity' => $item_data['quantity'],
+        'alternative_quantity' => 0,
         'unit_price' => $item_data['unit_price'],
         'total_price' => $item_data['total_price']
       ]);
@@ -310,6 +314,7 @@ class PreOrderPeriodService
       $packs = array_filter($items, fn($item) => $item['type'] === 'pack');
 
       // Obtener detalles completos de suministros
+      // no necesito cantidad alternativa
       $provisions_details = [];
       foreach ($provisions as $provision_item) {
         $provision = Provision::find($provision_item['id']);
@@ -326,6 +331,7 @@ class PreOrderPeriodService
       }
 
       // Obtener detalles completos de packs
+      // no necesito cantidad alternativa
       $packs_details = [];
       foreach ($packs as $pack_item) {
         $pack = Pack::find($pack_item['id']);
@@ -363,8 +369,8 @@ class PreOrderPeriodService
           'id' => $supplier->id,
           'company_name' => $supplier->company_name,
           'company_cuit' => $supplier->company_cuit,
-          'contact_email' => $supplier->contact_email,
-          'contact_phone' => $supplier->contact_phone
+          'contact_email' => $supplier->user->email,
+          'contact_phone' => $supplier->phone_number
         ],
         'provisions' => $provisions_details,
         'packs' => $packs_details,
