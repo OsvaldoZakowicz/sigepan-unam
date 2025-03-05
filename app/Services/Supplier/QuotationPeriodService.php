@@ -150,6 +150,12 @@ class QuotationPeriodService
 
   /**
    * obtener comparativa de precios de presupuestos
+   * retorna un array con la forma:
+   * [
+   *  'provisions' => [suministro..., precios por proveedor..., comparativa de precios...],
+   *  'packs'      => [suministro..., precios por proveedor..., comparativa de precios...],
+   * ]
+   *
    * @param int $period_id id del periodo a consultar
    * @return array array de comparativa de precios
   */

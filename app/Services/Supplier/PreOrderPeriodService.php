@@ -318,8 +318,8 @@ class PreOrderPeriodService
           'provision_name' => $provision->provision_name,
           'trademark' => $provision->trademark->provision_trademark_name,
           'type' => $provision->type->provision_type_name,
-          'quantity' => $provision_item['quantity'],
-          'measure' => $provision->measure->measure_abrv,
+          'quantity' => convert_measure($provision_item['quantity'], $provision->measure),
+          'measure' => $provision->measure->unit_symbol,
           'unit_price' => $provision_item['unit_price'],
           'total_price' => $provision_item['total_price']
         ];
@@ -334,8 +334,8 @@ class PreOrderPeriodService
           'pack_name' => $pack->pack_name,
           'trademark' => $pack->provision->trademark->provision_trademark_name,
           'type' => $pack->provision->type->provision_type_name,
-          'quantity' => $pack_item['quantity'],
-          'measure' => $pack->provision->measure->measure_abrv,
+          'quantity' => convert_measure($pack_item['quantity'], $pack->provision->measure),
+          'measure' => $pack->provision->measure->unit_symbol,
           'unit_price' => $pack_item['unit_price'],
           'total_price' => $pack_item['total_price']
         ];

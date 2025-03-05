@@ -8,6 +8,7 @@ use App\Jobs\NotifySuppliersRequestForPreOrderReceivedJob;
 use App\Jobs\OpenPreOrderPeriodJob;
 use App\Models\PreOrderPeriod;
 use App\Services\Supplier\PreOrderPeriodService;
+use App\Services\Supplier\QuotationPeriodService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\View\View;
@@ -18,6 +19,9 @@ class ShowPreOrderPeriod extends Component
 {
   // periodo de pre ordenes
   public $preorder_period;
+
+  // ranking de presupuestos asociados
+  public array | null $quotations_ranking = null;
 
   // posibles estados del periodo
   public int $scheduled;
@@ -45,9 +49,19 @@ class ShowPreOrderPeriod extends Component
    * @param int $id del periodo de pre orden
    * @return void
    */
-  public function mount(int $id): void
+  public function mount(QuotationPeriodService $qps, int $id): void
   {
     $this->preorder_period = PreOrderPeriod::findOrFail($id);
+
+    /**
+     * necesito crear nuevamente datos de ranking de presupuestos,
+     * para obtener suministros y packs de interes. Siempre que
+     * el periodo de pre orden parta de un periodo presupuestario
+     */
+    if ($this->preorder_period->quotation_period_id !== null) {
+      // generar ranking inicial del periodo presupuestario
+      $this->quotations_ranking = $qps->comparePricesBetweenQuotations($this->preorder_period->quotation_period_id);
+    }
   }
 
   /**

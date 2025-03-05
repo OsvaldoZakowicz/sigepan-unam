@@ -29,6 +29,10 @@ class CreatePreOrderPeriod extends Component
   public string $min_date;
   public string $max_date;
 
+  // modal para mostrar pre ordenes
+  public $showing_preorder_modal = false;
+  public $selected_preorder = null;
+
   /**
    * boot de datos
    * @return void
@@ -53,7 +57,27 @@ class CreatePreOrderPeriod extends Component
     $this->preview_preorders = $pps->previewPreOrders($this->quotations_ranking);
   }
 
-   /**
+  /**
+   * mostrar el modal con una pre orden
+   * @return void
+   */
+  public function showModal($preorder_index)
+  {
+    $this->selected_preorder = $this->preview_preorders[$preorder_index];
+    $this->showing_preorder_modal = true;
+  }
+
+  /**
+   * cerrar el modal y reestablecer la variable modal
+   * @return void
+   */
+  public function closeModal()
+  {
+    $this->showing_preorder_modal = false;
+    $this->selected_preorder = null;
+  }
+
+  /**
    * guardar periodo de solicitud
    * @param QuotationPeriodService $quotation_period_service
    * @return void
@@ -65,13 +89,16 @@ class CreatePreOrderPeriod extends Component
       [
         'period_start_at'           =>  ['required', 'date', 'after_or_equal:' . $this->min_date],
         'period_end_at'             =>  ['required', 'date', 'after:period_start_at'],
-        'period_short_description'  =>  ['nullable', 'regex:/^[A-Za-z\s]+$/', 'max:150'],],[
+        'period_short_description'  =>  ['nullable', 'regex:/^[A-Za-z\s]+$/', 'max:150'],
+      ],
+      [
         'period_start_at.required'        =>  'La :attribute es obligatoria',
         'period_start_at.after_or_equal'  =>  'La :attribute debe ser a partir de hoy como mínimo',
         'period_end_at.required'          =>  'La :attribute es obligatoria',
         'period_end_at.after'             =>  'La :attribute debe estar después de la fecha de inicio',
         'period_short_description.regex'  =>  'La :attribute solo permite letras y espacios',
-      ],[
+      ],
+      [
         'period_start_at'           =>  'fecha de inicio',
         'period_end_at'             =>  'fecha de cierre',
         'period_short_description'  =>  'descripción corta',
@@ -87,7 +114,7 @@ class CreatePreOrderPeriod extends Component
        * 'period_end_at',
        * 'period_short_description',
        * 'period_status_id',
-      */
+       */
       $validated['quotation_period_id'] = $this->period->id ?? null;
       $validated['period_code'] = $pps->getPeriodCodePrefix() . str_replace(':', '', now()->format('H:i:s'));
       $validated['period_status_id'] = $pps->getStatusScheduled();
@@ -98,12 +125,10 @@ class CreatePreOrderPeriod extends Component
 
       session()->flash('operation-success', toastSuccessBody('periodo de pre ordenes', 'creado y programado'));
       $this->redirectRoute('suppliers-preorders-index');
-
     } catch (\Exception $e) {
 
       session()->flash('operation-error', 'error: ' . $e->getMessage() . ', contacte al Administrador');
       $this->redirectRoute('suppliers-preorders-index');
-
     }
   }
 

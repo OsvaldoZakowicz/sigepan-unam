@@ -104,13 +104,13 @@
 
       <x-slot:content class="flex-col">
 
-        {{--
-          todo: suministros y packs de interes
-          cuando el periodo de pre orden NO proviene de un previo
-          periodo presupuestario
-        --}}
-
         @if ($preorder_period->quotation_period_id == null)
+
+          {{--
+            todo: suministros y packs de interes
+            cuando el periodo de pre orden NO proviene de un previo
+            periodo presupuestario
+          --}}
 
           {{-- suministros de interes --}}
           <x-div-toggle x-data="{ open: false }" title="suministros de interés para este período:" class="p-2">
@@ -181,21 +181,120 @@
           </x-div-toggle>
 
         @else
-        <div class="flex justify-between items-center mb-2 p-1 border border-neutral-200 bg-neutral-100 rounded-sm">
-          <span class="">
-            <span>pre ordenes creadas a partir del ranking de presupuestos</span>
-            <span>obtenidos en el periodo presupuestario: <span class="font-semibold">{{ $preorder_period->quotation_period->period_code }}</span>.</span>
-          </span>
 
-          <x-a-button
-            wire:navigate
-            href="{{ route('suppliers-budgets-ranking', $preorder_period->quotation_period->id) }}"
-            bg_color="neutral-100"
-            border_color="neutral-200"
-            text_color="neutral-600"
-            >ver ranking
-          </x-a-button>
-        </div>
+          {{--
+            suministros y packs de interes
+            cuando el periodo de pre orden viene de un periodo presupuestario previo
+          --}}
+
+          <div class="flex justify-between items-center mb-2 p-1 border border-neutral-200 bg-neutral-100 rounded-sm">
+
+            <span class="">
+              <span>pre ordenes creadas a partir del ranking de presupuestos</span>
+              <span>obtenidos en el periodo presupuestario: <span class="font-semibold">{{ $preorder_period->quotation_period->period_code }}</span>.</span>
+            </span>
+
+            <x-a-button
+              wire:navigate
+              href="{{ route('suppliers-budgets-ranking', $preorder_period->quotation_period->id) }}"
+              bg_color="neutral-100"
+              border_color="neutral-200"
+              text_color="neutral-600"
+              >ver ranking
+            </x-a-button>
+
+          </div>
+
+          {{-- suministros de interes --}}
+          <x-div-toggle x-data="{ open: false }" title="suministros de interés para este período:" class="p-2">
+
+            {{-- leyenda --}}
+            <x-slot:subtitle>
+              <span>lista de suministros pre ordenados en el período</span>
+            </x-slot:subtitle>
+
+            {{-- tabla de suministros --}}
+            <x-table-base>
+              <x-slot:tablehead>
+                <tr class="border bg-neutral-100">
+                  <x-table-th class="text-end w-12">id</x-table-th>
+                  <x-table-th class="text-start w-56">nombre</x-table-th>
+                  <x-table-th class="text-start">marca / tipo</x-table-th>
+                  <x-table-th class="text-end">
+                    <span>cantidad</span>
+                    <x-quest-icon title="kilogramos (kg), gramos (g), litros (l), mililitros (ml), metro (m), centimetro (cm), unidad (u)"/>
+                  </x-table-th>
+                  <x-table-th class="text-end">
+                    <span>cantidad pre ordenada</span>
+                    <x-quest-icon title="cantidad de unidades de cada suministro que fue pre ordenado"/>
+                  </x-table-th>
+                </tr>
+              </x-slot:tablehead>
+              <x-slot:tablebody>
+                @forelse ($quotations_ranking['provisions'] as $provision)
+                  <tr>
+                    <x-table-td class="text-end">{{ $provision['id_suministro'] }}</x-table-td>
+                    <x-table-td class="text-start">{{ $provision['nombre_suministro'] }}</x-table-td>
+                    <x-table-td class="text-start">{{ $provision['marca'] }} / {{ $provision['tipo'] }}</x-table-td>
+                    <x-table-td class="text-end">{{ $provision['volumen'] }}</x-table-td>
+                    <x-table-td class="text-end">{{ $provision['cantidad'] }}</x-table-td>
+                  </tr>
+                @empty
+                  <tr>
+                    <td colspan="5">¡sin registros!</td>
+                  </tr>
+                @endforelse
+              </x-slot:tablebody>
+            </x-table-base>
+            {{-- paginacion --}}
+            {{-- <div class="w-full flex justify-end items-center gap-1 mt-1"></div> --}}
+          </x-div-toggle>
+
+          {{-- packs de interes --}}
+          <x-div-toggle x-data="{ open: false }" title="packs de interés para este período:" class="p-2">
+
+            {{-- leyenda --}}
+            <x-slot:subtitle>
+              <span>lista de packs pre ordenados en el período</span>
+            </x-slot:subtitle>
+
+            {{-- tabla de packs --}}
+            <x-table-base>
+              <x-slot:tablehead>
+                <tr class="border bg-neutral-100">
+                  <x-table-th class="text-end w-12">id</x-table-th>
+                  <x-table-th class="text-start w-56">nombre</x-table-th>
+                  <x-table-th class="text-start">marca / tipo</x-table-th>
+                  <x-table-th class="text-end">
+                    <span>cantidad</span>
+                    <x-quest-icon title="kilogramos (kg), gramos (g), litros (l), mililitros (ml), metro (m), centimetro (cm), unidad (u)"/>
+                  </x-table-th>
+                  <x-table-th class="text-end">
+                    <span>cantidad pre ordenada</span>
+                    <x-quest-icon title="cantidad de unidades de cada pack que fue pre ordenado"/>
+                  </x-table-th>
+                </tr>
+              </x-slot:tablehead>
+              <x-slot:tablebody>
+                @forelse ($quotations_ranking['packs'] as $pack)
+                  <tr>
+                    <x-table-td class="text-end">{{ $pack['id_suministro'] }}</x-table-td>
+                    <x-table-td class="text-start">{{ $pack['nombre_pack'] }}</x-table-td>
+                    <x-table-td class="text-start">{{ $pack['marca'] }} / {{ $provision['tipo'] }}</x-table-td>
+                    <x-table-td class="text-end">{{ $pack['volumen'] }}</x-table-td>
+                    <x-table-td class="text-end">{{ $pack['cantidad'] }}</x-table-td>
+                  </tr>
+                @empty
+                  <tr>
+                    <td colspan="5">¡sin registros!</td>
+                  </tr>
+                @endforelse
+              </x-slot:tablebody>
+            </x-table-base>
+            {{-- paginacion --}}
+            {{-- <div class="w-full flex justify-end items-center gap-1 mt-1"></div> --}}
+          </x-div-toggle>
+
         @endif
 
         {{-- pre ordenes --}}

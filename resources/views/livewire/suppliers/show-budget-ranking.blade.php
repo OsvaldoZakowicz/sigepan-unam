@@ -6,17 +6,18 @@
 
      <div class="flex gap-2">
       <x-a-button
-        wire:navigate
-        href="{{ route('suppliers-budgets-periods-show', $period->id) }}"
+        onclick="window.history.back()"
         bg_color="neutral-100"
         border_color="neutral-200"
         text_color="neutral-600"
+        class="cursor-pointer"
         >volver
       </x-a-button>
 
       <x-a-button
-        wire:navigate
-        href="{{ route('suppliers-preorders-create', $period->id) }}"
+        wire:click="createPreorders({{ $period->id }})"
+        {{-- href="{{ route('suppliers-preorders-create', $period->id) }}" --}}
+        class="cursor-pointer"
         >crear preordenes de compra
       </x-a-button>
      </div>
