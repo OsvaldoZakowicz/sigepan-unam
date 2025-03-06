@@ -16,7 +16,6 @@
 
       <x-a-button
         wire:click="createPreorders({{ $period->id }})"
-        {{-- href="{{ route('suppliers-preorders-create', $period->id) }}" --}}
         class="cursor-pointer"
         >crear preordenes de compra
       </x-a-button>
@@ -191,9 +190,19 @@
                       </x-table-td>
                       <x-table-td class="text-start">
                         @if ($precio['tiene_stock'])
-                          <span class="bg-emerald-200 text-emerald-700 font-light px-1">disponible</span>
+                          <x-text-tag
+                            color="emerald"
+                            class="cursor-pointer text-xs"
+                            title="el proveedor tiene stock disponible"
+                            >disponible
+                          </x-text-tag>
                         @else
-                          <span class="bg-red-200 text-red-600 font-light px-1">sin stock</span>
+                          <x-text-tag
+                            color="red"
+                            class="cursor-pointer text-xs"
+                            title="el proveedor no tiene stock disponible"
+                            >no disponible
+                          </x-text-tag>
                         @endif
                       </x-table-td>
                       <x-table-td class="text-end">
@@ -201,13 +210,23 @@
                       </x-table-td>
                       <x-table-td class="text-end">
                         @if ($pack['estadisticas_precio_unitario']['precio_minimo'] === $precio['precio_unitario'])
-                          <span class="font-light text-yellow-500">¡mejor precio!&nbsp;</span>
+                          <x-text-tag
+                            color="orange"
+                            class="cursor-pointer text-xs mx-1"
+                            title="este es el mejor precio"
+                            >¡mejor precio!
+                          </x-text-tag>
                         @endif
                         <span>$&nbsp;{{ $precio['precio_unitario'] }}</span>
                       </x-table-td>
                       <x-table-td class="text-end">
                         @if ($pack['estadisticas_precio_total']['precio_minimo'] === $precio['precio_total'])
-                          <span class="font-light text-yellow-500">¡mejor precio!&nbsp;</span>
+                          <x-text-tag
+                            color="orange"
+                            class="cursor-pointer text-xs mx-1"
+                            title="este es el mejor precio"
+                            >¡mejor precio!
+                          </x-text-tag>
                         @endif
                         <span>$&nbsp;{{ $precio['precio_total'] }}</span>
                       </x-table-td>
