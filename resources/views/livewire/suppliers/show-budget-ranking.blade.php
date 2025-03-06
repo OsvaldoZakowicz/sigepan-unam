@@ -57,8 +57,8 @@
                       <span>stock</span>
                     </x-table-th>
                     <x-table-th class="text-end w-56">
-                      <span>cantidad presupuestada</span>
-                      <x-quest-icon title="cantidad pedida del suministro o pack en el presupuesto"/>
+                      <span>unidades presupuestadas</span>
+                      <x-quest-icon title="cantidad de unidades pedidas del suministro o pack en el presupuesto"/>
                     </x-table-th>
                     <x-table-th class="text-end w-56">
                       <span>precio unitario</span>
@@ -166,8 +166,8 @@
                       <span>stock</span>
                     </x-table-th>
                     <x-table-th class="text-end w-56">
-                      <span>cantidad presupuestada</span>
-                      <x-quest-icon title="cantidad pedida del suministro o pack en el presupuesto"/>
+                      <span>unidades presupuestadas</span>
+                      <x-quest-icon title="cantidad de unidades pedidas del suministro o pack en el presupuesto"/>
                     </x-table-th>
                     <x-table-th class="text-end w-56">
                       <span>precio unitario</span>
