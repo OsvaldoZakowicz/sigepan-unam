@@ -131,12 +131,12 @@
                       <x-table-td class="text-start">
                         {{-- vista previa en un modal --}}
                         <x-a-button
-                          href="#"
                           wire:click="showModal({{ $key }})"
                           bg_color="neutral-200"
                           border_color="neutral-200"
                           text_color="neutral-600"
-                          >ver
+                          class="cursor-pointer"
+                          >vista previa
                         </x-a-button>
                       </x-table-td>
                     </tr>
@@ -153,7 +153,7 @@
               <div class="relative top-20 mx-auto w-2/3 shadow-lg rounded-md bg-white">
                 <div class="flex justify-between items-center p-4 border-b">
                   <h3 class="text-lg font-semibold">Vista Previa de Pre Orden</h3>
-                  <button wire:click="closeModal()" class="text-gray-600 hover:text-gray-800">
+                  <button type="button" wire:click="closeModal()" class="text-gray-600 hover:text-gray-800">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -230,12 +230,12 @@
                               <th
                                 scope="col"
                                 class="px-3 py-2 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider"
-                                >Marca/Tipo/volumen
+                                >Marca/Tipo/cantidad
                               </th>
                               <th
                                 scope="col"
                                 class="px-3 py-2 text-right text-xs font-medium text-neutral-500 uppercase tracking-wider
-                                ">Cantidad
+                                ">Unidades a pre ordenar
                               </th>
                               <th
                                 scope="col"
@@ -245,7 +245,7 @@
                               <th
                                 scope="col"
                                 class="px-3 py-2 text-right text-xs font-medium text-neutral-500 uppercase tracking-wider
-                                ">Total
+                                ">Sub Total
                               </th>
                             </tr>
                           </thead>
@@ -268,7 +268,7 @@
                                   <td class="px-3 py-2 whitespace-nowrap text-sm text-neutral-500">
                                     <span>
                                       <span>{{ $provision['trademark'] }} / {{ $provision['type'] }}</span>
-                                      <span class="lowercase"> / de {{ $provision['quantity'] }}</span>
+                                      <span class="lowercase"> / de {{ $provision['volumen'] }}</span>
                                     </span>
                                   </td>
                                   <td class="px-3 py-2 whitespace-nowrap text-sm text-neutral-500 text-right">
@@ -299,7 +299,7 @@
                                   <td class="px-3 py-2 whitespace-nowrap text-sm text-neutral-500">
                                     <span>
                                       <span>{{ $pack['trademark'] }} / {{ $pack['type'] }}</span>
-                                      <span class="lowercase"> / de {{ $pack['quantity'] }}</span>
+                                      <span class="lowercase"> / de {{ $pack['volumen'] }}</span>
                                     </span>
                                   </td>
                                   <td class="px-3 py-2 whitespace-nowrap text-sm text-neutral-500 text-right">
@@ -318,8 +318,8 @@
                           </tbody>
                           <tfoot class="bg-neutral-100">
                             <tr>
-                              <td colspan="5" class="px-3 py-2 text-normal font-medium text-neutral-800 text-right">Total:</td>
-                              <td class="px-3 py-2 text-normal font-bold text-neutral-800 text-right">
+                              <td colspan="5" class="px-3 py-2 text-lg font-medium text-neutral-800 text-right">Total:</td>
+                              <td class="px-3 py-2 text-lg font-bold text-neutral-800 text-right">
                                 ${{ number_format($selected_preorder['summary']['total_order'], 2) }}
                               </td>
                             </tr>
@@ -332,11 +332,11 @@
 
                 <div class="flex justify-end p-4 bg-gray-50">
                   <x-a-button
-                    href="#"
                     wire:click="closeModal()"
                     bg_color="neutral-200"
                     border_color="neutral-200"
                     text_color="neutral-600"
+                    class="cursor-pointer"
                     >Cerrar
                   </x-a-button>
                 </div>
