@@ -12,10 +12,14 @@ use Illuminate\View\View;
 use Illuminate\Support\Collection;
 use Livewire\Component;
 
+/**
+ * * VISTA DE LA RESPUESTA DE PRE ORDEN PARA EL GERENTE
+ */
 class ShowPreOrderResponse extends Component
 {
   // pre orden y presupuesto de referencia
   public PreOrder $preorder;
+  public $preorder_details;
   public Quotation | null $quotation;
 
   // estados
@@ -25,7 +29,10 @@ class ShowPreOrderResponse extends Component
 
   // coleccion de suministros o packs
   public Collection $items;
+  // cuando el stock es false o cambia en algun item
+  public Collection $alternative_items;
   public float $total_price;
+  public float $alternative_total_price;
 
   protected $PROVISION = 'provision';
   protected $PACK = 'pack';
@@ -52,6 +59,15 @@ class ShowPreOrderResponse extends Component
   public function mount(int $id): void
   {
     $this->preorder = PreOrder::findOrFail($id);
+
+    // si el proveedor no completo, retornar
+    if (!$this->preorder->is_completed) {
+
+      session()->flash('operation-info', 'El provedor no ha respondido aún');
+      $this->redirectRoute('suppliers-preorders-show', $this->preorder->pre_order_period->id);
+    }
+
+    $this->preorder_details = json_decode($this->preorder->details, true); // json asocitivo
     $this->quotation = Quotation::where('quotation_code', $this->preorder->quotation_reference)->first();
 
     $this->item_provision = $this->PROVISION;
@@ -59,6 +75,7 @@ class ShowPreOrderResponse extends Component
 
     $this->setProvisionsAndPacks();
     $this->getTotalPrice();
+    $this->getAlternativeTotalPrice();
   }
 
   /**
@@ -69,7 +86,8 @@ class ShowPreOrderResponse extends Component
   public function setProvisionsAndPacks(): void
   {
     $this->fill([
-      'items' => collect([]),
+      'items'             => collect([]),
+      'alternative_items' => collect([])
     ]);
 
     if ($this->preorder->provisions->count() > 0) {
@@ -94,25 +112,56 @@ class ShowPreOrderResponse extends Component
   {
     $type = ($item instanceof Provision) ? $this->PROVISION : $this->PACK;
 
+    // Agregamos el item original
     $this->items->push([
-      'item_id'           =>  $item->id,
-      'item_type'         =>  $type,
-      'item_object'       =>  $item,
-      'item_has_stock'    =>  $item->pivot->has_stock, // true, o false
-      'item_quantity'     =>  $item->pivot->quantity,
-      'item_unit_price'   =>  $item->pivot->unit_price,
-      'item_total_price'  =>  $item->pivot->total_price,
+      'item_id'                   =>  $item->id,
+      'item_type'                 =>  $type,
+      'item_object'               =>  $item,
+      'item_has_stock'            =>  $item->pivot->has_stock,
+      'item_quantity'             =>  $item->pivot->quantity,
+      'item_alternative_quantity' =>  $item->pivot->alternative_quantity,
+      'item_unit_price'           =>  $item->pivot->unit_price,
+      'item_total_price'          =>  $item->pivot->total_price,
+    ]);
+
+    // Calculamos el precio total alternativo según las reglas
+    $alternative_total_price = $item->pivot->has_stock
+      ? $item->pivot->total_price
+      : ($item->pivot->alternative_quantity > 0
+        ? $item->pivot->alternative_quantity * $item->pivot->unit_price
+        : 0);
+
+    // Agregamos el item alternativo
+    $this->alternative_items->push([
+      'item_id'                   =>  $item->id,
+      'item_type'                 =>  $type,
+      'item_object'               =>  $item,
+      'item_has_stock'            =>  $item->pivot->has_stock,
+      'item_quantity'             =>  $item->pivot->quantity,
+      'item_alternative_quantity' =>  $item->pivot->alternative_quantity,
+      'item_unit_price'           =>  $item->pivot->unit_price,
+      'item_total_price'          =>  $alternative_total_price,
     ]);
   }
 
   /**
    * calcular precio total
-   * a partir de la coleccin de items, reduce de cada uno su 'item_total_price'
    * @return void
    */
   public function getTotalPrice(): void
   {
     $this->total_price = $this->items->reduce(function ($acc, $item) {
+      return $acc + $item['item_total_price'];
+    }, 0);
+  }
+
+  /**
+   * calcular precio total alternativo
+   * @return void
+   */
+  public function getAlternativeTotalPrice(): void
+  {
+    $this->alternative_total_price = $this->alternative_items->reduce(function ($acc, $item) {
       return $acc + $item['item_total_price'];
     }, 0);
   }
@@ -126,8 +175,11 @@ class ShowPreOrderResponse extends Component
    */
   public function approveAndMakeOrder(): void
   {
-    // todo: crear albaran (PDF)
+    // todo: pre orden aprobada por el comprador, status, approved
+    $this->preorder->is_approved_by_buyer = true;
+    $this->preorder->save();
 
+    // todo: crear albaran (PDF)
     // todo: crear orden final (PDF)
 
     // notificar

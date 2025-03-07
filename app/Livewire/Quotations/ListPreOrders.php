@@ -36,6 +36,11 @@ class ListPreOrders extends Component
   public int $status_open;
   public int $status_closed;
 
+   // estados de la pre orden
+   public string $status_pending;
+   public string $status_approved;
+   public string $status_rejected;
+
   /**
    * boot de datos
    * @return void
@@ -47,6 +52,10 @@ class ListPreOrders extends Component
 
     $this->status_open = $pps->getStatusOpen();
     $this->status_closed = $pps->getStatusClosed();
+
+    $this->status_pending = PreOrder::getPendingStatus();
+    $this->status_approved = PreOrder::getApprovedStatus();
+    $this->status_rejected = PreOrder::getRejectedStatus();
   }
 
   /**

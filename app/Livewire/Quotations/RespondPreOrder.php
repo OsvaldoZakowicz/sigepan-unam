@@ -11,6 +11,9 @@ use Illuminate\Support\Arr;
 use Illuminate\View\View;
 use Livewire\Component;
 
+/**
+ * * UN PROVEEDOR RESPONDE A LA PRE ORDEN
+ */
 class RespondPreOrder extends Component
 {
   public PreOrder $preorder;
@@ -40,6 +43,8 @@ class RespondPreOrder extends Component
    */
   public function mount(int $id): void
   {
+    // todo: para proceder debe completar su direccion en el perfil
+
     $this->preorder = PreOrder::findOrFail($id);
     $this->quotation = Quotation::where('quotation_code', $this->preorder->quotation_reference)->first();
 
@@ -138,10 +143,10 @@ class RespondPreOrder extends Component
         'items.*.item_unit_price'  => ['required'],
         'items.*.item_total_price' => ['required'],
         'delivery_type'     =>  ['required', 'array'],
-        'delivery_type.*'   =>  ['string', 'in:domicilio,local'],
+        'delivery_type.*'   =>  ['string', 'in:envio a domicilio,retirar en local'],
         'delivery_date'     =>  ['required', 'date', 'date_format:Y-m-d', 'after_or_equal:today'],
         'payment_method'    =>  ['required', 'array', 'min:1'],
-        'payment_method.*'  =>  ['string', 'in:efectivo,tarjeta_credito,tarjeta_debito,mercado_pago,uala,viumi'],
+        'payment_method.*'  =>  ['string', 'in:efectivo,tarjeta de credito,tarjeta de debito,mercado pago,uala,viumi'],
         'short_description' =>  ['nullable', 'string', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s,.$]*$/'],
         'accept_terms'      =>  ['required']
 
@@ -168,8 +173,6 @@ class RespondPreOrder extends Component
     );
 
     try {
-
-      //dd($validated);
 
       // detalles finales para la pre orden
       $details = [

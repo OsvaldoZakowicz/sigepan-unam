@@ -318,13 +318,20 @@ class PreOrderPeriodService
       $provisions_details = [];
       foreach ($provisions as $provision_item) {
         $provision = Provision::find($provision_item['id']);
+        // Encontrar el item en comparison_data
+        $comparison_item = collect($comparison_data['provisions'])->first(function($item) use ($provision_item) {
+          return $item['id_suministro'] == $provision_item['id'];
+        });
+
         $provisions_details[] = [
           'id' => $provision->id,
           'provision_name' => $provision->provision_name,
           'trademark' => $provision->trademark->provision_trademark_name,
           'type' => $provision->type->provision_type_name,
-          'quantity' => convert_measure($provision_item['quantity'], $provision->measure),
+          'quantity' => $comparison_item['cantidad'], // Usar cantidad de la comparativa
           'measure' => $provision->measure->unit_symbol,
+          'volumen' => $comparison_item['volumen'], // Agregar volumen
+          'volumen_tag' => $comparison_item['volumen_tag'], // Agregar volumen_tag
           'unit_price' => $provision_item['unit_price'],
           'total_price' => $provision_item['total_price']
         ];
@@ -335,13 +342,20 @@ class PreOrderPeriodService
       $packs_details = [];
       foreach ($packs as $pack_item) {
         $pack = Pack::find($pack_item['id']);
+        // Encontrar el item en comparison_data
+        $comparison_item = collect($comparison_data['packs'])->first(function($item) use ($pack_item) {
+          return $item['id_pack'] == $pack_item['id'];
+        });
+
         $packs_details[] = [
           'id' => $pack->id,
           'pack_name' => $pack->pack_name,
           'trademark' => $pack->provision->trademark->provision_trademark_name,
           'type' => $pack->provision->type->provision_type_name,
-          'quantity' => convert_measure($pack_item['quantity'], $pack->provision->measure),
+          'quantity' => $comparison_item['cantidad'], // Usar cantidad de la comparativa
           'measure' => $pack->provision->measure->unit_symbol,
+          'volumen' => $comparison_item['volumen'], // Agregar volumen
+          'volumen_tag' => $comparison_item['volumen_tag'], // Agregar volumen_tag
           'unit_price' => $pack_item['unit_price'],
           'total_price' => $pack_item['total_price']
         ];

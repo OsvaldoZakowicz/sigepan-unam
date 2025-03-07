@@ -137,171 +137,199 @@
 
           {{-- items --}}
           <div class="p-4 border-b">
+
             <h4 class="text-sm font-medium text-neutral-600 uppercase tracking-wider mb-2">Detalle:</h4>
-            <div class="overflow-x-auto">
-              <table class="min-w-full divide-y divide-neutral-200">
-                <thead class="bg-neutral-50">
-                  <tr>
-                    <th
-                      scope="col"
-                      class="px-3 py-2 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider"
-                      >#
-                    </th>
-                    <th
-                      scope="col"
-                      class="px-3 py-2 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider"
-                      >Suministro/Pack
-                    </th>
-                    <th
-                      scope="col"
-                      class="px-3 py-2 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider"
-                      >Marca/Tipo/volumen
-                    </th>
-                    <th
-                      scope="col"
-                      class="px-3 py-2 text-right text-xs font-medium text-neutral-500 uppercase tracking-wider
-                      ">Tiene Stock de la cantidad?
-                    </th>
-                    <th
-                      scope="col"
-                      class="px-3 py-2 text-right text-xs font-medium text-neutral-500 uppercase tracking-wider
-                      ">Cantidad
-                    </th>
-                    <th
-                      scope="col"
-                      class="px-3 py-2 text-right text-xs font-medium text-neutral-500 uppercase tracking-wider
-                      ">Precio Unit.
-                    </th>
-                    <th
-                      scope="col"
-                      class="px-3 py-2 text-right text-xs font-medium text-neutral-500 uppercase tracking-wider
-                      ">Total
-                    </th>
-                  </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-neutral-200">
-                  @foreach($items as $key => $item)
-                    @if ($item['item_type'] === $item_provision)
-                      {{-- suministros --}}
-                      <tr>
-                        <td class="px-3 py-2 whitespace-nowrap text-sm font-medium">
-                          {{ $key+1 }}
-                        </td>
-                        <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-neutral-800">
-                          {{ $item['item_object']->provision_name }}
-                        </td>
-                        <td class="px-3 py-2 whitespace-nowrap text-sm text-neutral-500">
-                          <span>
-                            <span>{{ $item['item_object']->trademark->provision_trademark_name }} / {{ $item['item_object']->type->provision_type_name }}</span>
-                            <span class="lowercase"> / de {{ convert_measure($item['item_object']->provision_quantity, $item['item_object']->measure) }}</span>
-                          </span>
-                        </td>
-                        {{-- input stock --}}
-                        {{-- * PROVISIONS --}}
-                        <td class="px-3 py-2 whitespace-nowrap text-sm text-end text-neutral-500">
-                          {{ ($item['item_has_stock']) ? 'si' : 'no' }}
-                        </td>
-                        <td class="px-3 py-2 whitespace-nowrap text-sm text-neutral-500 text-right">
-                          {{ $item['item_quantity'] }}
-                        </td>
-                        <td class="px-3 py-2 whitespace-nowrap text-sm text-neutral-500 text-right">
-                          ${{ number_format($item['item_unit_price'], 2) }}
-                        </td>
-                        <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-neutral-800 text-right">
-                          ${{ number_format($item['item_total_price'], 2) }}
-                        </td>
-                      </tr>
-                    @else
-                      {{-- packs --}}
-                      <tr>
-                        <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-neutral-800">
-                          {{ $item['item_object']->pack_name }}
-                        </td>
-                        <td class="px-3 py-2 whitespace-nowrap text-sm text-neutral-500">
-                          <span>
-                            <span>{{ $item['item_object']->provision->trademark->provision_trademark_name }} / {{ $item['item_object']->provision->type->provision_type_name }}</span>
-                            <span class="lowercase"> / de {{ convert_measure($item['item_object']->provision->provision_quantity, $item['item_object']->provision->measure) }}</span>
-                          </span>
-                        </td>
-                        {{-- input stock --}}
-                        {{-- * PACKS --}}
-                        <td class="px-3 py-2 whitespace-nowrap text-sm text-end text-neutral-500">
-                          {{ ($item['item_has_stock']) ? 'si' : 'no' }}
-                        </td>
-                        <td class="px-3 py-2 whitespace-nowrap text-sm text-neutral-500 text-right">
-                          {{ $item['item_quantity'] }}
-                        </td>
-                        <td class="px-3 py-2 whitespace-nowrap text-sm text-neutral-500 text-right">
-                          ${{ number_format($item['item_unit_price'], 2) }}
-                        </td>
-                        <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-neutral-800 text-right">
-                          ${{ number_format($item['item_total_price'], 2) }}
-                        </td>
-                      </tr>
-                    @endif
-                  @endforeach
-                </tbody>
-                <tfoot class="bg-neutral-100">
-                  <tr>
-                    <td colspan="6" class="px-3 py-2 text-normal font-medium text-neutral-800 text-right">Total:</td>
-                    <td class="px-3 py-2 text-normal font-bold text-neutral-800 text-right">
-                      $ {{ number_format($total_price, 2) }}
-                    </td>
-                  </tr>
-                </tfoot>
-              </table>
-            </div>
+
+            <x-div-toggle x-data="{ open: true }" title="suministros y packs de esta pre orden">
+              <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-neutral-200">
+                  <thead class="bg-neutral-50">
+                    <tr>
+                      <th
+                        scope="col"
+                        class="px-3 py-2 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider"
+                        >#
+                      </th>
+                      <th
+                        scope="col"
+                        class="px-3 py-2 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider"
+                        >Suministro/Pack
+                      </th>
+                      <th
+                        scope="col"
+                        class="px-3 py-2 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider"
+                        >Marca/Tipo/volumen
+                      </th>
+                      <th
+                        scope="col"
+                        class="px-3 py-2 text-right text-xs font-medium text-neutral-500 uppercase tracking-wider
+                        ">Tiene Stock de la cantidad?
+                      </th>
+                      <th
+                        scope="col"
+                        class="px-3 py-2 text-right text-xs font-medium text-neutral-500 uppercase tracking-wider
+                        ">Cantidad
+                      </th>
+                      <th
+                        scope="col"
+                        class="px-3 py-2 text-right text-xs font-medium text-neutral-500 uppercase tracking-wider
+                        ">Precio Unit.
+                      </th>
+                      <th
+                        scope="col"
+                        class="px-3 py-2 text-right text-xs font-medium text-neutral-500 uppercase tracking-wider
+                        ">Total
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-neutral-200">
+                    @foreach($items as $key => $item)
+                      @if ($item['item_type'] === $item_provision)
+                        {{-- suministros --}}
+                        <tr>
+                          <td class="px-3 py-2 whitespace-nowrap text-sm font-medium">
+                            {{ $key+1 }}
+                          </td>
+                          <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-neutral-800">
+                            {{ $item['item_object']->provision_name }}
+                          </td>
+                          <td class="px-3 py-2 whitespace-nowrap text-sm text-neutral-500">
+                            <span>
+                              <span>{{ $item['item_object']->trademark->provision_trademark_name }} / {{ $item['item_object']->type->provision_type_name }}</span>
+                              <span class="lowercase"> / de {{ convert_measure($item['item_object']->provision_quantity, $item['item_object']->measure) }}</span>
+                            </span>
+                          </td>
+                          <td class="px-3 py-2 whitespace-nowrap text-sm text-end text-neutral-500">
+                            {{ ($item['item_has_stock']) ? 'si' : 'no' }}
+                          </td>
+                          <td class="px-3 py-2 whitespace-nowrap text-sm text-neutral-500 text-right">
+                            @if(!$item['item_has_stock'])
+                              <del class="text-neutral-400">{{ $item['item_quantity'] }}</del>
+                              <span>cantidad alternativa:&nbsp;{{ $item['item_alternative_quantity'] }}</span>
+                            @else
+                              <span>{{ $item['item_quantity'] }}</span>
+                            @endif
+                          </td>
+                          <td class="px-3 py-2 whitespace-nowrap text-sm text-neutral-500 text-right">
+                            <span>${{ number_format($item['item_unit_price'], 2) }}</span>
+                          </td>
+                          <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-neutral-800 text-right">
+                            @if(!$item['item_has_stock'])
+                              <del class="text-neutral-400">${{ number_format($item['item_total_price'], 2) }}</del>
+                              <span>${{ number_format($item['item_alternative_quantity'] * $item['item_unit_price'], 2) }}</span>
+                            @else
+                              <span>${{ number_format($item['item_total_price'], 2) }}</span>
+                            @endif
+                          </td>
+                        </tr>
+                      @else
+                        {{-- packs --}}
+                        <tr>
+                          <td class="px-3 py-2 whitespace-nowrap text-sm font-medium">
+                            {{ $key+1 }}
+                          </td>
+                          <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-neutral-800">
+                            {{ $item['item_object']->pack_name }}
+                          </td>
+                          <td class="px-3 py-2 whitespace-nowrap text-sm text-neutral-500">
+                            <span>
+                              <span>{{ $item['item_object']->provision->trademark->provision_trademark_name }} / {{ $item['item_object']->provision->type->provision_type_name }}</span>
+                              <span class="lowercase"> / de {{ convert_measure($item['item_object']->pack_quantity, $item['item_object']->provision->measure) }}</span>
+                            </span>
+                          </td>
+                          <td class="px-3 py-2 whitespace-nowrap text-sm text-end text-neutral-500">
+                            {{ ($item['item_has_stock']) ? 'si' : 'no' }}
+                          </td>
+                          <td class="px-3 py-2 whitespace-nowrap text-sm text-neutral-500 text-right">
+                            @if(!$item['item_has_stock'])
+                              <del class="text-neutral-400">{{ $item['item_quantity'] }}</del>
+                              <span>{{ $item['item_alternative_quantity'] }}</span>
+                            @else
+                              <span>{{ $item['item_quantity'] }}</span>
+                            @endif
+                          </td>
+                          <td class="px-3 py-2 whitespace-nowrap text-sm text-neutral-500 text-right">
+                            <span>${{ number_format($item['item_unit_price'], 2) }}</span>
+                          </td>
+                          <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-neutral-800 text-right">
+                            @if(!$item['item_has_stock'])
+                              <del class="text-neutral-400">${{ number_format($item['item_total_price'], 2) }}</del>
+                              <span>${{ number_format($item['item_alternative_quantity'] * $item['item_unit_price'], 2) }}</span>
+                            @else
+                              <span>${{ number_format($item['item_total_price'], 2) }}</span>
+                            @endif
+                          </td>
+                        </tr>
+                      @endif
+                    @endforeach
+                  </tbody>
+                  <tfoot class="bg-neutral-100">
+                    <tr>
+                      <td colspan="6" class="px-3 py-2 text-normal font-medium text-neutral-800 text-right">Total:</td>
+                      <td class="px-3 py-2 text-normal font-bold text-neutral-800 text-right">
+                        @if (number_format($total_price, 2) === number_format($alternative_total_price, 2))
+                          {{-- no hay cambios --}}
+                          <span>$ {{ number_format($total_price, 2) }}</span>
+                        @else
+                          <del class="text-neutral-400">$ {{ number_format($total_price, 2) }}</del>
+                          <span>$ {{ number_format($alternative_total_price, 2) }}</span>
+                        @endif
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </x-div-toggle>
+
           </div>
 
           {{-- detalle de envio, fecha, y medio de pago informado por el proveedor --}}
           <div class="flex gap-2 flex-wrap p-4 bg-neutral-100">
 
             <div class="flex flex-col">
-              <h4 class="text-sm font-medium text-neutral-600 uppercase tracking-wider mb-2">anexo</h4>
-              <span>El proveedor indica los siguientes datos para la pre orden:</span>
+              <h4 class="text-sm font-medium text-neutral-700 uppercase tracking-wider mb-2">anexo</h4>
+              @if ($preorder->is_approved_by_supplier)
+                <span>El proveedor <x-text-tag color="emerald">aceptó</x-text-tag> cumplir con la pre orden según el stock y anexo declarado</span>
+              @endif
             </div>
 
             {{-- retiro o envio, fecha y método de pago en una línea --}}
             <div class="flex flex-wrap gap-4 w-full">
-              {{-- retiro o envio --}}
-              <div class="flex items-center">
-                <span class="font-medium text-sm text-neutral-600">Tipo de entrega:</span>
-                <span class="ml-2 text-sm">
-                  @if(is_array($preorder->details['delivery_type']))
-                    {{ implode(', ', $preorder->details['delivery_type']) }}
-                  @else
-                    {{ $preorder->details['delivery_type'] }}
-                  @endif
-                </span>
-              </div>
 
-              {{-- fecha de envio o retiro --}}
-              <div class="flex items-center">
-                <span class="font-medium text-sm text-neutral-600">Fecha de entrega:</span>
-                <span class="ml-2 text-sm">
-                  {{ \Carbon\Carbon::parse($preorder->details['delivery_date'])->format('d/m/Y') }}
-                </span>
-              </div>
+              @if (!empty($preorder_details))
+                {{-- retiro o envio --}}
+                <div class="flex items-center">
+                  <span class="font-medium text-sm text-neutral-700">Tipo de entrega:</span>
+                  <span class="ml-2 text-sm">
+                    {{ implode(', ', $preorder_details['delivery_type']) }}
+                  </span>
+                </div>
 
-              {{-- metodo de pago --}}
-              <div class="flex items-center">
-                <span class="font-medium text-sm text-neutral-600">Métodos de pago:</span>
-                <span class="ml-2 text-sm">
-                  @if(is_array($preorder->details['payment_method']))
-                    {{ implode(', ', $preorder->details['payment_method']) }}
-                  @else
-                    {{ $preorder->details['payment_method'] }}
-                  @endif
-                </span>
-              </div>
+                {{-- fecha de envio o retiro --}}
+                <div class="flex items-center">
+                  <span class="font-medium text-sm text-neutral-700">Fecha tentativa de entrega o retiro a partir de:</span>
+                  <span class="ml-2 text-sm">
+                    {{ formatDateTime($preorder_details['delivery_date'], 'd-m-Y') }}
+                  </span>
+                </div>
+
+                {{-- metodo de pago --}}
+                <div class="flex items-center">
+                  <span class="font-medium text-sm text-neutral-700">Métodos de pago aceptados:</span>
+                  <span class="ml-2 text-sm">
+                    {{ implode(', ', $preorder_details['payment_method']) }}
+                  </span>
+                </div>
+              @endif
+
             </div>
 
             {{-- comentarios --}}
-            @if($preorder->details['short_description'])
+            @if(!empty($preorder_details))
               <div class="w-full mt-2">
-                <span class="font-medium text-sm text-neutral-600">Comentarios:</span>
+                <span class="font-medium text-sm text-neutral-700">Comentarios:</span>
                 <p class="mt-1 text-sm text-neutral-700">
-                  {{ $preorder->details['short_description'] }}
+                  {{ $preorder_details['short_description'] ?? 'ninguno' }}
                 </p>
               </div>
             @endif
@@ -317,22 +345,26 @@
         {{-- botones de guardado: desktop, display desde 1024px --}}
         <div class="hidden lg:flex w-full justify-end gap-2 mt-2">
 
-          <x-a-button
-            wire:navigate
-            href="#"
-            bg_color="red-600"
-            border_color="red-600"
-            wire:click=""
-            wire:confirm="¿?"
-            >rechazar
-          </x-a-button>
+          {{-- si el proveedor no respondio ni acepto la pre orden --}}
+          @if ($preorder->is_completed && $preorder->is_approved_by_supplier)
+            <x-a-button
+              wire:navigate
+              href="#"
+              bg_color="red-600"
+              border_color="red-600"
+              wire:click=""
+              wire:confirm="¿?"
+              >rechazar
+            </x-a-button>
 
-          <x-btn-button
-            type="button"
-            wire:click="approveAndMakeOrder()"
-            wire:confirm="¿aprobar esta pre orden?, al aprobar la pre orden se emitirá una orden de compra final para todos los suministros y packs de la lista con stock"
-            >aprobar y ordenar compra
-          </x-btn-button>
+            <x-btn-button
+              type="button"
+              wire:click="approveAndMakeOrder()"
+              wire:confirm="¿aprobar esta pre orden?, al aprobar la pre orden indica que está de acuerdo con el stock que puede cumplir el proveedor y con los parámetros del anexo. Se emitirá una orden de compra final para todos los suministros y packs de la lista con stock, la orden de compra definitiva se enviará por email al proveedor"
+              >aprobar y ordenar compra
+            </x-btn-button>
+          @endif
+
 
         </div>
 

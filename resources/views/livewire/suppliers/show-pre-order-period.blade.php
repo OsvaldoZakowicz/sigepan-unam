@@ -225,7 +225,7 @@
                     <x-quest-icon title="kilogramos (kg), gramos (g), litros (l), mililitros (ml), metro (m), centimetro (cm), unidad (u)"/>
                   </x-table-th>
                   <x-table-th class="text-end">
-                    <span>cantidad pre ordenada</span>
+                    <span>unidades pre ordenadas</span>
                     <x-quest-icon title="cantidad de unidades de cada suministro que fue pre ordenado"/>
                   </x-table-th>
                 </tr>
@@ -270,7 +270,7 @@
                     <x-quest-icon title="kilogramos (kg), gramos (g), litros (l), mililitros (ml), metro (m), centimetro (cm), unidad (u)"/>
                   </x-table-th>
                   <x-table-th class="text-end">
-                    <span>cantidad pre ordenada</span>
+                    <span>unidades pre ordenadas</span>
                     <x-quest-icon title="cantidad de unidades de cada pack que fue pre ordenado"/>
                   </x-table-th>
                 </tr>
@@ -278,7 +278,7 @@
               <x-slot:tablebody>
                 @forelse ($quotations_ranking['packs'] as $pack)
                   <tr>
-                    <x-table-td class="text-end">{{ $pack['id_suministro'] }}</x-table-td>
+                    <x-table-td class="text-end">{{ $pack['id_pack'] }}</x-table-td>
                     <x-table-td class="text-start">{{ $pack['nombre_pack'] }}</x-table-td>
                     <x-table-td class="text-start">{{ $pack['marca'] }} / {{ $provision['tipo'] }}</x-table-td>
                     <x-table-td class="text-end">{{ $pack['volumen'] }}</x-table-td>
@@ -358,14 +358,17 @@
                   </x-table-td>
                   <x-table-td>
 
-                    <x-a-button
-                      wire:navigate
-                      href="{{ route('suppliers-preorders-response', $preorder->id) }}"
-                      bg_color="neutral-100"
-                      border_color="neutral-200"
-                      text_color="neutral-600"
-                      >ver
-                    </x-a-button>
+                    {{-- si el proveedor completo, puedo ver --}}
+                    @if ($preorder->is_completed)
+                      <x-a-button
+                        wire:navigate
+                        href="{{ route('suppliers-preorders-response', $preorder->id) }}"
+                        bg_color="neutral-100"
+                        border_color="neutral-200"
+                        text_color="neutral-600"
+                        >ver
+                      </x-a-button>
+                    @endif
 
                   </x-table-td>
                 </tr>

@@ -84,6 +84,14 @@
             </div>
           </div>
 
+          @if ($errors->any())
+            <ul>
+              @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+              @endforeach
+            </ul>
+          @endif
+
           {{-- items --}}
           <div class="p-4 border-b">
 
@@ -226,7 +234,7 @@
                           <td class="px-3 py-2 whitespace-nowrap text-sm text-neutral-500">
                             <span>
                               <span>{{ $item['item_object']->provision->trademark->provision_trademark_name }} / {{ $item['item_object']->provision->type->provision_type_name }}</span>
-                              <span class="lowercase"> / de {{ convert_measure($item['item_object']->provision->provision_quantity, $item['item_object']->provision->measure) }}</span>
+                              <span class="lowercase"> / de {{ convert_measure($item['item_object']->pack_quantity, $item['item_object']->provision->measure) }}</span>
                             </span>
                           </td>
                           {{-- input stock --}}
@@ -300,7 +308,6 @@
               </div>
             </x-div-toggle>
 
-
           </div>
 
           {{-- formulario con otros datos --}}
@@ -323,7 +330,7 @@
                       type="checkbox"
                       name="delivery_type"
                       wire:model.live="delivery_type"
-                      value="domicilio"
+                      value="envio a domicilio"
                       class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
                     />
                     <label>Envíos a domicilio</label>
@@ -333,7 +340,7 @@
                       type="checkbox"
                       name="delivery_type"
                       wire:model.live="delivery_type"
-                      value="local"
+                      value="retirar en local"
                       class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
                     />
                     <label>Retiros en el local</label>
@@ -344,7 +351,7 @@
               {{-- fecha de envio o retiro --}}
               <div class="flex flex-col gap-2 p-1 w-1/4 shrink">
                 <span>
-                    <label>Fecha posible de envío/retiro</label>
+                    <label>Fecha posible de envío/retiro a partir de:</label>
                   <span class="text-red-500">*</span>
                   <x-quest-icon title="Indique cual podría ser la fecha en que estarian listos los suministros y/o packs para el envio a domicilio o retiro en el local."/>
                 </span>
@@ -381,7 +388,7 @@
                       type="checkbox"
                       name="payment_method"
                       wire:model.live="payment_method"
-                      value="tarjeta_credito"
+                      value="tarjeta de credito"
                       class="mt-1 border border-neutral-200 focus:ring focus:ring-neutral-300"
                     />
                     <label>Tarjeta de crédito</label>
@@ -391,7 +398,7 @@
                       type="checkbox"
                       name="payment_method"
                       wire:model.live="payment_method"
-                      value="tarjeta_debito"
+                      value="tarjeta de debito"
                       class="mt-1 border border-neutral-200 focus:ring focus:ring-neutral-300"
                     />
                     <label>Tarjeta de débito</label>
@@ -401,7 +408,7 @@
                       type="checkbox"
                       name="payment_method"
                       wire:model.live="payment_method"
-                      value="mercado_pago"
+                      value="mercado pago"
                       class="mt-1 border border-neutral-200 focus:ring focus:ring-neutral-300"
                     />
                     <label>Mercado Pago</label>
@@ -473,7 +480,7 @@
 
           <x-a-button
             wire:navigate
-            href="{{ route('quotations-quotations-index') }}"
+            href="{{ route('quotations-preorders-index') }}"
             bg_color="neutral-600"
             border_color="neutral-600"
             >cancelar

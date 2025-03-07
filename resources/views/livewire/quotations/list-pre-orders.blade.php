@@ -111,11 +111,13 @@
             <tr class="border bg-neutral-100">
               <x-table-th class="text-end w-12">id</x-table-th>
               <x-table-th class="text-start">codigo de pre orden</x-table-th>
-              <x-table-th class="text-start">estado de la pre orden</x-table-th>
               <x-table-th class="text-start">periodo</x-table-th>
+              <x-table-th class="text-start">estado de la pre orden</x-table-th>
+              <x-table-th class="text-start">evaluación</x-table-th>
               <x-table-th class="text-start">recibido el</x-table-th>
               <x-table-th class="text-start">disponible hasta</x-table-th>
-              <x-table-th class="text-start w-60">acciones</x-table-th>
+              <x-table-th class="text-start">orden de compra y albarán</x-table-th>
+              <x-table-th class="text-start w-24">acciones</x-table-th>
             </tr>
           </x-slot:tablehead>
           <x-slot:tablebody>
@@ -128,39 +130,65 @@
                   {{ $preorder->pre_order_code }}
                 </x-table-td>
                 <x-table-td class="text-start">
-                  {{-- estado de la pre orden --}}
-                  @if ($preorder->is_completed)
-                    <x-text-tag
-                      color="emerald"
-                      title="ya has respondido a esta pre orden"
-                      >respondido
-                    </x-text-tag>
-                  @else
-                  <x-text-tag
-                    color="red"
-                    title="no has respondido a esta pre orden"
-                    >sin responder
-                  </x-text-tag>
-                  @endif
-                </x-table-td>
-                <x-table-td class="text-start">
-                  <span>{{ $preorder->pre_order_period->period_code }},&nbsp;el periodo está:&nbsp;</span>
+                  <span>{{ $preorder->pre_order_period->period_code }}&nbsp;</span>
                   {{-- estado del periodo --}}
                   @if ($preorder->pre_order_period->status->status_code == 1)
                     {{-- abierto --}}
                     <x-text-tag
                       color="emerald"
-                      title="{{ $preorder->pre_order_period->status->status_short_description }}"
                       class="cursor-pointer"
                       >{{ $preorder->pre_order_period->status->status_name }}
+                      <x-quest-icon title="{{ $preorder->pre_order_period->status->status_short_description }}" />
                     </x-text-tag>
                   @else
                     {{-- cerrado --}}
                     <x-text-tag
                       color="emerald"
-                      title="{{ $preorder->pre_order_period->status->status_short_description }}"
                       class="cursor-pointer"
                       >{{ $preorder->pre_order_period->status->status_name }}
+                      <x-quest-icon title="{{ $preorder->pre_order_period->status->status_short_description }}" />
+                    </x-text-tag>
+                  @endif
+                </x-table-td>
+                <x-table-td class="text-start">
+                  {{-- estado de la pre orden (respondido o no) --}}
+                  @if ($preorder->is_completed)
+                    <x-text-tag
+                      color="emerald"
+                      class="cursor-pointer"
+                      >respondido
+                      <x-quest-icon title="ya has respondido a esta pre orden"/>
+                    </x-text-tag>
+                  @else
+                    <x-text-tag
+                      color="red"
+                      class="cursor-pointer"
+                      >sin responder
+                      <x-quest-icon title="no has respondido a esta pre orden"/>
+                    </x-text-tag>
+                  @endif
+                </x-table-td>
+                <x-table-td class="text-start">
+                  @if ($preorder->status === $status_pending)
+                    <x-text-tag
+                      color="neutral"
+                      class="cursor-pointer"
+                      >{{ $preorder->status }}
+                      <x-quest-icon title="su respuesta será evaluada" />
+                    </x-text-tag>
+                  @elseif ($preorder->status === $status_approved)
+                    <x-text-tag
+                      color="emerald"
+                      class="cursor-pointer"
+                      >{{ $preorder->status }}
+                      <x-quest-icon title="la panadería esta de acuerdo con la pre orden, y le enviará una orden de compra definitiva" />
+                    </x-text-tag>
+                  @else
+                    <x-text-tag
+                      color="red"
+                      class="cursor-pointer"
+                      >{{ $preorder->status }}
+                      <x-quest-icon title="la panadería decidio no continuar con la orden de compra" />
                     </x-text-tag>
                   @endif
                 </x-table-td>
@@ -171,24 +199,28 @@
                   {{ formatDateTime($preorder->pre_order_period->period_end_at, 'd-m-Y') }}
                 </x-table-td>
                 <x-table-td>
+                  -
+                </x-table-td>
+                <x-table-td>
                   <div class="flex justify-start gap-1">
                     {{-- si el periodo NO esta cerrado --}}
                     @if ($preorder->pre_order_period->period_status_id !== $status_closed)
-
                       {{-- responder si no esta completado, de lo contrario, editar --}}
                       @if ($preorder->is_completed)
+                        {{-- mientras la panaderia no apruebe, el proveedor puede editar --}}
+                        @if (!$preorder->is_approved_by_buyer)
 
-                        <x-a-button
-                          wire:navigate
-                          href="#"
-                          bg_color="neutral-100"
-                          border_color="neutral-200"
-                          text_color="neutral-600"
-                          >modificar
-                        </x-a-button>
+                          <x-a-button
+                            wire:navigate
+                            href="#"
+                            bg_color="neutral-100"
+                            border_color="neutral-200"
+                            text_color="neutral-600"
+                            >modificar
+                          </x-a-button>
 
+                        @endif
                       @else
-
                         <x-a-button
                           wire:navigate
                           href="{{ route('quotations-preorders-respond', $preorder->id) }}"
@@ -197,11 +229,9 @@
                           text_color="neutral-600"
                           >responder
                         </x-a-button>
-
                       @endif
-
+                    {{-- periodo cerrado, solo ver mi respuesta (o no) --}}
                     @else
-
                       <x-a-button
                         wire:navigate
                         href="#"
@@ -210,7 +240,6 @@
                         text_color="neutral-600"
                         >ver
                       </x-a-button>
-
                     @endif
                   </div>
                 </x-table-td>
