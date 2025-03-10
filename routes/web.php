@@ -219,7 +219,7 @@ Route::middleware(['auth', 'verified', 'can:proveedores'])->group(function () {
 
   //*---------------------------- PDFs
 
-  Route::get('/preorders/pdf/{id}', [PDFController::class, 'open_pdf_order'])
+  Route::get('preorders/pdf/show/{id}', [PDFController::class, 'open_pdf_order'])
     ->name('open-pdf-order');
 
 });
@@ -244,6 +244,11 @@ Route::middleware(['auth', 'verified', 'can:presupuestos'])->group(function () {
 
   Route::get('preorders/respond/{id}', [QuotationController::class, 'preorders_respond'])
     ->name('quotations-preorders-respond');
+
+  //*---------------------------- PDFs
+
+  Route::get('preorders/pdf/download/{id}', [PDFController::class, 'download_pdf_order'])
+    ->name('download-pdf-order');
 
 });
 

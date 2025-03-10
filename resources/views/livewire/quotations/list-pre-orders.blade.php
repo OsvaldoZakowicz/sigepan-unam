@@ -116,7 +116,7 @@
               <x-table-th class="text-start">evaluación</x-table-th>
               <x-table-th class="text-start">recibido el</x-table-th>
               <x-table-th class="text-start">disponible hasta</x-table-th>
-              <x-table-th class="text-start">orden de compra y albarán</x-table-th>
+              <x-table-th class="text-start">orden de compra</x-table-th>
               <x-table-th class="text-start w-24">acciones</x-table-th>
             </tr>
           </x-slot:tablehead>
@@ -199,7 +199,15 @@
                   {{ formatDateTime($preorder->pre_order_period->period_end_at, 'd-m-Y') }}
                 </x-table-td>
                 <x-table-td>
-                  -
+                  {{-- boton para descargar orden de compra --}}
+                  <x-a-button
+                    href="#"
+                    wire:click="downloadPdfOrder({{ $preorder->id }})"
+                    bg_color="neutral-200"
+                    border_color="neutral-200"
+                    text_color="neutral-600"
+                    >descargar pdf
+                  </x-a-button>
                 </x-table-td>
                 <x-table-td>
                   <div class="flex justify-start gap-1">
@@ -260,6 +268,15 @@
       </x-slot:footer>
 
     </x-content-section>
+
+    {{-- manejar evento para descargar pdf de orden --}}
+    <script>
+      document.addEventListener('livewire:initialized', () => {
+          Livewire.on('downloadPdf', ({ url }) => {
+              window.open(url, '_blank');
+          });
+      });
+    </script>
 
   </article>
 </div>

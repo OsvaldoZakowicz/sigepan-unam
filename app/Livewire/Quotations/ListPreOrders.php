@@ -126,6 +126,18 @@ class ListPreOrders extends Component
   }
 
   /**
+   * descargar orden de compra
+   * @param int $id de pre orden base para el pdf
+   */
+  public function downloadPdfOrder(int $id)
+  {
+    // Generar URL para el PDF y notificacion email
+    $pdfUrl = route('download-pdf-order', ['id' => $id]);
+    // Disparar evento para abrir PDF en nueva pestaña
+    $this->dispatch('downloadPdf', url: $pdfUrl);
+  }
+
+  /**
    * renderizar vista
    * @return View
    */
