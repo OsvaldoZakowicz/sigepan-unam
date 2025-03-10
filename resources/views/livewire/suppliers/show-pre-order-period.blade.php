@@ -80,7 +80,7 @@
               bg_color="emerald-600"
               border_color="emerald-600"
               text_color="neutral-100"
-              wire:confirm="¿Abrir este período?, se enviarán las pre ordenes a los proveedores activos de los suministros de interés"
+              wire:confirm="¿Abrir este período?, se enviarán las pre ordenes a los proveedores activos de los suministros y packs de interés"
               >abrir ahora
             </x-a-button>
 
@@ -310,12 +310,14 @@
                 <x-table-th class="text-end w-12">id</x-table-th>
                 <x-table-th class="text-start">pre orden</x-table-th>
                 <x-table-th class="text-start">proveedor</x-table-th>
-                <x-table-th class="text-start">estado</x-table-th>
+                <x-table-th class="text-start">estado de la pre orden</x-table-th>
+                <x-table-th class="text-start">evaluación</x-table-th>
+                <x-table-th class="text-start">orden de compra</x-table-th>
                 <x-table-th class="text-end">
                   <span>última respuesta</span>
                   <x-quest-icon title="última vez que el proveedor modificó los precios de este presupuesto"/>
                 </x-table-th>
-                <x-table-th class="text-start w-48">acciones</x-table-th>
+                <x-table-th class="text-start w-24">acciones</x-table-th>
               </tr>
             </x-slot:tablehead>
             <x-slot:tablebody>
@@ -331,23 +333,61 @@
                     {{ $preorder->supplier->company_name }},&nbsp;CUIT:&nbsp;{{ $preorder->supplier->company_cuit }}
                   </x-table-td>
                   <x-table-td class="text-start">
-                    {{-- proveedor respondio --}}
+                    {{-- estado de pre orden --}}
                     @if ($preorder->is_completed)
                       <x-text-tag
-                        title="el proveedor ha respondido"
                         color="emerald"
                         class="cursor-pointer"
                         >respondido
+                        <x-quest-icon title="el proveedor ha respondido"/>
                       </x-text-tag>
                     @else
                       {{-- proveedor no respondio --}}
                       <x-text-tag
-                        title="el proveedor no ha respondido"
                         color="neutral"
                         class="cursor-pointer"
                         >sin responder
+                        <x-text-tag title="el proveedor no ha respondido"/>
                       </x-text-tag>
                     @endif
+                  </x-table-td>
+                  <x-table-td class="text-start">
+                    {{-- evaluacion --}}
+                    @if ($preorder->status === $status_pending)
+                      <x-text-tag
+                        color="neutral"
+                        class="cursor-pointer"
+                        >{{ $preorder->status }}
+                        <x-quest-icon title="pendiente de evaluación"/>
+                      </x-text-tag>
+                    @elseif ($preorder->status === $status_approved)
+                      <x-text-tag
+                        color="emerald"
+                        class="cursor-pointer"
+                        >{{ $preorder->status }}
+                        <x-quest-icon title="aprobó esta preorden para crear una orden definitiva"/>
+                      </x-text-tag>
+                    @else
+                      <x-text-tag
+                        color="red"
+                        class="cursor-pointer"
+                        >{{ $preorder->status }}
+                        <x-quest-icon title="esta pre orden fue rechazada por una de las partes"/>
+                      </x-text-tag>
+                    @endif
+                  </x-table-td>
+                  <x-table-td class="text-end">
+
+                    {{-- ver pdf --}}
+                    <x-a-button
+                      href="#"
+                      wire:click="openPdfOrder({{ $preorder->id }})"
+                      bg_color="neutral-200"
+                      border_color="neutral-200"
+                      text_color="neutral-600"
+                      >ver pdf
+                    </x-a-button>
+
                   </x-table-td>
                   <x-table-td class="text-end">
                     @if ($preorder->is_completed)
@@ -374,7 +414,7 @@
                 </tr>
               @empty
                 <tr class="border">
-                  <td colspan="6">¡sin registros hasta que el período comience!</td>
+                  <td colspan="8">¡sin registros hasta que el período comience!</td>
                 </tr>
               @endforelse
             </x-slot:tablebody>
@@ -392,6 +432,15 @@
       </x-slot:footer>
 
     </x-content-section>
+
+    {{-- manejar evento para mostrar orden en pdf en nueva ventana --}}
+    <script>
+      document.addEventListener('livewire:initialized', () => {
+          Livewire.on('openPdfInNewTab', ({ url }) => {
+              window.open(url, '_blank');
+          });
+      });
+    </script>
 
   </article>
 </div>

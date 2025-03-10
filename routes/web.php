@@ -9,6 +9,7 @@ use App\Http\Controllers\Suppliers\SupplierController;
 use App\Http\Controllers\Stocks\StockController;
 use App\Http\Controllers\Store\PaymentController;
 use App\Http\Controllers\Store\StoreController;
+use App\Http\Controllers\Pdf\PDFController;
 
 //* layout publico
 // retorna la vista tienda publica
@@ -215,6 +216,11 @@ Route::middleware(['auth', 'verified', 'can:proveedores'])->group(function () {
   // NOTA: ver la respuesta de una pre orden del proveedor
   Route::get('suppliers/preorders/response/{id}', [SupplierController::class, 'preorder_response'])
     ->name('suppliers-preorders-response');
+
+  //*---------------------------- PDFs
+
+  Route::get('/preorders/pdf/{id}', [PDFController::class, 'open_pdf_order'])
+    ->name('open-pdf-order');
 
 });
 

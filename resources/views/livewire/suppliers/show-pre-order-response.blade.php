@@ -66,7 +66,7 @@
               {{-- estado aprobado --}}
               @if ($preorder->status === $status_approved)
                 <x-text-tag
-                  color="neutral"
+                  color="emerald"
                   class="cursor-pointer"
                   >{{ $preorder->status }}
                   <x-quest-icon title="tanto proveedor como la panaderia estan de acuerdo con esta pre orden de compra"/>
@@ -76,7 +76,7 @@
               {{-- estado rechazado --}}
               @if ($preorder->status === $status_rejected)
                 <x-text-tag
-                  color="neutral"
+                  color="red"
                   class="cursor-pointer"
                   >{{ $preorder->status }}
                   <x-quest-icon title="una de las partes rechazó esta pre orden de compra"/>
@@ -346,7 +346,8 @@
         <div class="hidden lg:flex w-full justify-end gap-2 mt-2">
 
           {{-- si el proveedor no respondio ni acepto la pre orden --}}
-          @if ($preorder->is_completed && $preorder->is_approved_by_supplier)
+          @if ($preorder->is_completed && $preorder->is_approved_by_supplier && !$preorder->is_approved_by_buyer)
+
             <x-a-button
               wire:navigate
               href="#"
@@ -363,9 +364,12 @@
               wire:confirm="¿aprobar esta pre orden?, al aprobar la pre orden indica que está de acuerdo con el stock que puede cumplir el proveedor y con los parámetros del anexo. Se emitirá una orden de compra final para todos los suministros y packs de la lista con stock, la orden de compra definitiva se enviará por email al proveedor"
               >aprobar y ordenar compra
             </x-btn-button>
+
+          @else
+
+            <p>Esta pre orden fue aceptada, y se envió al proveedor una orden de compra definitiva.</p>
+
           @endif
-
-
         </div>
 
       </x-slot:footer>

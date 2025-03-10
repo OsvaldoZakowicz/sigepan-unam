@@ -8,6 +8,8 @@ use App\Models\Quotation;
 use App\Models\PreOrder;
 use App\Models\Provision;
 use App\Models\Pack;
+use App\Services\Supplier\PreOrderService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\View\View;
 use Illuminate\Support\Collection;
 use Livewire\Component;
@@ -67,7 +69,7 @@ class ShowPreOrderResponse extends Component
       $this->redirectRoute('suppliers-preorders-show', $this->preorder->pre_order_period->id);
     }
 
-    $this->preorder_details = json_decode($this->preorder->details, true); // json asocitivo
+    $this->preorder_details = json_decode($this->preorder->details, true); // json asociativo
     $this->quotation = Quotation::where('quotation_code', $this->preorder->quotation_reference)->first();
 
     $this->item_provision = $this->PROVISION;
@@ -168,21 +170,39 @@ class ShowPreOrderResponse extends Component
 
   /**
    * * aprobar pre orden y ordenar la compra
-   * crear albaran PDF
-   * notificar al proveedor que deseo comprar, enviar albarán
-   * y orden de compra.
-   * @return void
    */
-  public function approveAndMakeOrder(): void
+  public function approveAndMakeOrder(PreOrderService $pos)
   {
-    // todo: pre orden aprobada por el comprador, status, approved
     $this->preorder->is_approved_by_buyer = true;
+    $this->preorder->status               = $this->status_approved;
+    $pdf_body_order_data                  = $pos->generatePDFBodyOrderData($this->alternative_items);
+    $pdf_order_data                       = $pos->generatePDFOrderData($this->preorder, $this->quotation, $pdf_body_order_data);
+    $this->preorder->order                = json_encode($pdf_order_data);
     $this->preorder->save();
 
-    // todo: crear albaran (PDF)
-    // todo: crear orden final (PDF)
+    $order_anexo = json_decode($this->preorder->details, true);
 
-    // notificar
+    // configurar pdf
+    Pdf::setOption([
+      'defaultFont' => 'DejaVu Sans',
+      'isHtml5ParserEnabled' => true,
+      'isRemoteEnabled' => true,
+      'isFontSubsettingEnabled' => true,
+      'defaultMediaType' => 'screen',
+      'defaultPaperSize' => 'a4',
+      'encoding' => 'UTF-8',
+    ]);
+
+    // crear pdf
+    $pdf = Pdf::loadView('pdf.orders.order', ['order' => $pdf_order_data, 'anexo' => $order_anexo])
+      ->setPaper('a4')
+      ->setOption('encoding', 'UTF-8');
+
+    $pdf_path = 'ordenes/orden_compra_' . $pdf_order_data['code'] . '.pdf';
+    $pdf->save(storage_path('app/public/' . $pdf_path));
+    $this->preorder->order_pdf = $pdf_path;
+    $this->preorder->save();
+
     SendEmailJob::dispatch(
       $this->preorder->supplier->user->email,
       new NewPurchaseOrderReceived(
@@ -192,7 +212,7 @@ class ShowPreOrderResponse extends Component
     );
 
     // retornar a la vista anterior
-    session()->flash('operation-success', toastSuccessBody('orden de compra', 'enviada'));
+    session()->flash('operation-success', toastSuccessBody('orden de compra', 'creada y enviada'));
     $this->redirectRoute('suppliers-preorders-show', $this->preorder->pre_order_period->id);
   }
 

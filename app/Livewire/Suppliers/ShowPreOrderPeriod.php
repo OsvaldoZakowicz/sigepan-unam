@@ -12,6 +12,7 @@ use App\Services\Supplier\QuotationPeriodService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\View\View;
+use App\Models\PreOrder;
 use Livewire\WithPagination;
 use Livewire\Component;
 
@@ -31,6 +32,11 @@ class ShowPreOrderPeriod extends Component
   // estado del periodo
   public int $period_status;
 
+  // estados preorden
+  public string $status_pending;
+  public string $status_approved;
+  public string $status_rejected;
+
   /**
    * boot de constantes
    * @param PreOrderPeriodService $pps servicio para pre ordenes
@@ -42,6 +48,11 @@ class ShowPreOrderPeriod extends Component
     $this->scheduled = $pps->getStatusScheduled();
     $this->opened = $pps->getStatusOpen();
     $this->closed = $pps->getStatusClosed();
+
+    // estados de pre orden
+    $this->status_pending = PreOrder::getPendingStatus();
+    $this->status_approved = PreOrder::getApprovedStatus();
+    $this->status_rejected = PreOrder::getRejectedStatus();
   }
 
   /**
@@ -92,6 +103,20 @@ class ShowPreOrderPeriod extends Component
       ClosePreOrderPeriodJob::dispatch($this->preorder_period),
       NotifySuppliersRequestForPreOrderClosedJob::dispatch($this->preorder_period),
     ]);
+  }
+
+  /**
+   * abrir pdf en una nueva pestaña,
+   * para poder descargar.
+   * @param int $id id de preorden base para el pdf
+   * @return void
+   */
+  public function openPdfOrder($id): void
+  {
+    // Generar URL para el PDF y notificacion email
+    $pdfUrl = route('open-pdf-order', ['id' => $id]);
+    // Disparar evento para abrir PDF en nueva pestaña
+    $this->dispatch('openPdfInNewTab', url: $pdfUrl);
   }
 
   /**
