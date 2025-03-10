@@ -25,12 +25,16 @@ class PreOrder extends Model
     'is_approved_by_supplier', //boolean
     'is_approved_by_buyer', //boolean
     'details', // json, detalles del acuerdo para pre orden, nullable
+    'order', //json, datos para la orden final pdf
+    'order_pdf', // varchar ruta al archivo
+    'is_sended_to_supplier', //boolean, indica si se envio el pdf de orden al proveedor
   ];
 
   // codificar y decodificar details
   // json a array y viceversa
   protected $casts = [
-    'details' => 'array'
+    'details' => 'array',
+    'order' => 'array',
   ];
 
   /**

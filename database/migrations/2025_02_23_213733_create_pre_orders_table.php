@@ -22,7 +22,10 @@ return new class extends Migration
       $table->boolean('is_completed')->default(false);
       $table->boolean('is_approved_by_supplier')->default(false);
       $table->boolean('is_approved_by_buyer')->default(false);
-      $table->json('details')->nullable();
+      $table->json('details')->nullable(); // detalles json del anexo de la pre orden
+      $table->json('order')->nullable(); // datos para la creacion de la orden final
+      $table->string('order_pdf')->nullable(); // ruta al pdf de orden
+      $table->boolean('is_sended_to_supplier')->default(false); // true cuando la orden se envia una primera vez
       $table->timestamps();
     });
   }
