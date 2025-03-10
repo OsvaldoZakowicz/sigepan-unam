@@ -7,6 +7,7 @@ use App\Models\Supplier;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
@@ -18,7 +19,7 @@ class NewPurchaseOrderReceived extends Mailable
   /**
    * Create a new message instance.
    * @param Supplier $supplier
-   * @param $PreOrder $preorder
+   * @param PreOrder $preorder
    */
   public function __construct(
     public Supplier $supplier,
@@ -55,6 +56,10 @@ class NewPurchaseOrderReceived extends Mailable
    */
   public function attachments(): array
   {
-    return [];
+    return [
+      Attachment::fromPath(storage_path('app/public/' . $this->preorder->order_pdf))
+        ->as('orden_compra.pdf')
+        ->withMime('application/pdf')
+    ];
   }
 }
