@@ -50,7 +50,6 @@ Route::middleware(['auth', 'can:tienda'])->group(function () {
   // * redirecciona a / y retorna 'welcome'
   Route::get('client/logout', ClientLogOutController::class)
     ->name('client-logout');
-
 });
 
 //* layout interno panel
@@ -63,14 +62,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
   // vista del perfil, actualizar usuario y password, borrar cuenta
   Route::view('profile', 'profile')
-    ->middleware(['can:panel','can:panel-perfil'])
+    ->middleware(['can:panel', 'can:panel-perfil'])
     ->name('profile');
 
   // vista de completar y/o editar perfil
   Route::get('profile/complete', [UserController::class, 'profile_complete'])
-    ->middleware(['can:panel','can:panel-perfil'])
+    ->middleware(['can:panel', 'can:panel-perfil'])
     ->name('profile-complete');
-
 });
 
 //* modulo de usuarios
@@ -99,7 +97,6 @@ Route::middleware(['auth', 'verified', 'can:usuarios'])->group(function () {
   //* permisos
   Route::get('users/permissions', [UserController::class, 'permissions_index'])
     ->name('users-permissions-index');
-
 });
 
 //* modulo de auditoria
@@ -116,7 +113,6 @@ Route::middleware(['auth', 'verified', 'can:auditoria'])->group(function () {
 
   Route::get('audits/report/one/{id}', [AuditController::class, 'audits_report_one'])
     ->name('audits-audits-report');
-
 });
 
 //* modulo de proveedores
@@ -221,7 +217,6 @@ Route::middleware(['auth', 'verified', 'can:proveedores'])->group(function () {
 
   Route::get('preorders/pdf/show/{id}', [PDFController::class, 'open_pdf_order'])
     ->name('open-pdf-order');
-
 });
 
 //* seccion de presupuestos (quotations) y preordenes para proveedores
@@ -249,7 +244,6 @@ Route::middleware(['auth', 'verified', 'can:presupuestos'])->group(function () {
 
   Route::get('preorders/pdf/download/{id}', [PDFController::class, 'download_pdf_order'])
     ->name('download-pdf-order');
-
 });
 
 //* modulo de stock
@@ -290,8 +284,7 @@ Route::middleware(['auth', 'verified', 'can:stock'])->group(function () {
 
   Route::get('stocks/tags/edit/{id}', [StockController::class, 'tags_edit'])
     ->name('stocks-tags-edit');
-
 });
 
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

@@ -16,18 +16,18 @@ class PreOrder extends Model
   protected const STATUS_REJECTED = 'rechazado';
 
   protected $fillable = [
-    'pre_order_period_id', // fk pre_order_periods
-    'supplier_id', //fk suppliers
-    'pre_order_code', //varchar unico
-    'quotation_reference', //varchar nullable
-    'status', //enum = ['pendiente', 'aprobado', 'rechazado']
-    'is_completed', // boolean
-    'is_approved_by_supplier', //boolean
-    'is_approved_by_buyer', //boolean
-    'details', // json, detalles del acuerdo para pre orden, nullable
-    'order', //json, datos para la orden final pdf
-    'order_pdf', // varchar ruta al archivo
-    'is_sended_to_supplier', //boolean, indica si se envio el pdf de orden al proveedor
+    'pre_order_period_id',        // fk pre_order_periods
+    'supplier_id',                //fk suppliers
+    'pre_order_code',             //varchar unico
+    'quotation_reference',        //varchar nullable
+    'status',                     //enum = ['pendiente', 'aprobado', 'rechazado']
+    'is_completed',               // boolean
+    'is_approved_by_supplier',    //boolean
+    'is_approved_by_buyer',       //boolean
+    'details',                    // json, detalles del acuerdo para pre orden, nullable
+    'order',                      //json, datos para la orden final pdf
+    'order_pdf',                  // varchar ruta al archivo
+    'is_sended_to_supplier',      //boolean, indica si se envio el pdf de orden al proveedor
   ];
 
   // codificar y decodificar details

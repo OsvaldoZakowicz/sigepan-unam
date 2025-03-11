@@ -8,6 +8,7 @@ use App\Models\Quotation;
 use App\Models\PreOrder;
 use App\Models\Provision;
 use App\Models\Pack;
+use App\Services\Pdf\PdfService;
 use App\Services\Supplier\PreOrderService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\View\View;
@@ -31,9 +32,10 @@ class ShowPreOrderResponse extends Component
 
   // coleccion de suministros o packs
   public Collection $items;
+  public float $total_price;
+
   // cuando el stock es false o cambia en algun item
   public Collection $alternative_items;
-  public float $total_price;
   public float $alternative_total_price;
 
   protected $PROVISION = 'provision';
@@ -69,7 +71,7 @@ class ShowPreOrderResponse extends Component
       $this->redirectRoute('suppliers-preorders-show', $this->preorder->pre_order_period->id);
     }
 
-    $this->preorder_details = json_decode($this->preorder->details, true); // json asociativo
+    $this->preorder_details = json_decode($this->preorder->details, true);
     $this->quotation = Quotation::where('quotation_code', $this->preorder->quotation_reference)->first();
 
     $this->item_provision = $this->PROVISION;
@@ -82,7 +84,7 @@ class ShowPreOrderResponse extends Component
 
   /**
    * preparar suministros y packs
-   * de la pre orden.
+   * de la pre orden para su visualizacion.
    * @return void
    */
   public function setProvisionsAndPacks(): void
@@ -107,6 +109,10 @@ class ShowPreOrderResponse extends Component
 
   /**
    * agregar un suministro o un pack al array de items
+   * e items alternativos.
+   * La razon por la cual se hace esto es para obtener un diff cuando el stock
+   * que el proveedor puede dar es 0 o una cantidad menor a la pedida.
+   * * la coleccion alternativa siempre sera la indicada para la orden final
    * @param Provision | Pack $item es un suministro o pack
    * @return void
    */
@@ -126,6 +132,7 @@ class ShowPreOrderResponse extends Component
       'item_total_price'          =>  $item->pivot->total_price,
     ]);
 
+    // en caso de que algun item tenga cantidad alternativa
     // Calculamos el precio total alternativo según las reglas
     $alternative_total_price = $item->pivot->has_stock
       ? $item->pivot->total_price
@@ -133,7 +140,9 @@ class ShowPreOrderResponse extends Component
         ? $item->pivot->alternative_quantity * $item->pivot->unit_price
         : 0);
 
-    // Agregamos el item alternativo
+    // creamos un item alternativo el cual:
+    // sera una copia exacta del item inicial si stock = true
+    // sera una copia con una cantidad alternativa y un precio total recalculado
     $this->alternative_items->push([
       'item_id'                   =>  $item->id,
       'item_type'                 =>  $type,
@@ -171,38 +180,21 @@ class ShowPreOrderResponse extends Component
   /**
    * * aprobar pre orden y ordenar la compra
    */
-  public function approveAndMakeOrder(PreOrderService $pos)
+  public function approveAndMakeOrder(PreOrderService $pos, PdfService $pdfs)
   {
+    // datos para almacenar la orden en la BD como json
+    $order_data = $pos->generateOrderData($this->preorder, $this->quotation, $this->alternative_items);
+
+    // aprobar preorden, cambiar estado a aprobado, guardar en json los datos de la orden final
     $this->preorder->is_approved_by_buyer = true;
-    $this->preorder->status               = $this->status_approved;
-    $pdf_body_order_data                  = $pos->generatePDFBodyOrderData($this->alternative_items);
-    $pdf_order_data                       = $pos->generatePDFOrderData($this->preorder, $this->quotation, $pdf_body_order_data);
-    $this->preorder->order                = json_encode($pdf_order_data);
+    $this->preorder->status = $this->status_approved;
+    $this->preorder->order = json_encode($order_data);
+    $this->preorder->is_sended_to_supplier = true; // enviado al provedor
     $this->preorder->save();
 
-    $order_anexo = json_decode($this->preorder->details, true);
+    $pdfs->generateOrderPDF($this->preorder, $order_data);
 
-    // configurar pdf
-    Pdf::setOption([
-      'defaultFont' => 'DejaVu Sans',
-      'isHtml5ParserEnabled' => true,
-      'isRemoteEnabled' => true,
-      'isFontSubsettingEnabled' => true,
-      'defaultMediaType' => 'screen',
-      'defaultPaperSize' => 'a4',
-      'encoding' => 'UTF-8',
-    ]);
-
-    // crear pdf
-    $pdf = Pdf::loadView('pdf.orders.order', ['order' => $pdf_order_data, 'anexo' => $order_anexo])
-      ->setPaper('a4')
-      ->setOption('encoding', 'UTF-8');
-
-    $pdf_path = 'ordenes/orden_compra_' . $pdf_order_data['code'] . '.pdf';
-    $pdf->save(storage_path('app/public/' . $pdf_path));
-    $this->preorder->order_pdf = $pdf_path;
-    $this->preorder->save();
-
+    // notificar al proveedor (el email adjuntara el pdf)
     SendEmailJob::dispatch(
       $this->preorder->supplier->user->email,
       new NewPurchaseOrderReceived(

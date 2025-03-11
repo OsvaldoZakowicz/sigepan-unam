@@ -312,12 +312,9 @@
                 <x-table-th class="text-start">proveedor</x-table-th>
                 <x-table-th class="text-start">estado de la pre orden</x-table-th>
                 <x-table-th class="text-start">evaluación</x-table-th>
-                <x-table-th class="text-start">orden de compra</x-table-th>
-                <x-table-th class="text-end">
-                  <span>última respuesta</span>
-                  <x-quest-icon title="última vez que el proveedor modificó los precios de este presupuesto"/>
-                </x-table-th>
-                <x-table-th class="text-start w-24">acciones</x-table-th>
+                <x-table-th class="text-start">orden de compra<x-quest-icon title="disponible cuando la pre orden es aprobada" /></x-table-th>
+                <x-table-th class="text-end">última respuesta<x-quest-icon title="última vez que el proveedor modificó los precios de este presupuesto"/></x-table-th>
+                <x-table-th class="text-start w-36">acciones</x-table-th>
               </tr>
             </x-slot:tablehead>
             <x-slot:tablebody>
@@ -376,18 +373,22 @@
                       </x-text-tag>
                     @endif
                   </x-table-td>
-                  <x-table-td class="text-end">
-
+                  <x-table-td class="text-start">
                     {{-- ver pdf --}}
-                    <x-a-button
-                      href="#"
-                      wire:click="openPdfOrder({{ $preorder->id }})"
-                      bg_color="neutral-200"
-                      border_color="neutral-200"
-                      text_color="neutral-600"
-                      >ver pdf
-                    </x-a-button>
-
+                    @if ($preorder->order != null && $preorder->order_pdf != null)
+                      <x-a-button
+                        href="#"
+                        wire:click="openPdfOrder({{ $preorder->id }})"
+                        bg_color="neutral-100"
+                        border_color="neutral-200"
+                        text_color="neutral-600"
+                        title="ver orden de compras y descargar pdf"
+                        >ver orden pdf
+                        <x-svg-pdf-paper/>
+                      </x-a-button>
+                    @else
+                      <span class="font-semibold text-neutral-400">-</span>
+                    @endif
                   </x-table-td>
                   <x-table-td class="text-end">
                     @if ($preorder->is_completed)
@@ -397,8 +398,7 @@
                     @endif
                   </x-table-td>
                   <x-table-td>
-
-                    {{-- si el proveedor completo, puedo ver --}}
+                    {{-- acciones --}}
                     @if ($preorder->is_completed)
                       <x-a-button
                         wire:navigate
@@ -406,10 +406,11 @@
                         bg_color="neutral-100"
                         border_color="neutral-200"
                         text_color="neutral-600"
-                        >ver
+                        >ver preorden
                       </x-a-button>
+                    @else
+                      <span class="font-semibold text-neutral-400">-</span>
                     @endif
-
                   </x-table-td>
                 </tr>
               @empty
@@ -433,13 +434,16 @@
 
     </x-content-section>
 
-    {{-- manejar evento para mostrar orden en pdf en nueva ventana --}}
+    {{-- manejar eventos --}}
     <script>
+
+      /* evento: abrir pdf en nueva pestaña para visualizar */
       document.addEventListener('livewire:initialized', () => {
           Livewire.on('openPdfInNewTab', ({ url }) => {
               window.open(url, '_blank');
           });
       });
+
     </script>
 
   </article>

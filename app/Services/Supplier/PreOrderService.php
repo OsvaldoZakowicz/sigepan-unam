@@ -9,22 +9,26 @@ use App\Models\Quotation;
 use App\Models\Supplier;
 use Illuminate\Support\Collection;
 
+/**
+ * servicios para pre ordenes y ordenes
+ */
 class PreOrderService
 {
 
   /**
-   * generar datos para el PDF de la orden de compra
+   * generar datos finales de la orden de compra
+   * todo: Datos de panaderia
    * @param PreOrder $preorder
    * @param Quotation $quotation
-   * @param array $body_order_data datos del cuerpo del PDF
-   * todo: Datos de panaderia
-   * @return array $order_data para pre orden
+   * @param Collection $preorder_items conjunto de suministros y/o packs
+   * @return array $order_data
    */
-  public function generatePDFOrderData(
-    PreOrder $preorder,
-    Quotation $quotation,
-    array $body_order_data
-  ): array {
+  public function generateOrderData(PreOrder $preorder, Quotation $quotation, Collection $preorder_items): array
+  {
+    $body_order_data = $this->generateBodyOrderData($preorder_items);
+
+    $anexo = json_decode($preorder->details, true);
+
     $order_data = [
       'code'            =>  (string) substr($preorder->pre_order_code, 3),
       'date'            =>  (string) now()->format('d-m-Y'), // fecha de la orden
@@ -39,17 +43,18 @@ class PreOrderService
       'provider_phone'  =>  (string) $preorder->supplier->phone_number,
       'items'           =>  $body_order_data['body_items'],
       'total'           =>  $body_order_data['body_total_price'],
+      'anexo'           =>  $anexo,
     ];
 
     return $this->utf8EncodeArray($order_data);
   }
 
   /**
-   * generar datos del cuerpo para el PDF de la pre orden
+   * generar datos del cuerpo para la orden
    * @param Collection $preorder_items conjunto de suministros y/o packs
    * @return array $body_order_data = ['body_items' => [], 'body_total_price' => '...']
    */
-  public function generatePDFBodyOrderData(Collection $preorder_items): array
+  private function generateBodyOrderData(Collection $preorder_items): array
   {
     // Filtrar solo los items que tienen stock o cantidad alternativa
     $purchasable_items = $preorder_items->filter(function ($item) {
@@ -85,7 +90,7 @@ class PreOrderService
    * @param Provision | Pack $object
    * @return string name
    */
-  protected function getItemName($object): string
+  private function getItemName($object): string
   {
     $name = '';
 
@@ -105,18 +110,18 @@ class PreOrderService
    * @param Provision | Pack $object
    * @return string marca y volumen
    */
-  protected function getItemTrademarkAndVolume($object): string
+  private function getItemTrademarkAndVolume($object): string
   {
     $trademark_volume = '';
 
     if ($object instanceof Provision) {
       $trademark_volume = $object->trademark->provision_trademark_name
-        .' '.convert_measure($object->provision_quantity, $object->measure);
+        . ' ' . convert_measure($object->provision_quantity, $object->measure);
     }
 
     if ($object instanceof Pack) {
       $trademark_volume = $object->provision->trademark->provision_trademark_name
-        .' '.convert_measure($object->pack_quantity, $object->provision->measure);
+        . ' ' . convert_measure($object->pack_quantity, $object->provision->measure);
     }
 
     return $trademark_volume;
@@ -127,7 +132,7 @@ class PreOrderService
    * @param $item
    * @return string cantidad
    */
-  protected function getItemQuantity($item): string
+  private function getItemQuantity($item): string
   {
     $quantity = '';
 
@@ -156,5 +161,4 @@ class PreOrderService
     }
     return $array;
   }
-
 }

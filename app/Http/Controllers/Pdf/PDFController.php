@@ -5,8 +5,6 @@ namespace App\Http\Controllers\Pdf;
 use App\Http\Controllers\Controller;
 use App\Models\PreOrder;
 use Barryvdh\DomPDF\Facade\Pdf;
-use App\Jobs\SendEmailJob;
-use App\Mail\NewPurchaseOrderReceived;
 use Illuminate\Http\Request;
 
 /**
@@ -30,6 +28,7 @@ class PDFController extends Controller
       ->setPaper('a4')
       ->setOption('encoding', 'UTF-8');
 
+    // orden_compra_order_... .pdf
     $pdf_name = 'orden_compra_' . $order_data['code'] . '.pdf';
 
     // stream a una pestaña del navegador
@@ -52,6 +51,7 @@ class PDFController extends Controller
       ->setPaper('a4')
       ->setOption('encoding', 'UTF-8');
 
+    // orden_compra_order_... .pdf
     $pdf_name = 'orden_compra_' . $order_data['code'] . '.pdf';
 
     // stream a una pestaña del navegador

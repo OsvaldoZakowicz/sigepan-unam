@@ -116,7 +116,7 @@
               <x-table-th class="text-start">evaluación</x-table-th>
               <x-table-th class="text-start">recibido el</x-table-th>
               <x-table-th class="text-start">disponible hasta</x-table-th>
-              <x-table-th class="text-start">orden de compra</x-table-th>
+              <x-table-th class="text-start">orden de compra<x-quest-icon title="disponible solo cuando el estado de la pre orden es aprobado"/></x-table-th>
               <x-table-th class="text-start w-24">acciones</x-table-th>
             </tr>
           </x-slot:tablehead>
@@ -169,6 +169,7 @@
                   @endif
                 </x-table-td>
                 <x-table-td class="text-start">
+                  {{-- estado de la pre orden (pendiente, aprobado, rechazado) --}}
                   @if ($preorder->status === $status_pending)
                     <x-text-tag
                       color="neutral"
@@ -200,14 +201,19 @@
                 </x-table-td>
                 <x-table-td>
                   {{-- boton para descargar orden de compra --}}
-                  <x-a-button
-                    href="#"
-                    wire:click="downloadPdfOrder({{ $preorder->id }})"
-                    bg_color="neutral-200"
-                    border_color="neutral-200"
-                    text_color="neutral-600"
-                    >descargar pdf
-                  </x-a-button>
+                  @if ($preorder->order != null && $preorder->order_pdf != null)
+                    <x-a-button
+                      href="#"
+                      wire:click="downloadPdfOrder({{ $preorder->id }})"
+                      bg_color="neutral-100"
+                      border_color="neutral-200"
+                      text_color="neutral-600"
+                      >descargar pdf
+                      <x-svg-pdf-paper/>
+                    </x-a-button>
+                  @else
+                    <span class="text-neutral-400 font-semibold">-</span>
+                  @endif
                 </x-table-td>
                 <x-table-td>
                   <div class="flex justify-start gap-1">

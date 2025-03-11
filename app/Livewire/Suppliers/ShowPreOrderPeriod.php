@@ -32,7 +32,7 @@ class ShowPreOrderPeriod extends Component
   // estado del periodo
   public int $period_status;
 
-  // estados preorden
+  // posibles estados de preorden
   public string $status_pending;
   public string $status_approved;
   public string $status_rejected;
@@ -41,15 +41,15 @@ class ShowPreOrderPeriod extends Component
    * boot de constantes
    * @param PreOrderPeriodService $pps servicio para pre ordenes
    * @return void
-  */
+   */
   public function boot(PreOrderPeriodService $pps): void
   {
-    // ids de estados
+    // posibles estados del periodo
     $this->scheduled = $pps->getStatusScheduled();
     $this->opened = $pps->getStatusOpen();
     $this->closed = $pps->getStatusClosed();
 
-    // estados de pre orden
+    // posibles estados de preorden
     $this->status_pending = PreOrder::getPendingStatus();
     $this->status_approved = PreOrder::getApprovedStatus();
     $this->status_rejected = PreOrder::getRejectedStatus();
@@ -78,7 +78,7 @@ class ShowPreOrderPeriod extends Component
   /**
    * abrir el periodo.
    * @return void
-  */
+   */
   public function openPeriod(): void
   {
     $this->preorder_period->period_start_at = Carbon::now()->format('Y-m-d');
@@ -93,7 +93,7 @@ class ShowPreOrderPeriod extends Component
   /**
    * cerrar el periodo.
    * @return void
-  */
+   */
   public function closePeriod(): void
   {
     $this->preorder_period->period_end_at = Carbon::now()->format('Y-m-d');
@@ -107,15 +107,15 @@ class ShowPreOrderPeriod extends Component
 
   /**
    * abrir pdf en una nueva pestaña,
-   * para poder descargar.
+   * para poder visualizar y descargar.
    * @param int $id id de preorden base para el pdf
    * @return void
    */
   public function openPdfOrder($id): void
   {
-    // Generar URL para el PDF y notificacion email
+    // denerar URL para ver el pdf
     $pdfUrl = route('open-pdf-order', ['id' => $id]);
-    // Disparar evento para abrir PDF en nueva pestaña
+    // disparar evento para abrir el PDF en nueva pestaña
     $this->dispatch('openPdfInNewTab', url: $pdfUrl);
   }
 
@@ -127,7 +127,7 @@ class ShowPreOrderPeriod extends Component
   {
     $preorders = $this->preorder_period
       ->pre_orders()
-      ->orderBy('id','desc')
+      ->orderBy('id', 'desc')
       ->paginate(10);
 
     return view('livewire.suppliers.show-pre-order-period', compact('preorders'));
