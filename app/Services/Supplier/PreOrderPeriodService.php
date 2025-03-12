@@ -100,6 +100,18 @@ class PreOrderPeriodService
   }
 
   /**
+   * obtener las pre ordenes no completadas (es decir, no respondidas)
+   * de un periodo de pre ordenes
+   * @param PreOrderPeriod $preorder_period periodo de pre ordenes
+   */
+  public function getPreOrdersToReject(PreOrderPeriod $preorder_period)
+  {
+    return $preorder_period->pre_orders()
+      ->where('is_completed', false)
+      ->get();
+  }
+
+  /**
    * crear codigos de preorden unicos
    * @return string
    */
@@ -249,7 +261,7 @@ class PreOrderPeriodService
     int $pre_order_period_id,
     int $supplier_id,
     int $quotation_id
-    ): PreOrder {
+  ): PreOrder {
     return PreOrder::create([
       'pre_order_period_id' => $pre_order_period_id,
       'supplier_id' => $supplier_id,
@@ -319,7 +331,7 @@ class PreOrderPeriodService
       foreach ($provisions as $provision_item) {
         $provision = Provision::find($provision_item['id']);
         // Encontrar el item en comparison_data
-        $comparison_item = collect($comparison_data['provisions'])->first(function($item) use ($provision_item) {
+        $comparison_item = collect($comparison_data['provisions'])->first(function ($item) use ($provision_item) {
           return $item['id_suministro'] == $provision_item['id'];
         });
 
@@ -343,7 +355,7 @@ class PreOrderPeriodService
       foreach ($packs as $pack_item) {
         $pack = Pack::find($pack_item['id']);
         // Encontrar el item en comparison_data
-        $comparison_item = collect($comparison_data['packs'])->first(function($item) use ($pack_item) {
+        $comparison_item = collect($comparison_data['packs'])->first(function ($item) use ($pack_item) {
           return $item['id_pack'] == $pack_item['id'];
         });
 

@@ -6,7 +6,10 @@ use App\Jobs\ClosePreOrderPeriodJob;
 use App\Jobs\NotifySuppliersRequestForPreOrderClosedJob;
 use App\Jobs\NotifySuppliersRequestForPreOrderReceivedJob;
 use App\Jobs\OpenPreOrderPeriodJob;
+use App\Jobs\SendEmailJob;
+use App\Mail\ClosePreOrderPeriod;
 use App\Models\PreOrderPeriod;
+use App\Models\User;
 use App\Services\Supplier\PreOrderPeriodService;
 use App\Services\Supplier\QuotationPeriodService;
 use Illuminate\Support\Carbon;
@@ -81,6 +84,7 @@ class ShowPreOrderPeriod extends Component
    */
   public function openPeriod(): void
   {
+    // corrimiento de la fecha de apertura, por apertura manual
     $this->preorder_period->period_start_at = Carbon::now()->format('Y-m-d');
     $this->preorder_period->save();
 
@@ -94,8 +98,9 @@ class ShowPreOrderPeriod extends Component
    * cerrar el periodo.
    * @return void
    */
-  public function closePeriod(): void
+  public function closePeriod(PreOrderPeriodService $pps): void
   {
+    // corrimiento de la fecha de cierre, por cierre manual
     $this->preorder_period->period_end_at = Carbon::now()->format('Y-m-d');
     $this->preorder_period->save();
 
@@ -103,6 +108,12 @@ class ShowPreOrderPeriod extends Component
       ClosePreOrderPeriodJob::dispatch($this->preorder_period),
       NotifySuppliersRequestForPreOrderClosedJob::dispatch($this->preorder_period),
     ]);
+
+    // notificar del cierre a gerentes
+    $gerentes_to_notify = User::role('gerente')->get();
+    foreach ($gerentes_to_notify as $gerente) {
+      SendEmailJob::dispatch($gerente->email, new ClosePreOrderPeriod($this->preorder_period));
+    }
   }
 
   /**

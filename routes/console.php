@@ -7,9 +7,12 @@ use App\Jobs\NotifySuppliersRequestForPreOrderReceivedJob;
 use App\Jobs\NotifySuppliersRequestForQuotationClosedJob;
 use App\Jobs\NotifySuppliersRequestForQuotationReceivedJob;
 use App\Jobs\OpenPreOrderPeriodJob;
-use App\Services\Supplier\QuotationPeriodService;
 use App\Jobs\OpenQuotationPeriodJob;
+use App\Jobs\SendEmailJob;
+use App\Mail\ClosePreOrderPeriod;
+use App\Services\Supplier\QuotationPeriodService;
 use App\Services\Supplier\PreOrderPeriodService;
+use App\Models\User;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Bus;
 
@@ -27,13 +30,13 @@ use Illuminate\Support\Facades\Bus;
  * ->everyMinute(); ejecutar el comando cada minuto.
  * ->everyTwoMinutes(); ejecutar el comando cada dos minutos.
  * ->everyFiveMinutes(); ejecutar el comando cada cinco minutos.
-*/
+ */
 
 /**
  * command: abrir periodos de peticion de presupuesto.
  * @param signature: firma del comando (nombre y argumentos opcionales)
  * @param clusure: callback fn con la logica o servicio del comando.
-*/
+ */
 Artisan::command('budget-periods:open', function (QuotationPeriodService $quotation_period_service) {
 
   $periods_to_open = $quotation_period_service->getQuotationPeriodsToOpen();
@@ -54,7 +57,7 @@ Artisan::command('budget-periods:open', function (QuotationPeriodService $quotat
  * command: cerrar periodos de peticion de presupuesto.
  * @param signature: firma del comando (nombre y argumentos opcionales)
  * @param clusure: callback fn con la logica o servicio del comando.
-*/
+ */
 Artisan::command('budget-periods:close', function (QuotationPeriodService $quotation_period_service) {
 
   $periods_to_close = $quotation_period_service->getQuotationPeriodsToClose();
@@ -89,7 +92,6 @@ Artisan::command('preorder-periods:open', function (PreOrderPeriodService $preor
       ]);
     }
   }
-
 })->purpose('abrir periodos de solicitud de pre ordenes')
   ->everyMinute();
 
@@ -102,6 +104,8 @@ Artisan::command('preorder-periods:close', function (PreOrderPeriodService $preo
 
   $periods_to_close = $preorder_period_service->getPreOrdersPeriodsToClose();
 
+  $gerentes_to_notify = User::role('gerente')->get();
+
   if (count($periods_to_close) != 0) {
     foreach ($periods_to_close as $preorder_period) {
       // cada periodo debe cerrarse
@@ -109,8 +113,11 @@ Artisan::command('preorder-periods:close', function (PreOrderPeriodService $preo
         ClosePreOrderPeriodJob::dispatch($preorder_period),
         NotifySuppliersRequestForPreOrderClosedJob::dispatch($preorder_period),
       ]);
+      // notificar del cierre a gerentes
+      foreach ($gerentes_to_notify as $gerente) {
+        SendEmailJob::dispatch($gerente->email, new ClosePreOrderPeriod($this->preorder_period));
+      }
     }
   }
-
 })->purpose('cerrar periodos de solicitud de pre orden')
   ->everyTwoMinutes();

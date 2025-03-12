@@ -312,7 +312,7 @@
                 <x-table-th class="text-start">proveedor</x-table-th>
                 <x-table-th class="text-start">estado de la pre orden</x-table-th>
                 <x-table-th class="text-start">evaluación</x-table-th>
-                <x-table-th class="text-start">orden de compra<x-quest-icon title="disponible cuando la pre orden es aprobada" /></x-table-th>
+                <x-table-th class="text-start">orden de compra<x-quest-icon title="disponible cuando la pre orden es aprobada y se solicita al proveedor" /></x-table-th>
                 <x-table-th class="text-end">última respuesta<x-quest-icon title="última vez que el proveedor modificó los precios de este presupuesto"/></x-table-th>
                 <x-table-th class="text-start w-36">acciones</x-table-th>
               </tr>
@@ -375,6 +375,7 @@
                   </x-table-td>
                   <x-table-td class="text-start">
                     {{-- ver pdf --}}
+                    {{-- todo: alternativa si solo se aprueba pero no se envia --}}
                     @if ($preorder->order != null && $preorder->order_pdf != null)
                       <x-a-button
                         href="#"
@@ -391,8 +392,9 @@
                     @endif
                   </x-table-td>
                   <x-table-td class="text-end">
+                    {{-- ultima respuesta --}}
                     @if ($preorder->is_completed)
-                      {{ formatDateTime($preorder->updated_at, 'd-m-Y') }}
+                      <span>{{ formatDateTime($preorder->updated_at, 'd-m-Y H:i:s') }} hs.</span>
                     @else
                       <span class="font-semibold text-neutral-400">-</span>
                     @endif
