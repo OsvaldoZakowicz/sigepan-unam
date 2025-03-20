@@ -366,14 +366,25 @@
                         color="emerald"
                         class="cursor-pointer"
                         >{{ $preorder->status }}
-                        <x-quest-icon title="aprobó esta preorden para crear una orden definitiva"/>
+                        <x-quest-icon title="aprobó esta pre orden para crear una orden definitiva"/>
                       </x-text-tag>
                     @else
+                      @php
+                        $rejected_by = '';
+
+                        if ($preorder->is_completed && $prorder->status == $status_rejected) {
+                          $rejected_by = 'gerente';
+                        } else if (!$preorder->is_completed && $prorder->status == $status_rejected) {
+                          $rejected_by = 'proveedor';
+                        } else {
+                          $rejected_by = 'sistema, por falta de respuesta';
+                        }
+                      @endphp
                       <x-text-tag
                         color="red"
                         class="cursor-pointer"
                         >{{ $preorder->status }}
-                        <x-quest-icon title="esta pre orden fue rechazada por una de las partes"/>
+                        <x-quest-icon title="esta pre orden fue rechazada por: {{ $rejected_by }}"/>
                       </x-text-tag>
                     @endif
                   </x-table-td>
@@ -387,7 +398,6 @@
                   </x-table-td>
                   <x-table-td class="text-start">
                     {{-- ver pdf --}}
-                    {{-- todo: alternativa si solo se aprueba pero no se envia --}}
                     @if ($preorder->order != null && $preorder->order_pdf != null)
                       <x-a-button
                         href="#"

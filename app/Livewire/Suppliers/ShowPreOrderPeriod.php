@@ -100,6 +100,17 @@ class ShowPreOrderPeriod extends Component
    */
   public function closePeriod(PreOrderPeriodService $pps): void
   {
+    // intento de cierre de un periodo con pre ordenes sin evaluar
+    if ($pps->getPreOrdersPending($this->preorder_period)) {
+      $this->dispatch('toast-event', event_data: [
+        'event_type' => 'info',
+        'title_toast' => toastTitle('', true),
+        'descr_toast' => 'no puede cerrar este periodo hasta que evalue todas las pre ordenes respondidas'
+      ]);
+
+      return;
+    }
+
     // corrimiento de la fecha de cierre, por cierre manual
     $this->preorder_period->period_end_at = Carbon::now()->format('Y-m-d');
     $this->preorder_period->save();

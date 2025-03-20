@@ -112,6 +112,19 @@ class PreOrderPeriodService
   }
 
   /**
+   * existe en el periodo al menos una pre_orden completada por el proveedor
+   * pero pendiente de evaluacion por parte del comprador (panaderia, gerente)?
+   * @param PreOrderPeriod $preorder_period periodo de pre ordenes
+   */
+  public function getPreOrdersPending(PreOrderPeriod $preorder_period)
+  {
+    return $preorder_period->pre_orders()
+      ->where('is_completed', true)
+      ->where('status', PreOrder::getPendingStatus())
+      ->exists();
+  }
+
+  /**
    * crear codigos de preorden unicos
    * @return string
    */
