@@ -103,14 +103,34 @@ class RespondPreOrder extends Component
     ]);
   }
 
-   /**
+  /**
+   * ver cambios en stock y cantidad alternativa
+   * esto debe recalcular precios
+   * @return void
+   */
+  public function updatedItems($value, $key): void
+  {
+    // Si el key termina en item_alternative_quantity o item_has_stock
+    if (str_ends_with($key, 'item_alternative_quantity') || str_ends_with($key, 'item_has_stock')) {
+      $this->getTotalPrice();
+    }
+  }
+
+  /**
    * calcular precio total
-   * a partir de la coleccin de items, reduce de cada uno su 'item_total_price'
+   * a partir de la coleccion de items, reduce de cada uno su 'item_total_price'
+   * toma en cuenta la existencia de un stock alternativo de 0 o mas
    * @return void
    */
   public function getTotalPrice(): void
   {
     $this->total_price = $this->items->reduce(function ($acc, $item) {
+
+      // stock alternativo?
+      if (!$item['item_has_stock'] && $item['item_alternative_quantity'] >= 0) {
+        return $acc + ($item['item_alternative_quantity'] * $item['item_unit_price']);
+      }
+
       return $acc + $item['item_total_price'];
     }, 0);
   }
@@ -132,7 +152,7 @@ class RespondPreOrder extends Component
           'required_if:items.*.item_has_stock,false',
           'numeric',
           'min:0',
-          function($attribute, $value, $fail) {
+          function ($attribute, $value, $fail) {
             $index = explode('.', $attribute)[1];
             if ($value > $this->items[$index]['item_quantity']) {
               $fail('La cantidad alternativa no puede ser mayor a la cantidad requerida.');
@@ -150,7 +170,8 @@ class RespondPreOrder extends Component
         'short_description' =>  ['nullable', 'string', 'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s,.$]*$/'],
         'accept_terms'      =>  ['required']
 
-      ], [
+      ],
+      [
         'items.*.item_alternative_quantity.required_if' => 'Debe indicar una cantidad alternativa cuando no tiene stock completo',
         'items.*.item_alternative_quantity.numeric'     => 'La cantidad alternativa debe ser un número',
         'items.*.item_alternative_quantity.min'         => 'La cantidad alternativa no puede ser negativa',
@@ -202,14 +223,16 @@ class RespondPreOrder extends Component
           if ($item['item_has_stock']) {
             // true, tengo stock
             $this->preorder->provisions()->updateExistingPivot(
-              $item['item_id'], [
+              $item['item_id'],
+              [
                 'has_stock'             => $item['item_has_stock'], //mantengo stock en true, se cumple quantity
                 'alternative_quantity'  => 0 // 0
               ]
             );
           } else {
             $this->preorder->provisions()->updateExistingPivot(
-              $item['item_id'], [
+              $item['item_id'],
+              [
                 'has_stock'             => $item['item_has_stock'], // stock en false, NO se cumple quantity
                 'alternative_quantity'  => (int) $item['item_alternative_quantity'] // nueva cantidad
               ]
@@ -223,33 +246,32 @@ class RespondPreOrder extends Component
           if ($item['item_has_stock']) {
             // true, tengo stock
             $this->preorder->packs()->updateExistingPivot(
-              $item['item_id'], [
+              $item['item_id'],
+              [
                 'has_stock'   => $item['item_has_stock'], // mantengo stock en true, se cumple quantity
                 'alternative_quantity'  => 0 // 0
               ]
             );
           } else {
             $this->preorder->packs()->updateExistingPivot(
-              $item['item_id'], [
+              $item['item_id'],
+              [
                 'has_stock'             => $item['item_has_stock'], // stock en false, NO se cumple quantity
                 'alternative_quantity'  => (int) $item['item_alternative_quantity'] // nueva cantidad
               ]
             );
           }
         }
-
       }
 
       $this->reset();
 
       session()->flash('operation-success', toastSuccessBody('pre orden', 'completada y enviada'));
       $this->redirectRoute('quotations-preorders-index');
-
     } catch (\Exception $e) {
 
       session()->flash('operation-error', 'error: ' . $e->getMessage() . ', contacte al Administrador');
       $this->redirectRoute('quotations-preorders-index');
-
     }
   }
 

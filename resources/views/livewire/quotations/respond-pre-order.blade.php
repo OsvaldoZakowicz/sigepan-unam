@@ -84,14 +84,6 @@
             </div>
           </div>
 
-          @if ($errors->any())
-            <ul>
-              @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-              @endforeach
-            </ul>
-          @endif
-
           {{-- items --}}
           <div class="p-4 border-b">
 
@@ -177,12 +169,14 @@
 
                               <div class="flex items-center gap-2">
 
+                                {{-- texto si / no --}}
                                 @if ($items[$key]['item_has_stock'])
                                   <span>si</span>
                                 @else
                                   <span>no</span>
                                 @endif
 
+                                {{-- checkbox 'item_has_stock' --}}
                                 <input
                                   type="checkbox"
                                   id="items_{{ $key }}_item_has_stock"
@@ -191,6 +185,7 @@
                                   class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
                                 />
 
+                                {{-- si no tiene stock, indicar cantidad alternativa --}}
                                 @if (!$items[$key]['item_has_stock'])
                                   <div class="flex flex-col gap-1">
                                     <div class="flex items-center gap-1">
@@ -198,7 +193,7 @@
                                       <input
                                         type="number"
                                         id="items_{{ $key }}_alternative_quantity"
-                                        wire:model.defer="items.{{ $key }}.item_alternative_quantity"
+                                        wire:model.live="items.{{ $key }}.item_alternative_quantity"
                                         min="0"
                                         max="{{ $items[$key]['item_quantity'] }}"
                                         class="w-12 p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
@@ -219,7 +214,12 @@
                             ${{ number_format($item['item_unit_price'], 2) }}
                           </td>
                           <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-neutral-800 text-right">
-                            ${{ number_format($item['item_total_price'], 2) }}
+                            {{-- precio total, si no tiene stock, calcular por cantidad alternativa --}}
+                            @if (!$items[$key]['item_has_stock'])
+                              ${{ number_format($items[$key]['item_alternative_quantity'] * $items[$key]['item_unit_price'], 2) }}
+                            @else
+                              ${{ number_format($item['item_total_price'], 2) }}
+                            @endif
                           </td>
                         </tr>
                       @else
@@ -247,12 +247,14 @@
 
                               <div class="flex items-center gap-2">
 
+                                {{-- texto si / no --}}
                                 @if ($items[$key]['item_has_stock'])
                                   <span>si</span>
                                 @else
                                   <span>no</span>
                                 @endif
 
+                                {{-- checkbox 'item_has_stock' --}}
                                 <input
                                   type="checkbox"
                                   id="items_{{ $key }}_item_has_stock"
@@ -261,6 +263,7 @@
                                   class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
                                 />
 
+                                {{-- si no tiene stock, indicar cantidad alternativa --}}
                                 @if (!$items[$key]['item_has_stock'])
                                   <div class="flex flex-col gap-1">
                                     <div class="flex items-center gap-1">
@@ -268,7 +271,7 @@
                                       <input
                                         type="number"
                                         id="items_{{ $key }}_alternative_quantity"
-                                        wire:model.defer="items.{{ $key }}.item_alternative_quantity"
+                                        wire:model.live="items.{{ $key }}.item_alternative_quantity"
                                         min="0"
                                         max="{{ $items[$key]['item_quantity'] }}"
                                         class="w-12 p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
@@ -289,7 +292,13 @@
                             ${{ number_format($item['item_unit_price'], 2) }}
                           </td>
                           <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-neutral-800 text-right">
-                            ${{ number_format($item['item_total_price'], 2) }}
+                            {{-- precio total, si no tiene stock, calcular por cantidad alternativa --}}
+                            @if (!$items[$key]['item_has_stock'])
+                              <del>${{ number_format($item['item_total_price'], 2) }}</del>
+                              ${{ number_format($items[$key]['item_alternative_quantity'] * $items[$key]['item_unit_price'], 2) }}
+                            @else
+                              ${{ number_format($item['item_total_price'], 2) }}
+                            @endif
                           </td>
                         </tr>
                       @endif
