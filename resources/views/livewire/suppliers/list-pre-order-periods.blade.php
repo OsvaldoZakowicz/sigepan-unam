@@ -112,30 +112,30 @@
                     @case(0)
                       {{-- programado --}}
                       <x-text-tag
-                        title="{{ $period->status->status_short_description }}"
                         color="neutral"
                         class="cursor-pointer"
                         >{{ $period->status->status_name }}
+                        <x-quest-icon title="{{ $period->status->status_short_description }}"/>
                       </x-text-tag>
                       @break
 
                     @case(1)
                       {{-- abierto --}}
                       <x-text-tag
-                        title="{{ $period->status->status_short_description }}"
                         color="emerald"
                         class="cursor-pointer"
                         >{{ $period->status->status_name }}
+                        <x-quest-icon title="{{ $period->status->status_short_description }}"/>
                       </x-text-tag>
                       @break
 
                     @default
                       {{-- cerrado --}}
                       <x-text-tag
-                        title="{{ $period->status->status_short_description }}"
                         color="red"
                         class="cursor-pointer"
                         >{{ $period->status->status_name }}
+                        <x-quest-icon title="{{ $period->status->status_short_description }}"/>
                       </x-text-tag>
 
                   @endswitch

@@ -31,30 +31,30 @@
               @case(0)
                 {{-- programado --}}
                 <x-text-tag
-                  title="{{ $preorder_period->status->status_short_description }}"
                   color="neutral"
                   class="cursor-pointer"
                   >{{ $preorder_period->status->status_name }}
+                  <x-quest-icon title="{{ $preorder_period->status->status_short_description }}"/>
                 </x-text-tag>
                 @break
 
               @case(1)
                 {{-- abierto --}}
                 <x-text-tag
-                  title="{{ $preorder_period->status->status_short_description }}"
                   color="emerald"
                   class="cursor-pointer"
                   >{{ $preorder_period->status->status_name }}
+                  <x-quest-icon title="{{ $preorder_period->status->status_short_description }}"/>
                 </x-text-tag>
                 @break
 
               @default
                 {{-- cerrado --}}
                 <x-text-tag
-                  title="{{ $preorder_period->status->status_short_description }}"
                   color="red"
                   class="cursor-pointer"
                   >{{ $preorder_period->status->status_name }}
+                  <x-quest-icon title="{{ $preorder_period->status->status_short_description }}"/>
                 </x-text-tag>
 
             @endswitch
@@ -218,8 +218,8 @@
               <x-slot:tablehead>
                 <tr class="border bg-neutral-100">
                   <x-table-th class="text-end w-12">id</x-table-th>
-                  <x-table-th class="text-start w-56">nombre</x-table-th>
-                  <x-table-th class="text-start">marca / tipo</x-table-th>
+                  <x-table-th class="text-start">nombre</x-table-th>
+                  <x-table-th class="text-start">marca/tipo</x-table-th>
                   <x-table-th class="text-end">
                     <span>cantidad</span>
                     <x-quest-icon title="kilogramos (kg), gramos (g), litros (l), mililitros (ml), metro (m), centimetro (cm), unidad (u)"/>
@@ -235,7 +235,7 @@
                   <tr>
                     <x-table-td class="text-end">{{ $provision['id_suministro'] }}</x-table-td>
                     <x-table-td class="text-start">{{ $provision['nombre_suministro'] }}</x-table-td>
-                    <x-table-td class="text-start">{{ $provision['marca'] }} / {{ $provision['tipo'] }}</x-table-td>
+                    <x-table-td class="text-start">{{ $provision['marca'] }}/{{ $provision['tipo'] }}</x-table-td>
                     <x-table-td class="text-end">{{ $provision['volumen'] }}</x-table-td>
                     <x-table-td class="text-end">{{ $provision['cantidad'] }}</x-table-td>
                   </tr>
@@ -263,8 +263,8 @@
               <x-slot:tablehead>
                 <tr class="border bg-neutral-100">
                   <x-table-th class="text-end w-12">id</x-table-th>
-                  <x-table-th class="text-start w-56">nombre</x-table-th>
-                  <x-table-th class="text-start">marca / tipo</x-table-th>
+                  <x-table-th class="text-start">nombre</x-table-th>
+                  <x-table-th class="text-start">marca/tipo</x-table-th>
                   <x-table-th class="text-end">
                     <span>cantidad</span>
                     <x-quest-icon title="kilogramos (kg), gramos (g), litros (l), mililitros (ml), metro (m), centimetro (cm), unidad (u)"/>
@@ -280,7 +280,7 @@
                   <tr>
                     <x-table-td class="text-end">{{ $pack['id_pack'] }}</x-table-td>
                     <x-table-td class="text-start">{{ $pack['nombre_pack'] }}</x-table-td>
-                    <x-table-td class="text-start">{{ $pack['marca'] }} / {{ $provision['tipo'] }}</x-table-td>
+                    <x-table-td class="text-start">{{ $pack['marca'] }}/{{ $provision['tipo'] }}</x-table-td>
                     <x-table-td class="text-end">{{ $pack['volumen'] }}</x-table-td>
                     <x-table-td class="text-end">{{ $pack['cantidad'] }}</x-table-td>
                   </tr>
@@ -312,8 +312,12 @@
                 <x-table-th class="text-start">proveedor</x-table-th>
                 <x-table-th class="text-start">estado de la pre orden</x-table-th>
                 <x-table-th class="text-start">evaluación</x-table-th>
-                <x-table-th class="text-start">orden de compra<x-quest-icon title="disponible cuando la pre orden es aprobada y se solicita al proveedor" /></x-table-th>
-                <x-table-th class="text-end">última respuesta<x-quest-icon title="última vez que el proveedor modificó los precios de este presupuesto"/></x-table-th>
+                <x-table-th class="text-end">última respuesta
+                  <x-quest-icon title="última vez que el proveedor modificó su respuesta en la pre orden"/>
+                </x-table-th>
+                <x-table-th class="text-start">orden de compra
+                  <x-quest-icon title="disponible cuando la pre orden es aprobada y se solicita al proveedor" />
+                </x-table-th>
                 <x-table-th class="text-start w-36">acciones</x-table-th>
               </tr>
             </x-slot:tablehead>
@@ -344,7 +348,7 @@
                         color="neutral"
                         class="cursor-pointer"
                         >sin responder
-                        <x-text-tag title="el proveedor no ha respondido"/>
+                        <x-quest-icon title="el proveedor no ha respondido"/>
                       </x-text-tag>
                     @endif
                   </x-table-td>
@@ -373,6 +377,14 @@
                       </x-text-tag>
                     @endif
                   </x-table-td>
+                  <x-table-td class="text-end">
+                    {{-- ultima respuesta --}}
+                    @if ($preorder->is_completed)
+                      <span>{{ formatDateTime($preorder->updated_at, 'd-m-Y H:i:s') }} hs.</span>
+                    @else
+                      <span class="font-semibold text-neutral-400">-</span>
+                    @endif
+                  </x-table-td>
                   <x-table-td class="text-start">
                     {{-- ver pdf --}}
                     {{-- todo: alternativa si solo se aprueba pero no se envia --}}
@@ -387,14 +399,6 @@
                         >ver orden pdf
                         <x-svg-pdf-paper/>
                       </x-a-button>
-                    @else
-                      <span class="font-semibold text-neutral-400">-</span>
-                    @endif
-                  </x-table-td>
-                  <x-table-td class="text-end">
-                    {{-- ultima respuesta --}}
-                    @if ($preorder->is_completed)
-                      <span>{{ formatDateTime($preorder->updated_at, 'd-m-Y H:i:s') }} hs.</span>
                     @else
                       <span class="font-semibold text-neutral-400">-</span>
                     @endif
