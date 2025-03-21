@@ -9,6 +9,7 @@ use App\Jobs\NotifySuppliersRequestForQuotationReceivedJob;
 use App\Jobs\OpenPreOrderPeriodJob;
 use App\Jobs\OpenQuotationPeriodJob;
 use App\Jobs\SendEmailJob;
+use App\Mail\CantClosePreOrderPeriod;
 use App\Mail\ClosePreOrderPeriod;
 use App\Services\Supplier\QuotationPeriodService;
 use App\Services\Supplier\PreOrderPeriodService;
@@ -107,16 +108,30 @@ Artisan::command('preorder-periods:close', function (PreOrderPeriodService $preo
   $gerentes_to_notify = User::role('gerente')->get();
 
   if (count($periods_to_close) != 0) {
+
     foreach ($periods_to_close as $preorder_period) {
-      // cada periodo debe cerrarse
-      Bus::chain([
-        ClosePreOrderPeriodJob::dispatch($preorder_period),
-        NotifySuppliersRequestForPreOrderClosedJob::dispatch($preorder_period),
-      ]);
-      // notificar del cierre a gerentes
-      foreach ($gerentes_to_notify as $gerente) {
-        SendEmailJob::dispatch($gerente->email, new ClosePreOrderPeriod($this->preorder_period));
+
+      if ($preorder_period_service->getPreOrdersPending($preorder_period)) {
+
+        // notificar de la imposibilidad de cierre del periodo a gerentes
+        foreach ($gerentes_to_notify as $gerente) {
+          SendEmailJob::dispatch($gerente->email, new CantClosePreOrderPeriod($preorder_period));
+        }
+
+      } else {
+
+        // cerrar periodo
+        Bus::chain([
+          ClosePreOrderPeriodJob::dispatch($preorder_period),
+          NotifySuppliersRequestForPreOrderClosedJob::dispatch($preorder_period),
+        ]);
+
+        // notificar del cierre a gerentes
+        foreach ($gerentes_to_notify as $gerente) {
+          SendEmailJob::dispatch($gerente->email, new ClosePreOrderPeriod($this->preorder_period));
+        }
       }
+
     }
   }
 })->purpose('cerrar periodos de solicitud de pre orden')
