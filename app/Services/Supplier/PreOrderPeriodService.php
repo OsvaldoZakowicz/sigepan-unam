@@ -11,6 +11,7 @@ use App\Models\Provision;
 use App\Models\Pack;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 
 class PreOrderPeriodService
 {
@@ -112,8 +113,8 @@ class PreOrderPeriodService
   }
 
   /**
-   * existe en el periodo al menos una pre_orden completada por el proveedor
-   * pero pendiente de evaluacion por parte del comprador (panaderia, gerente)?
+   * retorna true si existe en el periodo dado al menos una pre orden completada por el proveedor
+   * pero pendiente de evaluacion por parte del comprador (panaderia, gerente)
    * @param PreOrderPeriod $preorder_period periodo de pre ordenes
    */
   public function getPreOrdersPending(PreOrderPeriod $preorder_period)
@@ -435,5 +436,163 @@ class PreOrderPeriodService
   private function generateTemporaryPreorderCode(int $supplier_id): string
   {
     return 'PREVIEW-' . date('Ymd') . '-S' . $supplier_id . '-' . substr(uniqid(), -5);
+  }
+
+  /**
+   * obtener suministros y packs no cubiertos en las pre ordenes respondidas
+   * @param PreOrderPeriod $preorder_period periodo de pre ordenes
+   */
+  public function getUncoveredItems(PreOrderPeriod $preorder_period)
+  {
+    // obtener todas las pre ordenes completadas para el periodo
+    $completed_preorders = $preorder_period->pre_orders()
+      ->where('is_completed', true)
+      ->get();
+
+    // inicializar colecciones para packs y suministros
+    $uncovered_provisions = collect();
+    $uncovered_packs = collect();
+
+    // procesar cada pre orden
+    foreach ($completed_preorders as $preorder) {
+
+      // procesar packs no cubiertos
+      $this->processUncoveredPacks($preorder, $uncovered_packs);
+
+      // procesar suministros no cubiertos
+      $this->processUncoveredProvisions($preorder, $uncovered_provisions);
+    }
+
+    return [
+      'uncovered_provisions'  => $uncovered_provisions,
+      'uncovered_packs'       => $uncovered_packs,
+    ];
+  }
+
+  /**
+   * procesar packs con cantidades no cubiertas en la pre orden
+   * @param PreOrder $preorder pre orden
+   * @param Collection $uncovered_packs referencia a coleccion de packs no cubiertos
+   */
+  private function processUncoveredPacks(PreOrder $preorder, Collection &$uncovered_packs)
+  {
+    $packs = $preorder->packs;
+
+    foreach ($packs as $pack) {
+
+      // packs marcados como 'sin stock'
+      if (!$pack->pivot->has_stock) {
+        // cantidad no cubierta
+        $uncovered_quantity = $pack->pivot->quantity - ($pack->pivot->alternative_quantity ?? 0);
+
+        // si la cantidad no cubierta es mayor a 0
+        if ($uncovered_quantity > 0) {
+          $uncovered_packs->push([
+            'id_pack'               => $pack->pivot->pack_id,   // id del pack no cubierto
+            'nombre_pack'           => $pack->pack_name,        // nombre del pack no cubierto
+            'cantidad_faltante'     => $uncovered_quantity,     // cantidad no cubierta
+            'id_preorden'           => $preorder->id,           // preorden donde se pidio el pack
+            'proveedor_contactado'  => $preorder->supplier->id, // proveedor contactado
+          ]);
+        }
+      }
+    }
+  }
+
+  /**
+   * procesar suministros con cantidades no cubiertas en la pre orden
+   * @param PreOrder $preorder pre orden
+   * @param Collection $uncovered_provisions referencia a coleccion de suministros no cubiertos
+   */
+  private function processUncoveredProvisions(PreOrder $preorder, Collection &$uncovered_provisions)
+  {
+    $provisions = $preorder->provisions;
+
+    foreach ($provisions as $provision) {
+
+      // suministros marcados como 'sin stock'
+      if (!$provision->pivot->has_stock) {
+        // cantidad no cubierta
+        $uncovered_quantity = $provision->pivot->quantity - ($provision->pivot->alternative_quantity ?? 0);
+
+        // si la cantidad no cubierta es mayor a 0
+        if ($uncovered_quantity > 0) {
+          $uncovered_provisions->push([
+            'id_suministro'         => $provision->pivot->provision_id,  // id del suministro no cubierto
+            'nombre_suministro'     => $provision->provision_name,       // nombre del pack no cubierto
+            'cantidad_faltante'     => $uncovered_quantity,              // cantidad no cubierta
+            'id_preorden'           => $preorder->id,                    // preorden donde se pidio el suministro
+            'proveedor_contactado'  => $preorder->supplier->id,          // proveedor contactado
+          ]);
+        }
+      }
+    }
+  }
+
+  /**
+   * obtener proveedores alternativos para los suministros y
+   * packs no cubiertos procesados en la funcion getUncoveredItems
+   * @param array $uncovered_items suministros y packs no cubiertos
+   * @param array $quotations_ranking ranking de presupuestos
+   * @return array suministros y packs no cubiertos con proveedores alternativos
+   */
+  public function getAlternativeSuppliersForUncoveredItems(array $uncovered_items, array $quotations_ranking)
+  {
+    $uncovered_provisions_with_alternative_suppliers = $this->processUncoveredItems(
+      $uncovered_items['uncovered_provisions'],
+      $quotations_ranking['provisions'],
+      'id_suministro'
+    );
+
+    $uncovered_packs_with_alternative_suppliers = $this->processUncoveredItems(
+      $uncovered_items['uncovered_packs'],
+      $quotations_ranking['packs'],
+      'id_pack'
+    );
+
+    return [
+      'uncovered_provisions_with_alternative_suppliers' => $uncovered_provisions_with_alternative_suppliers,
+      'uncovered_packs_with_alternative_suppliers'      => $uncovered_packs_with_alternative_suppliers,
+    ];
+  }
+
+  /**
+   * procesar suministros y packs no cubiertos, contrastar con el ranking de presupuestos
+   * y obtener proveedores alternativos
+   * @param Collection $uncovered_items suministros o packs no cubiertos
+   * @param array $quotations_ranking ranking de presupuestos para suministros o packs
+   * @param string $item_id_key clave para obtener el id del item, 'id_suministro' o 'id_pack'
+   * @return Collection suministros o packs no cubiertos con proveedores alternativos
+   */
+  private function processUncoveredItems($uncovered_items, $quotations_ranking, $item_id_key)
+  {
+    return $uncovered_items->map(function ($item) use ($quotations_ranking, $item_id_key) {
+      // Buscar el item en el ranking de presupuestos
+      $item_budgets = collect($quotations_ranking)
+        ->filter(function ($budget) use ($item, $item_id_key) {
+          // Usar la clave correcta del item según si es suministro o pack
+          $item_id = $item[$item_id_key];
+          return $budget[$item_id_key] === $item_id;
+        })
+        ->first();
+
+      if (!$item_budgets) {
+        $item['alternative_suppliers'] = null;
+        return $item;
+      }
+
+      // Obtener proveedores del ranking, excluyendo el proveedor original
+      $alternative_suppliers = collect($item_budgets['precios_por_proveedor'])
+        ->filter(function ($provider_price) use ($item) {
+          return $provider_price['id_proveedor'] !== $item['proveedor_contactado'];
+        })
+        // Ordenar por precio unitario de menor a mayor
+        ->sortBy('precio_unitario')
+        ->values()
+        ->toArray();
+
+      $item['alternative_suppliers'] = $alternative_suppliers ?: null;
+      return $item;
+    });
   }
 }

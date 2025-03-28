@@ -40,6 +40,11 @@ class ShowPreOrderPeriod extends Component
   public string $status_approved;
   public string $status_rejected;
 
+  // suministros y packs no cubiertos
+  public $uncovered_items;
+  public $uncovered_items_with_alternative_suppliers;
+  public bool $has_uncovered_items = false;
+
   /**
    * boot de constantes
    * @param PreOrderPeriodService $pps servicio para pre ordenes
@@ -63,9 +68,10 @@ class ShowPreOrderPeriod extends Component
    * @param int $id del periodo de pre orden
    * @return void
    */
-  public function mount(QuotationPeriodService $qps, int $id): void
+  public function mount(QuotationPeriodService $qps, PreOrderPeriodService $pps, int $id): void
   {
     $this->preorder_period = PreOrderPeriod::findOrFail($id);
+    $this->period_status = $this->preorder_period->status->id;
 
     /**
      * necesito crear nuevamente datos de ranking de presupuestos,
@@ -75,6 +81,23 @@ class ShowPreOrderPeriod extends Component
     if ($this->preorder_period->quotation_period_id !== null) {
       // generar ranking inicial del periodo presupuestario
       $this->quotations_ranking = $qps->comparePricesBetweenQuotations($this->preorder_period->quotation_period_id);
+    }
+
+    /**
+     * para periodos cerrados:
+     * 1- necesito obtener suministros y packs no cubiertos en las pre ordenes respondidas.
+     * 2- usarlos para obtener por cada uno de ellos proveedores alternativos, del ranking base.
+     */
+    if ($this->period_status === $this->closed) {
+      $this->uncovered_items = $pps->getUncoveredItems($this->preorder_period);
+      $this->uncovered_items_with_alternative_suppliers = $pps->getAlternativeSuppliersForUncoveredItems(
+        $this->uncovered_items,
+        $this->quotations_ranking
+      );
+
+      // Verificar si hay items sin cubrir
+      $this->has_uncovered_items = !empty($this->uncovered_items_with_alternative_suppliers['uncovered_provisions_with_alternative_suppliers']) ||
+        !empty($this->uncovered_items_with_alternative_suppliers['uncovered_packs_with_alternative_suppliers']);
     }
   }
 
@@ -102,10 +125,11 @@ class ShowPreOrderPeriod extends Component
   {
     // intento de cierre de un periodo con pre ordenes sin evaluar
     if ($pps->getPreOrdersPending($this->preorder_period)) {
-      $this->dispatch('toast-event', event_data: [
-        'event_type' => 'info',
+
+      $this->dispatch('toast-event', toast_data: [
+        'event_type'  => 'info',
         'title_toast' => toastTitle('', true),
-        'descr_toast' => 'no puede cerrar este periodo hasta que evalue todas las pre ordenes respondidas'
+        'descr_toast' => 'No se puede cerrar el periodo, existen pre ordenes sin evaluar.',
       ]);
 
       return;

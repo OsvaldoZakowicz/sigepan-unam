@@ -104,6 +104,30 @@
 
       <x-slot:content class="flex-col">
 
+        {{-- aviso cuando el periodo cerro, para acciones extra --}}
+        {{-- existen suministros y packs sin cubrir, o finalizado correctamente --}}
+        @if ($period_status === $closed)
+          @if ($has_uncovered_items)
+            <div class="flex justify-between items-center mb-2 p-1 border border-yellow-200 bg-yellow-100 rounded-sm">
+              <div class="flex flex-col">
+                <span class="text-yellow-800">
+                  <span class="font-semibold">¡atención!</span>
+                  <span>existen suministros y packs sin cubrir parcial o totalmente!</span>
+                </span>
+                <p class="text-yellow-800">Debido a la disponibilidad del stock de los suministros y packs de interes pre ordenados en el presente periodo, no se han cubierto del todo las cantidades en las ordenes finales.</p>
+              </div>
+            </div>
+            {{-- todo: mostrar suministros y packs faltantes?, con proveedores alternativos? --}}
+          @else
+            <div class="flex justify-between items-center mb-2 p-1 border border-emerald-200 bg-emerald-100 rounded-sm">
+              <span class="text-emerald-800">
+                <span class="font-semibold">¡Éxito!</span>
+                <span>se han pedido y cubierto todos los suministros y packs pre ordenados!</span>
+              </span>
+            </div>
+          @endif
+        @endif
+
         @if ($preorder_period->quotation_period_id == null)
 
           {{--
