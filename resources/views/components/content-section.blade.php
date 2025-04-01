@@ -6,7 +6,7 @@
 
 {{-- content section --}}
 <section {{ $attributes->merge([
-  'class' => 'flex flex-col pt-2 px-1 text-sm capitalize bg-white'
+  'class' => 'flex flex-col pt-2 px-1 text-sm bg-white'
 ]) }}>
 
   {{-- header --}}
