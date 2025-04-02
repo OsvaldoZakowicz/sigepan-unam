@@ -41,8 +41,8 @@ class ShowPreOrderPeriod extends Component
   public string $status_rejected;
 
   // suministros y packs no cubiertos
-  public $uncovered_items;
-  public $uncovered_items_with_alternative_suppliers;
+  public $uncovered_provisions = null;
+  public $uncovered_packs = null;
   public bool $has_uncovered_items = false;
 
   /**
@@ -89,15 +89,28 @@ class ShowPreOrderPeriod extends Component
      * 2- usarlos para obtener por cada uno de ellos proveedores alternativos, del ranking base.
      */
     if ($this->period_status === $this->closed) {
-      $this->uncovered_items = $pps->getUncoveredItems($this->preorder_period);
-      $this->uncovered_items_with_alternative_suppliers = $pps->getAlternativeSuppliersForUncoveredItems(
-        $this->uncovered_items,
-        $this->quotations_ranking
-      );
+      $uncovered_items = $pps->getUncoveredItems($this->preorder_period);
+      $uncovered_items_with_alt_suppliers = $pps->getAlternativeSuppliersForUncoveredItems($uncovered_items, $this->quotations_ranking);
+
+      // array de suministros no cubiertos
+      if (!empty($uncovered_items_with_alt_suppliers['uncovered_provisions_with_alternative_suppliers'])) {
+        $this->uncovered_provisions = $uncovered_items_with_alt_suppliers['uncovered_provisions_with_alternative_suppliers']->toArray();
+      } else {
+        $this->uncovered_provisions = [];
+      }
+
+      // array de packs no cubiertos
+      if (!empty($uncovered_items_with_alt_suppliers['uncovered_packs_with_alternative_suppliers'])) {
+        $this->uncovered_packs = $uncovered_items_with_alt_suppliers['uncovered_packs_with_alternative_suppliers']->toArray();
+      } else {
+        $this->uncovered_packs = [];
+      }
 
       // Verificar si hay items sin cubrir
-      $this->has_uncovered_items = !empty($this->uncovered_items_with_alternative_suppliers['uncovered_provisions_with_alternative_suppliers']) ||
-        !empty($this->uncovered_items_with_alternative_suppliers['uncovered_packs_with_alternative_suppliers']);
+      $this->has_uncovered_items = !empty($this->uncovered_provisions) ||
+        !empty($this->uncovered_packs);
+
+      //dd($this->uncovered_provisions, $this->uncovered_packs);
     }
   }
 
@@ -129,7 +142,7 @@ class ShowPreOrderPeriod extends Component
       $this->dispatch('toast-event', toast_data: [
         'event_type'  => 'info',
         'title_toast' => toastTitle('', true),
-        'descr_toast' => 'No se puede cerrar el periodo, existen pre ordenes sin evaluar.',
+        'descr_toast' => 'No se puede cerrar el periodo, existen pre ordenes respondidas por proveedores que debe evaluar.',
       ]);
 
       return;

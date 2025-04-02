@@ -490,9 +490,13 @@ class PreOrderPeriodService
           $uncovered_packs->push([
             'id_pack'               => $pack->pivot->pack_id,   // id del pack no cubierto
             'nombre_pack'           => $pack->pack_name,        // nombre del pack no cubierto
-            'cantidad_faltante'     => $uncovered_quantity,     // cantidad no cubierta
-            'id_preorden'           => $preorder->id,           // preorden donde se pidio el pack
-            'proveedor_contactado'  => $preorder->supplier->id, // proveedor contactado
+            'marca_pack'            => $pack->provision->trademark->provision_trademark_name, // marca del pack
+            'tipo_pack'             => $pack->provision->type->provision_type_name,           // tipo del pack
+            'cantidad_pack'         => $pack->pack_quantity,      // volumen del pack
+            'unidad_pack'           => $pack->provision->measure, // unidad de medida del pack
+            'cantidad_faltante'     => $uncovered_quantity,       // cantidad no cubierta
+            'id_preorden'           => $preorder->id,             // preorden donde se pidio el pack
+            'proveedor_contactado'  => $preorder->supplier->id,   // proveedor contactado
           ]);
         }
       }
@@ -520,6 +524,10 @@ class PreOrderPeriodService
           $uncovered_provisions->push([
             'id_suministro'         => $provision->pivot->provision_id,  // id del suministro no cubierto
             'nombre_suministro'     => $provision->provision_name,       // nombre del pack no cubierto
+            'marca_suministro'      => $provision->trademark->provision_trademark_name, // marca del suministro
+            'tipo_suministro'       => $provision->type->provision_type_name,           // tipo del suministro
+            'cantidad_suministro'   => $provision->provision_quantity,   // volumen del suministro
+            'unidad_suministro'     => $provision->measure,              // unidad de medida del suministro
             'cantidad_faltante'     => $uncovered_quantity,              // cantidad no cubierta
             'id_preorden'           => $preorder->id,                    // preorden donde se pidio el suministro
             'proveedor_contactado'  => $preorder->supplier->id,          // proveedor contactado

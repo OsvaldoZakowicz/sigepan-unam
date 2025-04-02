@@ -108,16 +108,74 @@
         {{-- existen suministros y packs sin cubrir, o finalizado correctamente --}}
         @if ($period_status === $closed)
           @if ($has_uncovered_items)
-            <div class="flex justify-between items-center mb-2 p-1 border border-yellow-200 bg-yellow-100 rounded-sm">
+            <div class="flex justify-between items-center p-1 border border-yellow-200 bg-yellow-100 rounded-sm">
               <div class="flex flex-col">
                 <span class="text-yellow-800">
                   <span class="font-semibold">¡atención!</span>
-                  <span>existen suministros y packs sin cubrir parcial o totalmente!</span>
+                  <span>el periodo ha cerrado y existen suministros y packs pre ordenados que no fueron cubiertos en su totalidad!</span>
                 </span>
-                <p class="text-yellow-800">Debido a la disponibilidad del stock de los suministros y packs de interes pre ordenados en el presente periodo, no se han cubierto del todo las cantidades en las ordenes finales.</p>
               </div>
             </div>
-            {{-- todo: mostrar suministros y packs faltantes?, con proveedores alternativos? --}}
+            <x-div-toggle x-data="{ open: true }" title="suministros y packs no cubiertos" class="border-yellow-200 p-2 mb-6">
+              {{-- tabla de faltantes --}}
+              <x-table-base>
+                <x-slot:tablehead>
+                  <tr class="border bg-neutral-100">
+                    <x-table-th class="text-end w-12">id</x-table-th>
+                    <x-table-th class="text-start">nombre</x-table-th>
+                    <x-table-th class="text-start">marca/tipo</x-table-th>
+                    <x-table-th class="text-end">
+                      <span>cantidad</span>
+                      <x-quest-icon title="kilogramos (kg), gramos (g), litros (l), mililitros (ml), metro (m), centimetro (cm), unidad (u)"/>
+                    </x-table-th>
+                    <x-table-th class="text-end">
+                      <span>cantidad faltante</span>
+                      <x-quest-icon title="cantidad de unidades de cada suministro que no pudieron cubrirse en las ordenes de compra finales"/>
+                    </x-table-th>
+                    <x-table-th class="text-start">
+                      <span>proveedores alternativos</span>
+                      <x-quest-icon title="indica si existen proveedores alternativos a los que pedir los faltantes" />
+                    </x-table-th>
+                  </tr>
+                </x-slot:tablehead>
+                <x-slot:tablebody>
+                  {{-- suministros --}}
+                  @foreach ($uncovered_provisions as $uncovered_provision)
+                    <tr>
+                      <x-table-td class="text-end">{{ $uncovered_provision['id_suministro'] }}</x-table-td>
+                      <x-table-td class="text-start">{{ $uncovered_provision['nombre_suministro'] }}</x-table-td>
+                      <x-table-td class="text-start">{{ $uncovered_provision['marca_suministro'] }}/{{ $uncovered_provision['tipo_suministro'] }}</x-table-td>
+                      <x-table-td class="text-end">{{ convert_measure($uncovered_provision['cantidad_suministro'], $uncovered_provision['unidad_suministro']) }}</x-table-td>
+                      <x-table-td class="text-end">{{ $uncovered_provision['cantidad_faltante'] }}</x-table-td>
+                      <x-table-td class="text-start">
+                        @if ($uncovered_provision['alternative_suppliers'] != null)
+                          <span>{{ count($uncovered_provision['alternative_suppliers']) }} proveedores</span>
+                        @else
+                          <span>ninguno</span>
+                        @endif
+                      </x-table-td>
+                    </tr>
+                  @endforeach
+                  {{-- packs --}}
+                  @foreach ($uncovered_packs as $uncovered_pack)
+                    <tr>
+                      <x-table-td class="text-end">{{ $uncovered_pack['id_pack'] }}</x-table-td>
+                      <x-table-td class="text-start">{{ $uncovered_pack['nombre_pack'] }}</x-table-td>
+                      <x-table-td class="text-start">{{ $uncovered_pack['marca_pack'] }}/{{ $uncovered_pack['tipo_pack'] }}</x-table-td>
+                      <x-table-td class="text-end">{{ convert_measure($uncovered_pack['cantidad_pack'], $uncovered_pack['unidad_pack']) }}</x-table-td>
+                      <x-table-td class="text-end">{{ $uncovered_pack['cantidad_faltante'] }}</x-table-td>
+                      <x-table-td class="text-start">
+                        @if ($uncovered_pack['alternative_suppliers'] != null)
+                          <span>{{ count($uncovered_pack['alternative_suppliers']) }} proveedores</span>
+                        @else
+                          <span>ninguno</span>
+                        @endif
+                      </x-table-td>
+                    </tr>
+                  @endforeach
+                </x-slot:tablebody>
+              </x-table-base>
+            </x-div-toggle>
           @else
             <div class="flex justify-between items-center mb-2 p-1 border border-emerald-200 bg-emerald-100 rounded-sm">
               <span class="text-emerald-800">
@@ -132,8 +190,8 @@
 
           {{--
             todo: suministros y packs de interes
-            cuando el periodo de pre orden NO proviene de un previo
-            periodo presupuestario
+            * cuando el periodo de pre orden NO proviene de un previo
+            * periodo presupuestario
           --}}
 
           {{-- suministros de interes --}}
@@ -207,8 +265,8 @@
         @else
 
           {{--
-            suministros y packs de interes
-            cuando el periodo de pre orden viene de un periodo presupuestario previo
+            * suministros y packs de interes
+            * cuando el periodo de pre orden viene de un periodo presupuestario previo
           --}}
 
           <div class="flex justify-between items-center mb-2 p-1 border border-neutral-200 bg-neutral-100 rounded-sm">
@@ -336,12 +394,8 @@
                 <x-table-th class="text-start">proveedor</x-table-th>
                 <x-table-th class="text-start">estado de la pre orden</x-table-th>
                 <x-table-th class="text-start">evaluación</x-table-th>
-                <x-table-th class="text-end">última respuesta
-                  <x-quest-icon title="última vez que el proveedor modificó su respuesta en la pre orden"/>
-                </x-table-th>
-                <x-table-th class="text-start">orden de compra
-                  <x-quest-icon title="disponible cuando la pre orden es aprobada y se solicita al proveedor" />
-                </x-table-th>
+                <x-table-th class="text-end">última respuesta<x-quest-icon title="última vez que el proveedor modificó su respuesta en la pre orden"/></x-table-th>
+                <x-table-th class="text-start">orden de compra<x-quest-icon title="PDF disponible cuando la pre orden es aprobada y se solicita al proveedor una orden de compra definitiva" /></x-table-th>
                 <x-table-th class="text-start w-36">acciones</x-table-th>
               </tr>
             </x-slot:tablehead>
@@ -355,7 +409,7 @@
                     {{ $preorder->pre_order_code }}
                   </x-table-td>
                   <x-table-td class="text-start">
-                    {{ $preorder->supplier->company_name }},&nbsp;CUIT:&nbsp;{{ $preorder->supplier->company_cuit }}
+                    {{ $preorder->supplier->company_name }}
                   </x-table-td>
                   <x-table-td class="text-start">
                     {{-- estado de pre orden --}}
@@ -367,7 +421,6 @@
                         <x-quest-icon title="el proveedor ha respondido"/>
                       </x-text-tag>
                     @else
-                      {{-- proveedor no respondio --}}
                       <x-text-tag
                         color="neutral"
                         class="cursor-pointer"
@@ -393,22 +446,11 @@
                         <x-quest-icon title="aprobó esta pre orden para crear una orden definitiva"/>
                       </x-text-tag>
                     @else
-                      @php
-                        $rejected_by = '';
-
-                        if ($preorder->is_completed && $prorder->status == $status_rejected) {
-                          $rejected_by = 'gerente';
-                        } else if (!$preorder->is_completed && $prorder->status == $status_rejected) {
-                          $rejected_by = 'proveedor';
-                        } else {
-                          $rejected_by = 'sistema, por falta de respuesta';
-                        }
-                      @endphp
                       <x-text-tag
                         color="red"
                         class="cursor-pointer"
                         >{{ $preorder->status }}
-                        <x-quest-icon title="esta pre orden fue rechazada por: {{ $rejected_by }}"/>
+                        <x-quest-icon title="esta pre orden fue rechazada por alguna de las partes"/>
                       </x-text-tag>
                     @endif
                   </x-table-td>
@@ -430,7 +472,7 @@
                         border_color="neutral-200"
                         text_color="neutral-600"
                         title="ver orden de compras y descargar pdf"
-                        >ver orden pdf
+                        >ver pdf
                         <x-svg-pdf-paper/>
                       </x-a-button>
                     @else
@@ -465,11 +507,9 @@
           </div>
         </x-div-toggle>
 
-
       </x-slot:content>
 
-      <x-slot:footer class="my-2">
-        <div></div>
+      <x-slot:footer class="">
       </x-slot:footer>
 
     </x-content-section>
