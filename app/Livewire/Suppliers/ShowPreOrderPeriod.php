@@ -110,7 +110,11 @@ class ShowPreOrderPeriod extends Component
       $this->has_uncovered_items = !empty($this->uncovered_provisions) ||
         !empty($this->uncovered_packs);
 
-      //dd($this->uncovered_provisions, $this->uncovered_packs);
+      /**
+       * todo: retornar id y nombre proveedor contactado.
+       * todo: retornar id y nombre proveedores alternativos (si existen).
+       */
+      dd($this->uncovered_provisions, $this->uncovered_packs);
     }
   }
 
@@ -142,7 +146,7 @@ class ShowPreOrderPeriod extends Component
       $this->dispatch('toast-event', toast_data: [
         'event_type'  => 'info',
         'title_toast' => toastTitle('', true),
-        'descr_toast' => 'No se puede cerrar el periodo, existen pre ordenes respondidas por proveedores que debe evaluar.',
+        'descr_toast' => 'No se puede cerrar el periodo, existen pre ordenes respondidas por proveedores que debe evaluar. Para evaluar, acceda a "ver preorden" y rechaze o apruebe la misma.',
       ]);
 
       return;

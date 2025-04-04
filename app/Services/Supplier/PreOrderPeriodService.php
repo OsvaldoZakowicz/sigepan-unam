@@ -9,17 +9,15 @@ use App\Models\Quotation;
 use App\Models\Supplier;
 use App\Models\Provision;
 use App\Models\Pack;
-use Illuminate\Support\Str;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
 class PreOrderPeriodService
 {
   // prefijo para el codigo de periodo
-  protected $PERIOD_PREFIX = 'periodo_#';
+  protected $PERIOD_PREFIX = 'periodo#';
 
   // prefijo para el codigo de presupuesto
-  protected $PREORDER_PREFIX = 'preorden_#';
+  protected $PREORDER_PREFIX = 'preorden#';
 
   /**
    * obtener estado programado
@@ -132,12 +130,12 @@ class PreOrderPeriodService
   public function generateUniquePreorderCode(): string
   {
     // Conjunto de caracteres para generar el código aleatorio restante
-    $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@$%&*=+';
+    $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
     $charactersLength = strlen($characters);
 
-    // Generar el resto del código (longitud total será 10 + longitud del prefijo)
+    // Generar el resto del código (longitud total sera 8 + longitud del prefijo)
     $randomPart = '';
-    for ($i = 0; $i < 10; $i++) {
+    for ($i = 0; $i < 8; $i++) {
       $randomPart .= $characters[random_int(0, $charactersLength - 1)];
     }
 
@@ -158,6 +156,7 @@ class PreOrderPeriodService
 
   /**
    * metodo auxiliar para verificar la unicidad del codigo
+   * * verifica que no exista un codigo similar en la base de datos
    * @param string $code codigo a verificar
    * @return bool existencia o no del codigo
    */
@@ -167,9 +166,9 @@ class PreOrderPeriodService
   }
 
   /**
-   * Genera pre-órdenes basadas en los mejores precios de la comparativa
-   * @param int $pre_order_period_id ID del período de pre-órdenes
-   * @param array $comparison_data Datos de la comparativa de precios
+   * Genera pre-ordenes basadas en los mejores precios de la comparativa o ranking de presupuestos
+   * @param int $pre_order_period_id ID del período de pre-ordenes
+   * @param array $comparison_data Datos de la comparativa de precios o ranking de presupuestos
    * @return array Array de pre-ordenes generadas
    */
   public function generatePreOrdersFromRanking(int $pre_order_period_id, array $comparison_data): array
@@ -198,40 +197,47 @@ class PreOrderPeriodService
     return $generated_pre_orders;
   }
 
+  /**
+   * agrupa los suministrso y packs con mejores precios por proveedor
+   * @param array $comparision_data datos de la comparativa de precios o ranking de presupuestos
+   * @return array $best_prices
+   */
   private function groupBestPricesBySupplier(array $comparison_data): array
   {
     $best_prices = [];
 
     // Procesar suministros
     foreach ($comparison_data['provisions'] as $provision) {
+
       $best_price = $this->findBestPrice($provision['precios_por_proveedor']);
 
       if ($best_price) {
         $supplier_id = $best_price['id_proveedor'];
         $best_prices[$supplier_id][] = [
-          'type' => 'provision',
-          'id' => $provision['id_suministro'],
-          'quantity' => $best_price['cantidad'],
-          'unit_price' => $best_price['precio_unitario'],
-          'total_price' => $best_price['precio_total'],
-          'quotation_id' => $best_price['id_presupuesto']
+          'type'          => 'provision',
+          'id'            => $provision['id_suministro'],
+          'quantity'      => $best_price['cantidad'],
+          'unit_price'    => $best_price['precio_unitario'],
+          'total_price'   => $best_price['precio_total'],
+          'quotation_id'  => $best_price['id_presupuesto']
         ];
       }
     }
 
     // Procesar packs
     foreach ($comparison_data['packs'] as $pack) {
+
       $best_price = $this->findBestPrice($pack['precios_por_proveedor']);
 
       if ($best_price) {
         $supplier_id = $best_price['id_proveedor'];
         $best_prices[$supplier_id][] = [
-          'type' => 'pack',
-          'id' => $pack['id_pack'],
-          'quantity' => $best_price['cantidad'],
-          'unit_price' => $best_price['precio_unitario'],
-          'total_price' => $best_price['precio_total'],
-          'quotation_id' => $best_price['id_presupuesto']
+          'type'          => 'pack',
+          'id'            => $pack['id_pack'],
+          'quantity'      => $best_price['cantidad'],
+          'unit_price'    => $best_price['precio_unitario'],
+          'total_price'   => $best_price['precio_total'],
+          'quotation_id'  => $best_price['id_presupuesto']
         ];
       }
     }
@@ -239,6 +245,9 @@ class PreOrderPeriodService
     return $best_prices;
   }
 
+  /**
+   * encuentra el mejor precio
+   */
   private function findBestPrice(array $supplier_prices): ?array
   {
     $valid_prices = array_filter(
@@ -262,44 +271,54 @@ class PreOrderPeriodService
   }
 
   /**
-   * 'pre_order_period_id', // fk pre_order_periods
-   * 'supplier_id', //fk suppliers
-   * 'pre_order_code', //varchar unico
-   * 'quotation_reference', //varchar nullable
-   * 'status', //enum = ['pendiente', 'aprobado', 'rechazado']
+   * crea una pre orden
+   * @param int $pre_order_period_id periodo de pre ordenes
+   * @param int $supplier_id proveedor objetivo
+   * @param int $quotation_id presupuesto previo relacionado
+   *
+   * formato de la pre orden:
+   * * NOTA: ver estructura completa en el modelo PreOrder
+   * 'pre_order_period_id',     // fk pre_order_periods
+   * 'supplier_id',             //fk suppliers
+   * 'pre_order_code',          //varchar unico
+   * 'quotation_reference',     //varchar nullable
+   * 'status',                  //enum = ['pendiente', 'aprobado', 'rechazado']
+   * 'is_completed'             //boolean
    * 'is_approved_by_supplier', //boolean
-   * 'is_approved_by_buyer', //boolean
-   * 'details', //json, nullable
+   * 'is_approved_by_buyer',    //boolean
+   * 'details',                 //json, nullable
    */
-  private function createPreOrder(
-    int $pre_order_period_id,
-    int $supplier_id,
-    int $quotation_id
-  ): PreOrder {
+  private function createPreOrder( int $pre_order_period_id, int $supplier_id, int $quotation_id ): PreOrder
+  {
     return PreOrder::create([
-      'pre_order_period_id' => $pre_order_period_id,
-      'supplier_id' => $supplier_id,
-      'pre_order_code' => $this->generateUniquePreorderCode(),
-      'quotation_reference' => Quotation::find($quotation_id)->quotation_code,
-      'status' => 'pendiente',
-      'is_completed' => false,
+      'pre_order_period_id'     => $pre_order_period_id,
+      'supplier_id'             => $supplier_id,
+      'pre_order_code'          => $this->generateUniquePreorderCode(),
+      'quotation_reference'     => Quotation::find($quotation_id)->quotation_code,
+      'status'                  => PreOrder::getPendingStatus(),
+      'is_completed'            => false,
       'is_approved_by_supplier' => false,
-      'is_approved_by_buyer' => false,
-      'details' => null
+      'is_approved_by_buyer'    => false,
+      'details'                 => null
     ]);
   }
 
+  /**
+   * para cada pre orden, crear los renglones suministro y/o pack a pedir
+   * @param PreOrder $pre_order pre orden creada
+   * @param array $item_data datos del renglon
+   */
   private function createPreOrderItem(PreOrder $pre_order, array $item_data)
   {
     if ($item_data['type'] === 'provision') {
 
       // completa la tabla pre_order_provision
       $pre_order->provisions()->attach($item_data['id'], [
-        'has_stock' => true,
-        'quantity' => $item_data['quantity'],
-        'alternative_quantity' => 0,
-        'unit_price' => $item_data['unit_price'],
-        'total_price' => $item_data['total_price']
+        'has_stock'             => true,
+        'quantity'              => $item_data['quantity'],
+        'alternative_quantity'  => 0,
+        'unit_price'            => $item_data['unit_price'],
+        'total_price'           => $item_data['total_price']
       ]);
     }
 
@@ -307,17 +326,17 @@ class PreOrderPeriodService
 
       // completa la tabla pre_order_pack
       $pre_order->packs()->attach($item_data['id'], [
-        'has_stock' => true,
-        'quantity' => $item_data['quantity'],
-        'alternative_quantity' => 0,
-        'unit_price' => $item_data['unit_price'],
-        'total_price' => $item_data['total_price']
+        'has_stock'             => true,
+        'quantity'              => $item_data['quantity'],
+        'alternative_quantity'  => 0,
+        'unit_price'            => $item_data['unit_price'],
+        'total_price'           => $item_data['total_price']
       ]);
     }
   }
 
   /**
-   * Genera una vista previa de las pre-órdenes basadas en los mejores precios
+   * Genera una vista previa de las pre-ordenes basadas en los mejores precios de un ranking previo
    * @param array $comparison_data Datos de la comparativa de precios
    * @return array Array de vista previa de pre-órdenes
    */
@@ -350,16 +369,16 @@ class PreOrderPeriodService
         });
 
         $provisions_details[] = [
-          'id' => $provision->id,
+          'id'             => $provision->id,
           'provision_name' => $provision->provision_name,
-          'trademark' => $provision->trademark->provision_trademark_name,
-          'type' => $provision->type->provision_type_name,
-          'quantity' => $comparison_item['cantidad'], // Usar cantidad de la comparativa
-          'measure' => $provision->measure->unit_symbol,
-          'volumen' => $comparison_item['volumen'], // Agregar volumen
-          'volumen_tag' => $comparison_item['volumen_tag'], // Agregar volumen_tag
-          'unit_price' => $provision_item['unit_price'],
-          'total_price' => $provision_item['total_price']
+          'trademark'      => $provision->trademark->provision_trademark_name,
+          'type'           => $provision->type->provision_type_name,
+          'quantity'       => $comparison_item['cantidad'], // Usar cantidad de la comparativa
+          'measure'        => $provision->measure->unit_symbol,
+          'volumen'        => $comparison_item['volumen'], // Agregar volumen
+          'volumen_tag'    => $comparison_item['volumen_tag'], // Agregar volumen_tag
+          'unit_price'     => $provision_item['unit_price'],
+          'total_price'    => $provision_item['total_price']
         ];
       }
 
@@ -374,15 +393,15 @@ class PreOrderPeriodService
         });
 
         $packs_details[] = [
-          'id' => $pack->id,
-          'pack_name' => $pack->pack_name,
-          'trademark' => $pack->provision->trademark->provision_trademark_name,
-          'type' => $pack->provision->type->provision_type_name,
-          'quantity' => $comparison_item['cantidad'], // Usar cantidad de la comparativa
-          'measure' => $pack->provision->measure->unit_symbol,
-          'volumen' => $comparison_item['volumen'], // Agregar volumen
+          'id'          => $pack->id,
+          'pack_name'   => $pack->pack_name,
+          'trademark'   => $pack->provision->trademark->provision_trademark_name,
+          'type'        => $pack->provision->type->provision_type_name,
+          'quantity'    => $comparison_item['cantidad'], // Usar cantidad de la comparativa
+          'measure'     => $pack->provision->measure->unit_symbol,
+          'volumen'     => $comparison_item['volumen'], // Agregar volumen
           'volumen_tag' => $comparison_item['volumen_tag'], // Agregar volumen_tag
-          'unit_price' => $pack_item['unit_price'],
+          'unit_price'  => $pack_item['unit_price'],
           'total_price' => $pack_item['total_price']
         ];
       }
@@ -394,33 +413,33 @@ class PreOrderPeriodService
 
       // Crear la estructura de la pre-orden
       $preview_pre_orders[] = [
-        'pre_order_data' => [
-          'supplier_id' => $supplier_id,
-          'pre_order_code' => $this->generateTemporaryPreorderCode($supplier_id),
-          'quotation_reference' => $quotation->quotation_code,
-          'status' => 'pendiente',
-          'is_completed' => false,
+        'pre_order_data'            => [
+          'supplier_id'             => $supplier_id,
+          'pre_order_code'          => $this->generateTemporaryPreorderCode($supplier_id),
+          'quotation_reference'     => $quotation->quotation_code,
+          'status'                  => 'pendiente',
+          'is_completed'            => false,
           'is_approved_by_supplier' => false,
-          'is_approved_by_buyer' => false,
-          'total_amount' => $total_order,
-          'current_date' => date('Y-m-d')
+          'is_approved_by_buyer'    => false,
+          'total_amount'            => $total_order,
+          'current_date'            => date('Y-m-d')
         ],
         'supplier' => [
-          'id' => $supplier->id,
-          'company_name' => $supplier->company_name,
-          'company_cuit' => $supplier->company_cuit,
+          'id'            => $supplier->id,
+          'company_name'  => $supplier->company_name,
+          'company_cuit'  => $supplier->company_cuit,
           'contact_email' => $supplier->user->email,
           'contact_phone' => $supplier->phone_number
         ],
-        'provisions' => $provisions_details,
-        'packs' => $packs_details,
+        'provisions'  => $provisions_details,
+        'packs'       => $packs_details,
         'summary' => [
-          'total_provisions' => $total_provisions,
-          'total_packs' => $total_packs,
-          'total_order' => $total_order,
-          'provisions_count' => count($provisions_details),
-          'packs_count' => count($packs_details),
-          'items_count' => count($provisions_details) + count($packs_details)
+          'total_provisions'  => $total_provisions,
+          'total_packs'       => $total_packs,
+          'total_order'       => $total_order,
+          'provisions_count'  => count($provisions_details),
+          'packs_count'       => count($packs_details),
+          'items_count'       => count($provisions_details) + count($packs_details)
         ]
       ];
     }

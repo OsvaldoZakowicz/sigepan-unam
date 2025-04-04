@@ -30,7 +30,7 @@ class PreOrderService
     $anexo = json_decode($preorder->details, true);
 
     $order_data = [
-      'code'            =>  (string) substr($preorder->pre_order_code, 3),
+      'code'            =>  (string) substr($preorder->pre_order_code, 3), // quitar el prefijo 'pre'
       'date'            =>  (string) now()->format('d-m-Y'), // fecha de la orden
       'budget_date'     =>  (string) ($quotation) ? formatDateTime($quotation->created_at, 'd-m-Y') : '-',  // fecha de el presupuesto previo
       'issuer_name'     =>  (string) 'Panadería',

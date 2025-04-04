@@ -118,6 +118,11 @@
             </div>
             <x-div-toggle x-data="{ open: true }" title="suministros y packs no cubiertos" class="border-yellow-200 p-2 mb-6">
               {{-- tabla de faltantes --}}
+              {{-- todo:
+                - boton: crear nuevo periodo (para cubrir faltantes), vista nueva, recalcular no cubiertos.
+                - boton: ignorar y finalizar (terminar este proceso definitivamente). Columna en tabla periodo, fin definitivo.
+                - columna: proveedor contactado, proveedores alternativos con nombre y precio unitario (tooltip)
+              --}}
               <x-table-base>
                 <x-slot:tablehead>
                   <tr class="border bg-neutral-100">
