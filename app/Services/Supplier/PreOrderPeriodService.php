@@ -515,7 +515,7 @@ class PreOrderPeriodService
             'unidad_pack'           => $pack->provision->measure, // unidad de medida del pack
             'cantidad_faltante'     => $uncovered_quantity,       // cantidad no cubierta
             'id_preorden'           => $preorder->id,             // preorden donde se pidio el pack
-            'proveedor_contactado'  => $preorder->supplier->id,   // proveedor contactado
+            'proveedor_contactado'  => $preorder->supplier,       // proveedor contactado
           ]);
         }
       }
@@ -549,7 +549,7 @@ class PreOrderPeriodService
             'unidad_suministro'     => $provision->measure,              // unidad de medida del suministro
             'cantidad_faltante'     => $uncovered_quantity,              // cantidad no cubierta
             'id_preorden'           => $preorder->id,                    // preorden donde se pidio el suministro
-            'proveedor_contactado'  => $preorder->supplier->id,          // proveedor contactado
+            'proveedor_contactado'  => $preorder->supplier,              // proveedor contactado
           ]);
         }
       }
@@ -611,14 +611,14 @@ class PreOrderPeriodService
       // Obtener proveedores del ranking, excluyendo el proveedor original
       $alternative_suppliers = collect($item_budgets['precios_por_proveedor'])
         ->filter(function ($provider_price) use ($item) {
-          return $provider_price['id_proveedor'] !== $item['proveedor_contactado'];
+          return $provider_price['id_proveedor'] !== $item['proveedor_contactado']->id;
         })
         // Ordenar por precio unitario de menor a mayor
         ->sortBy('precio_unitario')
         ->values()
         ->toArray();
 
-      $item['alternative_suppliers'] = $alternative_suppliers ?: null;
+      $item['alternative_suppliers'] = $alternative_suppliers ?: [];
       return $item;
     });
   }

@@ -89,6 +89,7 @@ class ShowPreOrderPeriod extends Component
      * 2- usarlos para obtener por cada uno de ellos proveedores alternativos, del ranking base.
      */
     if ($this->period_status === $this->closed) {
+
       $uncovered_items = $pps->getUncoveredItems($this->preorder_period);
       $uncovered_items_with_alt_suppliers = $pps->getAlternativeSuppliersForUncoveredItems($uncovered_items, $this->quotations_ranking);
 
@@ -107,14 +108,8 @@ class ShowPreOrderPeriod extends Component
       }
 
       // Verificar si hay items sin cubrir
-      $this->has_uncovered_items = !empty($this->uncovered_provisions) ||
-        !empty($this->uncovered_packs);
+      $this->has_uncovered_items = !empty($this->uncovered_provisions) || !empty($this->uncovered_packs);
 
-      /**
-       * todo: retornar id y nombre proveedor contactado.
-       * todo: retornar id y nombre proveedores alternativos (si existen).
-       */
-      dd($this->uncovered_provisions, $this->uncovered_packs);
     }
   }
 

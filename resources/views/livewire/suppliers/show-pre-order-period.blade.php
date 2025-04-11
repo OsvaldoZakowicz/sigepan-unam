@@ -108,6 +108,8 @@
         {{-- existen suministros y packs sin cubrir, o finalizado correctamente --}}
         @if ($period_status === $closed)
           @if ($has_uncovered_items)
+
+            {{-- alerta fija --}}
             <div class="flex justify-between items-center p-1 border border-yellow-200 bg-yellow-100 rounded-sm">
               <div class="flex flex-col">
                 <span class="text-yellow-800">
@@ -116,30 +118,48 @@
                 </span>
               </div>
             </div>
-            <x-div-toggle x-data="{ open: true }" title="suministros y packs no cubiertos" class="border-yellow-200 p-2 mb-6">
+
+            {{-- seccion con tabla de faltantes --}}
+            <x-div-toggle x-data="{ open: true }" title="suministros y packs no cubiertos" class="relative border-yellow-200 p-2 mb-6">
+
+              <x-slot:subtitle>puede crear un nuevo periodo de pre ordenes para cubrir faltantes!</x-slot:subtitle>
+
+                <div class="absolute top-0 right-0 px-2 flex justify-end">
+                  <x-a-button
+                    wire:navigate
+                    href="#"
+                    >nuevo periodo
+                  </x-a-button>
+                </div>
+
               {{-- tabla de faltantes --}}
-              {{-- todo:
-                - boton: crear nuevo periodo (para cubrir faltantes), vista nueva, recalcular no cubiertos.
-                - boton: ignorar y finalizar (terminar este proceso definitivamente). Columna en tabla periodo, fin definitivo.
-                - columna: proveedor contactado, proveedores alternativos con nombre y precio unitario (tooltip)
-              --}}
               <x-table-base>
                 <x-slot:tablehead>
                   <tr class="border bg-neutral-100">
-                    <x-table-th class="text-end w-12">id</x-table-th>
-                    <x-table-th class="text-start">nombre</x-table-th>
-                    <x-table-th class="text-start">marca/tipo</x-table-th>
+                    <x-table-th class="text-end w-12">
+                      <span>id</span>
+                    </x-table-th>
+                    <x-table-th class="text-start">
+                      <span>nombre</span>
+                    </x-table-th>
+                    <x-table-th class="text-start">
+                      <span>marca/tipo</span>
+                    </x-table-th>
                     <x-table-th class="text-end">
                       <span>cantidad</span>
                       <x-quest-icon title="kilogramos (kg), gramos (g), litros (l), mililitros (ml), metro (m), centimetro (cm), unidad (u)"/>
                     </x-table-th>
                     <x-table-th class="text-end">
-                      <span>cantidad faltante</span>
+                      <span>unidades faltantes</span>
                       <x-quest-icon title="cantidad de unidades de cada suministro que no pudieron cubrirse en las ordenes de compra finales"/>
                     </x-table-th>
                     <x-table-th class="text-start">
+                      <span>proveedor contactado</span>
+                      <x-quest-icon title="proveedor que fue contactado en este período"/>
+                    </x-table-th>
+                    <x-table-th class="text-start">
                       <span>proveedores alternativos</span>
-                      <x-quest-icon title="indica si existen proveedores alternativos a los que pedir los faltantes" />
+                      <x-quest-icon title="indica si existen proveedores alternativos a los que pedir los faltantes, según el ranking presupuestario inicial"/>
                     </x-table-th>
                   </tr>
                 </x-slot:tablehead>
@@ -147,47 +167,100 @@
                   {{-- suministros --}}
                   @foreach ($uncovered_provisions as $uncovered_provision)
                     <tr>
-                      <x-table-td class="text-end">{{ $uncovered_provision['id_suministro'] }}</x-table-td>
-                      <x-table-td class="text-start">{{ $uncovered_provision['nombre_suministro'] }}</x-table-td>
-                      <x-table-td class="text-start">{{ $uncovered_provision['marca_suministro'] }}/{{ $uncovered_provision['tipo_suministro'] }}</x-table-td>
-                      <x-table-td class="text-end">{{ convert_measure($uncovered_provision['cantidad_suministro'], $uncovered_provision['unidad_suministro']) }}</x-table-td>
-                      <x-table-td class="text-end">{{ $uncovered_provision['cantidad_faltante'] }}</x-table-td>
+                      <x-table-td class="text-end">
+                        {{ $uncovered_provision['id_suministro'] }}
+                      </x-table-td>
                       <x-table-td class="text-start">
-                        @if ($uncovered_provision['alternative_suppliers'] != null)
-                          <span>{{ count($uncovered_provision['alternative_suppliers']) }} proveedores</span>
-                        @else
-                          <span>ninguno</span>
-                        @endif
+                        {{ $uncovered_provision['nombre_suministro'] }}
+                      </x-table-td>
+                      <x-table-td class="text-start">
+                        {{ $uncovered_provision['marca_suministro'] }}/{{ $uncovered_provision['tipo_suministro'] }}
+                      </x-table-td>
+                      <x-table-td class="text-end">
+                        {{ convert_measure($uncovered_provision['cantidad_suministro'], $uncovered_provision['unidad_suministro']) }}
+                      </x-table-td>
+                      <x-table-td class="text-end">
+                        {{ $uncovered_provision['cantidad_faltante'] }}
+                      </x-table-td>
+                      <x-table-td class="text-start">
+                        {{ $uncovered_provision['proveedor_contactado']->company_name }}
+                      </x-table-td>
+                      <x-table-td class="text-start">
+                        {{-- puede haber mas de 1 --}}
+                        <div x-data="{ open: false }" class="relative">
+
+                          {{-- texto con desplegable de lista --}}
+                          <button @click="open = !open" class="flex items-center text-blue-700 hover:text-blue-900">
+                            @if (count($uncovered_provision['alternative_suppliers']) > 0)
+                              <span>Ver {{ count($uncovered_provision['alternative_suppliers']) }} proveedores</span>
+                            @else
+                              <span>Ninguno</span>
+                            @endif
+                          </button>
+
+                          {{-- lista desplegable --}}
+                          <ul x-show="open"
+                              @click.away="open = false"
+                              class="absolute z-10 mt-1 w-64 bg-white border border-gray-200 rounded-md shadow-lg">
+                            @forelse ($uncovered_provision['alternative_suppliers'] as $alt_supplier)
+                              <li class="p-2 hover:bg-gray-100">
+                                <span class="block text-sm">{{ $alt_supplier['proveedor'] }}</span>
+                                <span class="block text-xs text-gray-500">Precio unitario: ${{ $alt_supplier['precio_unitario'] }}</span>
+                              </li>
+                            @empty
+                              <li class="p-2 text-gray-500">No hay proveedores alternativos</li>
+                            @endforelse
+                          </ul>
+                        </div>
                       </x-table-td>
                     </tr>
                   @endforeach
                   {{-- packs --}}
                   @foreach ($uncovered_packs as $uncovered_pack)
                     <tr>
-                      <x-table-td class="text-end">{{ $uncovered_pack['id_pack'] }}</x-table-td>
-                      <x-table-td class="text-start">{{ $uncovered_pack['nombre_pack'] }}</x-table-td>
-                      <x-table-td class="text-start">{{ $uncovered_pack['marca_pack'] }}/{{ $uncovered_pack['tipo_pack'] }}</x-table-td>
-                      <x-table-td class="text-end">{{ convert_measure($uncovered_pack['cantidad_pack'], $uncovered_pack['unidad_pack']) }}</x-table-td>
-                      <x-table-td class="text-end">{{ $uncovered_pack['cantidad_faltante'] }}</x-table-td>
+                      <x-table-td class="text-end">
+                        {{ $uncovered_pack['id_pack'] }}
+                      </x-table-td>
                       <x-table-td class="text-start">
-                        @if ($uncovered_pack['alternative_suppliers'] != null)
-                          <span>{{ count($uncovered_pack['alternative_suppliers']) }} proveedores</span>
-                        @else
+                        {{ $uncovered_pack['nombre_pack'] }}
+                      </x-table-td>
+                      <x-table-td class="text-start">
+                        {{ $uncovered_pack['marca_pack'] }}/{{ $uncovered_pack['tipo_pack'] }}
+                      </x-table-td>
+                      <x-table-td class="text-end">
+                        {{ convert_measure($uncovered_pack['cantidad_pack'], $uncovered_pack['unidad_pack']) }}
+                      </x-table-td>
+                      <x-table-td class="text-end">
+                        {{ $uncovered_pack['cantidad_faltante'] }}
+                      </x-table-td>
+                      <x-table-td class="text-start">
+                        {{ $uncovered_pack['proveedor_contactado']->company_name }}
+                      </x-table-td>
+                      <x-table-td class="text-start">
+                        {{-- puede haber mas de 1 --}}
+                        @forelse ($uncovered_pack['alternative_suppliers'] as $alt_supplier)
+                          <span>{{ $alt_supplier['proveedor'] }}</span>
+                        @empty
                           <span>ninguno</span>
-                        @endif
+                        @endforelse
                       </x-table-td>
                     </tr>
                   @endforeach
                 </x-slot:tablebody>
               </x-table-base>
+
             </x-div-toggle>
+
           @else
+
+            {{-- alerta fija --}}
             <div class="flex justify-between items-center mb-2 p-1 border border-emerald-200 bg-emerald-100 rounded-sm">
               <span class="text-emerald-800">
                 <span class="font-semibold">¡Éxito!</span>
                 <span>se han pedido y cubierto todos los suministros y packs pre ordenados!</span>
               </span>
             </div>
+
           @endif
         @endif
 
