@@ -124,13 +124,13 @@
 
               <x-slot:subtitle>puede crear un nuevo periodo de pre ordenes para cubrir faltantes!</x-slot:subtitle>
 
-                <div class="absolute top-0 right-0 px-2 flex justify-end">
-                  <x-a-button
-                    wire:navigate
-                    href="#"
-                    >nuevo periodo
-                  </x-a-button>
-                </div>
+              <div class="absolute top-0 right-0 px-2 flex justify-end">
+                <x-a-button
+                  href="{{ route('suppliers-preorders-create') }}"
+                  target="_blank"
+                  >crear nuevo periodo
+                </x-a-button>
+              </div>
 
               {{-- tabla de faltantes --}}
               <x-table-base>

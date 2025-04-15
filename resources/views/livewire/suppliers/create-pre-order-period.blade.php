@@ -5,14 +5,29 @@
     {{-- barra de titulo --}}
     <x-title-section title="crear periodo de preordenes de compra">
 
-      <x-a-button
-        wire:navigate
-        href="{{ route('suppliers-budgets-ranking', $period->id) }}"
-        bg_color="neutral-100"
-        border_color="neutral-200"
-        text_color="neutral-600"
-        >volver al ranking
-      </x-a-button>
+      @if ($period  !== null)
+
+        <x-a-button
+          wire:navigate
+          href="{{ route('suppliers-budgets-ranking', $period->id) }}"
+          bg_color="neutral-100"
+          border_color="neutral-200"
+          text_color="neutral-600"
+          >volver al ranking
+        </x-a-button>
+
+      @else
+
+        <x-a-button
+          wire:navigate
+          href="{{ route('suppliers-preorders-index') }}"
+          bg_color="neutral-100"
+          border_color="neutral-200"
+          text_color="neutral-600"
+          >volver
+        </x-a-button>
+
+      @endif
 
     </x-title-section>
 
@@ -95,7 +110,24 @@
 
           </x-div-toggle>
 
-          {{-- preordenes generadas --}}
+          {{-- si no existe priodo presupustario previo, mostrar seccion para creacion manual de pre ordenes --}}
+          {{-- permitir buscar y elegir suministros y packs, luego, proveedor a contactar --}}
+          @if ($period === null)
+            <x-div-toggle x-data="{open: true}" title="suministros y packs a pre ordenar" class="p-2">
+
+              <x-slot:subtitle>
+                <span>se presupuestarán suministros y packs de proveedores <x-text-tag color="emerald">activos</x-text-tag> </span>
+              </x-slot:subtitle>
+
+              {{-- necesito buscar --}}
+              @livewire('suppliers.search-provision-period')
+
+              {{-- necesito listar lo elegido en la busqueda --}}
+
+            </x-div-toggle>
+          @endif
+
+          {{-- preordenes a generar --}}
           <x-div-toggle x-data="{open: true}" title="Vista previa de pre ordenes a generar" class="p-2">
 
             {{-- leyenda --}}
@@ -108,26 +140,56 @@
               <x-table-base>
                 <x-slot:tablehead>
                   <tr class="border bg-neutral-50">
-                    <x-table-th class="text-end w-12">#</x-table-th>
-                    <x-table-th class="text-start">código</x-table-th>
-                    <x-table-th class="text-end">fecha tentativa</x-table-th>
-                    <x-table-th class="text-start">presupuesto de origen</x-table-th>
-                    <x-table-th class="text-start">proveedor</x-table-th>
-                    <x-table-th class="text-end">cantidad de items</x-table-th>
-                    <x-table-th class="text-end">costo total</x-table-th>
-                    <x-table-th class="text-start">acciones</x-table-th>
+                    <x-table-th class="text-end w-12">
+                      #
+                    </x-table-th>
+                    <x-table-th class="text-start">
+                      código
+                    </x-table-th>
+                    <x-table-th class="text-end">
+                      fecha tentativa
+                    </x-table-th>
+                    <x-table-th class="text-start">
+                      presupuesto de origen
+                    </x-table-th>
+                    <x-table-th class="text-start">
+                      proveedor
+                    </x-table-th>
+                    <x-table-th class="text-end">
+                      cantidad de items
+                    </x-table-th>
+                    <x-table-th class="text-end">
+                      costo total
+                    </x-table-th>
+                    <x-table-th class="text-start">
+                      acciones
+                    </x-table-th>
                   </tr>
                 </x-slot:tablehead>
                 <x-slot:tablebody>
-                  @foreach ($preview_preorders as $key => $preorder)
+                  @forelse ($preview_preorders as $key => $preorder)
                     <tr>
-                      <x-table-td class="text-end w-12">{{ $key+1 }}</x-table-td>
-                      <x-table-td class="text-start">{{ $preorder['pre_order_data']['pre_order_code'] }}</x-table-td>
-                      <x-table-td class="text-end">{{ formatDateTime($preorder['pre_order_data']['current_date'], 'd-m-Y') }}</x-table-td>
-                      <x-table-td class="text-start">{{ $preorder['pre_order_data']['quotation_reference'] }}</x-table-td>
-                      <x-table-td class="text-start">{{ $preorder['supplier']['company_name'] }}</x-table-td>
-                      <x-table-td class="text-end">{{ $preorder['summary']['items_count'] }}</x-table-td>
-                      <x-table-td class="text-end">${{ number_format($preorder['summary']['total_order'], 2) }}</x-table-td>
+                      <x-table-td class="text-end w-12">
+                        {{ $key+1 }}
+                      </x-table-td>
+                      <x-table-td class="text-start">
+                        {{ $preorder['pre_order_data']['pre_order_code'] }}
+                      </x-table-td>
+                      <x-table-td class="text-end">
+                        {{ formatDateTime($preorder['pre_order_data']['current_date'], 'd-m-Y') }}
+                      </x-table-td>
+                      <x-table-td class="text-start">
+                        {{ $preorder['pre_order_data']['quotation_reference'] }}
+                      </x-table-td>
+                      <x-table-td class="text-start">
+                        {{ $preorder['supplier']['company_name'] }}
+                      </x-table-td>
+                      <x-table-td class="text-end">
+                        {{ $preorder['summary']['items_count'] }}
+                      </x-table-td>
+                      <x-table-td class="text-end">
+                        ${{ number_format($preorder['summary']['total_order'], 2) }}
+                      </x-table-td>
                       <x-table-td class="text-start">
                         {{-- vista previa en un modal --}}
                         <x-a-button
@@ -140,7 +202,13 @@
                         </x-a-button>
                       </x-table-td>
                     </tr>
-                  @endforeach
+                  @empty
+                    <tr>
+                      <x-table-td colspan="8">
+                        <span>¡Sin vistas previas hasta que se definan las pre ordenes!</span>
+                      </x-table-td>
+                    </tr>
+                  @endforelse
                 </x-slot:tablebody>
               </x-table-base>
             </div>
@@ -349,12 +417,13 @@
       </x-slot:content>
 
       <x-slot:footer class="mt-2">
+
         <!-- botones del formulario -->
         <div class="flex justify-end my-2 gap-2">
 
           <x-a-button
             wire:navigate
-            href="{{ route('suppliers-budgets-periods-index') }}"
+            href="{{ route('suppliers-preorders-index') }}"
             bg_color="neutral-600"
             border_color="neutral-600"
             >cancelar
@@ -368,6 +437,7 @@
           </x-btn-button>
 
         </div>
+
       </x-slot:footer>
 
     </x-content-section>

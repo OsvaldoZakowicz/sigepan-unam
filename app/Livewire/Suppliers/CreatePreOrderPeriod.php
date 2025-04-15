@@ -50,11 +50,19 @@ class CreatePreOrderPeriod extends Component
    */
   public function mount(QuotationPeriodService $qps, PreOrderPeriodService $pps, $id = null): void
   {
-    ($id !== null) ? $this->period = RequestForQuotationPeriod::findOrFail($id) : null;
-    ($id !== null) ? $this->quotations_ranking = $qps->comparePricesBetweenQuotations($this->period->id) : null;
+    if ($id !== null) {
 
-    // genera un preview de las pre ordenes a crear
-    $this->preview_preorders = $pps->previewPreOrders($this->quotations_ranking);
+      /* partimos el periodo de pre orden desde un periodo de presupuestos */
+      $this->period = RequestForQuotationPeriod::findOrFail($id);
+      $this->quotations_ranking = $qps->comparePricesBetweenQuotations($this->period->id);
+      $this->preview_preorders = $pps->previewPreOrders($this->quotations_ranking);
+    } else {
+
+      /* partimos el periodo de pre orden desde cero */
+      $this->period = null;
+      $this->quotations_ranking = [];
+      $this->preview_preorders = [];
+    }
   }
 
   /**
@@ -90,13 +98,15 @@ class CreatePreOrderPeriod extends Component
         'period_start_at'           =>  ['required', 'date', 'after_or_equal:' . $this->min_date],
         'period_end_at'             =>  ['required', 'date', 'after:period_start_at'],
         'period_short_description'  =>  ['nullable', 'regex:/^[A-Za-z\s]+$/', 'max:150'],
-      ], [
+      ],
+      [
         'period_start_at.required'        =>  'La :attribute es obligatoria',
         'period_start_at.after_or_equal'  =>  'La :attribute debe ser a partir de hoy como mínimo',
         'period_end_at.required'          =>  'La :attribute es obligatoria',
         'period_end_at.after'             =>  'La :attribute debe estar después de la fecha de inicio',
         'period_short_description.regex'  =>  'La :attribute solo permite letras y espacios',
-      ], [
+      ],
+      [
         'period_start_at'           =>  'fecha de inicio',
         'period_end_at'             =>  'fecha de cierre',
         'period_short_description'  =>  'descripción corta',

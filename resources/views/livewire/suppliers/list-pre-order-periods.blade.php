@@ -6,14 +6,12 @@
     {{-- barra de titulo --}}
     <x-title-section title="lista de periodos de petición de pre ordenes">
 
-      {{-- todo: crear periodo sin necesidad de presupuestos previos? --}}
-      {{-- todo: crear a partir de un presupuesto anterior? --}}
-      {{-- <x-a-button
+      <x-a-button
         wire:navigate
-        href="{{route('suppliers-budgets-periods-create')}}"
+        href="{{ route('suppliers-preorders-create') }}"
         class="mx-1"
         >crear nuevo período
-      </x-a-button> --}}
+      </x-a-button>
 
     </x-title-section>
 
