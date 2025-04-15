@@ -10,6 +10,12 @@ use App\Services\Supplier\SupplierService;
 use App\Models\Provision;
 use App\Models\Pack;
 
+/**
+ * * Componente de busqueda de suministros y packs para periodos
+ * presupuestarios o de pre orden.
+ * - se usa en la creacion de periodo presupuestario
+ * - se usa en la creacion de periodo de pre ordenes
+ */
 class SearchProvisionPeriod extends Component
 {
   use WithPagination;
@@ -35,16 +41,11 @@ class SearchProvisionPeriod extends Component
   #[Url]
   public $paginas = '5';
 
-  // periodo (al editar)
-  public $period;
-
   // marcas de suministros
   public $trademarks;
+
   // tipos de suministros
   public $provision_types;
-
-  // busqueda de edicion
-  public $is_editing;
 
   // toggle del objetivo de busqueda
   public $toggle;
@@ -52,7 +53,7 @@ class SearchProvisionPeriod extends Component
   /**
    * boot de datos
    * @return void
-  */
+   */
   public function boot(SupplierService $sps): void
   {
     $this->trademarks = $sps->getProvisionTrademarks();
@@ -61,40 +62,41 @@ class SearchProvisionPeriod extends Component
 
   /**
    * montar datos
-   * @param $is_editing indica si se busca en modo edicion o no
    * @return void
-  */
-  public function mount($is_editing = false)
+   */
+  public function mount()
   {
-    $this->is_editing = $is_editing;
     $this->toggle = false;
   }
 
   /**
    * cambiar busqueda
    * alternar entre busqueda de suministros individuales o packs
+   * al hacer toggle limpiar parametros de busqueda y pagina
    * @return void
-  */
+   */
   public function toggleSearch(): void
   {
-      $this->toggle = !$this->toggle;
+    $this->reset(['search', 'search_pack', 'search_tr', 'search_tr_pack', 'search_ty', 'search_ty_pack', 'paginas']);
+    $this->resetPagination();
+    $this->toggle = !$this->toggle;
   }
 
   /**
-  * enviar la provision elegida mediante un evento
-  * @param Provision $provision
-  * @return void
-  */
+   * enviar la provision elegida mediante un evento
+   * @param Provision $provision
+   * @return void
+   */
   public function addProvision(Provision $provision): void
   {
     $this->dispatch('add-provision', provision: $provision);
   }
 
-   /**
+  /**
    * enviar el pack elegido mediante un evento
    * @param Pack $pack
    * @return void
-  */
+   */
   public function addPack(Pack $pack): void
   {
     $this->dispatch('add-pack', pack: $pack);
@@ -104,12 +106,12 @@ class SearchProvisionPeriod extends Component
    * buscar suministros para el periodo de peticion
    * con proveedor activo
    * @return mixed
-  */
+   */
   public function searchProvisions()
   {
     $result = Provision::whereHas('suppliers', function ($query) {
-        $query->where('status_is_active', true);
-      })
+      $query->where('status_is_active', true);
+    })
       ->when($this->search, function ($query) {
         $query->where('provision_name', 'like', '%' . $this->search . '%');
       })
@@ -128,12 +130,12 @@ class SearchProvisionPeriod extends Component
   /**
    * buscar packs con proveedores activos
    * @return mixed
-  */
+   */
   public function searchPacks()
   {
     $result = Pack::whereHas('suppliers', function ($query) {
-        $query->where('status_is_active', true);
-      })
+      $query->where('status_is_active', true);
+    })
       ->has('provision')  // incluir suministro del pack
       ->when($this->search_pack, function ($query) {
         $query->where('pack_name', 'like', '%' . $this->search_pack . '%');
@@ -157,7 +159,7 @@ class SearchProvisionPeriod extends Component
   /**
    * reiniciar la paginacion al buscar
    * @return void
-  */
+   */
   public function resetPagination()
   {
     $this->resetPage();

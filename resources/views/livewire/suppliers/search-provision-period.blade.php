@@ -3,7 +3,7 @@
    <x-div-toggle x-data="{ open: false }" title="cuadro de búsqueda" class=" relative p-1">
 
     <x-slot:subtitle>
-      <span>busque y elija suministros o packs para presupuestar</span>
+      <span>busque y elija suministros o packs</span>
     </x-slot:subtitle>
 
     {{-- seccion de acciones --}}
@@ -12,7 +12,13 @@
       {{-- boton para cambiar entre buscar suministros individuales o packs --}}
       <div class="inline-flex items-center gap-1 p-1 border border-neutral-200 bg-neutral-100 rounded-md cursor-pointer">
         <label for="toggle">buscar packs</label>
-        <input type="checkbox" wire:click="toggleSearch" name="toggle" id="toggle" class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
+        <input
+          wire:click="toggleSearch"
+          type="checkbox"
+          name="toggle"
+          id="toggle"
+          class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+          />
       </div>
 
     </div>
@@ -33,7 +39,8 @@
               wire:click="resetPagination"
               name="search_pack"
               type="text"
-              placeholder="ingrese un id o termino de búsqueda ..." />
+              placeholder="ingrese un id o termino de búsqueda ..."
+            />
           </div>
 
           {{-- filtrar por marca --}}
@@ -43,16 +50,16 @@
               id="search_tr_pack"
               wire:model.live="search_tr_pack"
               wire:click="resetPagination"
-              class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
-
+              class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+            >
               <option selected value="">seleccione una marca ...</option>
-
               @forelse ($trademarks as $tr)
-                <option value="{{ $tr->id }}">{{ $tr->provision_trademark_name }}</option>
+                <option value="{{ $tr->id }}">
+                  {{ $tr->provision_trademark_name }}
+                </option>
               @empty
                 <option value="">sin opciones ...</option>
               @endforelse
-
             </select>
           </div>
 
@@ -63,16 +70,16 @@
               id="search_ty_pack"
               wire:model.live="search_ty_pack"
               wire:click="resetPagination"
-              class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
-
+              class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+            >
               <option selected value="">seleccione un tipo ...</option>
-
               @forelse ($provision_types as $ty)
-                <option value="{{ $ty->id }}">{{ $ty->provision_type_name }}</option>
+                <option value="{{ $ty->id }}">
+                  {{ $ty->provision_type_name }}
+                </option>
               @empty
                 <option value="">sin opciones ...</option>
               @endforelse
-
             </select>
           </div>
 
@@ -83,12 +90,11 @@
               id="paginas"
               wire:model.live="paginas"
               wire:click="resetPagination"
-              class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
-
+              class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+            >
               <option value="5"> mostrar grupos de 5 resultados</option>
               <option value="10">mostrar grupos de 10 resultados</option>
               <option value="15">mostrar grupos de 15 resultados</option>
-
             </select>
           </div>
 
@@ -100,10 +106,18 @@
           <x-table-base>
             <x-slot:tablehead>
               <tr class="border bg-neutral-100">
-                <x-table-th class="text-end w-12">id</x-table-th>
-                <x-table-th class="text-start">nombre</x-table-th>
-                <x-table-th class="text-start">marca</x-table-th>
-                <x-table-th class="text-start">tipo</x-table-th>
+                <x-table-th class="text-end w-12">
+                  id
+                </x-table-th>
+                <x-table-th class="text-start">
+                  nombre
+                </x-table-th>
+                <x-table-th class="text-start">
+                  marca
+                </x-table-th>
+                <x-table-th class="text-start">
+                  tipo
+                </x-table-th>
                 <x-table-th class="text-end">
                   <span>cantidad</span>
                   <x-quest-icon title="indica si se trata de una unidad (1), o pack de unidades (mas de uno)"/>
@@ -112,8 +126,9 @@
                   <span>volumen</span>
                   <x-quest-icon title="kilogramos (kg), litros (lts) o unidades (un)"/>
                 </x-table-th>
-                @if ($is_editing) <x-table-th class="text-end w-1/3">$&nbsp;precio</x-table-th> @endif
-                <x-table-th class="text-start w-16">elegir</x-table-th>
+                <x-table-th class="text-start w-16">
+                  elegir
+                </x-table-th>
               </tr>
             </x-slot:tablehead>
             <x-slot:tablebody>
@@ -136,13 +151,8 @@
                     pack x {{ $pack->pack_units }}
                   </x-table-td>
                   <x-table-td class="text-end">
-                    {{ $pack->pack_quantity }}&nbsp;({{ $pack->provision->measure->measure_abrv }})
+                    {{ convert_measure($pack->pack_quantity, $pack->provision->measure) }}
                   </x-table-td>
-                  @if ($is_editing)
-                    <x-table-td class="text-end">
-                      <span>$&nbsp;{{ $pack->pivot->price }}</span>
-                    </x-table-td>
-                  @endif
                   <x-table-td class="text-start">
                     <div class="w-full inline-flex gap-1 justify-start items-center">
                       <span
@@ -156,11 +166,7 @@
               </tr>
               @empty
               <tr class="border">
-                @if ($is_editing)
-                  <td colspan="7">¡sin registros!</td>
-                @else
-                  <td colspan="6">¡sin registros!</td>
-                @endif
+                <td colspan="7">¡sin registros!</td>
               </tr>
               @endforelse
             </x-slot:tablebody>
@@ -190,7 +196,8 @@
               wire:click="resetPagination"
               name="search"
               type="text"
-              placeholder="ingrese un id o termino de búsqueda ..." />
+              placeholder="ingrese un id o termino de búsqueda ..."
+            />
           </div>
 
           {{-- filtrar por marca --}}
@@ -200,16 +207,16 @@
               id="search_tr"
               wire:model.live="search_tr"
               wire:click="resetPagination"
-              class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
-
+              class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+            >
               <option selected value="">seleccione una marca ...</option>
-
               @forelse ($trademarks as $tr)
-                <option value="{{ $tr->id }}">{{ $tr->provision_trademark_name }}</option>
+                <option value="{{ $tr->id }}">
+                  {{ $tr->provision_trademark_name }}
+                </option>
               @empty
                 <option value="">sin opciones ...</option>
               @endforelse
-
             </select>
           </div>
 
@@ -220,16 +227,16 @@
               id="search_ty"
               wire:model.live="search_ty"
               wire:click="resetPagination"
-              class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
-
+              class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+            >
               <option selected value="">seleccione un tipo ...</option>
-
               @forelse ($provision_types as $ty)
-                <option value="{{ $ty->id }}">{{ $ty->provision_type_name }}</option>
+                <option value="{{ $ty->id }}">
+                  {{ $ty->provision_type_name }}
+                </option>
               @empty
                 <option value="">sin opciones ...</option>
               @endforelse
-
             </select>
           </div>
 
@@ -240,12 +247,11 @@
               id="paginas"
               wire:model.live="paginas"
               wire:click="resetPagination"
-              class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
-
+              class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+            >
               <option value="5"> mostrar grupos de 5 resultados</option>
               <option value="10">mostrar grupos de 10 resultados</option>
               <option value="15">mostrar grupos de 15 resultados</option>
-
             </select>
           </div>
 
@@ -257,10 +263,18 @@
           <x-table-base>
             <x-slot:tablehead>
               <tr class="border bg-neutral-100">
-                <x-table-th class="text-end w-12">id</x-table-th>
-                <x-table-th class="text-start">nombre</x-table-th>
-                <x-table-th class="text-start">marca</x-table-th>
-                <x-table-th class="text-start">tipo</x-table-th>
+                <x-table-th class="text-end w-12">
+                  id
+                </x-table-th>
+                <x-table-th class="text-start">
+                  nombre
+                </x-table-th>
+                <x-table-th class="text-start">
+                  marca
+                </x-table-th>
+                <x-table-th class="text-start">
+                  tipo
+                </x-table-th>
                 <x-table-th class="text-end">
                   <span>cantidad</span>
                   <x-quest-icon title="indica si se trata de una unidad (1), o pack de unidades (mas de uno)"/>
@@ -269,10 +283,9 @@
                   <span>volumen</span>
                   <x-quest-icon title="kilogramos (kg), litros (lts) o unidades (un)"/>
                 </x-table-th>
-                @if ($is_editing)
-                  <x-table-th class="text-end w-1/3">$&nbsp;precio</x-table-th>
-                @endif
-                <x-table-th class="text-start w-16">elegir</x-table-th>
+                <x-table-th class="text-start w-16">
+                  elegir
+                </x-table-th>
               </tr>
             </x-slot:tablehead>
             <x-slot:tablebody>
@@ -296,13 +309,8 @@
                     <span>1</span>
                   </x-table-td>
                   <x-table-td class="text-end">
-                    {{ $provision->provision_quantity }}&nbsp;({{ $provision->measure->measure_abrv }})
+                    {{ convert_measure($provision->provision_quantity, $provision->measure) }}
                   </x-table-td>
-                  @if ($is_editing)
-                  <x-table-td class="text-end">
-                    $&nbsp;{{ $provision->pivot->price }}
-                  </x-table-td>
-                  @endif
                   <x-table-td class="text-start">
                     <div class="w-full inline-flex gap-1 justify-start items-center">
                       <span
@@ -316,11 +324,7 @@
               </tr>
               @empty
               <tr class="border">
-                @if ($is_editing)
-                  <td colspan="8">¡sin registros!</td>
-                @else
-                  <td colspan="7">¡sin registros!</td>
-                @endif
+                <td colspan="7">¡sin registros!</td>
               </tr>
               @endforelse
             </x-slot:tablebody>
