@@ -119,10 +119,197 @@
                 <span>se presupuestarán suministros y packs de proveedores <x-text-tag color="emerald">activos</x-text-tag> </span>
               </x-slot:subtitle>
 
+              <x-slot:messages>
+                @error('items')
+                  <span class="text-red-400">¡hay errores en esta sección!</span>
+                @enderror
+              </x-slot:messages>
+
               {{-- necesito buscar --}}
               @livewire('suppliers.search-provision-period')
 
               {{-- necesito listar lo elegido en la busqueda --}}
+              {{-- tabla dinamica con campos de formulario para cantidad y proveedor --}}
+              {{-- lista de suministros elegidos --}}
+              <div class="flex flex-col gap-1 w-full">
+                <span class="font-semibold capitalize">lista de suministros y/o packs elegidos para pre ordenar</span>
+                <div class="max-h-72 overflow-y-auto overflow-x-hidden">
+                  <x-table-base>
+                    <x-slot:tablehead>
+                      <tr class="border bg-neutral-100">
+                        <x-table-th class="text-end w-12">
+                          id
+                        </x-table-th>
+                        <x-table-th class="text-start">
+                          nombre
+                        </x-table-th>
+                        <x-table-th class="text-start">
+                          marca
+                        </x-table-th>
+                        <x-table-th class="text-start">
+                          tipo
+                        </x-table-th>
+                        <x-table-th class="text-end">
+                          <span>cantidad</span>
+                          <x-quest-icon title="kilogramos (kg), gramos (g), litros (l), mililitros (ml), metro (m), centimetro (cm), unidad (u)"/>
+                        </x-table-th>
+                        <x-table-th class="text-end">
+                          <span>unidades a pre ordenar</span>
+                          <span class="text-red-400">*</span>
+                          <x-quest-icon title="cantidad de unidades que desea pre ordenar" />
+                        </x-table-th>
+                        <x-table-th class="text-end">
+                          <span>proveedor a contactar</span>
+                          <span class="text-red-400">*</span>
+                          <x-quest-icon title="proveedor al cual pre ordenar y ultimo precio unitario asignado o presupuestado" />
+                        </x-table-th>
+                        <x-table-th class="text-start w-16">
+                          quitar
+                        </x-table-th>
+                      </tr>
+                    </x-slot:tablehead>
+                    <x-slot:tablebody>
+                      @forelse ($items as $key => $item)
+                        @if ($item['provision'] !== null)
+                          {{-- renglon es suministro --}}
+                          <tr wire:key="{{ $key }}">
+                            <x-table-td class="text-end">
+                              {{ $item['provision']->id }}
+                            </x-table-td>
+                            <x-table-td
+                              title="{{ $item['provision']->provision_short_description }}"
+                              class="cursor-pointer text-start">
+                              {{ $item['provision']->provision_name }}
+                            </x-table-td>
+                            <x-table-td class="text-start">
+                              {{ $item['provision']->trademark->provision_trademark_name }}
+                            </x-table-td>
+                            <x-table-td class="text-start">
+                              {{ $item['provision']->type->provision_type_name }}
+                            </x-table-td>
+                            <x-table-td class="text-end">
+                              {{ convert_measure($item['provision']->provision_quantity, $item['provision']->measure) }}
+                            </x-table-td>
+                            <x-table-td class="text-start">
+                              {{-- input cantidad --}}
+                              @error('items.'.$key.'.quantity')<span class="text-red-400 text-xs capitalize">{{ $message }}</span>@enderror
+                              <div class="flex justify-start items-center">
+                                {{-- cantidad a pre ordenar --}}
+                                <x-text-input
+                                  id="items_{{ $key }}_quantity"
+                                  wire:model.defer="items.{{ $key }}.quantity"
+                                  type="number"
+                                  min="1"
+                                  max="99"
+                                  step="1"
+                                  placeholder="cantidad ..."
+                                  class="w-full text-right"/>
+                              </div>
+                            </x-table-td>
+                            <x-table-td class="text-start">
+                              {{-- select proveedor --}}
+                              @error('items.'.$key.'.supplier_id')<span class="text-red-400 text-xs capitalize">{{ $message }}</span>@enderror
+                              <div class="flex justify-start items-center">
+                                {{-- proveedor a elegir --}}
+                                <select
+                                  id="items.{{ $key }}.supplier_id"
+                                  name="items_{{ $key }}_supplier_id"
+                                  wire:model.defer="items.{{ $key }}.supplier_id"
+                                  class="p-1 w-full text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                                  >
+                                  <option value="">seleccione un proveedor ...</option>
+                                  @forelse ($item['available_suppliers'] as $supplier)
+                                    <option value="{{ $supplier['id'] }}">{{ $supplier['company_name'] }} - $&nbsp;{{ $supplier['price'] }}</option>
+                                  @empty
+                                    <option value="">seleccione un proveedor ...</option>
+                                  @endforelse
+                                </select>
+                              </div>
+                            </x-table-td>
+                            <x-table-td class="text-start">
+                              {{-- boton para quitar de la lista --}}
+                              <span
+                                title="quitar de la lista."
+                                wire:click="removeFromItemsList({{ $key }})"
+                                class="font-semibold cursor-pointer leading-none p-1 bg-red-200 text-neutral-600 border-red-300 rounded-sm"
+                                >&times;
+                              </span>
+                            </x-table-td>
+                          </tr>
+                        @else
+                          {{-- renglon es pack --}}
+                          <tr wire:key="{{ $key }}">
+                            <x-table-td class="text-end">
+                              {{ $item['pack']->id }}
+                            </x-table-td>
+                            <x-table-td class="text-start">
+                              {{ $item['pack']->pack_name }}
+                            </x-table-td>
+                            <x-table-td class="text-start">
+                              {{ $item['pack']->provision->trademark->provision_trademark_name }}
+                            </x-table-td>
+                            <x-table-td class="text-start">
+                              {{ $item['pack']->provision->type->provision_type_name }}
+                            </x-table-td>
+                            <x-table-td class="text-end">
+                              {{ convert_measure($item['pack']->pack_quantity, $item['pack']->provision->measure) }}
+                            </x-table-td>
+                            <x-table-td class="text-start">
+                              {{-- input cantidad --}}
+                              @error('items.'.$key.'.quantity')<span class="text-red-400 text-xs capitalize">{{ $message }}</span>@enderror
+                              <div class="flex justify-start items-center">
+                                {{-- cantidad a pre ordenar --}}
+                                <x-text-input
+                                  id="items_{{ $key }}_quantity"
+                                  wire:model.defer="items.{{ $key }}.quantity"
+                                  type="number"
+                                  min="1"
+                                  max="99"
+                                  step="1"
+                                  placeholder="cantidad ..."
+                                  class="w-full text-right"/>
+                              </div>
+                            </x-table-td>
+                            <x-table-td class="text-start">
+                              {{-- select proveedor --}}
+                              @error('items.'.$key.'.supplier_id')<span class="text-red-400 text-xs capitalize">{{ $message }}</span>@enderror
+                              <div class="flex justify-start items-center">
+                                {{-- proveedor a elegir --}}
+                                <select
+                                  id="items.{{ $key }}.supplier_id"
+                                  name="items_{{ $key }}_supplier_id"
+                                  wire:model.defer="items.{{ $key }}.supplier_id"
+                                  class="p-1 w-full text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                                  >
+                                  <option value="">seleccione un proveedor ...</option>
+                                  @forelse ($item['available_suppliers'] as $supplier)
+                                    <option value="{{ $supplier['id'] }}">{{ $supplier['company_name'] }} - $&nbsp;{{ $supplier['price'] }}</option>
+                                  @empty
+                                    <option value="">seleccione un proveedor ...</option>
+                                  @endforelse
+                                </select>
+                              </div>
+                            </x-table-td>
+                            <x-table-td class="text-start">
+                              {{-- boton para quitar de la lista --}}
+                              <span
+                                title="quitar de la lista."
+                                wire:click="removeFromItemsList({{ $key }})"
+                                class="font-semibold cursor-pointer leading-none p-1 bg-red-200 text-neutral-600 border-red-300 rounded-sm"
+                                >&times;
+                              </span>
+                            </x-table-td>
+                          </tr>
+                        @endif
+                      @empty
+                        <tr class="border">
+                          <td colspan="8">¡lista vacia!</td>
+                        </tr>
+                      @endforelse
+                    </x-slot:tablebody>
+                  </x-table-base>
+                </div>
+              </div>
 
             </x-div-toggle>
           @endif

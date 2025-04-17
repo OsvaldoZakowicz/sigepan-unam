@@ -6,8 +6,13 @@ use App\Models\RequestForQuotationPeriod;
 use App\Services\Supplier\QuotationPeriodService;
 use App\Services\Supplier\PreOrderPeriodService;
 use App\Models\PreOrderPeriod;
+use App\Models\Provision;
+use App\Models\Pack;
+use App\Models\Supplier;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\View\View;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 class CreatePreOrderPeriod extends Component
@@ -19,6 +24,9 @@ class CreatePreOrderPeriod extends Component
 
   // preview de preordenes
   public $preview_preorders;
+
+  // lista de items para presupuestos manuales
+  public Collection $items;
 
   public $period_code;
   public $period_start_at;
@@ -62,7 +70,126 @@ class CreatePreOrderPeriod extends Component
       $this->period = null;
       $this->quotations_ranking = [];
       $this->preview_preorders = [];
+
+      $this->setItemsList();
     }
+  }
+
+  /**
+   * iniciar una coleccion de items a presupuestar vacia
+   * ['items' => []]
+   * @return void.
+  */
+  public function setItemsList(): void
+  {
+    $this->fill([
+      'items' => collect([]),
+    ]);
+  }
+
+  /**
+   * * agregar suministros a la lista de precios
+   * provision_id, para mantener el id del suministro en el request
+   * * el evento proviene de SearchProvision::class
+   * @param Provision $provision un suministro
+   * @return void
+  */
+  #[On('add-provision')]
+  public function addProvisionToItemsList(Provision $provision): void
+  {
+
+    foreach ($this->items as $item) {
+      if ($item['provision_id'] == $provision->id) {
+
+        $this->dispatch('toast-event', toast_data: [
+          'event_type' => 'info',
+          'title_toast' => toastTitle('',true),
+          'descr_toast' => 'el suministro ya existe en la lista!'
+        ]);
+
+        return;
+      }
+    }
+
+    // proveedores con estado activo que provean el pack en cuestion, junto al precio unitario
+    $available_suppliers = $provision->suppliers()
+      ->where('status_is_active', true)
+      ->get()
+      ->map(function($supplier) {
+        return [
+          'id' => $supplier->id,
+          'company_name' => $supplier->company_name,
+          'price' => $supplier->pivot->price
+        ];
+      })
+      ->toArray();
+
+    $this->items->push([
+      'provision'           =>  $provision,
+      'provision_id'        =>  $provision->id,
+      'pack'                =>  null,
+      'pack_id'             =>  null,
+      'quantity'            =>  '',
+      'supplier_id'         =>  '',
+      'available_suppliers' =>  $available_suppliers,
+    ]);
+  }
+
+  /**
+   * * agregar packs a la lista de precios
+   * pack_id, para mantener el id del pack en el request
+   * * el evento proviene de SearchProvision::class
+   * @param Pack $pack un pack
+   * @return void
+  */
+  #[On('add-pack')]
+  public function addPackToItemsList(Pack $pack): void
+  {
+
+    foreach ($this->items as $item) {
+      if ($item['pack_id'] == $pack->id) {
+
+        $this->dispatch('toast-event', toast_data: [
+          'event_type' => 'info',
+          'title_toast' => toastTitle('',true),
+          'descr_toast' => 'el pack ya existe en la lista!'
+        ]);
+
+        return;
+      }
+    }
+
+    // proveedores con estado activo que provean el pack en cuestion, junto al precio unitario
+    $available_suppliers = $pack->suppliers()
+      ->where('status_is_active', true)
+      ->get()
+      ->map(function($supplier) {
+        return [
+          'id' => $supplier->id,
+          'company_name' => $supplier->company_name,
+          'price' => $supplier->pivot->price
+        ];
+      })
+      ->toArray();
+
+    $this->items->push([
+      'provision'           =>  null,
+      'provision_id'        =>  null,
+      'pack'                =>  $pack,
+      'pack_id'             =>  $pack->id,
+      'quantity'            =>  '',
+      'supplier_id'         =>  '',
+      'available_suppliers' =>  $available_suppliers,
+    ]);
+  }
+
+  /**
+   * remover un item de la lista de items
+   * @param int $key clave del array de items para el item.
+  */
+  public function removeFromItemsList(int $key): void
+  {
+    $this->items->pull($key);
   }
 
   /**
@@ -98,6 +225,11 @@ class CreatePreOrderPeriod extends Component
         'period_start_at'           =>  ['required', 'date', 'after_or_equal:' . $this->min_date],
         'period_end_at'             =>  ['required', 'date', 'after:period_start_at'],
         'period_short_description'  =>  ['nullable', 'regex:/^[A-Za-z\s]+$/', 'max:150'],
+        'items'                     =>  'required',
+        'items.*.provision_id'      =>  'nullable',
+        'items.*.pack_id'           =>  'nullable',
+        'items.*.supplier_id'       =>  'required',
+        'items.*.quantity'          =>  ['required',  'numeric', 'min:1'],
       ],
       [
         'period_start_at.required'        =>  'La :attribute es obligatoria',
@@ -114,6 +246,8 @@ class CreatePreOrderPeriod extends Component
     );
 
     try {
+
+      dd($validated);
 
       /**
        * 'quotation_period_id',
