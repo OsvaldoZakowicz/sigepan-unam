@@ -133,6 +133,27 @@
               {{-- lista de suministros elegidos --}}
               <div class="flex flex-col gap-1 w-full">
                 <span class="font-semibold capitalize">lista de suministros y/o packs elegidos para pre ordenar</span>
+
+                {{-- errores en la lista --}}
+                <div class="mb-2">
+                  @if($errors->has('items') || $errors->has('items.*.supplier_id') || $errors->has('items.*.quantity'))
+                    <ul class="text-red-400 text-sm list-none">
+                      @error('items')
+                        <li>{{ $message }}</li>
+                      @enderror
+
+                      @error('items.*.supplier_id')
+                        <li>{{ $message }}</li>
+                      @enderror
+
+                      @error('items.*.quantity')
+                        <li>{{ $message }}</li>
+                      @enderror
+                    </ul>
+                  @endif
+                </div>
+
+                {{-- lista --}}
                 <div class="max-h-72 overflow-y-auto overflow-x-hidden">
                   <x-table-base>
                     <x-slot:tablehead>
@@ -192,7 +213,6 @@
                             </x-table-td>
                             <x-table-td class="text-start">
                               {{-- input cantidad --}}
-                              @error('items.'.$key.'.quantity')<span class="text-red-400 text-xs capitalize">{{ $message }}</span>@enderror
                               <div class="flex justify-start items-center">
                                 {{-- cantidad a pre ordenar --}}
                                 <x-text-input
@@ -208,7 +228,6 @@
                             </x-table-td>
                             <x-table-td class="text-start">
                               {{-- select proveedor --}}
-                              @error('items.'.$key.'.supplier_id')<span class="text-red-400 text-xs capitalize">{{ $message }}</span>@enderror
                               <div class="flex justify-start items-center">
                                 {{-- proveedor a elegir --}}
                                 <select
@@ -256,7 +275,6 @@
                             </x-table-td>
                             <x-table-td class="text-start">
                               {{-- input cantidad --}}
-                              @error('items.'.$key.'.quantity')<span class="text-red-400 text-xs capitalize">{{ $message }}</span>@enderror
                               <div class="flex justify-start items-center">
                                 {{-- cantidad a pre ordenar --}}
                                 <x-text-input
@@ -272,7 +290,6 @@
                             </x-table-td>
                             <x-table-td class="text-start">
                               {{-- select proveedor --}}
-                              @error('items.'.$key.'.supplier_id')<span class="text-red-400 text-xs capitalize">{{ $message }}</span>@enderror
                               <div class="flex justify-start items-center">
                                 {{-- proveedor a elegir --}}
                                 <select

@@ -229,7 +229,7 @@ class CreatePreOrderPeriod extends Component
         'items.*.provision_id'      =>  'nullable',
         'items.*.pack_id'           =>  'nullable',
         'items.*.supplier_id'       =>  'required',
-        'items.*.quantity'          =>  ['required',  'numeric', 'min:1'],
+        'items.*.quantity'          =>  ['required', 'numeric', 'min:1', 'max:99'],
       ],
       [
         'period_start_at.required'        =>  'La :attribute es obligatoria',
@@ -237,11 +237,18 @@ class CreatePreOrderPeriod extends Component
         'period_end_at.required'          =>  'La :attribute es obligatoria',
         'period_end_at.after'             =>  'La :attribute debe estar después de la fecha de inicio',
         'period_short_description.regex'  =>  'La :attribute solo permite letras y espacios',
+        'items.required'                  =>  'La :attribute debe contener al menos un suministro o pack',
+        'items.*.supplier_id.required'    =>  'Debe indicar el proveedor a contactar para cada suministro o pack',
+        'items.*.quantity.required'       =>  'Debe indicar las unidades a pre ordenar para cada suministro o pack',
+        'items.*.quantity.numeric'        =>  'Las unidades a pre ordenar deben ser un numero entero positivo',
+        'items.*.quantity.min'            =>  'Las unidades a pre ordenar deben ser minimo 1',
+        'items.*.quantity.max'            =>  'Las unidades a pre ordenar deben ser maximo 99',
       ],
       [
         'period_start_at'           =>  'fecha de inicio',
         'period_end_at'             =>  'fecha de cierre',
         'period_short_description'  =>  'descripción corta',
+        'items'                     =>  'lista',
       ]
     );
 
