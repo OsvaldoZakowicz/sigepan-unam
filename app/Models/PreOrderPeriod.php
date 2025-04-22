@@ -18,6 +18,7 @@ class PreOrderPeriod extends Model
     'period_end_at',
     'period_short_description',
     'period_status_id',
+    'period_preorders_data', // json, datos de pre ordenes
   ];
 
   //* un periodo de pre ordenes tiene un estado

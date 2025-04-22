@@ -40,6 +40,10 @@
 
         <span class="font-semibold text-neutral-800 capitalize">formulario</span>
 
+        @if ($errors->any())
+          <span>hay problemas de validacion!</span>
+        @endif
+
         {{-- formulario del periodo --}}
         <form class="w-full flex flex-col gap-1">
 
@@ -116,7 +120,7 @@
             <x-div-toggle x-data="{open: true}" title="suministros y packs a pre ordenar" class="p-2">
 
               <x-slot:subtitle>
-                <span>se presupuestarán suministros y packs de proveedores <x-text-tag color="emerald">activos</x-text-tag> </span>
+                <span>se pre ordenarán suministros y packs de proveedores <x-text-tag color="emerald">activos</x-text-tag> </span>
               </x-slot:subtitle>
 
               <x-slot:messages>
@@ -331,289 +335,291 @@
             </x-div-toggle>
           @endif
 
-          {{-- preordenes a generar --}}
-          <x-div-toggle x-data="{open: true}" title="Vista previa de pre ordenes a generar" class="p-2">
+          {{-- preview preordenes a generar --}}
+          @if ($period !== null)
+            <x-div-toggle x-data="{open: true}" title="Vista previa de pre ordenes a generar" class="p-2">
 
-            {{-- leyenda --}}
-            <x-slot:subtitle>
-              <span class="text-sm text-neutral-600">se prepararan las siguientes {{ count($preview_preorders) }} pre ordenes segun los mejores precios de suministros y packs con los proveedores <x-text-tag color="emerald" >activos</x-text-tag> </span>
-            </x-slot:subtitle>
+              {{-- leyenda --}}
+              <x-slot:subtitle>
+                <span class="text-sm text-neutral-600">se prepararan las siguientes {{ count($preview_preorders) }} pre ordenes segun los mejores precios de suministros y packs con los proveedores <x-text-tag color="emerald" >activos</x-text-tag> </span>
+              </x-slot:subtitle>
 
-            {{-- lista de preordenes --}}
-            <div class="space-y-8 max-h-96 overflow-y-auto overflow-x-hidden">
-              <x-table-base>
-                <x-slot:tablehead>
-                  <tr class="border bg-neutral-50">
-                    <x-table-th class="text-end w-12">
-                      #
-                    </x-table-th>
-                    <x-table-th class="text-start">
-                      código
-                    </x-table-th>
-                    <x-table-th class="text-end">
-                      fecha tentativa
-                    </x-table-th>
-                    <x-table-th class="text-start">
-                      presupuesto de origen
-                    </x-table-th>
-                    <x-table-th class="text-start">
-                      proveedor
-                    </x-table-th>
-                    <x-table-th class="text-end">
-                      cantidad de items
-                    </x-table-th>
-                    <x-table-th class="text-end">
-                      costo total
-                    </x-table-th>
-                    <x-table-th class="text-start">
-                      acciones
-                    </x-table-th>
-                  </tr>
-                </x-slot:tablehead>
-                <x-slot:tablebody>
-                  @forelse ($preview_preorders as $key => $preorder)
-                    <tr>
-                      <x-table-td class="text-end w-12">
-                        {{ $key+1 }}
-                      </x-table-td>
-                      <x-table-td class="text-start">
-                        {{ $preorder['pre_order_data']['pre_order_code'] }}
-                      </x-table-td>
-                      <x-table-td class="text-end">
-                        {{ formatDateTime($preorder['pre_order_data']['current_date'], 'd-m-Y') }}
-                      </x-table-td>
-                      <x-table-td class="text-start">
-                        {{ $preorder['pre_order_data']['quotation_reference'] }}
-                      </x-table-td>
-                      <x-table-td class="text-start">
-                        {{ $preorder['supplier']['company_name'] }}
-                      </x-table-td>
-                      <x-table-td class="text-end">
-                        {{ $preorder['summary']['items_count'] }}
-                      </x-table-td>
-                      <x-table-td class="text-end">
-                        ${{ number_format($preorder['summary']['total_order'], 2) }}
-                      </x-table-td>
-                      <x-table-td class="text-start">
-                        {{-- vista previa en un modal --}}
-                        <x-a-button
-                          wire:click="showModal({{ $key }})"
-                          bg_color="neutral-200"
-                          border_color="neutral-200"
-                          text_color="neutral-600"
-                          class="cursor-pointer"
-                          >vista previa
-                        </x-a-button>
-                      </x-table-td>
+              {{-- lista de preordenes --}}
+              <div class="space-y-8 max-h-96 overflow-y-auto overflow-x-hidden">
+                <x-table-base>
+                  <x-slot:tablehead>
+                    <tr class="border bg-neutral-50">
+                      <x-table-th class="text-end w-12">
+                        #
+                      </x-table-th>
+                      <x-table-th class="text-start">
+                        código
+                      </x-table-th>
+                      <x-table-th class="text-end">
+                        fecha tentativa
+                      </x-table-th>
+                      <x-table-th class="text-start">
+                        presupuesto de origen
+                      </x-table-th>
+                      <x-table-th class="text-start">
+                        proveedor
+                      </x-table-th>
+                      <x-table-th class="text-end">
+                        cantidad de items
+                      </x-table-th>
+                      <x-table-th class="text-end">
+                        costo total
+                      </x-table-th>
+                      <x-table-th class="text-start">
+                        acciones
+                      </x-table-th>
                     </tr>
-                  @empty
-                    <tr>
-                      <x-table-td colspan="8">
-                        <span>¡Sin vistas previas hasta que se definan las pre ordenes!</span>
-                      </x-table-td>
-                    </tr>
-                  @endforelse
-                </x-slot:tablebody>
-              </x-table-base>
-            </div>
+                  </x-slot:tablehead>
+                  <x-slot:tablebody>
+                    @forelse ($preview_preorders as $key => $preorder)
+                      <tr>
+                        <x-table-td class="text-end w-12">
+                          {{ $key+1 }}
+                        </x-table-td>
+                        <x-table-td class="text-start">
+                          {{ $preorder['pre_order_data']['pre_order_code'] }}
+                        </x-table-td>
+                        <x-table-td class="text-end">
+                          {{ formatDateTime($preorder['pre_order_data']['current_date'], 'd-m-Y') }}
+                        </x-table-td>
+                        <x-table-td class="text-start">
+                          {{ $preorder['pre_order_data']['quotation_reference'] }}
+                        </x-table-td>
+                        <x-table-td class="text-start">
+                          {{ $preorder['supplier']['company_name'] }}
+                        </x-table-td>
+                        <x-table-td class="text-end">
+                          {{ $preorder['summary']['items_count'] }}
+                        </x-table-td>
+                        <x-table-td class="text-end">
+                          ${{ number_format($preorder['summary']['total_order'], 2) }}
+                        </x-table-td>
+                        <x-table-td class="text-start">
+                          {{-- vista previa en un modal --}}
+                          <x-a-button
+                            wire:click="showModal({{ $key }})"
+                            bg_color="neutral-200"
+                            border_color="neutral-200"
+                            text_color="neutral-600"
+                            class="cursor-pointer"
+                            >vista previa
+                          </x-a-button>
+                        </x-table-td>
+                      </tr>
+                    @empty
+                      <tr>
+                        <x-table-td colspan="8">
+                          <span>¡Sin vistas previas hasta que se definan las pre ordenes!</span>
+                        </x-table-td>
+                      </tr>
+                    @endforelse
+                  </x-slot:tablebody>
+                </x-table-base>
+              </div>
 
-          </x-div-toggle>
+            </x-div-toggle>
 
-          {{-- modal pre orden --}}
-          @if($showing_preorder_modal)
-            <div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" id="modal">
-              <div class="relative top-20 mx-auto w-2/3 shadow-lg rounded-md bg-white">
-                <div class="flex justify-between items-center p-4 border-b">
-                  <h3 class="text-lg font-semibold">Vista Previa de Pre Orden</h3>
-                  <button type="button" wire:click="closeModal()" class="text-gray-600 hover:text-gray-800">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
+            {{-- modal pre orden --}}
+            @if($showing_preorder_modal)
+              <div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" id="modal">
+                <div class="relative top-20 mx-auto w-2/3 shadow-lg rounded-md bg-white">
+                  <div class="flex justify-between items-center p-4 border-b">
+                    <h3 class="text-lg font-semibold">Vista Previa de Pre Orden</h3>
+                    <button type="button" wire:click="closeModal()" class="text-gray-600 hover:text-gray-800">
+                      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
 
-                @if($selected_preorder)
-                  {{-- una pre orden --}}
-                  <div class="bg-white overflow-hidden">
-                    <!-- Cabecera de la Pre-orden -->
-                    <div class="bg-neutral-100 p-4 border-b">
-                      <div class="flex justify-between items-center">
-                        <div>
-                          <h3 class="text-lg text-neutral-800">
-                            código: <span class="font-semibold uppercase">{{ $selected_preorder['pre_order_data']['pre_order_code'] }}</span>
-                          </h3>
-                          <p class="text-lg text-neutral-600">
-                            fecha: {{ formatDateTime($selected_preorder['pre_order_data']['current_date'], 'd-m-Y') }}
-                          </p>
+                  @if($selected_preorder)
+                    {{-- una pre orden --}}
+                    <div class="bg-white overflow-hidden">
+                      <!-- Cabecera de la Pre-orden -->
+                      <div class="bg-neutral-100 p-4 border-b">
+                        <div class="flex justify-between items-center">
+                          <div>
+                            <h3 class="text-lg text-neutral-800">
+                              código: <span class="font-semibold uppercase">{{ $selected_preorder['pre_order_data']['pre_order_code'] }}</span>
+                            </h3>
+                            <p class="text-lg text-neutral-600">
+                              fecha: {{ formatDateTime($selected_preorder['pre_order_data']['current_date'], 'd-m-Y') }}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                      <div class="mt-2 flex gap-2 justify-start items-center">
-                        <x-text-tag
-                          color="neutral"
-                          class="cursor-pointer"
-                          >pendiente
-                          <x-quest-icon title="estado inicial de la pre orden"/>
-                        </x-text-tag>
-                        @if ($selected_preorder['pre_order_data']['quotation_reference'] !== null)
+                        <div class="mt-2 flex gap-2 justify-start items-center">
                           <x-text-tag
                             color="neutral"
                             class="cursor-pointer"
-                            >referencia: <span class="uppercase text-xs font-semibold">{{ $selected_preorder['pre_order_data']['quotation_reference'] }}</span>
+                            >pendiente
+                            <x-quest-icon title="estado inicial de la pre orden"/>
                           </x-text-tag>
-                        @endif
+                          @if ($selected_preorder['pre_order_data']['quotation_reference'] !== null)
+                            <x-text-tag
+                              color="neutral"
+                              class="cursor-pointer"
+                              >referencia: <span class="uppercase text-xs font-semibold">{{ $selected_preorder['pre_order_data']['quotation_reference'] }}</span>
+                            </x-text-tag>
+                          @endif
+                        </div>
+                      </div>
+
+                      <!-- informacion del emisor y proveedor -->
+                      <div class="flex justify-start items-start gap-2 p-4 border-b">
+                        {{-- emisor --}}
+                        <div class="p-4">
+                          <h4 class="text-sm font-medium text-neutral-600 uppercase tracking-wider mb-2">Emisor</h4>
+                          <p class="font-medium">panaderia</p>
+                          <p class="text-sm text-neutral-600">CUIT: 99999999999</p>
+                          <p class="text-sm text-neutral-600">Contacto: email@ejemplo.com | Tel: 3758252525</p>
+                        </div>
+                        {{-- proveedor --}}
+                        <div class="p-4">
+                          <h4 class="text-sm font-medium text-neutral-600 uppercase tracking-wider mb-2">Proveedor</h4>
+                          <p class="font-medium">{{ $selected_preorder['supplier']['company_name'] }}</p>
+                          <p class="text-sm text-neutral-600">CUIT: {{ $selected_preorder['supplier']['company_cuit'] }}</p>
+                          <p class="text-sm text-neutral-600">Contacto: {{ $selected_preorder['supplier']['contact_email'] }} | Tel: {{ $selected_preorder['supplier']['contact_phone'] }}</p>
+                        </div>
+                      </div>
+
+                      {{-- items --}}
+                      <div class="p-4 border-b">
+                        <h4 class="text-sm font-medium text-neutral-600 uppercase tracking-wider mb-2">Detalle:</h4>
+                        <div class="overflow-x-auto">
+                          <table class="min-w-full divide-y divide-neutral-200">
+                            <thead class="bg-neutral-50">
+                              <tr>
+                                <th
+                                  scope="col"
+                                  class="px-3 py-2 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider"
+                                  >#
+                                </th>
+                                <th
+                                  scope="col"
+                                  class="px-3 py-2 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider"
+                                  >Suministro/Pack
+                                </th>
+                                <th
+                                  scope="col"
+                                  class="px-3 py-2 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider"
+                                  >Marca/Tipo/cantidad
+                                </th>
+                                <th
+                                  scope="col"
+                                  class="px-3 py-2 text-right text-xs font-medium text-neutral-500 uppercase tracking-wider
+                                  ">Unidades a pre ordenar
+                                </th>
+                                <th
+                                  scope="col"
+                                  class="px-3 py-2 text-right text-xs font-medium text-neutral-500 uppercase tracking-wider
+                                  ">Precio Unit.
+                                </th>
+                                <th
+                                  scope="col"
+                                  class="px-3 py-2 text-right text-xs font-medium text-neutral-500 uppercase tracking-wider
+                                  ">Sub Total
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-neutral-200">
+                              {{-- key --}}
+                              @php
+                                $keynumber = 1;
+                              @endphp
+                              {{-- suministros --}}
+                              @if(count($selected_preorder['provisions']) > 0)
+
+                                @foreach ($selected_preorder['provisions'] as $provision)
+                                  <tr>
+                                    <td class="px-3 py-2 whitespace-nowrap text-sm font-medium">
+                                      {{ $keynumber++ }}
+                                    </td>
+                                    <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-neutral-800">
+                                      {{ $provision['provision_name'] }}
+                                    </td>
+                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-neutral-500">
+                                      <span>
+                                        <span>{{ $provision['trademark'] }} / {{ $provision['type'] }}</span>
+                                        <span class="lowercase"> / de {{ $provision['volumen'] }}</span>
+                                      </span>
+                                    </td>
+                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-neutral-500 text-right">
+                                      {{ $provision['quantity'] }}
+                                    </td>
+                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-neutral-500 text-right">
+                                      ${{ number_format($provision['unit_price'], 2) }}
+                                    </td>
+                                    <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-neutral-800 text-right">
+                                      ${{ number_format($provision['total_price'], 2) }}
+                                    </td>
+                                  </tr>
+                                @endforeach
+
+                              @endif
+
+                              {{-- packs --}}
+                              @if(count($selected_preorder['packs']) > 0)
+
+                                @foreach ($selected_preorder['packs'] as $pack)
+                                  <tr>
+                                    <td class="px-3 py-2 whitespace-nowrap text-sm font-medium">
+                                      {{ $keynumber++ }}
+                                    </td>
+                                    <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-neutral-800">
+                                      {{ $pack['pack_name'] }}
+                                    </td>
+                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-neutral-500">
+                                      <span>
+                                        <span>{{ $pack['trademark'] }} / {{ $pack['type'] }}</span>
+                                        <span class="lowercase"> / de {{ $pack['volumen'] }}</span>
+                                      </span>
+                                    </td>
+                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-neutral-500 text-right">
+                                      {{ $pack['quantity'] }}
+                                    </td>
+                                    <td class="px-3 py-2 whitespace-nowrap text-sm text-neutral-500 text-right">
+                                      ${{ number_format($pack['unit_price'], 2) }}
+                                    </td>
+                                    <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-neutral-800 text-right">
+                                      ${{ number_format($pack['total_price'], 2) }}
+                                    </td>
+                                  </tr>
+                                @endforeach
+
+                              @endif
+                            </tbody>
+                            <tfoot class="bg-neutral-100">
+                              <tr>
+                                <td colspan="5" class="px-3 py-2 text-lg font-medium text-neutral-800 text-right">Total:</td>
+                                <td class="px-3 py-2 text-lg font-bold text-neutral-800 text-right">
+                                  ${{ number_format($selected_preorder['summary']['total_order'], 2) }}
+                                </td>
+                              </tr>
+                            </tfoot>
+                          </table>
+                        </div>
                       </div>
                     </div>
+                  @endif
 
-                    <!-- informacion del emisor y proveedor -->
-                    <div class="flex justify-start items-start gap-2 p-4 border-b">
-                      {{-- emisor --}}
-                      <div class="p-4">
-                        <h4 class="text-sm font-medium text-neutral-600 uppercase tracking-wider mb-2">Emisor</h4>
-                        <p class="font-medium">panaderia</p>
-                        <p class="text-sm text-neutral-600">CUIT: 99999999999</p>
-                        <p class="text-sm text-neutral-600">Contacto: email@ejemplo.com | Tel: 3758252525</p>
-                      </div>
-                      {{-- proveedor --}}
-                      <div class="p-4">
-                        <h4 class="text-sm font-medium text-neutral-600 uppercase tracking-wider mb-2">Proveedor</h4>
-                        <p class="font-medium">{{ $selected_preorder['supplier']['company_name'] }}</p>
-                        <p class="text-sm text-neutral-600">CUIT: {{ $selected_preorder['supplier']['company_cuit'] }}</p>
-                        <p class="text-sm text-neutral-600">Contacto: {{ $selected_preorder['supplier']['contact_email'] }} | Tel: {{ $selected_preorder['supplier']['contact_phone'] }}</p>
-                      </div>
-                    </div>
-
-                    {{-- items --}}
-                    <div class="p-4 border-b">
-                      <h4 class="text-sm font-medium text-neutral-600 uppercase tracking-wider mb-2">Detalle:</h4>
-                      <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-neutral-200">
-                          <thead class="bg-neutral-50">
-                            <tr>
-                              <th
-                                scope="col"
-                                class="px-3 py-2 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider"
-                                >#
-                              </th>
-                              <th
-                                scope="col"
-                                class="px-3 py-2 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider"
-                                >Suministro/Pack
-                              </th>
-                              <th
-                                scope="col"
-                                class="px-3 py-2 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider"
-                                >Marca/Tipo/cantidad
-                              </th>
-                              <th
-                                scope="col"
-                                class="px-3 py-2 text-right text-xs font-medium text-neutral-500 uppercase tracking-wider
-                                ">Unidades a pre ordenar
-                              </th>
-                              <th
-                                scope="col"
-                                class="px-3 py-2 text-right text-xs font-medium text-neutral-500 uppercase tracking-wider
-                                ">Precio Unit.
-                              </th>
-                              <th
-                                scope="col"
-                                class="px-3 py-2 text-right text-xs font-medium text-neutral-500 uppercase tracking-wider
-                                ">Sub Total
-                              </th>
-                            </tr>
-                          </thead>
-                          <tbody class="bg-white divide-y divide-neutral-200">
-                            {{-- key --}}
-                            @php
-                              $keynumber = 1;
-                            @endphp
-                            {{-- suministros --}}
-                            @if(count($selected_preorder['provisions']) > 0)
-
-                              @foreach ($selected_preorder['provisions'] as $provision)
-                                <tr>
-                                  <td class="px-3 py-2 whitespace-nowrap text-sm font-medium">
-                                    {{ $keynumber++ }}
-                                  </td>
-                                  <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-neutral-800">
-                                    {{ $provision['provision_name'] }}
-                                  </td>
-                                  <td class="px-3 py-2 whitespace-nowrap text-sm text-neutral-500">
-                                    <span>
-                                      <span>{{ $provision['trademark'] }} / {{ $provision['type'] }}</span>
-                                      <span class="lowercase"> / de {{ $provision['volumen'] }}</span>
-                                    </span>
-                                  </td>
-                                  <td class="px-3 py-2 whitespace-nowrap text-sm text-neutral-500 text-right">
-                                    {{ $provision['quantity'] }}
-                                  </td>
-                                  <td class="px-3 py-2 whitespace-nowrap text-sm text-neutral-500 text-right">
-                                    ${{ number_format($provision['unit_price'], 2) }}
-                                  </td>
-                                  <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-neutral-800 text-right">
-                                    ${{ number_format($provision['total_price'], 2) }}
-                                  </td>
-                                </tr>
-                              @endforeach
-
-                            @endif
-
-                            {{-- packs --}}
-                            @if(count($selected_preorder['packs']) > 0)
-
-                              @foreach ($selected_preorder['packs'] as $pack)
-                                <tr>
-                                  <td class="px-3 py-2 whitespace-nowrap text-sm font-medium">
-                                    {{ $keynumber++ }}
-                                  </td>
-                                  <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-neutral-800">
-                                    {{ $pack['pack_name'] }}
-                                  </td>
-                                  <td class="px-3 py-2 whitespace-nowrap text-sm text-neutral-500">
-                                    <span>
-                                      <span>{{ $pack['trademark'] }} / {{ $pack['type'] }}</span>
-                                      <span class="lowercase"> / de {{ $pack['volumen'] }}</span>
-                                    </span>
-                                  </td>
-                                  <td class="px-3 py-2 whitespace-nowrap text-sm text-neutral-500 text-right">
-                                    {{ $pack['quantity'] }}
-                                  </td>
-                                  <td class="px-3 py-2 whitespace-nowrap text-sm text-neutral-500 text-right">
-                                    ${{ number_format($pack['unit_price'], 2) }}
-                                  </td>
-                                  <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-neutral-800 text-right">
-                                    ${{ number_format($pack['total_price'], 2) }}
-                                  </td>
-                                </tr>
-                              @endforeach
-
-                            @endif
-                          </tbody>
-                          <tfoot class="bg-neutral-100">
-                            <tr>
-                              <td colspan="5" class="px-3 py-2 text-lg font-medium text-neutral-800 text-right">Total:</td>
-                              <td class="px-3 py-2 text-lg font-bold text-neutral-800 text-right">
-                                ${{ number_format($selected_preorder['summary']['total_order'], 2) }}
-                              </td>
-                            </tr>
-                          </tfoot>
-                        </table>
-                      </div>
-                    </div>
+                  <div class="flex justify-end p-4 bg-gray-50">
+                    <x-a-button
+                      wire:click="closeModal()"
+                      bg_color="neutral-200"
+                      border_color="neutral-200"
+                      text_color="neutral-600"
+                      class="cursor-pointer"
+                      >Cerrar
+                    </x-a-button>
                   </div>
-                @endif
-
-                <div class="flex justify-end p-4 bg-gray-50">
-                  <x-a-button
-                    wire:click="closeModal()"
-                    bg_color="neutral-200"
-                    border_color="neutral-200"
-                    text_color="neutral-600"
-                    class="cursor-pointer"
-                    >Cerrar
-                  </x-a-button>
                 </div>
               </div>
-            </div>
+            @endif
           @endif
 
         </form>

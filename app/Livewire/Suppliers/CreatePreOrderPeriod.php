@@ -11,13 +11,16 @@ use App\Models\Pack;
 use App\Models\Supplier;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Arr;
 use Illuminate\View\View;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
 class CreatePreOrderPeriod extends Component
 {
-  public RequestForQuotationPeriod | null $period;
+  // periodo presupuestario base para las pre ordenes
+  // puede ser null
+  public $period;
 
   // comparativa de precios
   public array $quotations_ranking;
@@ -79,7 +82,7 @@ class CreatePreOrderPeriod extends Component
    * iniciar una coleccion de items a presupuestar vacia
    * ['items' => []]
    * @return void.
-  */
+   */
   public function setItemsList(): void
   {
     $this->fill([
@@ -93,7 +96,7 @@ class CreatePreOrderPeriod extends Component
    * * el evento proviene de SearchProvision::class
    * @param Provision $provision un suministro
    * @return void
-  */
+   */
   #[On('add-provision')]
   public function addProvisionToItemsList(Provision $provision): void
   {
@@ -103,7 +106,7 @@ class CreatePreOrderPeriod extends Component
 
         $this->dispatch('toast-event', toast_data: [
           'event_type' => 'info',
-          'title_toast' => toastTitle('',true),
+          'title_toast' => toastTitle('', true),
           'descr_toast' => 'el suministro ya existe en la lista!'
         ]);
 
@@ -115,7 +118,7 @@ class CreatePreOrderPeriod extends Component
     $available_suppliers = $provision->suppliers()
       ->where('status_is_active', true)
       ->get()
-      ->map(function($supplier) {
+      ->map(function ($supplier) {
         return [
           'id' => $supplier->id,
           'company_name' => $supplier->company_name,
@@ -125,13 +128,13 @@ class CreatePreOrderPeriod extends Component
       ->toArray();
 
     $this->items->push([
-      'provision'           =>  $provision,
-      'provision_id'        =>  $provision->id,
-      'pack'                =>  null,
-      'pack_id'             =>  null,
-      'quantity'            =>  '',
-      'supplier_id'         =>  '',
-      'available_suppliers' =>  $available_suppliers,
+      'provision_id'        =>  $provision->id,       // id de referencia
+      'provision'           =>  $provision,           // suministro completo
+      'pack'                =>  null,                 // null
+      'pack_id'             =>  null,                 // null
+      'quantity'            =>  '',                   // cantidad elegida
+      'supplier_id'         =>  '',                   // proveedor elegido
+      'available_suppliers' =>  $available_suppliers, // proveedores disponibles
     ]);
   }
 
@@ -141,7 +144,7 @@ class CreatePreOrderPeriod extends Component
    * * el evento proviene de SearchProvision::class
    * @param Pack $pack un pack
    * @return void
-  */
+   */
   #[On('add-pack')]
   public function addPackToItemsList(Pack $pack): void
   {
@@ -151,7 +154,7 @@ class CreatePreOrderPeriod extends Component
 
         $this->dispatch('toast-event', toast_data: [
           'event_type' => 'info',
-          'title_toast' => toastTitle('',true),
+          'title_toast' => toastTitle('', true),
           'descr_toast' => 'el pack ya existe en la lista!'
         ]);
 
@@ -163,7 +166,7 @@ class CreatePreOrderPeriod extends Component
     $available_suppliers = $pack->suppliers()
       ->where('status_is_active', true)
       ->get()
-      ->map(function($supplier) {
+      ->map(function ($supplier) {
         return [
           'id' => $supplier->id,
           'company_name' => $supplier->company_name,
@@ -173,20 +176,20 @@ class CreatePreOrderPeriod extends Component
       ->toArray();
 
     $this->items->push([
-      'provision'           =>  null,
-      'provision_id'        =>  null,
-      'pack'                =>  $pack,
-      'pack_id'             =>  $pack->id,
-      'quantity'            =>  '',
-      'supplier_id'         =>  '',
-      'available_suppliers' =>  $available_suppliers,
+      'provision_id'        =>  null,                 // null
+      'provision'           =>  null,                 // null
+      'pack_id'             =>  $pack->id,            // id de referencia
+      'pack'                =>  $pack,                // pack completo
+      'quantity'            =>  '',                   // cantidad elegida
+      'supplier_id'         =>  '',                   // proveedor elegido
+      'available_suppliers' =>  $available_suppliers, // proveedores disponibles
     ]);
   }
 
   /**
    * remover un item de la lista de items
    * @param int $key clave del array de items para el item.
-  */
+   */
   public function removeFromItemsList(int $key): void
   {
     $this->items->pull($key);
@@ -219,56 +222,103 @@ class CreatePreOrderPeriod extends Component
    */
   public function save(PreOrderPeriodService $pps): void
   {
-    // validar parametros del formulario
-    $validated = $this->validate(
-      [
-        'period_start_at'           =>  ['required', 'date', 'after_or_equal:' . $this->min_date],
-        'period_end_at'             =>  ['required', 'date', 'after:period_start_at'],
-        'period_short_description'  =>  ['nullable', 'regex:/^[A-Za-z\s]+$/', 'max:150'],
-        'items'                     =>  'required',
-        'items.*.provision_id'      =>  'nullable',
-        'items.*.pack_id'           =>  'nullable',
-        'items.*.supplier_id'       =>  'required',
-        'items.*.quantity'          =>  ['required', 'numeric', 'min:1', 'max:99'],
-      ],
-      [
-        'period_start_at.required'        =>  'La :attribute es obligatoria',
-        'period_start_at.after_or_equal'  =>  'La :attribute debe ser a partir de hoy como mínimo',
-        'period_end_at.required'          =>  'La :attribute es obligatoria',
-        'period_end_at.after'             =>  'La :attribute debe estar después de la fecha de inicio',
-        'period_short_description.regex'  =>  'La :attribute solo permite letras y espacios',
-        'items.required'                  =>  'La :attribute debe contener al menos un suministro o pack',
-        'items.*.supplier_id.required'    =>  'Debe indicar el proveedor a contactar para cada suministro o pack',
-        'items.*.quantity.required'       =>  'Debe indicar las unidades a pre ordenar para cada suministro o pack',
-        'items.*.quantity.numeric'        =>  'Las unidades a pre ordenar deben ser un numero entero positivo',
-        'items.*.quantity.min'            =>  'Las unidades a pre ordenar deben ser minimo 1',
-        'items.*.quantity.max'            =>  'Las unidades a pre ordenar deben ser maximo 99',
-      ],
-      [
-        'period_start_at'           =>  'fecha de inicio',
-        'period_end_at'             =>  'fecha de cierre',
-        'period_short_description'  =>  'descripción corta',
-        'items'                     =>  'lista',
-      ]
-    );
+    // Reglas base que siempre se aplican
+    $baseRules = [
+      'period_start_at'           => ['required', 'date', 'after_or_equal:' . $this->min_date],
+      'period_end_at'             => ['required', 'date', 'after:period_start_at'],
+      'period_short_description'  => ['nullable', 'regex:/^[A-Za-z\s]+$/', 'max:150'],
+    ];
+
+    // Reglas específicas para cuando $period es null
+    $itemRules = [
+      'items'                => 'required',
+      'items.*.provision_id' => 'nullable',
+      'items.*.pack_id'      => 'nullable',
+      'items.*.supplier_id'  => 'required',
+      'items.*.quantity'     => ['required', 'numeric', 'min:1', 'max:99'],
+    ];
+
+    // Mensajes base
+    $baseMessages = [
+      'period_start_at.required'        => 'La :attribute es obligatoria',
+      'period_start_at.after_or_equal'  => 'La :attribute debe ser a partir de hoy como mínimo',
+      'period_end_at.required'          => 'La :attribute es obligatoria',
+      'period_end_at.after'             => 'La :attribute debe estar después de la fecha de inicio',
+      'period_short_description.regex'   => 'La :attribute solo permite letras y espacios',
+    ];
+
+    // Mensajes específicos para items
+    $itemMessages = [
+      'items.required'               => 'La :attribute debe contener al menos un suministro o pack',
+      'items.*.supplier_id.required' => 'Debe indicar el proveedor a contactar para cada suministro o pack',
+      'items.*.quantity.required'    => 'Debe indicar las unidades a pre ordenar para cada suministro o pack',
+      'items.*.quantity.numeric'     => 'Las unidades a pre ordenar deben ser un numero entero positivo',
+      'items.*.quantity.min'         => 'Las unidades a pre ordenar deben ser minimo 1',
+      'items.*.quantity.max'         => 'Las unidades a pre ordenar deben ser maximo 99',
+    ];
+
+    // Atributos base
+    $baseAttributes = [
+      'period_start_at'          => 'fecha de inicio',
+      'period_end_at'            => 'fecha de cierre',
+      'period_short_description' => 'descripción corta',
+    ];
+
+    // Atributos específicos para items
+    $itemAttributes = [
+      'items' => 'lista',
+    ];
+
+    // Combinar reglas, mensajes y atributos según la condición
+    $rules = $baseRules;
+    $messages = $baseMessages;
+    $attributes = $baseAttributes;
+
+    if ($this->period === null) {
+      $rules = array_merge($baseRules, $itemRules);
+      $messages = array_merge($baseMessages, $itemMessages);
+      $attributes = array_merge($baseAttributes, $itemAttributes);
+    }
+
+    // Validar con las reglas combinadas
+    $validated = $this->validate($rules, $messages, $attributes);
 
     try {
 
-      dd($validated);
-
       /**
-       * 'quotation_period_id',
-       * 'period_code',
-       * 'period_start_at',
-       * 'period_end_at',
-       * 'period_short_description',
-       * 'period_status_id',
+       * 'quotation_period_id',       (id de un periodo presupuestario, o null)
+       * 'period_code',               (codigo identificador del periodo de pre orden a crear)
+       * 'period_start_at',           (fecha de inicio)
+       * 'period_end_at',             (fecha de fin)
+       * 'period_short_description',  (descripcion)
+       * 'period_status_id',          (estado)
+       * 'period_preorders_data'      (datos para las pre ordenes en caso de 'quotation_period_id' sea null)
        */
       $validated['quotation_period_id'] = $this->period->id ?? null;
-      $validated['period_code'] = $pps->getPeriodCodePrefix() . str_replace(':', '', now()->format('H:i:s'));
-      $validated['period_status_id'] = $pps->getStatusScheduled();
+      $validated['period_code']         = $pps->getPeriodCodePrefix() . str_replace(':', '', now()->format('H:i:s'));
+      $validated['period_status_id']    = $pps->getStatusScheduled();
 
-      PreOrderPeriod::create($validated);
+      if ($this->period === null) {
+        // preparar un array de datos para pre ordenes basico
+        $period_preorders_data = Arr::map($validated['items'], function ($item) {
+          return [
+            'provision_id'  =>  $item['provision_id'], // id del suministro a pedir, o null
+            'pack_id'       =>  $item['pack_id'],      // id del pack a pedir, o null
+            'quantity'      =>  $item['quantity'],     // cantidad a pedir
+            'supplier_id'   =>  $item['supplier_id'],  // id del proveedor a pedir
+          ];
+        });
+      }
+
+      PreOrderPeriod::create([
+        'quotation_period_id'      => $validated['quotation_period_id'],
+        'period_code'              => $validated['period_code'],
+        'period_start_at'          => $validated['period_start_at'],
+        'period_end_at'            => $validated['period_end_at'],
+        'period_short_description' => $validated['period_short_description'],
+        'period_status_id'         => $validated['period_status_id'],
+        'period_preorders_data'    => ($this->period === null) ? json_encode($period_preorders_data) : null,
+      ]);
 
       $this->reset();
 
