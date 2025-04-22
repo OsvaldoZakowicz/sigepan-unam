@@ -42,9 +42,10 @@ new class extends Component {
           @endcan
 
           {{-- stock --}}
+          {{-- * temporalmente dirige a productos --}}
           @can('stock')
             <x-nav-link
-              :href="route('stocks-stocks-index')"
+              :href="route('stocks-products-index')"
               :active="request()->routeIs('stocks-*')"
               wire:navigate
               >Stock

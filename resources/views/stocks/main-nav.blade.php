@@ -1,12 +1,13 @@
 {{-- navegacion del modulo de stock --}}
 <div class="flex justify-start items-center gap-4 font-normal text-md">
 
-  <x-nav-link
+  {{-- * temporalmente oculto --}}
+  {{-- <x-nav-link
     wire:navigate
     :href="route('stocks-stocks-index')"
     :active="request()->routeIs('stocks-stocks-*')"
     >stock
-  </x-nav-link>
+  </x-nav-link> --}}
 
   <x-nav-link
     wire:navigate

@@ -7,5 +7,5 @@
 @endsection
 
 @section('view_content')
-  <p>lista de productos en stock ... XD!</p>
+
 @endsection
