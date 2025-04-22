@@ -284,12 +284,18 @@
             <x-table-base>
               <x-slot:tablehead>
                 <tr class="border bg-neutral-100">
-                  <x-table-th class="text-end w-12">id</x-table-th>
-                  <x-table-th class="text-start w-56">nombre</x-table-th>
-                  <x-table-th class="text-start">marca</x-table-th>
+                  <x-table-th class="text-end w-12">
+                    id
+                  </x-table-th>
+                  <x-table-th class="text-start">
+                    nombre
+                  </x-table-th>
+                  <x-table-th class="text-start">
+                    marca/tipo
+                  </x-table-th>
                   <x-table-th class="text-end">
                     <span>cantidad</span>
-                    <x-quest-icon title=""/>
+                    <x-quest-icon title="kilogramos (kg), gramos (g), litros (l), mililitros (ml), metro (m), centimetro (cm), unidad (u)"/>
                   </x-table-th>
                   <x-table-th class="text-end">
                     <span>cantidad pre ordenada</span>
@@ -298,13 +304,31 @@
                 </tr>
               </x-slot:tablehead>
               <x-slot:tablebody>
-
+                @forelse ($provisions_and_packs['provisions'] as $item)
+                  <tr class="border">
+                    <x-table-td class="text-end">
+                      {{ $item['provision']->id }}
+                    </x-table-td>
+                    <x-table-td class="text-start">
+                      {{ $item['provision']->provision_name }}
+                    </x-table-td>
+                    <x-table-td class="text-start">
+                      {{ $item['provision']->trademark->provision_trademark_name }}/{{ $item['provision']->type->provision_type_name }}
+                    </x-table-td>
+                    <x-table-td class="text-end">
+                      {{ convert_measure($item['provision']->provision_quantity, $item['provision']->measure) }}
+                    </x-table-td>
+                    <x-table-td class="text-end">
+                      {{ $item['quantity'] }}
+                    </x-table-td>
+                  </tr>
+                @empty
+                  <tr>
+                    <td colspan="5">¡sin registros!</td>
+                  </tr>
+                @endforelse
               </x-slot:tablebody>
             </x-table-base>
-            {{-- paginacion --}}
-            <div class="w-full flex justify-end items-center gap-1 mt-1">
-
-            </div>
           </x-div-toggle>
 
           {{-- packs de interes --}}
@@ -319,12 +343,18 @@
             <x-table-base>
               <x-slot:tablehead>
                 <tr class="border bg-neutral-100">
-                  <x-table-th class="text-end w-12">id</x-table-th>
-                  <x-table-th class="text-start w-56">nombre</x-table-th>
-                  <x-table-th class="text-start">marca</x-table-th>
+                  <x-table-th class="text-end w-12">
+                    id
+                  </x-table-th>
+                  <x-table-th class="text-start">
+                    nombre
+                  </x-table-th>
+                  <x-table-th class="text-start">
+                    marca/tipo
+                  </x-table-th>
                   <x-table-th class="text-end">
                     <span>cantidad</span>
-                    <x-quest-icon title=""/>
+                    <x-quest-icon title="kilogramos (kg), gramos (g), litros (l), mililitros (ml), metro (m), centimetro (cm), unidad (u)"/>
                   </x-table-th>
                   <x-table-th class="text-end">
                     <span>cantidad pre ordenada</span>
@@ -333,11 +363,31 @@
                 </tr>
               </x-slot:tablehead>
               <x-slot:tablebody>
+                @forelse ($provisions_and_packs['packs'] as $item)
+                  <tr class="border">
+                    <x-table-td class="text-end">
+                      {{ $item['pack']->id }}
+                    </x-table-td>
+                    <x-table-td class="text-start">
+                      {{ $item['pack']->pack_name }}
+                    </x-table-td>
+                    <x-table-td class="text-start">
+                      {{ $item['pack']->provision->trademark->provision_trademark_name }}/{{ $item['pack']->provision->type->provision_type_name }}
+                    </x-table-td>
+                    <x-table-td class="text-end">
+                      {{ convert_measure($item['pack']->pack_quantity, $item['pack']->provision->measure) }}
+                    </x-table-td>
+                    <x-table-td class="text-end">
+                      {{ $item['quantity'] }}
+                    </x-table-td>
+                  </tr>
+                @empty
+                  <tr>
+                    <td colspan="5">¡sin registros!</td>
+                  </tr>
+                @endforelse
               </x-slot:tablebody>
             </x-table-base>
-            {{-- paginacion --}}
-            <div class="w-full flex justify-end items-center gap-1 mt-1">
-            </div>
           </x-div-toggle>
 
         @else
@@ -377,9 +427,15 @@
             <x-table-base>
               <x-slot:tablehead>
                 <tr class="border bg-neutral-100">
-                  <x-table-th class="text-end w-12">id</x-table-th>
-                  <x-table-th class="text-start">nombre</x-table-th>
-                  <x-table-th class="text-start">marca/tipo</x-table-th>
+                  <x-table-th class="text-end w-12">
+                    id
+                  </x-table-th>
+                  <x-table-th class="text-start">
+                    nombre
+                  </x-table-th>
+                  <x-table-th class="text-start">
+                    marca/tipo
+                  </x-table-th>
                   <x-table-th class="text-end">
                     <span>cantidad</span>
                     <x-quest-icon title="kilogramos (kg), gramos (g), litros (l), mililitros (ml), metro (m), centimetro (cm), unidad (u)"/>
@@ -393,11 +449,21 @@
               <x-slot:tablebody>
                 @forelse ($quotations_ranking['provisions'] as $provision)
                   <tr>
-                    <x-table-td class="text-end">{{ $provision['id_suministro'] }}</x-table-td>
-                    <x-table-td class="text-start">{{ $provision['nombre_suministro'] }}</x-table-td>
-                    <x-table-td class="text-start">{{ $provision['marca'] }}/{{ $provision['tipo'] }}</x-table-td>
-                    <x-table-td class="text-end">{{ $provision['volumen'] }}</x-table-td>
-                    <x-table-td class="text-end">{{ $provision['cantidad'] }}</x-table-td>
+                    <x-table-td class="text-end">
+                      {{ $provision['id_suministro'] }}
+                    </x-table-td>
+                    <x-table-td class="text-start">
+                      {{ $provision['nombre_suministro'] }}
+                    </x-table-td>
+                    <x-table-td class="text-start">
+                      {{ $provision['marca'] }}/{{ $provision['tipo'] }}
+                    </x-table-td>
+                    <x-table-td class="text-end">
+                      {{ $provision['volumen'] }}
+                    </x-table-td>
+                    <x-table-td class="text-end">
+                      {{ $provision['cantidad'] }}
+                    </x-table-td>
                   </tr>
                 @empty
                   <tr>
@@ -406,8 +472,6 @@
                 @endforelse
               </x-slot:tablebody>
             </x-table-base>
-            {{-- paginacion --}}
-            {{-- <div class="w-full flex justify-end items-center gap-1 mt-1"></div> --}}
           </x-div-toggle>
 
           {{-- packs de interes --}}
@@ -422,9 +486,15 @@
             <x-table-base>
               <x-slot:tablehead>
                 <tr class="border bg-neutral-100">
-                  <x-table-th class="text-end w-12">id</x-table-th>
-                  <x-table-th class="text-start">nombre</x-table-th>
-                  <x-table-th class="text-start">marca/tipo</x-table-th>
+                  <x-table-th class="text-end w-12">
+                    id
+                  </x-table-th>
+                  <x-table-th class="text-start">
+                    nombre
+                  </x-table-th>
+                  <x-table-th class="text-start">
+                    marca/tipo
+                  </x-table-th>
                   <x-table-th class="text-end">
                     <span>cantidad</span>
                     <x-quest-icon title="kilogramos (kg), gramos (g), litros (l), mililitros (ml), metro (m), centimetro (cm), unidad (u)"/>
@@ -438,11 +508,21 @@
               <x-slot:tablebody>
                 @forelse ($quotations_ranking['packs'] as $pack)
                   <tr>
-                    <x-table-td class="text-end">{{ $pack['id_pack'] }}</x-table-td>
-                    <x-table-td class="text-start">{{ $pack['nombre_pack'] }}</x-table-td>
-                    <x-table-td class="text-start">{{ $pack['marca'] }}/{{ $provision['tipo'] }}</x-table-td>
-                    <x-table-td class="text-end">{{ $pack['volumen'] }}</x-table-td>
-                    <x-table-td class="text-end">{{ $pack['cantidad'] }}</x-table-td>
+                    <x-table-td class="text-end">
+                      {{ $pack['id_pack'] }}
+                    </x-table-td>
+                    <x-table-td class="text-start">
+                      {{ $pack['nombre_pack'] }}
+                    </x-table-td>
+                    <x-table-td class="text-start">
+                      {{ $pack['marca'] }}/{{ $provision['tipo'] }}
+                    </x-table-td>
+                    <x-table-td class="text-end">
+                      {{ $pack['volumen'] }}
+                    </x-table-td>
+                    <x-table-td class="text-end">
+                      {{ $pack['cantidad'] }}
+                    </x-table-td>
                   </tr>
                 @empty
                   <tr>
@@ -451,8 +531,6 @@
                 @endforelse
               </x-slot:tablebody>
             </x-table-base>
-            {{-- paginacion --}}
-            {{-- <div class="w-full flex justify-end items-center gap-1 mt-1"></div> --}}
           </x-div-toggle>
 
         @endif

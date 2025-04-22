@@ -25,7 +25,12 @@ class ShowPreOrderPeriod extends Component
   public $preorder_period;
 
   // ranking de presupuestos asociados
+  // de aqui obtengo suministros y packs de interes
   public array | null $quotations_ranking = null;
+
+  // datos de pre ordenes para el periodo, cuando no depende de un ranking de presupuestos
+  // de aqui obtengo suministros y packs de interes
+  public array | null $provisions_and_packs = null;
 
   // posibles estados del periodo
   public int $scheduled;
@@ -79,8 +84,16 @@ class ShowPreOrderPeriod extends Component
      * el periodo de pre orden parta de un periodo presupuestario
      */
     if ($this->preorder_period->quotation_period_id !== null) {
+
       // generar ranking inicial del periodo presupuestario
+      // para obtener suministros y packs de interes
       $this->quotations_ranking = $qps->comparePricesBetweenQuotations($this->preorder_period->quotation_period_id);
+
+    } else {
+
+      // generar array de datos con suministros y packs de interes
+      $this->provisions_and_packs = $pps->getProvisionAndPacksData($this->preorder_period->id);
+
     }
 
     /**
@@ -109,7 +122,6 @@ class ShowPreOrderPeriod extends Component
 
       // Verificar si hay items sin cubrir
       $this->has_uncovered_items = !empty($this->uncovered_provisions) || !empty($this->uncovered_packs);
-
     }
   }
 

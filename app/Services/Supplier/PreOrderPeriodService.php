@@ -10,6 +10,7 @@ use App\Models\Supplier;
 use App\Models\Provision;
 use App\Models\Pack;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Arr;
 
 class PreOrderPeriodService
 {
@@ -166,7 +167,7 @@ class PreOrderPeriodService
   }
 
   /**
-   * Genera pre-ordenes basadas en los mejores precios de la comparativa o ranking de presupuestos
+   * Genera pre ordenes basadas en los mejores precios de la comparativa o ranking de presupuestos
    * @param int $pre_order_period_id ID del período de pre-ordenes
    * @param array $comparison_data Datos de la comparativa de precios o ranking de presupuestos
    * @return array Array de pre-ordenes generadas
@@ -195,6 +196,56 @@ class PreOrderPeriodService
     }
 
     return $generated_pre_orders;
+  }
+
+  /**
+   * Obtiene datos completos de suministros y packs de interes,
+   * a partir de una lista de datos JSON de suministros y packs
+   * @param int $pre_order_period_id ID del período de pre-ordenes
+   * @return array array de datos: '['provisions' => [], 'packs' => []]'
+   */
+  public function getProvisionAndPacksData(int $pre_order_period_id)
+  {
+    $preorder_period = PreOrderPeriod::findOrfail($pre_order_period_id);
+
+    $array_data = json_decode($preorder_period->period_preorders_data, true);
+
+    $provisions_and_packs = [
+      'provisions'  =>  [],
+      'packs'       =>  []
+    ];
+
+    $provisions_and_packs['provisions'] = Arr::map(
+      array_filter($array_data, fn($item) => $item['provision_id'] !== null),
+      function ($item) {
+        // procesar suministros
+        $provision = Provision::where('id', $item['provision_id'])->first();
+        $supplier = Supplier::where('id', $item['supplier_id'])->first();
+
+        return [
+          'provision' => $provision,
+          'supplier'  => $supplier,
+          'quantity'  => $item['quantity']
+        ];
+      }
+    );
+
+    $provisions_and_packs['packs'] = Arr::map(
+      array_filter($array_data, fn($item) => $item['pack_id'] !== null),
+      function ($item) {
+        // procesar pack
+        $pack = Pack::where('id', $item['pack_id'])->first();
+        $supplier = Supplier::where('id', $item['supplier_id'])->first();
+
+        return [
+          'pack'     => $pack,
+          'supplier' => $supplier,
+          'quantity' => $item['quantity'],
+        ];
+      }
+    );
+
+    return $provisions_and_packs;
   }
 
   /**
