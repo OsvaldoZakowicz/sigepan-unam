@@ -267,7 +267,6 @@
         @if ($preorder_period->quotation_period_id == null)
 
           {{--
-            todo: suministros y packs de interes
             * cuando el periodo de pre orden NO proviene de un previo
             * periodo presupuestario
           --}}
@@ -545,14 +544,32 @@
           <x-table-base>
             <x-slot:tablehead>
               <tr class="border bg-neutral-100">
-                <x-table-th class="text-end w-12">id</x-table-th>
-                <x-table-th class="text-start">pre orden</x-table-th>
-                <x-table-th class="text-start">proveedor</x-table-th>
-                <x-table-th class="text-start">estado de la pre orden</x-table-th>
-                <x-table-th class="text-start">evaluación</x-table-th>
-                <x-table-th class="text-end">última respuesta<x-quest-icon title="última vez que el proveedor modificó su respuesta en la pre orden"/></x-table-th>
-                <x-table-th class="text-start">orden de compra<x-quest-icon title="PDF disponible cuando la pre orden es aprobada y se solicita al proveedor una orden de compra definitiva" /></x-table-th>
-                <x-table-th class="text-start w-36">acciones</x-table-th>
+                <x-table-th class="text-end w-12">
+                  id
+                </x-table-th>
+                <x-table-th class="text-start">
+                  pre orden
+                </x-table-th>
+                <x-table-th class="text-start">
+                  proveedor
+                </x-table-th>
+                <x-table-th class="text-start">
+                  estado de la pre orden
+                </x-table-th>
+                <x-table-th class="text-start">
+                  evaluación
+                </x-table-th>
+                <x-table-th class="text-end">
+                  última respuesta
+                  <x-quest-icon title="última vez que el proveedor modificó su respuesta en la pre orden"/>
+                </x-table-th>
+                <x-table-th class="text-start">
+                  orden de compra
+                  <x-quest-icon title="PDF disponible cuando la pre orden es aprobada y se solicita al proveedor una orden de compra definitiva" />
+                </x-table-th>
+                <x-table-th class="text-start w-36">
+                  acciones
+                </x-table-th>
               </tr>
             </x-slot:tablehead>
             <x-slot:tablebody>

@@ -61,7 +61,7 @@ class Supplier extends Model implements Auditable
   public function packs(): BelongsToMany
   {
     return $this->belongsToMany(Pack::class)
-      ->withPivot('price')->withTimestamps();
+      ->withPivot('id', 'price')->withTimestamps();
   }
 
   //* un proveedor completa muchos presupuestos (quotations)

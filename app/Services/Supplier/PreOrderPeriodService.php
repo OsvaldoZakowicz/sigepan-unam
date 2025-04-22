@@ -168,9 +168,9 @@ class PreOrderPeriodService
 
   /**
    * Genera pre ordenes basadas en los mejores precios de la comparativa o ranking de presupuestos
-   * @param int $pre_order_period_id ID del período de pre-ordenes
+   * @param int $pre_order_period_id ID del período de pre ordenes
    * @param array $comparison_data Datos de la comparativa de precios o ranking de presupuestos
-   * @return array Array de pre-ordenes generadas
+   * @return array Array de pre ordenes generadas
    */
   public function generatePreOrdersFromRanking(int $pre_order_period_id, array $comparison_data): array
   {
@@ -199,12 +199,167 @@ class PreOrderPeriodService
   }
 
   /**
+   * Genera pre ordenes basadas en los datos de pre orden del periodo,
+   * cuando el periodo de pre orden no depende de un ranking de presupuestos previo
+   * @param int $pre_order_period_id ID del período de pre ordenes
+   * @return array Array de pre ordenes generadas
+   */
+  public function generatePreOrdersFromScratch(int $pre_order_period_id)
+  {
+    /**
+     * [
+     *  'provisions' => [
+     *    [
+     *      'provision' => App\Models\Provision,
+     *      'supplier'  => App\Models\Supplier,
+     *      'quantity'  => 'number...'
+     *    ], ...
+     *  ],
+     *  'packs' => [
+     *    [
+     *      'pack'      => App\Models\Pack,
+     *      'supplier'  => App\Models\Supplier,
+     *      'quantity'  => 'number...'
+     *    ], ...
+     *  ]
+     * ]
+     */
+    $provisions_and_packs = $this->getProvisionAndPacksData($pre_order_period_id);
+
+    // agrupar suministros y packs por proveedor
+    $suppliers_items = [];
+
+    // Procesar suministros
+    foreach ($provisions_and_packs['provisions'] as $provision_data) {
+      $supplier = $provision_data['supplier'];
+      $supplier_key = 'supplier' . $supplier->id;
+
+      // Inicializar el array para el proveedor si no existe
+      if (!isset($suppliers_items[$supplier_key])) {
+        $suppliers_items[$supplier_key] = [
+          'supplier' => $supplier,
+          'provisions' => [],
+          'packs' => []
+        ];
+      }
+
+      // Agregar el suministro al array del proveedor
+      $suppliers_items[$supplier_key]['provisions'][] = [
+        'provision' => $provision_data['provision'],
+        'quantity' => $provision_data['quantity']
+      ];
+    }
+
+    // Procesar packs
+    foreach ($provisions_and_packs['packs'] as $pack_data) {
+      $supplier = $pack_data['supplier'];
+      $supplier_key = 'supplier' . $supplier->id;
+
+      // Inicializar el array para el proveedor si no existe
+      if (!isset($suppliers_items[$supplier_key])) {
+        $suppliers_items[$supplier_key] = [
+          'supplier' => $supplier,
+          'provisions' => [],
+          'packs' => []
+        ];
+      }
+
+      // Agregar el pack al array del proveedor
+      $suppliers_items[$supplier_key]['packs'][] = [
+        'pack' => $pack_data['pack'],
+        'quantity' => $pack_data['quantity']
+      ];
+    }
+
+    /**
+     * formato de supplier_items:
+      [
+        'supplier1' => [
+          'supplier' => App\Models\Supplier,
+          'provisions' => [
+            ['provision' => App\Models\Provision, 'quantity' => number],
+            // ...más suministros
+          ],
+          'packs' => [
+            ['pack' => App\Models\Pack, 'quantity' => number],
+            // ...más packs
+          ]
+        ],
+        'supplier2' => [
+          // ...misma estructura
+        ]
+      ]
+     */
+
+    // pre ordenes generadas
+    $generated_pre_orders = [];
+
+    // crear pre ordenes por proveedor y crear items de pre orden
+    foreach ($suppliers_items as $supplier_item) {
+
+      // pre orden
+      $pre_order = $this->createPreOrder($pre_order_period_id, $supplier_item['supplier']->id);
+
+      // suministros de la pre orden
+      foreach ($supplier_item['provisions'] as $item_provision) {
+
+        // Obtener el precio del suministro para este proveedor
+        $provision_price = $supplier_item['supplier']->provisions()
+          ->where('provisions.id', $item_provision['provision']->id)
+          ->first()
+          ->pivot
+          ->price ?? 0;
+
+        $item_data = [
+          'type'        =>  'provision',
+          'id'          =>  $item_provision['provision']->id,
+          'quantity'    =>  $item_provision['quantity'],
+          'unit_price'  =>  $provision_price,
+          'total_price' =>  $provision_price * $item_provision['quantity']
+
+        ];
+
+        // renglon pre orden para suministro
+        $this->createPreOrderItem($pre_order, $item_data);
+      }
+
+      // packs de la pre orden
+      foreach ($supplier_item['packs'] as $item_pack) {
+
+        // Obtener el precio del pack para este proveedor
+        $pack_price = $supplier_item['supplier']->packs()
+          ->where('packs.id', $item_pack['pack']->id)
+          ->first()
+          ->pivot
+          ->price ?? 0;
+
+        $item_data = [
+          'type'        =>  'pack',
+          'id'          =>  $item_pack['pack']->id,
+          'quantity'    =>  $item_pack['quantity'],
+          'unit_price'  =>  $pack_price,
+          'total_price' =>  $pack_price * $item_pack['quantity']
+        ];
+
+        // renglon pre orden para suministro
+        $this->createPreOrderItem($pre_order, $item_data);
+      }
+
+      // Agregar la pre-orden con sus relaciones cargadas al array
+      $generated_pre_orders[] = $pre_order->load(['packs', 'provisions']);
+
+    }
+
+    return $generated_pre_orders;
+  }
+
+  /**
    * Obtiene datos completos de suministros y packs de interes,
    * a partir de una lista de datos JSON de suministros y packs
    * @param int $pre_order_period_id ID del período de pre-ordenes
    * @return array array de datos: '['provisions' => [], 'packs' => []]'
    */
-  public function getProvisionAndPacksData(int $pre_order_period_id)
+  public function getProvisionAndPacksData(int $pre_order_period_id): array
   {
     $preorder_period = PreOrderPeriod::findOrfail($pre_order_period_id);
 
@@ -325,27 +480,16 @@ class PreOrderPeriodService
    * crea una pre orden
    * @param int $pre_order_period_id periodo de pre ordenes
    * @param int $supplier_id proveedor objetivo
-   * @param int $quotation_id presupuesto previo relacionado
-   *
-   * formato de la pre orden:
-   * * NOTA: ver estructura completa en el modelo PreOrder
-   * 'pre_order_period_id',     // fk pre_order_periods
-   * 'supplier_id',             //fk suppliers
-   * 'pre_order_code',          //varchar unico
-   * 'quotation_reference',     //varchar nullable
-   * 'status',                  //enum = ['pendiente', 'aprobado', 'rechazado']
-   * 'is_completed'             //boolean
-   * 'is_approved_by_supplier', //boolean
-   * 'is_approved_by_buyer',    //boolean
-   * 'details',                 //json, nullable
+   * @param int|null $quotation_id presupuesto previo relacionado (opcional)
+   * @return PreOrder
    */
-  private function createPreOrder( int $pre_order_period_id, int $supplier_id, int $quotation_id ): PreOrder
+  private function createPreOrder(int $pre_order_period_id, int $supplier_id, ?int $quotation_id = null): PreOrder
   {
     return PreOrder::create([
       'pre_order_period_id'     => $pre_order_period_id,
       'supplier_id'             => $supplier_id,
       'pre_order_code'          => $this->generateUniquePreorderCode(),
-      'quotation_reference'     => Quotation::find($quotation_id)->quotation_code,
+      'quotation_reference'     => $quotation_id ? Quotation::find($quotation_id)->quotation_code : null,
       'status'                  => PreOrder::getPendingStatus(),
       'is_completed'            => false,
       'is_approved_by_supplier' => false,

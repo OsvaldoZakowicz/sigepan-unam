@@ -47,9 +47,11 @@ class OpenPreOrderPeriodJob implements ShouldQueue
       // crear pre ordenes
       $preorder_period_service->generatePreOrdersFromRanking($this->preorder_period->id, $quotations_ranking_data);
 
-    }
+    } else {
 
-    // todo: si no hay periodo presupuestario asociado, crear preordenes de otra forma
+      // crear pre ordenes desde datos base del periodo
+      $preorder_period_service->generatePreOrdersFromScratch($this->preorder_period->id);
+    }
 
   }
 }
