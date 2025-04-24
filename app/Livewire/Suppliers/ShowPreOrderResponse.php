@@ -23,7 +23,7 @@ class ShowPreOrderResponse extends Component
   // pre orden y presupuesto de referencia
   public PreOrder $preorder;
   public $preorder_details;
-  public Quotation | null $quotation;
+  public ?Quotation $quotation = null;
 
   // estados
   public string $status_pending;
@@ -72,10 +72,10 @@ class ShowPreOrderResponse extends Component
     }
 
     $this->preorder_details = json_decode($this->preorder->details, true);
-    $this->quotation = Quotation::where('quotation_code', $this->preorder->quotation_reference)->first();
+    $this->quotation        = Quotation::where('quotation_code', $this->preorder->quotation_reference)->first();
 
     $this->item_provision = $this->PROVISION;
-    $this->item_pack = $this->PACK;
+    $this->item_pack      = $this->PACK;
 
     $this->setProvisionsAndPacks();
     $this->getTotalPrice();
@@ -108,8 +108,7 @@ class ShowPreOrderResponse extends Component
   }
 
   /**
-   * agregar un suministro o un pack al array de items
-   * e items alternativos.
+   * agregar un suministro o un pack al array de items e items alternativos.
    * La razon por la cual se hace esto es para obtener un diff cuando el stock
    * que el proveedor puede dar es 0 o una cantidad menor a la pedida.
    * * la coleccion alternativa siempre sera la indicada para la orden final
@@ -186,10 +185,10 @@ class ShowPreOrderResponse extends Component
     $order_data = $pos->generateOrderData($this->preorder, $this->quotation, $this->alternative_items);
 
     // aprobar preorden, cambiar estado a aprobado, guardar en json los datos de la orden final
-    $this->preorder->is_approved_by_buyer = true;
-    $this->preorder->status = $this->status_approved;
-    $this->preorder->order = json_encode($order_data);
-    $this->preorder->is_sended_to_supplier = true; // enviado al provedor
+    $this->preorder->is_approved_by_buyer  = true;
+    $this->preorder->status                = $this->status_approved;
+    $this->preorder->order                 = json_encode($order_data);
+    $this->preorder->is_sended_to_supplier = true;
     $this->preorder->save();
 
     $pdfs->generateOrderPDF($this->preorder, $order_data);

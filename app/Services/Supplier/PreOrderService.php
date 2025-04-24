@@ -18,12 +18,12 @@ class PreOrderService
   /**
    * generar datos finales de la orden de compra
    * todo: Datos de panaderia
-   * @param PreOrder $preorder
-   * @param Quotation $quotation
+   * @param PreOrder $preorder pre orden base
+   * @param Quotation|null $quotation puede o no existir un presupuesto previo
    * @param Collection $preorder_items conjunto de suministros y/o packs
    * @return array $order_data
    */
-  public function generateOrderData(PreOrder $preorder, Quotation $quotation, Collection $preorder_items): array
+  public function generateOrderData(PreOrder $preorder, ?Quotation $quotation, Collection $preorder_items): array
   {
     $body_order_data = $this->generateBodyOrderData($preorder_items);
 

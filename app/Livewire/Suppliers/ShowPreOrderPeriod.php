@@ -88,39 +88,24 @@ class ShowPreOrderPeriod extends Component
       // generar ranking inicial del periodo presupuestario
       // para obtener suministros y packs de interes
       $this->quotations_ranking = $qps->comparePricesBetweenQuotations($this->preorder_period->quotation_period_id);
-
     } else {
 
       // generar array de datos con suministros y packs de interes
       $this->provisions_and_packs = $pps->getProvisionAndPacksData($this->preorder_period->id);
-
     }
 
     /**
      * para periodos cerrados:
      * 1- necesito obtener suministros y packs no cubiertos en las pre ordenes respondidas.
-     * 2- usarlos para obtener por cada uno de ellos proveedores alternativos, del ranking base.
+     * 2- usarlos para obtener por cada uno de ellos proveedores alternativos, del ranking base o desde la base de datos.
      */
     if ($this->period_status === $this->closed) {
-
       $uncovered_items = $pps->getUncoveredItems($this->preorder_period);
-      $uncovered_items_with_alt_suppliers = $pps->getAlternativeSuppliersForUncoveredItems($uncovered_items, $this->quotations_ranking);
+      $items_with_suppliers = $pps->getAlternativeSuppliersForUncoveredItems($uncovered_items, $this->quotations_ranking);
 
-      // array de suministros no cubiertos
-      if (!empty($uncovered_items_with_alt_suppliers['uncovered_provisions_with_alternative_suppliers'])) {
-        $this->uncovered_provisions = $uncovered_items_with_alt_suppliers['uncovered_provisions_with_alternative_suppliers']->toArray();
-      } else {
-        $this->uncovered_provisions = [];
-      }
+      $this->uncovered_provisions = $items_with_suppliers['uncovered_provisions_with_alternative_suppliers']?->toArray() ?? [];
+      $this->uncovered_packs = $items_with_suppliers['uncovered_packs_with_alternative_suppliers']?->toArray() ?? [];
 
-      // array de packs no cubiertos
-      if (!empty($uncovered_items_with_alt_suppliers['uncovered_packs_with_alternative_suppliers'])) {
-        $this->uncovered_packs = $uncovered_items_with_alt_suppliers['uncovered_packs_with_alternative_suppliers']->toArray();
-      } else {
-        $this->uncovered_packs = [];
-      }
-
-      // Verificar si hay items sin cubrir
       $this->has_uncovered_items = !empty($this->uncovered_provisions) || !empty($this->uncovered_packs);
     }
   }

@@ -347,7 +347,6 @@ class PreOrderPeriodService
 
       // Agregar la pre-orden con sus relaciones cargadas al array
       $generated_pre_orders[] = $pre_order->load(['packs', 'provisions']);
-
     }
 
     return $generated_pre_orders;
@@ -755,20 +754,20 @@ class PreOrderPeriodService
    * obtener proveedores alternativos para los suministros y
    * packs no cubiertos procesados en la funcion getUncoveredItems
    * @param array $uncovered_items suministros y packs no cubiertos
-   * @param array $quotations_ranking ranking de presupuestos
+   * @param array|null $quotations_ranking ranking de presupuestos (puede no existir ranking previo)
    * @return array suministros y packs no cubiertos con proveedores alternativos
    */
-  public function getAlternativeSuppliersForUncoveredItems(array $uncovered_items, array $quotations_ranking)
+  public function getAlternativeSuppliersForUncoveredItems(array $uncovered_items, ?array $quotations_ranking)
   {
     $uncovered_provisions_with_alternative_suppliers = $this->processUncoveredItems(
       $uncovered_items['uncovered_provisions'],
-      $quotations_ranking['provisions'],
+      $quotations_ranking ? $quotations_ranking['provisions'] : null,
       'id_suministro'
     );
 
     $uncovered_packs_with_alternative_suppliers = $this->processUncoveredItems(
       $uncovered_items['uncovered_packs'],
-      $quotations_ranking['packs'],
+      $quotations_ranking ? $quotations_ranking['packs'] : null,
       'id_pack'
     );
 
@@ -782,39 +781,89 @@ class PreOrderPeriodService
    * procesar suministros y packs no cubiertos, contrastar con el ranking de presupuestos
    * y obtener proveedores alternativos
    * @param Collection $uncovered_items suministros o packs no cubiertos
-   * @param array $quotations_ranking ranking de presupuestos para suministros o packs
-   * @param string $item_id_key clave para obtener el id del item, 'id_suministro' o 'id_pack'
+   * @param array|null $quotations_ranking ranking de presupuestos para suministros o packs (puede no existir ranking previo)
+   * @param string $item_id_key clave para indicar si buscare alternativos para suministro o pack
    * @return Collection suministros o packs no cubiertos con proveedores alternativos
    */
   private function processUncoveredItems($uncovered_items, $quotations_ranking, $item_id_key)
   {
     return $uncovered_items->map(function ($item) use ($quotations_ranking, $item_id_key) {
-      // Buscar el item en el ranking de presupuestos
-      $item_budgets = collect($quotations_ranking)
-        ->filter(function ($budget) use ($item, $item_id_key) {
-          // Usar la clave correcta del item según si es suministro o pack
-          $item_id = $item[$item_id_key];
-          return $budget[$item_id_key] === $item_id;
-        })
-        ->first();
-
-      if (!$item_budgets) {
-        $item['alternative_suppliers'] = null;
-        return $item;
+      // Si hay ranking de presupuestos, buscar proveedores alternativos allí
+      if ($quotations_ranking) {
+        return $this->getAlternativeSuppliersFromRanking($item, $quotations_ranking, $item_id_key);
       }
 
-      // Obtener proveedores del ranking, excluyendo el proveedor original
-      $alternative_suppliers = collect($item_budgets['precios_por_proveedor'])
-        ->filter(function ($provider_price) use ($item) {
-          return $provider_price['id_proveedor'] !== $item['proveedor_contactado']->id;
-        })
-        // Ordenar por precio unitario de menor a mayor
-        ->sortBy('precio_unitario')
-        ->values()
-        ->toArray();
-
-      $item['alternative_suppliers'] = $alternative_suppliers ?: [];
-      return $item;
+      // Si no hay ranking, buscar proveedores alternativos en la BD
+      return $this->getAlternativeSuppliersFromDB($item, $item_id_key);
     });
+  }
+
+  /**
+   * obtener proveedores alternativos desde el ranking de presupuestos
+   */
+  private function getAlternativeSuppliersFromRanking($item, array $quotations_ranking, string $item_id_key): array
+  {
+    // Buscar el item en el ranking de presupuestos
+    // extrae suministros o packs segun el id key indicado
+    $item_budgets = collect($quotations_ranking)
+      ->filter(function ($budget) use ($item, $item_id_key) {
+        $item_id = $item[$item_id_key];
+        return $budget[$item_id_key] === $item_id;
+      })
+      ->first();
+
+    if (!$item_budgets) {
+      $item['alternative_suppliers'] = [];
+      return $item;
+    }
+
+    // Obtener proveedores del ranking, excluyendo el proveedor original
+    $alternative_suppliers = collect($item_budgets['precios_por_proveedor'])
+      ->filter(function ($provider_price) use ($item) {
+        return $provider_price['id_proveedor'] !== $item['proveedor_contactado']->id;
+      })
+      ->sortBy('precio_unitario')
+      ->values()
+      ->toArray();
+
+    $item['alternative_suppliers'] = $alternative_suppliers ?: [];
+
+    return $item;
+  }
+
+  /**
+   * obtener proveedores alternativos desde la base de datos
+   */
+  private function getAlternativeSuppliersFromDB($item, string $item_id_key): array
+  {
+    $model = $item_id_key === 'id_suministro' ? Provision::class : Pack::class;
+    $itemId = $item[$item_id_key];
+    $currentSupplierId = $item['proveedor_contactado']->id;
+
+    // Obtener el item (provision o pack)
+    $modelItem = $model::find($itemId);
+
+    // Obtener proveedores alternativos que tienen este item
+    $alternative_suppliers = $modelItem->suppliers()
+      ->where('suppliers.id', '!=', $currentSupplierId)
+      ->get()
+      ->map(function ($supplier) use ($modelItem) {
+        // Obtener el precio desde la tabla pivot
+        $price = $supplier->pivot->price;
+
+        return [
+          'id_proveedor' => $supplier->id,
+          'proveedor' => $supplier->company_name,
+          'precio_unitario' => $price,
+          'tiene_stock' => true, // Por defecto asumimos que tiene stock
+          'id_presupuesto' => null // No hay presupuesto asociado
+        ];
+      })
+      ->sortBy('precio_unitario')
+      ->values()
+      ->toArray();
+
+    $item['alternative_suppliers'] = $alternative_suppliers;
+    return $item;
   }
 }
