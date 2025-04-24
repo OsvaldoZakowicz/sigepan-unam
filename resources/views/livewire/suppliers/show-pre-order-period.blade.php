@@ -653,19 +653,17 @@
                     @endif
                   </x-table-td>
                   <x-table-td>
+
                     {{-- acciones --}}
-                    @if ($preorder->is_completed)
-                      <x-a-button
-                        wire:navigate
-                        href="{{ route('suppliers-preorders-response', $preorder->id) }}"
-                        bg_color="neutral-100"
-                        border_color="neutral-200"
-                        text_color="neutral-600"
-                        >ver preorden
-                      </x-a-button>
-                    @else
-                      <span class="font-semibold text-neutral-400">-</span>
-                    @endif
+                    <x-a-button
+                      wire:navigate
+                      href="{{ route('suppliers-preorders-response', $preorder->id) }}"
+                      bg_color="neutral-100"
+                      border_color="neutral-200"
+                      text_color="neutral-600"
+                      >ver preorden
+                    </x-a-button>
+
                   </x-table-td>
                 </tr>
               @empty

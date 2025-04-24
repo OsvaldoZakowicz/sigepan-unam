@@ -50,10 +50,27 @@
               </div>
             </div>
 
-            {{-- estado y presupuesto de referencia --}}
+            {{-- estado, evaluacion y presupuesto de referencia --}}
             <div class="mt-2 flex gap-2 justify-start items-center">
 
-              {{-- estado pendiente --}}
+              {{-- estado de pre orden --}}
+              @if ($preorder->is_completed)
+                <x-text-tag
+                  color="emerald"
+                  class="cursor-pointer"
+                  >respondido
+                  <x-quest-icon title="el proveedor ha respondido"/>
+                </x-text-tag>
+              @else
+                <x-text-tag
+                  color="neutral"
+                  class="cursor-pointer"
+                  >sin responder
+                  <x-quest-icon title="el proveedor no ha respondido"/>
+                </x-text-tag>
+              @endif
+
+              {{-- evaluacion pendiente --}}
               @if ($preorder->status === $status_pending)
                 <x-text-tag
                   color="neutral"
@@ -63,7 +80,7 @@
                 </x-text-tag>
               @endif
 
-              {{-- estado aprobado --}}
+              {{-- evaluacion aprobado --}}
               @if ($preorder->status === $status_approved)
                 <x-text-tag
                   color="emerald"
@@ -73,7 +90,7 @@
                 </x-text-tag>
               @endif
 
-              {{-- estado rechazado --}}
+              {{-- evaluacion rechazado --}}
               @if ($preorder->status === $status_rejected)
                 <x-text-tag
                   color="red"
@@ -102,6 +119,7 @@
                 </x-a-button>
 
               @endif
+
             </div>
 
             {{-- detalle de fecha sobre la pre orden de referencia --}}
@@ -200,7 +218,11 @@
                             </span>
                           </td>
                           <td class="px-3 py-2 whitespace-nowrap text-sm text-end text-neutral-500">
-                            {{ ($item['item_has_stock']) ? 'si' : 'no' }}
+                            @if ($preorder->is_completed)
+                              {{ ($item['item_has_stock']) ? 'si' : 'no' }}
+                            @else
+                              <span>sin respuesta</span>
+                            @endif
                           </td>
                           <td class="px-3 py-2 whitespace-nowrap text-sm text-neutral-500 text-right">
                             @if(!$item['item_has_stock'])
@@ -238,12 +260,16 @@
                             </span>
                           </td>
                           <td class="px-3 py-2 whitespace-nowrap text-sm text-end text-neutral-500">
-                            {{ ($item['item_has_stock']) ? 'si' : 'no' }}
+                            @if ($preorder->is_completed)
+                              {{ ($item['item_has_stock']) ? 'si' : 'no' }}
+                            @else
+                              <span>sin respuesta</span>
+                            @endif
                           </td>
                           <td class="px-3 py-2 whitespace-nowrap text-sm text-neutral-500 text-right">
                             @if(!$item['item_has_stock'])
                               <del class="text-neutral-400">{{ $item['item_quantity'] }}</del>
-                              <span>{{ $item['item_alternative_quantity'] }}</span>
+                              <span>cantidad alternativa:&nbsp;{{ $item['item_alternative_quantity'] }}</span>
                             @else
                               <span>{{ $item['item_quantity'] }}</span>
                             @endif
@@ -284,53 +310,59 @@
           </div>
 
           {{-- detalle de envio, fecha, y medio de pago informado por el proveedor --}}
-          <div class="flex gap-2 flex-wrap p-4 bg-neutral-100">
+          <div class="flex flex-col gap-2 flex-wrap p-4 bg-neutral-100">
 
-            <div class="flex flex-col">
-              <h4 class="text-sm font-medium text-neutral-700 uppercase tracking-wider mb-2">anexo</h4>
-              @if ($preorder->is_approved_by_supplier)
-                <span>El proveedor <x-text-tag color="emerald">aceptó</x-text-tag> cumplir con la pre orden según el stock y anexo declarado</span>
-              @endif
-            </div>
+            <h4 class="text-sm font-medium text-neutral-700 uppercase tracking-wider">anexo</h4>
 
-            {{-- retiro o envio, fecha y método de pago en una línea --}}
-            <div class="flex flex-wrap gap-4 w-full">
-
-              @if (!empty($preorder_details))
-                {{-- retiro o envio --}}
-                <div class="flex items-center">
-                  <span class="font-medium text-sm text-neutral-700">Tipo de entrega:</span>
-                  <span class="ml-2 text-sm">
-                    {{ implode(', ', $preorder_details['delivery_type']) }}
-                  </span>
+            @if ($preorder->is_completed && $preorder->is_approved_by_supplier)
+              <div>
+                {{-- mensaje de aprobacion del proveedor --}}
+                <div class="flex flex-col mt-2">
+                  @if ($preorder->is_approved_by_supplier)
+                    <span>El proveedor <x-text-tag color="emerald">aceptó</x-text-tag> cumplir con la pre orden según el stock y el presente anexo declarado</span>
+                  @endif
                 </div>
 
-                {{-- fecha de envio o retiro --}}
-                <div class="flex items-center">
-                  <span class="font-medium text-sm text-neutral-700">Fecha tentativa de entrega o retiro a partir de:</span>
-                  <span class="ml-2 text-sm">
-                    {{ formatDateTime($preorder_details['delivery_date'], 'd-m-Y') }}
-                  </span>
+                {{-- retiro o envio, fecha y método de pago en una línea --}}
+                <div class="flex flex-wrap gap-2 w-full mt-2">
+                  @if (!empty($preorder_details))
+                    {{-- retiro o envio --}}
+                    <div class="flex items-center">
+                      <span class="font-medium text-sm text-neutral-700">Tipo de entrega:</span>
+                      <span class="ml-2 text-sm">
+                        {{ implode(', ', $preorder_details['delivery_type']) }}
+                      </span>
+                    </div>
+                    {{-- fecha de envio o retiro --}}
+                    <div class="flex items-center">
+                      <span class="font-medium text-sm text-neutral-700">Fecha tentativa de entrega o retiro a partir de:</span>
+                      <span class="ml-2 text-sm">
+                        {{ formatDateTime($preorder_details['delivery_date'], 'd-m-Y') }}
+                      </span>
+                    </div>
+                    {{-- metodo de pago --}}
+                    <div class="flex items-center">
+                      <span class="font-medium text-sm text-neutral-700">Métodos de pago aceptados:</span>
+                      <span class="ml-2 text-sm">
+                        {{ implode(', ', $preorder_details['payment_method']) }}
+                      </span>
+                    </div>
+                  @endif
                 </div>
 
-                {{-- metodo de pago --}}
-                <div class="flex items-center">
-                  <span class="font-medium text-sm text-neutral-700">Métodos de pago aceptados:</span>
-                  <span class="ml-2 text-sm">
-                    {{ implode(', ', $preorder_details['payment_method']) }}
-                  </span>
-                </div>
-              @endif
-
-            </div>
-
-            {{-- comentarios --}}
-            @if(!empty($preorder_details))
-              <div class="w-full mt-2">
-                <span class="font-medium text-sm text-neutral-700">Comentarios:</span>
-                <p class="mt-1 text-sm text-neutral-700">
-                  {{ $preorder_details['short_description'] ?? 'ninguno' }}
-                </p>
+                {{-- comentarios --}}
+                @if(!empty($preorder_details))
+                  <div class="w-full mt-2">
+                    <span class="font-medium text-sm text-neutral-700">Comentarios:</span>
+                    <p class="mt-1 text-sm text-neutral-700">
+                      {{ $preorder_details['short_description'] ?? 'ninguno' }}
+                    </p>
+                  </div>
+                @endif
+              </div>
+            @else
+              <div>
+                <span>sin respuesta</span>
               </div>
             @endif
 
@@ -345,29 +377,32 @@
         {{-- botones de guardado: desktop, display desde 1024px --}}
         <div class="hidden lg:flex w-full justify-end gap-2 mt-2">
 
-          {{-- si el proveedor no respondio ni acepto la pre orden --}}
-          @if ($preorder->is_completed && $preorder->is_approved_by_supplier && !$preorder->is_approved_by_buyer)
+          @if ($preorder->is_completed && $preorder->is_approved_by_supplier)
 
-            <x-a-button
-              wire:navigate
-              href="#"
-              bg_color="red-600"
-              border_color="red-600"
-              wire:click=""
-              wire:confirm="¿?"
-              >rechazar
-            </x-a-button>
+            @if (!$preorder->is_approved_by_buyer)
 
-            <x-btn-button
-              type="button"
-              wire:click="approveAndMakeOrder()"
-              wire:confirm="¿aprobar esta pre orden?, al aprobar la pre orden indica que está de acuerdo con el stock que puede cumplir el proveedor y con los parámetros del anexo. Se emitirá una orden de compra final para todos los suministros y packs de la lista con stock, la orden de compra definitiva se enviará por email al proveedor"
-              >aprobar y ordenar compra
-            </x-btn-button>
+              <x-a-button
+                wire:navigate
+                href="#"
+                bg_color="red-600"
+                border_color="red-600"
+                wire:click=""
+                wire:confirm="¿?"
+                >rechazar
+              </x-a-button>
 
-          @else
+              <x-btn-button
+                type="button"
+                wire:click="approveAndMakeOrder()"
+                wire:confirm="¿aprobar esta pre orden?, al aprobar la pre orden indica que está de acuerdo con el stock que puede cumplir el proveedor y con los parámetros del anexo. Se emitirá una orden de compra final para todos los suministros y packs de la lista con stock, la orden de compra definitiva se enviará por email al proveedor"
+                >aprobar y ordenar compra
+              </x-btn-button>
 
-            <p>Esta pre orden fue aceptada, y se envió al proveedor una orden de compra definitiva.</p>
+            @else
+
+              <p>Esta pre orden fue aceptada, y se envió al proveedor una orden de compra definitiva.</p>
+
+            @endif
 
           @endif
         </div>

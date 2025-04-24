@@ -64,13 +64,6 @@ class ShowPreOrderResponse extends Component
   {
     $this->preorder = PreOrder::findOrFail($id);
 
-    // si el proveedor no completo, retornar
-    if (!$this->preorder->is_completed) {
-
-      session()->flash('operation-info', 'El provedor no ha respondido aún');
-      $this->redirectRoute('suppliers-preorders-show', $this->preorder->pre_order_period->id);
-    }
-
     $this->preorder_details = json_decode($this->preorder->details, true);
     $this->quotation        = Quotation::where('quotation_code', $this->preorder->quotation_reference)->first();
 
