@@ -379,15 +379,15 @@
 
           @if ($preorder->is_completed && $preorder->is_approved_by_supplier)
 
-            @if (!$preorder->is_approved_by_buyer)
+            @if (!$preorder->is_approved_by_buyer && $preorder->status === $status_pending)
 
               <x-a-button
                 wire:navigate
                 href="#"
                 bg_color="red-600"
                 border_color="red-600"
-                wire:click=""
-                wire:confirm="¿?"
+                wire:click="rejectPreOrder()"
+                wire:confirm="¿rechazar esta pre orden? el proveedor no podrá responder la pre orden una vez la rechace, al finalizar el periodo los suministros y packs de esta pre orden se indicarán como faltates a cubrir."
                 >rechazar
               </x-a-button>
 
@@ -398,9 +398,13 @@
                 >aprobar y ordenar compra
               </x-btn-button>
 
-            @else
+            @elseif ($preorder->is_approved_by_buyer && $preorder->status === $status_approved)
 
               <p>Esta pre orden fue aceptada, y se envió al proveedor una orden de compra definitiva.</p>
+
+            @else
+
+              <p>Esta pre orden fue rechazada.</p>
 
             @endif
 

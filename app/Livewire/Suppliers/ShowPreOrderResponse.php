@@ -201,6 +201,19 @@ class ShowPreOrderResponse extends Component
   }
 
   /**
+   * * rechazar pre orden
+   * el comprador no aprueba la pre orden
+   * el estado de la pre orden cambia a rechazado
+   */
+  public function rejectPreOrder()
+  {
+    $this->preorder->update([
+      'is_approved_by_buyer'  => false,
+      'status'                => $this->status_rejected,
+    ]);
+  }
+
+  /**
    * renderizar vista
    * @return View
    */

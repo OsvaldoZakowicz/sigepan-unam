@@ -653,6 +653,9 @@ class PreOrderPeriodService
 
   /**
    * obtener suministros y packs no cubiertos en las pre ordenes respondidas
+   * NOTA: una pre orden respondida 'is_completed' = true puede tener un estado 'aprobado' o 'rechazado'
+   * donde el estado 'aprobado' puede ser con cantidad alternativa en algun suministro o pack
+   * y donde el estado 'rechazado' considera como no cubierto todo lo pedido
    * @param PreOrderPeriod $preorder_period periodo de pre ordenes
    */
   public function getUncoveredItems(PreOrderPeriod $preorder_period)
@@ -693,25 +696,32 @@ class PreOrderPeriodService
 
     foreach ($packs as $pack) {
 
-      // packs marcados como 'sin stock'
-      if (!$pack->pivot->has_stock) {
-        // cantidad no cubierta
-        $uncovered_quantity = $pack->pivot->quantity - ($pack->pivot->alternative_quantity ?? 0);
-
-        // si la cantidad no cubierta es mayor a 0
-        if ($uncovered_quantity > 0) {
-          $uncovered_packs->push([
-            'id_pack'               => $pack->pivot->pack_id,   // id del pack no cubierto
-            'nombre_pack'           => $pack->pack_name,        // nombre del pack no cubierto
-            'marca_pack'            => $pack->provision->trademark->provision_trademark_name, // marca del pack
-            'tipo_pack'             => $pack->provision->type->provision_type_name,           // tipo del pack
-            'cantidad_pack'         => $pack->pack_quantity,      // volumen del pack
-            'unidad_pack'           => $pack->provision->measure, // unidad de medida del pack
-            'cantidad_faltante'     => $uncovered_quantity,       // cantidad no cubierta
-            'id_preorden'           => $preorder->id,             // preorden donde se pidio el pack
-            'proveedor_contactado'  => $preorder->supplier,       // proveedor contactado
-          ]);
+      // Determinar cantidad no cubierta según el estado de la pre-orden
+      if ($preorder->status === PreOrder::getRejectedStatus()) {
+        // Si la pre-orden está rechazada, toda la cantidad solicitada es faltante
+        $uncovered_quantity = $pack->pivot->quantity;
+      } else {
+        // Si la pre-orden está aprobada, calcular cantidad no cubierta solo si no hay stock
+        if (!$pack->pivot->has_stock) {
+          $uncovered_quantity = $pack->pivot->quantity - ($pack->pivot->alternative_quantity ?? 0);
+        } else {
+          continue; // Si hay stock, no hay cantidad no cubierta
         }
+      }
+
+      // Si hay cantidad no cubierta, agregar a la colección
+      if ($uncovered_quantity > 0) {
+        $uncovered_packs->push([
+          'id_pack'               => $pack->pivot->pack_id,
+          'nombre_pack'           => $pack->pack_name,
+          'marca_pack'            => $pack->provision->trademark->provision_trademark_name,
+          'tipo_pack'             => $pack->provision->type->provision_type_name,
+          'cantidad_pack'         => $pack->pack_quantity,
+          'unidad_pack'           => $pack->provision->measure,
+          'cantidad_faltante'     => $uncovered_quantity,
+          'id_preorden'           => $preorder->id,
+          'proveedor_contactado'  => $preorder->supplier,
+        ]);
       }
     }
   }
@@ -727,25 +737,32 @@ class PreOrderPeriodService
 
     foreach ($provisions as $provision) {
 
-      // suministros marcados como 'sin stock'
-      if (!$provision->pivot->has_stock) {
-        // cantidad no cubierta
-        $uncovered_quantity = $provision->pivot->quantity - ($provision->pivot->alternative_quantity ?? 0);
-
-        // si la cantidad no cubierta es mayor a 0
-        if ($uncovered_quantity > 0) {
-          $uncovered_provisions->push([
-            'id_suministro'         => $provision->pivot->provision_id,  // id del suministro no cubierto
-            'nombre_suministro'     => $provision->provision_name,       // nombre del pack no cubierto
-            'marca_suministro'      => $provision->trademark->provision_trademark_name, // marca del suministro
-            'tipo_suministro'       => $provision->type->provision_type_name,           // tipo del suministro
-            'cantidad_suministro'   => $provision->provision_quantity,   // volumen del suministro
-            'unidad_suministro'     => $provision->measure,              // unidad de medida del suministro
-            'cantidad_faltante'     => $uncovered_quantity,              // cantidad no cubierta
-            'id_preorden'           => $preorder->id,                    // preorden donde se pidio el suministro
-            'proveedor_contactado'  => $preorder->supplier,              // proveedor contactado
-          ]);
+      // Determinar cantidad no cubierta según el estado de la pre-orden
+      if ($preorder->status === PreOrder::getRejectedStatus()) {
+        // Si la pre-orden está rechazada, toda la cantidad solicitada es faltante
+        $uncovered_quantity = $provision->pivot->quantity;
+      } else {
+        // Si la pre-orden está aprobada, calcular cantidad no cubierta solo si no hay stock
+        if (!$provision->pivot->has_stock) {
+          $uncovered_quantity = $provision->pivot->quantity - ($provision->pivot->alternative_quantity ?? 0);
+        } else {
+          continue; // Si hay stock, no hay cantidad no cubierta
         }
+      }
+
+      // Si hay cantidad no cubierta, agregar a la colección
+      if ($uncovered_quantity > 0) {
+        $uncovered_provisions->push([
+          'id_suministro'         => $provision->pivot->provision_id,
+          'nombre_suministro'     => $provision->provision_name,
+          'marca_suministro'      => $provision->trademark->provision_trademark_name,
+          'tipo_suministro'       => $provision->type->provision_type_name,
+          'cantidad_suministro'   => $provision->provision_quantity,
+          'unidad_suministro'     => $provision->measure,
+          'cantidad_faltante'     => $uncovered_quantity,
+          'id_preorden'           => $preorder->id,
+          'proveedor_contactado'  => $preorder->supplier,
+        ]);
       }
     }
   }
