@@ -30,4 +30,12 @@ class Recipe extends Model implements Auditable
     return $this->belongsTo(Product::class, 'product_id', 'id');
   }
 
+  //* una receta tiene muchas categorias asociadas
+  public function provision_categories(): BelongsToMany
+  {
+    return $this->belongsToMany(ProvisionCategory::class, 'category_recipe', 'recipe_id', 'category_id')
+      ->withPivot('quantity')
+      ->withTimestamps();
+  }
+
 }
