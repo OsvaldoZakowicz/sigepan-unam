@@ -232,14 +232,15 @@
                       @endif
                     {{-- periodo cerrado, solo ver mi respuesta --}}
                     @else
-                      <x-a-button
+                      {{-- <x-a-button
                         wire:navigate
                         href="#"
                         bg_color="neutral-100"
                         border_color="neutral-200"
                         text_color="neutral-600"
                         >ver
-                      </x-a-button>
+                      </x-a-button> --}}
+                      <span>ninguna</span>
                     @endif
                   </div>
                 </x-table-td>
