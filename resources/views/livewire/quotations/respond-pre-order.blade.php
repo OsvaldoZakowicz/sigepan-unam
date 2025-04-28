@@ -3,9 +3,11 @@
   <article class="m-2 border rounded-sm border-neutral-200">
 
     {{-- barra de titulo --}}
-    <x-title-section title="responder pre orden de compras">
+    <x-title-section title="{{ $is_editing ? 'editar respuesta pre orden' : 'responder pre orden de compras' }}">
       <x-slot:title>
-        <span class="text-xl md:text-base lg:text-sm text-neutral-800">responder pre orden de compras</span>
+        <span class="text-xl md:text-base lg:text-sm text-neutral-800">
+          {{ $is_editing ? 'editar respuesta pre orden' : 'responder pre orden de compras' }}
+        </span>
       </x-slot:title>
     </x-title-section>
 
@@ -14,8 +16,15 @@
 
       <x-slot:header class="bg-blue-100 border-blue-500">
         <div class="flex flex-col p-2">
-          <span class="font-semibold mb-2 text-base lg:text-sm text-neutral-800">¡aviso!</span>
-          <span class="text-base lg:text-sm text-neutral-700">¡tiene hasta la fecha: <span class="font-semibold">{{ formatDateTime($preorder->pre_order_period->period_end_at, 'd-m-Y') }}</span> para enviar una respuesta, hasta el cierre de este pedido de pre orden!</span>
+          <span class="font-semibold mb-2 text-lg lg:text-sm text-neutral-800">¡Aviso!</span>
+          <sp class="text-base lg:text-sm text-neutral-700">
+            <span>¡Tiene hasta la fecha:&nbsp;</span>
+            <span class="font-semibold">{{ formatDateTime($preorder->pre_order_period->period_end_at, 'd-m-Y') }}</span>
+            <span>&nbsp;para enviar una respuesta!</span>
+            @if($is_editing)
+              <span class="font-semibold text-blue-700">Está editando su respuesta anterior a esta pre orden</span>
+            @endif
+          </span>
         </div>
       </x-slot:header>
 
@@ -26,6 +35,8 @@
 
           <!-- Cabecera de la Pre-orden -->
           <div class="bg-neutral-100 p-4 border-b">
+
+            {{-- codigo y fecha --}}
             <div class="flex justify-between items-center">
               <div>
                 <h3 class="text-lg text-neutral-800">
@@ -36,34 +47,78 @@
                 </p>
               </div>
             </div>
+
+            {{-- estado, evaluacion y presupuesto de referencia --}}
             <div class="mt-2 flex gap-2 justify-start items-center">
-              <x-text-tag
-                color="neutral"
-                class="cursor-pointer"
-                >{{ $preorder->status }}
-                <x-quest-icon title="aún no completo su respuesta a esta pre orden"/>
-              </x-text-tag>
+
+              {{-- estado de pre orden --}}
+              @if ($preorder->is_completed)
+                <x-text-tag
+                  color="emerald"
+                  class="cursor-pointer"
+                  >respondido
+                  <x-quest-icon title="ya ha respondido"/>
+                </x-text-tag>
+              @else
+                <x-text-tag
+                  color="neutral"
+                  class="cursor-pointer"
+                  >sin responder
+                  <x-quest-icon title="no ha respondido"/>
+                </x-text-tag>
+              @endif
+
+              {{-- evaluacion pendiente --}}
+              @if ($preorder->status === $status_pending)
+                <x-text-tag
+                  color="neutral"
+                  class="cursor-pointer"
+                  >{{ $preorder->status }}
+                  <x-quest-icon title="esta pre orden esta aún en tramite de aprobación"/>
+                </x-text-tag>
+              @endif
+
+              {{-- evaluacion aprobado --}}
+              @if ($preorder->status === $status_approved)
+                <x-text-tag
+                  color="emerald"
+                  class="cursor-pointer"
+                  >{{ $preorder->status }}
+                  <x-quest-icon title="tanto usted como proveedor y la panaderia estan de acuerdo con esta pre orden de compra"/>
+                </x-text-tag>
+              @endif
+
+              {{-- evaluacion rechazado --}}
+              @if ($preorder->status === $status_rejected)
+                <x-text-tag
+                  color="red"
+                  class="cursor-pointer"
+                  >{{ $preorder->status }}
+                  <x-quest-icon title="una de las partes rechazó esta pre orden de compra"/>
+                </x-text-tag>
+              @endif
+
+              {{-- si la pre orden se basa en un presupuesto previo --}}
               @if ($preorder->quotation_reference !== null)
+
                 <x-text-tag
                   color="neutral"
                   class="cursor-pointer"
                   >referencia: <span class="uppercase text-xs font-semibold">{{ $preorder->quotation_reference }}</span>
                 </x-text-tag>
+
                 <x-a-button
                   wire:navigate
-                  href="{{ route('quotations-quotations-show', $quotation->id) }}"
+                  href="{{ route('suppliers-budgets-response', $quotation->id) }}"
                   bg_color="neutral-100"
                   border_color="neutral-200"
                   text_color="neutral-600"
                   >ver presupuesto previo
                 </x-a-button>
+
               @endif
+
             </div>
-            @if ($preorder->quotation_reference !== null)
-              <div class="mt-2 ">
-                <span class="py-2 lowercase">esta pre orden se creó a partir de uno de sus presupuestos recibido el {{ $quotation->updated_at->format('d-m-Y H:i:s') }}</span>
-              </div>
-            @endif
           </div>
 
           <!-- Información del Proveedor y Emisor -->
@@ -189,19 +244,28 @@
                                 @if (!$items[$key]['item_has_stock'])
                                   <div class="flex flex-col gap-1">
                                     <div class="flex items-center gap-1">
-                                      <label for="items_{{ $key }}_alternative_quantity" class="text-xs">¿cuanto puede cubrir?:</label>
+                                      <label for="items_{{ $key }}_alternative_quantity" class="text-xs">
+                                        ¿cuanto puede cubrir?:
+                                      </label>
                                       <input
                                         type="number"
                                         id="items_{{ $key }}_alternative_quantity"
                                         wire:model.live="items.{{ $key }}.item_alternative_quantity"
                                         min="0"
                                         max="{{ $items[$key]['item_quantity'] }}"
+                                        value="{{ $items[$key]['item_alternative_quantity'] }}" {{-- valor desde BD --}}
                                         class="w-12 p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
                                       />
                                     </div>
                                     @error("items.{$key}.item_alternative_quantity")
                                       <span class="text-xs text-red-400">{{ $message }}</span>
                                     @enderror
+
+                                    @if($is_editing && $items[$key]['item_alternative_quantity'] > 0)
+                                      <span class="text-xs text-blue-600">
+                                        Cantidad alternativa anterior: {{ $original_alternative_quantities[$key]['quantity'] }}
+                                      </span>
+                                    @endif
                                   </div>
                                 @endif
                               </div>
@@ -267,19 +331,28 @@
                                 @if (!$items[$key]['item_has_stock'])
                                   <div class="flex flex-col gap-1">
                                     <div class="flex items-center gap-1">
-                                      <label for="items_{{ $key }}_alternative_quantity" class="text-xs">¿cuanto puede cubrir?:</label>
+                                      <label for="items_{{ $key }}_alternative_quantity" class="text-xs">
+                                        ¿cuanto puede cubrir?:
+                                      </label>
                                       <input
                                         type="number"
                                         id="items_{{ $key }}_alternative_quantity"
                                         wire:model.live="items.{{ $key }}.item_alternative_quantity"
                                         min="0"
                                         max="{{ $items[$key]['item_quantity'] }}"
+                                        value="{{ $items[$key]['item_alternative_quantity'] }}" {{-- valor desde BD --}}
                                         class="w-12 p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
                                       />
                                     </div>
                                     @error("items.{$key}.item_alternative_quantity")
                                       <span class="text-xs text-red-400">{{ $message }}</span>
                                     @enderror
+
+                                    @if($is_editing && $items[$key]['item_alternative_quantity'] > 0)
+                                      <span class="text-xs text-blue-600">
+                                        Cantidad alternativa anterior: {{ $original_alternative_quantities[$key]['quantity'] }}
+                                      </span>
+                                    @endif
                                   </div>
                                 @endif
                               </div>
@@ -498,8 +571,8 @@
           <x-btn-button
             type="button"
             wire:click="save"
-            wire:confirm="¿confirma de ha leido toda la pre orden y puede cumplir con todos los suministros y/o packs solicitados según su stock?"
-            >responder
+            wire:confirm="{{ $is_editing ? '¿Confirma los cambios realizados?' : '¿confirma que ha leido toda la pre orden y puede cumplir con todos los suministros y/o packs solicitados según su stock?' }}"
+            >{{ $is_editing ? 'actualizar respuesta' : 'responder' }}
           </x-btn-button>
 
         </div>

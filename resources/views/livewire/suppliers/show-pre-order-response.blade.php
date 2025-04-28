@@ -122,7 +122,7 @@
 
             </div>
 
-            {{-- detalle de fecha sobre la pre orden de referencia --}}
+            {{-- detalle de fecha sobre el presupuesto de referencia --}}
             @if ($preorder->quotation_reference !== null)
               <div class="mt-2 ">
                 <span class="py-2 lowercase">esta pre orden se creó a partir del presupuesto obtenido el:&nbsp;</span>

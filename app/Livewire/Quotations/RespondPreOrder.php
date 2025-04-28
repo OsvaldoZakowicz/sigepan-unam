@@ -8,21 +8,31 @@ use App\Models\Pack;
 use App\Models\Quotation;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Livewire\Component;
 
 /**
  * * UN PROVEEDOR RESPONDE A LA PRE ORDEN
+ * funcionalidad de respuesta y edicion de respuesta
  */
 class RespondPreOrder extends Component
 {
+  // labels dedicadas
+  protected string $PROVISION = 'provision';
+  protected string $PACK = 'pack';
+
+  // controla si se trata o no del modo edicion
+  public bool $is_editing = false;
+
+  // pre orden y posible presupuesto asociado
   public PreOrder $preorder;
-  public Quotation | null $quotation;
+  public Quotation|null $quotation;
 
   // formulario
-  public $delivery_type; // dos tipos
+  public $delivery_type;
   public $delivery_date;
-  public $payment_method; // varios metodos
+  public $payment_method;
   public $short_description;
   public $accept_terms;
 
@@ -30,11 +40,32 @@ class RespondPreOrder extends Component
   public Collection $items;
   public float $total_price;
 
-  protected $PROVISION = 'provision';
-  protected $PACK = 'pack';
+  // propiedad para almacenar cantidades alternativas originales
+  public Collection $original_alternative_quantities;
 
-  public $item_provision;
-  public $item_pack;
+  // labels publicas
+  public string $item_provision;
+  public string $item_pack;
+
+  // estados
+  public string $status_pending;
+  public string $status_approved;
+  public string $status_rejected;
+
+  /**
+   * boot de constantes
+   * @return void
+   */
+  public function boot(): void
+  {
+    $this->status_pending = PreOrder::getPendingStatus();
+    $this->status_approved = PreOrder::getApprovedStatus();
+    $this->status_rejected = PreOrder::getRejectedStatus();
+
+    // preparacion de labels
+    $this->item_provision = $this->PROVISION;
+    $this->item_pack      = $this->PACK;
+  }
 
   /**
    * montar datos
@@ -43,31 +74,129 @@ class RespondPreOrder extends Component
    */
   public function mount(int $id): void
   {
-    // todo: para proceder debe completar su direccion en el perfil
 
     $this->preorder = PreOrder::findOrFail($id);
     $this->quotation = Quotation::where('quotation_code', $this->preorder->quotation_reference)->first();
 
-    $this->item_provision = $this->PROVISION;
-    $this->item_pack = $this->PACK;
+    // Ejecutar validaciones antes de continuar
+    if (!$this->validatePreOrderResponse()) {
+      return;
+    }
 
-    $this->delivery_type = [];
-    $this->payment_method = [];
+    // Verificar si la pre-orden ya fue respondida
+    if ($this->preorder->is_completed) {
+      $this->is_editing = true;
+      // cargar anexo
+      $this->loadExistingResponse();
+    }
 
-    $this->setProvisionsAndPacks();
-    $this->getTotalPrice();
+    // si no es edicion, preparar arrays vacios para anexo
+    if (!$this->is_editing) {
+      $this->delivery_type = [];
+      $this->payment_method = [];
+    }
+
+    $this->setProvisionsAndPacks(); // cargar suministros y packs
+    $this->getTotalPrice();         // calcular precio total
   }
 
   /**
-   * preparar suministros y packs
-   * de la pre orden.
+   * Validaciones previas antes de mostrar el componente
+   * Se ejecutan en el siguiente orden:
+   * 1. Perfil completo del proveedor
+   * 2. Estado del período de pre-orden
+   * 3. Estado de la pre-orden
+   *
+   * @return bool true si pasa todas las validaciones, false en caso contrario
+   */
+  protected function validatePreOrderResponse(): bool
+  {
+    /**
+     * todo: Validación 1: Perfil del proveedor
+     * Verifica que el proveedor tenga un perfil completo antes de responder
+     * - Usa la relación profile del modelo User
+     * - Redirige a la página de perfil si no está completo
+     */
+    /* if (!Auth::user()->profile) {
+      session()->flash('operation-info', toastInfoBody('Debe completar su perfil antes de poder responder pre órdenes'));
+
+      // Redirigir a la pagina de perfil para que lo complete
+      $this->redirectRoute('profile');
+      return false;
+    } */
+
+    /**
+     * Validacion 2: Estado del período
+     * Verifica que el período de pre-orden esté abierto (codigo 1)
+     * Códigos de estado:
+     * - 0: programado
+     * - 1: abierto
+     * - 2: cerrado
+     */
+    if ($this->preorder->pre_order_period->status->status_code !== 1) {
+
+      $description   = $this->preorder->pre_order_period->status->status_short_description;
+
+      session()->flash('operation-info', toastInfoBody("No es posible responder, $description "));
+
+      $this->redirectRoute('quotations-preorders-index');
+      return false;
+    }
+
+    /**
+     * Validación 3: Estado de la pre-orden
+     * Verifica que la pre-orden esté en estado pendiente
+     * Estados posibles:
+     * - pendiente: puede ser modificada
+     * - aprobada: no puede modificarse
+     * - rechazada: no puede modificarse
+     */
+    if ($this->preorder->status !== $this->status_pending) {
+
+      $currentStatus = ucfirst($this->preorder->status);
+
+      session()->flash('operation-info', toastInfoBody("No es posible modificar la pre orden. Estado actual: $currentStatus"));
+
+      $this->redirectRoute('quotations-preorders-index');
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * si estamos en modo de edicion,
+   * cargar respuesta previa del anexo
+   * @return void
+   */
+  protected function loadExistingResponse(): void
+  {
+    if ($this->preorder->details) {
+      $details = json_decode($this->preorder->details, true);
+
+      $this->delivery_type     = $details['delivery_type'] ?? [];
+      $this->delivery_date     = $details['delivery_date'] ?? null;
+      $this->payment_method    = $details['payment_method'] ?? [];
+      $this->short_description = $details['short_description'] ?? null;
+      $this->accept_terms      = $details['accept_terms'] ?? false;
+    }
+  }
+
+  /**
+   * preparar suministros y packs de la pre orden en una coleccion,
+   * para permitir responder la disponibilidad de cada uno.
+   * captura independientemente de si es modo edicion o no
    * @return void
    */
   public function setProvisionsAndPacks(): void
   {
+    // coleccion de suministros y packs
     $this->fill([
       'items' => collect([]),
     ]);
+
+    // preparar coleccion de cantidades alternativas para suministros y packs a mostrar en edicion
+    $this->original_alternative_quantities = collect([]);
 
     if ($this->preorder->provisions->count() > 0) {
       foreach ($this->preorder->provisions as $provision) {
@@ -83,21 +212,35 @@ class RespondPreOrder extends Component
   }
 
   /**
-   * agregar un suministro o un pack al array de items
-   * @param Provision | Pack $item es un suministro o pack
+   * agregar un suministro o un pack al array de items,
+   * con los datos necesarios para visualizarlos en la tabla de items (renglones)
+   * @param Provision|Pack $item es un suministro o pack
    * @return void
    */
   public function addItem(Provision|Pack $item): void
   {
     $type = ($item instanceof Provision) ? $this->PROVISION : $this->PACK;
 
+    // Capturar cantidad alternativa si existe
+    $alternative_quantity = $item->pivot->alternative_quantity ?? 0;
+
+    // Guardar cantidad alternativa original
+    $this->original_alternative_quantities->push([
+      'item_id'   => $item->id,
+      'item_type' => $type,
+      'quantity'  => $alternative_quantity
+    ]);
+
+    // Si hay cantidad alternativa, significa que no había stock completo
+    $has_stock = $alternative_quantity > 0 ? false : (bool) $item->pivot->has_stock;
+
     $this->items->push([
       'item_id'                   =>  $item->id,
       'item_type'                 =>  $type,
       'item_object'               =>  $item,
-      'item_has_stock'            =>  (bool) $item->pivot->has_stock, // true (1), false (0)
+      'item_has_stock'            =>  $has_stock,
       'item_quantity'             =>  (int) $item->pivot->quantity,
-      'item_alternative_quantity' =>  0,
+      'item_alternative_quantity' =>  (int) $alternative_quantity,
       'item_unit_price'           =>  $item->pivot->unit_price,
       'item_total_price'          =>  $item->pivot->total_price,
     ]);
@@ -209,10 +352,11 @@ class RespondPreOrder extends Component
 
       // actualizar pre orden
       // a este punto, el proveedor aprueba la pre orden, y esta es completada
-      $this->preorder->is_approved_by_supplier  = $validated['accept_terms'];
-      $this->preorder->is_completed             = true;
-      $this->preorder->details                  = $json_details;
-      $this->preorder->save();
+      $this->preorder->update([
+        'is_approved_by_supplier' => $validated['accept_terms'],
+        'is_completed'            => true,
+        'details'                 => $json_details,
+      ]);
 
       // actualizar packs y/o suministros
       foreach ($this->items as $item) {
@@ -264,9 +408,15 @@ class RespondPreOrder extends Component
         }
       }
 
+      // Separar la lógica del mensaje
+      $message = $this->is_editing
+        ? toastSuccessBody('pre orden', 'actualizada y enviada')
+        : toastSuccessBody('pre orden', 'completada y enviada');
+
+      session()->flash('operation-success', $message);
+
       $this->reset();
 
-      session()->flash('operation-success', toastSuccessBody('pre orden', 'completada y enviada'));
       $this->redirectRoute('quotations-preorders-index');
     } catch (\Exception $e) {
 

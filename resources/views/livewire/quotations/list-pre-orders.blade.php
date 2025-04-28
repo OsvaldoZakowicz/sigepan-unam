@@ -219,22 +219,8 @@
                   <div class="flex justify-start gap-1">
                     {{-- si el periodo NO esta cerrado --}}
                     @if ($preorder->pre_order_period->period_status_id !== $status_closed)
-                      {{-- responder si no esta completado, de lo contrario, editar --}}
-                      @if ($preorder->is_completed)
-                        {{-- mientras la panaderia no apruebe, el proveedor puede editar --}}
-                        @if (!$preorder->is_approved_by_buyer)
-
-                          <x-a-button
-                            wire:navigate
-                            href="#"
-                            bg_color="neutral-100"
-                            border_color="neutral-200"
-                            text_color="neutral-600"
-                            >modificar
-                          </x-a-button>
-
-                        @endif
-                      @else
+                      {{-- mientras la panaderia no apruebe, el proveedor puede editar --}}
+                      @if (!$preorder->is_approved_by_buyer)
                         <x-a-button
                           wire:navigate
                           href="{{ route('quotations-preorders-respond', $preorder->id) }}"
@@ -244,7 +230,7 @@
                           >responder
                         </x-a-button>
                       @endif
-                    {{-- periodo cerrado, solo ver mi respuesta (o no) --}}
+                    {{-- periodo cerrado, solo ver mi respuesta --}}
                     @else
                       <x-a-button
                         wire:navigate
