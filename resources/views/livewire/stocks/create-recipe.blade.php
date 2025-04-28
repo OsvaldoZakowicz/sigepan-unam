@@ -153,7 +153,7 @@
               <span class="text-sm text-neutral-600">elija los suministros que necesita para la receta</span>
             </x-slot:subtitle>
 
-            @error('provisions*')
+            @error('provision_categories*')
               <x-slot:messages class="my-2">
                 <span class="text-red-400">¡hay errores en esta seccion!</span>
               </x-slot:messages>
@@ -168,7 +168,7 @@
               {{-- leyenda --}}
               <div class="py-1">
                 <span class="font-semibold capitalize">lista de suministros de la receta</span>
-                @error('provisions')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
+                @error('provision_categories')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
               </div>
 
               <div class="max-h-60 overflow-y-auto overflow-x-hidden">
@@ -177,43 +177,45 @@
                     <tr class="border bg-neutral-100">
                       <x-table-th class="text-end w-12">id</x-table-th>
                       <x-table-th class="text-start">nombre</x-table-th>
-                      <x-table-th class="text-start">marca</x-table-th>
                       <x-table-th class="text-start">tipo</x-table-th>
                       <x-table-th class="text-end">
                         <span>cantidad necesaria</span>
-                        <x-quest-icon title="kilogramos (kg), litros (lts) o unidades (un)"/>
+                        <x-quest-icon title="kilogramos (kg), gramos (g), litros (L), mililitros (ml), metros (m), centimetros (cm)  o unidades (un)"/>
                       </x-table-th>
                       <x-table-th class="text-start w-16">quitar</x-table-th>
                     </tr>
                   </x-slot:tablehead>
                   <x-slot:tablebody>
-                    @forelse ($provisions as $key => $provision)
+                    @forelse ($provision_categories as $key => $category)
                       <tr class="border">
                         <x-table-td class="text-end">
-                          {{ $provision['provision']->id }}
+                          {{ $category['category']->id }}
                         </x-table-td>
                         <x-table-td class="text-start">
-                          {{ $provision['provision']->provision_name }}
+                          {{ $category['category']->provision_category_name }}
                         </x-table-td>
                         <x-table-td class="text-start">
-                          {{ $provision['provision']->trademark->provision_trademark_name }}
-                        </x-table-td>
-                        <x-table-td class="text-start">
-                          {{ $provision['provision']->type->provision_type_name }}
+                          {{ $category['category']->provision_type->provision_type_name }}
                         </x-table-td>
                         {{-- cantidad necesaria --}}
                         <x-table-td class="text-end">
                           {{-- cantidad --}}
-                          @error('provisions.'.$key.'.quantity')
+                          @error('provision_categories.'.$key.'.quantity')
                             <span class="text-red-400 text-xs">{{ $message }}</span>
                           @enderror
-                          <input
-                            type="text"
-                            id="provisions_{{ $key }}_quantity"
-                            wire:model.defer="provisions.{{ $key }}.quantity"
-                            placeholder="cantidad"
-                            class="w-full p-1 text-sm text-right border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                          <div class="flex gap-2 items-center justify-end">
+                            <input
+                              type="text"
+                              id="provision_categories_{{ $key }}_quantity"
+                              wire:model.defer="provision_categories.{{ $key }}.quantity"
+                              placeholder="cantidad"
+                              class="w-48 p-1 text-sm text-right border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
                             />
+                            <span class="capitalize">({{ $category['category']->measure->unit_symbol }})</span>
+                            @if ($category['category']->measure->conversion_unit !== null)
+                              <span>o, ({{ $category['category']->measure->conversion_symbol ?? null }})</span>
+                            @endif
+                          </div>
                         </x-table-td>
                         {{-- acciones --}}
                         <x-table-td class="text-start">

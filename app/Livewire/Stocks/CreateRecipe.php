@@ -5,6 +5,7 @@ namespace App\Livewire\Stocks;
 use App\Models\Provision;
 use App\Models\Recipe;
 use App\Models\Product;
+use App\Models\ProvisionCategory;
 use Illuminate\Support\Carbon;
 use Livewire\Attributes\On;
 use Illuminate\Support\Collection;
@@ -27,46 +28,8 @@ class CreateRecipe extends Component
   public $time_h = '00'; // horas
   public $time_m = '01'; // minutos
 
-  // lista de suministros seleccionada
-  public Collection $provisions;
-
-  /**
-   * Valida y formatea el tiempo en horas ingresado
-   * Asegura que esté entre 00-12 con formato de 2 dígitos
-   * @return void
-   */
-  public function updatedTimeH()
-  {
-    // Validar rango
-    $value = (int) $this->time_h;
-    if ($value < 0) {
-      $this->time_h = '00';
-    } elseif ($value > 12) {
-      $this->time_h = '12';
-    } else {
-      // Formatear con ceros a la izquierda
-      $this->time_h = str_pad($value, 2, '0', STR_PAD_LEFT);
-    }
-  }
-
-  /**
-   * Valida y formatea el tiempo en minutos ingresado
-   * Asegura que esté entre 00-59 con formato de 2 dígitos
-   * @return void
-   */
-  public function updatedTimeM()
-  {
-    // Validar rango
-    $value = (int) $this->time_m;
-    if ($value < 1) {
-      $this->time_m = '01';
-    } elseif ($value > 59) {
-      $this->time_m = '59';
-    } else {
-      // Formatear con ceros a la izquierda
-      $this->time_m = str_pad($value, 2, '0', STR_PAD_LEFT);
-    }
-  }
+  // lista de categoria de suministros
+  public Collection $provision_categories;
 
   /**
    * boot de datos
@@ -87,41 +50,41 @@ class CreateRecipe extends Component
   }
 
   /**
-   * iniciar una coleccion de suministros vacia
-   * ['provisions' => []]
+   * iniciar una coleccion de categorias de suministro vacia
+   * ['provision_categories' => []]
    * @return void.
    */
   public function setProvisionsList(): void
   {
-    $this->fill(['provisions' => collect()]);
+    $this->fill(['provision_categories' => collect()]);
   }
 
   /**
-   * * agregar suministros a la lista de receta
-   * provision_id, para mantener el id del suministro en el request
-   * * el evento proviene de SearchProvisionRecipe::class
-   * @param Provision $provision_to_add un suministro a agregar
+   *
+   * @param int $category_id id de la categoria a agregar
    * @return void
    */
-  #[On('add-provision')]
-  public function addProvisionToList(Provision $provision): void
+  #[On('add-provision-category')]
+  public function addProvisionCategoryToList(int $category_id): void
   {
 
-    if ($this->provisions->contains('provision_id', 'provision_' . $provision->id)) {
+    $category = ProvisionCategory::findOrFail($category_id);
+
+    if ($this->provision_categories->contains('category_id', 'category_' . $category->id)) {
 
       $this->dispatch('toast-event', toast_data: [
         'event_type' => 'info',
         'title_toast' => toastTitle('', true),
-        'descr_toast' => 'este suministro ya fue elegido'
+        'descr_toast' => 'este categoria de suministros ya fue elegida'
       ]);
 
       return;
     }
 
-    $this->provisions->push([
-      'provision'     =>  $provision,
-      'provision_id'  =>  'provision_' . $provision->id,
-      'quantity'      =>  '',
+    $this->provision_categories->push([
+      'category'     =>  $category->load('measure', 'provision_type'),
+      'category_id'  =>  'category_' . $category->id,
+      'quantity'     =>  '',
     ]);
   }
 
@@ -132,7 +95,7 @@ class CreateRecipe extends Component
    */
   public function removeItemFromList(int $index): void
   {
-    $this->provisions->forget($index);
+    $this->provision_categories->forget($index);
   }
 
   /**
@@ -141,9 +104,8 @@ class CreateRecipe extends Component
    */
   public function removeAllItemsFromList(): void
   {
-    $this->provisions = collect();
+    $this->provision_categories = collect();
   }
-
 
   //* guardar receta
   public function save()
@@ -156,19 +118,19 @@ class CreateRecipe extends Component
       'time_h'                    =>  ['required', 'numeric', 'min:0', 'max:12'],
       'time_m'                    =>  ['required', 'numeric', 'min:1', 'max:59'],
       'recipe_instructions'       =>  ['required'],
-      'provisions'                =>  ['required'],
-      'provisions.*.quantity'     =>  ['required', 'numeric', 'min:0.01', 'max:99.99'],
+      'provision_categories'                =>  ['required'],
+      'provision_categories.*.quantity'     =>  ['required', 'numeric', 'min:0.01', 'max:99.99'],
     ], [
       'product_id.required'            => ':attribute es obligatorio',
       'recipe_title.unique'            => 'Ya existe una receta con el mismo titulo',
       'recipe_title.regex'             => ':attribute solo puede tener, letras y numeros',
       'recipe_title.min'               => ':attribute debe ser de 5 o mas caracteres',
       'recipe_title.max'               => ':attribute puede ser de hasta 50 caracteres',
-      'provisions.required'            => ':attribute debe tener al menos un suministro',
-      'provisions.*.quantity.required' => ':attribute es obligatorio',
-      'provisions.*.quantity.numeric'  => ':attribute debe ser un numero',
-      'provisions.*.quantity.min'      => ':attribute debe ser minimo :min',
-      'provisions.*.quantity.max'      => ':attribute debe ser maximo :max',
+      'provision_categories.required'            => ':attribute debe tener al menos un suministro',
+      'provision_categories.*.quantity.required' => ':attribute es obligatorio',
+      'provision_categories.*.quantity.numeric'  => ':attribute debe ser un numero',
+      'provision_categories.*.quantity.min'      => ':attribute debe ser minimo :min',
+      'provision_categories.*.quantity.max'      => ':attribute debe ser maximo :max',
     ], [
       'product_id'              => 'producto de la receta',
       'recipe_title'            => 'titulo',
@@ -176,24 +138,31 @@ class CreateRecipe extends Component
       'recipe_portions'         => 'porciones',
       'recipe_preparation_time' => 'tiempo de preparación',
       'recipe_instructions'     => 'instrucciones',
-      'provisions'              => 'lista de suministros',
-      'provisions.*.quantity'   => 'cantidad requerida',
+      'provision_categories'              => 'lista de suministros',
+      'provision_categories.*.quantity'   => 'cantidad requerida',
     ]);
 
     try {
 
-      $hours = str_pad((int) $validated['time_h'], 2, '0', STR_PAD_LEFT);
-      $minutes = str_pad((int) $validated['time_m'], 2, '0', STR_PAD_LEFT);
-      $validated['recipe_preparation_time'] = "{$hours}:{$minutes}:00";
+      $hours    = str_pad((int) $validated['time_h'], 2, '0', STR_PAD_LEFT);
+      $minutes  = str_pad((int) $validated['time_m'], 2, '0', STR_PAD_LEFT);
 
-      $recipe = Recipe::create($validated);
+      $recipe = Recipe::create([
+        'recipe_title'            => $validated['recipe_title'],
+        'recipe_yields'           => $validated['recipe_yields'],
+        'recipe_portions'         => $validated['recipe_portions'],
+        'recipe_preparation_time' => "{$hours}:{$minutes}:00",
+        'recipe_instructions'     => $validated['recipe_instructions'],
+        'product_id'              => $validated['product_id'],
+      ]);
 
-      foreach ($validated['provisions'] as $provision) {
-        $recipe->provisions()->attach($provision['provision']->id, ['recipe_quantity' => $provision['quantity']]);
+      foreach ($validated['provision_categories'] as $item) {
+        $recipe->provision_categories()->attach($item['category']->id, ['quantity' => $item['quantity']]);
       }
 
       session()->flash('operation-success', toastSuccessBody('receta', 'creada'));
       $this->redirectRoute('stocks-recipes-index');
+
     } catch (\Exception $e) {
 
       session()->flash('operation-error', 'error: ' . $e->getMessage() . ', contacte con el Administrador');

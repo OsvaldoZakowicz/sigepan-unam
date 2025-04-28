@@ -72,7 +72,6 @@
             <tr class="border bg-neutral-100">
               <x-table-th class="text-end w-12">id</x-table-th>
               <x-table-th class="text-start">nombre</x-table-th>
-              <x-table-th class="text-start">marca</x-table-th>
               <x-table-th class="text-start">tipo</x-table-th>
               <x-table-th class="text-end">
                 <span>unidad de medida</span>
@@ -82,31 +81,29 @@
             </tr>
           </x-slot:tablehead>
           <x-slot:tablebody>
-            @forelse ($provisions as $provision)
-              <tr wire:key="{{$provision->id}}" class="border">
+            @forelse ($provisions_categories as $pc)
+              <tr wire:key="{{$pc->id}}" class="border">
                 <x-table-td class="text-end">
-                  {{ $provision->id }}
+                  {{ $pc->id }}
                 </x-table-td>
                 <x-table-td
-                  title="{{ $provision->provision_short_description }}"
                   class="cursor-pointer text-start">
-                  {{ $provision->provision_name }}
+                  {{ $pc->provision_category_name }}
                 </x-table-td>
                 <x-table-td class="text-start">
-                  {{ $provision->trademark->provision_trademark_name }}
-                </x-table-td>
-                <x-table-td class="text-start">
-                  {{ $provision->type->provision_type_name }}
+                  {{ $pc->provision_type->provision_type_name }}
                 </x-table-td>
                 <x-table-td class="text-end">
-                  <span>{{ $provision->measure->measure_name }}&nbsp;({{ $provision->measure->measure_abrv }}),</span>
-                  <span>o &nbsp;{{ $provision->measure->measure_base }}{{ $provision->measure->measure_base_abrv }}</span>
+                  <span>{{ $pc->measure->unit_name }}&nbsp;<span class="capitalize">({{ $pc->measure->unit_symbol }})</span></span>
+                  @if ($pc->measure->conversion_unit !== null)
+                    <span>{{ $pc->measure->conversion_factor }}&nbsp;{{ $pc->measure->conversion_symbol }}</span>
+                  @endif
                 </x-table-td>
                 {{-- acciones --}}
                 <x-table-td class="text-start">
                   <div class="w-full inline-flex gap-1 justify-start items-center">
                     <span
-                      wire:click="addProvision({{ $provision }})"
+                      wire:click="addProvisionCategory({{ $pc->id }})"
                       title="elegir y agregar a la lista"
                       class="font-bold leading-none text-center p-1 cursor-pointer bg-neutral-100 border border-neutral-200 rounded-sm"
                       >&plus;
@@ -123,7 +120,7 @@
         </x-table-base>
 
         <div class="w-full flex justify-end items-center gap 1">
-          {{ $provisions->links() }}
+          {{ $provisions_categories->links() }}
         </div>
 
       </div>

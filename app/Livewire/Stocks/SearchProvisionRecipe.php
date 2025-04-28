@@ -3,6 +3,7 @@
 namespace App\Livewire\Stocks;
 
 use App\Models\Provision;
+use App\Models\ProvisionCategory;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\Url;
@@ -57,30 +58,30 @@ class SearchProvisionRecipe extends Component
   }
 
   /**
-   * enviar la provision elegida mediante un evento
+   * enviar la categoria elegida mediante un evento
    * notifica al componente livewire CreateRecipe::class
-   * @param int $id id del suministro
+   * @param int $id id de la categoria
    * @return void
   */
-  public function addProvision(Provision $provision): void
+  public function addProvisionCategory(int $id): void
   {
-    $this->dispatch('add-provision', provision: $provision)
+    $this->dispatch('add-provision-category', category_id: $id)
       ->to(CreateRecipe::class);
   }
 
   /**
-   * buscar suministros
+   * buscar categorias de suministros
    * @return mixed
   */
-  public function searchProvisions()
+  public function searchProvisionCategories()
   {
     if ($this->is_editing) {
-      // todo: buscar suministros asociados a la receta
+      // todo: buscar categorias asociadas a la receta
 
     } else {
-      // suministros no asociados a la receta
-      $provisions = Provision::when($this->search, function ($query) {
-          $query->where('provision_name', 'like', '%' . $this->search . '%');
+      // categorias de suministros no asociados a la receta
+      $provisions_categories = ProvisionCategory::when($this->search, function ($query) {
+          $query->where('provision_category_name', 'like', '%' . $this->search . '%');
         })
         ->when($this->search_ty, function ($query) {
           $query->where('provision_type_id', $this->search_ty);
@@ -88,7 +89,7 @@ class SearchProvisionRecipe extends Component
         ->orderBy('id', 'desc')
         ->paginate($this->paginas);
 
-      return $provisions;
+      return $provisions_categories;
     }
 
   }
@@ -96,7 +97,7 @@ class SearchProvisionRecipe extends Component
   #[On('refresh-search')]
   public function render()
   {
-    $provisions = $this->searchProvisions();
-    return view('livewire.stocks.search-provision-recipe', compact('provisions'));
+    $provisions_categories = $this->searchProvisionCategories();
+    return view('livewire.stocks.search-provision-recipe', compact('provisions_categories'));
   }
 }
