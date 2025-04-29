@@ -18,39 +18,70 @@
         <x-table-base>
           <x-slot:tablehead>
             <tr class="border bg-neutral-100">
-              <x-table-th class="text-end w-12">id</x-table-th>
-              <x-table-th class="text-start">titulo</x-table-th>
-              <x-table-th class="text-end">rendimiento (en unidades)</x-table-th>
-              <x-table-th class="text-end">porciones por unidad</x-table-th>
-              <x-table-th class="text-end">fecha de creación</x-table-th>
-              <x-table-th class="text-start w-48">acciones</x-table-th>
+              <x-table-th class="text-end w-12">
+                id
+              </x-table-th>
+              <x-table-th class="text-start">
+                titulo
+              </x-table-th>
+              <x-table-th class="text-end">
+                rendimiento (en unidades)
+              </x-table-th>
+              <x-table-th class="text-end">
+                porciones por unidad
+              </x-table-th>
+              <x-table-th class="text-end">
+                fecha de creación
+              </x-table-th>
+              <x-table-th class="text-start w-48">
+                acciones
+              </x-table-th>
             </tr>
           </x-slot:tablehead>
           <x-slot:tablebody>
             @forelse ($recipes as $recipe)
               <tr wire:key="{{ $recipe->id }}" class="border">
-                <x-table-td class="text-end">{{ $recipe->id }}</x-table-td>
-                <x-table-td class="text-start">{{ $recipe->recipe_title }}</x-table-td>
-                <x-table-td class="text-end">{{ $recipe->recipe_yields }}</x-table-td>
-                <x-table-td class="text-end">{{ $recipe->recipe_portions }}</x-table-td>
-                <x-table-td class="text-end">{{ formatDateTime($recipe->created_at, 'd-m-Y') }}</x-table-td>
+                <x-table-td class="text-end">
+                  {{ $recipe->id }}
+                </x-table-td>
+                <x-table-td class="text-start">
+                  {{ $recipe->recipe_title }}
+                </x-table-td>
+                <x-table-td class="text-end">
+                  {{ $recipe->recipe_yields }}
+                </x-table-td>
+                <x-table-td class="text-end">
+                  {{ $recipe->recipe_portions }}
+                </x-table-td>
+                <x-table-td class="text-end">
+                  {{ formatDateTime($recipe->created_at, 'd-m-Y') }}
+                </x-table-td>
                 <x-table-td class="text-start">
                   <div class="flex justify-start gap-1">
 
                     <x-a-button
+                      wire:navigate
+                      href="{{ route('stocks-recipes-show', $recipe->id) }}"
+                      bg_color="neutral-100"
+                      border_color="neutral-200"
+                      text_color="neutral-600"
+                      >ver
+                    </x-a-button>
+
+                    {{-- <x-a-button
                       wire:navigate
                       href="#"
                       bg_color="neutral-100"
                       border_color="neutral-200"
                       text_color="neutral-600"
                       >editar
-                    </x-a-button>
+                    </x-a-button> --}}
 
-                    <x-btn-button
+                    {{-- <x-btn-button
                       btn_type="button"
                       color="red"
                       >eliminar
-                    </x-btn-button>
+                    </x-btn-button> --}}
 
                   </div>
                 </x-table-td>
@@ -67,8 +98,6 @@
 
       <x-slot:footer class="py-2">
         {{ $recipes->links() }}
-        <!-- grupo de botones -->
-        <div class="flex"></div>
       </x-slot:footer>
 
     </x-content-section>

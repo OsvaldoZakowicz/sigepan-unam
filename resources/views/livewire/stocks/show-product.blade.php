@@ -23,13 +23,17 @@
       </x-slot:header>
 
       <x-slot:content class="flex-col">
+        {{-- producto --}}
         <div class="flex">
+          {{-- imagen --}}
           <div class="mr-4">
             <img
               src="{{ Storage::url($product->product_image_path) }}"
               alt="Imagen del producto"
-              class="w-80 border-2 border-dashed border-neutral-300">
+              class="w-96 border-2 border-dashed border-neutral-300"
+            />
           </div>
+          {{-- datos del producto --}}
           <div class="text-left">
             <h2 class="text-xl font-bold">
               {{ $product->product_name }}
@@ -61,6 +65,24 @@
                 </div>
               @empty
                 <span>¡no ha elegido ninguna etiqueta!</span>
+              @endforelse
+            </div>
+            <p class="mt-2 text-md">
+              <span class="font-semibold">Recetas:</span>
+            </p>
+            {{-- ver etiquetas --}}
+            <div class="flex justify-start items-center gap-2 flex-wrap p-1 min-h-8 leading-none">
+              @forelse ($product->recipes as $recipe)
+                <div class="flex items-center justify-start gap-1 border border-blue-300 bg-blue-200 py-px px-1 rounded-lg">
+                  <a
+                    wire:navigate
+                    href="{{ route('stocks-recipes-show', $recipe->id) }}"
+                    class="text-sm cursor-pointer underline text-blue-500"
+                    >{{ $recipe->recipe_title }}
+                  </a>
+                </div>
+              @empty
+                <span>¡este producto no tiene recetas!</span>
               @endforelse
             </div>
           </div>
