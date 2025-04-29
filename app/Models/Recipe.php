@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use OwenIt\Auditing\Contracts\Auditable;
 
 class Recipe extends Model implements Auditable
@@ -36,6 +37,12 @@ class Recipe extends Model implements Auditable
     return $this->belongsToMany(ProvisionCategory::class, 'category_recipe', 'recipe_id', 'category_id')
       ->withPivot('quantity')
       ->withTimestamps();
+  }
+
+  //* una receta se usa para elaborar muchos stocks
+  public function stocks(): HasMany
+  {
+    return $this->hasMany(Stock::class, 'recipe_id', 'id');
   }
 
 }

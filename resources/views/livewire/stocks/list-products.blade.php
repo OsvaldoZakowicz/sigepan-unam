@@ -73,16 +73,31 @@
         <x-table-base>
           <x-slot:tablehead>
             <tr class="border bg-neutral-100">
-              <x-table-th class="text-end w-12">id</x-table-th>
-              <x-table-th class="text-start">producto</x-table-th>
-              <x-table-th class="text-start">etiquetas</x-table-th>
-              <x-table-th class="text-end">$&nbsp;precio</x-table-th>
+              <x-table-th class="text-end w-12">
+                id
+              </x-table-th>
+              <x-table-th class="text-start">
+                producto
+              </x-table-th>
+              <x-table-th class="text-start">
+                etiquetas
+              </x-table-th>
+              <x-table-th class="text-start">
+                en stock
+              </x-table-th>
+              <x-table-th class="text-end">
+                $&nbsp;precio
+              </x-table-th>
               <x-table-th class="text-start">
                 <span>publicado</span>
                 <x-quest-icon title="indica si el producto aparece en la tienda para la venta"/>
               </x-table-th>
-              <x-table-th class="text-start w-24">estado</x-table-th>
-              <x-table-th class="text-start w-48">acciones</x-table-th>
+              <x-table-th class="text-start w-24">
+                estado
+              </x-table-th>
+              <x-table-th class="text-start w-48">
+                acciones
+              </x-table-th>
             </tr>
           </x-slot:tablehead>
           <x-slot:tablebody>
@@ -101,8 +116,8 @@
                         {{ $tag->tag_name }}
                       </span>
                     @else
-                      <span>... {{ $product->tags->count() }} en total
-                        <x-quest-icon title="vaya a la opcion 'ver' para mas detalles" />
+                      <span class="py-1 px-2 rounded-md text-xs lowercase text-neutral-600 bg-blue-200 border-blue-300">
+                        +{{ $product->tags->count() }}
                       </span>
                     @endif
                   @empty
@@ -110,27 +125,39 @@
                   @endforelse
                 </x-table-td>
                 <x-table-td class="text-end">
+                  stock
+                </x-table-td>
+                <x-table-td class="text-end">
                   <span>$&nbsp;</span>
                   {{ $product->product_price }}
                 </x-table-td>
                 <x-table-td class="text-start">
                   @if ($product->product_in_store)
-                    <span class="font-semibold text-emerald-600">si</span>
+                    <x-text-tag color="emerald">si</x-text-tag>
                   @else
-                    <span class="font-semibold text-neutral-600">no</span>
+                    <x-text-tag color="neutral">no</x-text-tag>
                   @endif
                 </x-table-td>
                 <x-table-td class="text-start">
                   @if ($product->deleted_at === 'borrado')
-                    <span class="font-semibold text-neutral-600" >{{ $product->deleted_at }}</span>
+                    <x-text-tag color="neutral" >{{ $product->deleted_at }}</x-text-tag>
                   @else
-                    <span class="font-semibold text-emerald-600">{{ $product->deleted_at }}</span>
+                    <x-text-tag color="emerald">{{ $product->deleted_at }}</x-text-tag>
                   @endif
                 </x-table-td>
                 <x-table-td class="text-start">
                   <div class="flex justify-start gap-1">
 
                     @if ($product->deleted_at === 'activo')
+
+                      <x-a-button
+                        wire:click="openElaborationModal({{ $product->id }})"
+                        href="#"
+                        bg_color="neutral-100"
+                        border_color="neutral-200"
+                        text_color="neutral-600"
+                        >elaborar
+                      </x-a-button>
 
                       <x-a-button
                         wire:navigate
@@ -175,6 +202,46 @@
                     @endif
 
                   </div>
+
+                  {{-- modal de elaboracion --}}
+                  @if($show_elaboration_modal)
+                  <div class="fixed inset-0 bg-neutral-400 bg-opacity-20 overflow-y-auto h-full w-full flex items-center justify-center" id="elaborationModal">
+                    <div class="bg-white p-5 border rounded-md shadow-lg w-96 transform transition-all">
+                      <div class="text-start">
+                        <h3 class="text-lg leading-6 capitalize font-medium text-neutral-800">Elaborar Producto</h3>
+                        <div class="mt-4">
+                          <p class="text-sm text-start text-neutral-600">
+                            Para elaborar <span class="font-semibold">{{ $selected_product->product_name }}</span>, elija una receta.
+                          </p>
+                          <div>
+                            <select
+                              wire:model="selected_recipe"
+                              class="w-full mt-2 text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
+                              <option value="">Seleccione una receta...</option>
+                              @forelse ($selected_product->recipes as $recipe)
+                                <option value="{{ $recipe->id }}">{{ $recipe->recipe_title }}</option>
+                              @empty
+                                <option value="">El producto no tiene recetas</option>
+                              @endforelse
+                            </select>
+                          </div>
+                        </div>
+                        <div class="flex justify-end gap-2 mt-6">
+                          <x-btn-button
+                            wire:click="$set('show_elaboration_modal', false)"
+                            color="neutral"
+                            >Cancelar
+                          </x-btn-button>
+                          <x-btn-button
+                            wire:click="elaborate()"
+                            color="emerald"
+                            >Confirmar
+                          </x-btn-button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  @endif
                 </x-table-td>
               </tr>
             @empty

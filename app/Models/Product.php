@@ -54,4 +54,10 @@ class Product extends Model
       ->withPivot('quantity', 'unit_price', 'subtotal_price')
       ->withTimestamps();
   }
+
+  //* un producto tiene diversos stocks
+  public function stocks(): HasMany
+  {
+    return $this->hasMany(Stock::class, 'product_id', 'id');
+  }
 }
