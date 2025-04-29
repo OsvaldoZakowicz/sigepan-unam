@@ -19,14 +19,14 @@ class CreateRecipe extends Component
   // datos generales de la receta
   public $product_id;
   public $recipe_title;
-  public $recipe_yields; // rendimiento en unidades
-  public $recipe_portions; // rendimiento en porciones por unidad
+  public $recipe_yields;    // rendimiento en unidades
+  public $recipe_portions;  // rendimiento en porciones por unidad
   public $recipe_instructions;
   public $recipe_short_description;
 
   // tiempo de preparacion
-  public $time_h = '00'; // horas
-  public $time_m = '01'; // minutos
+  public $time_h; // horas
+  public $time_m; // minutos
 
   // lista de categoria de suministros
   public Collection $provision_categories;
@@ -111,35 +111,39 @@ class CreateRecipe extends Component
   public function save()
   {
     $validated = $this->validate([
-      'product_id'                =>  ['required'],
-      'recipe_title'              =>  ['required', 'unique:recipes,recipe_title', 'regex:/^[\p{L}\s0-9]+$/', 'min:5', 'max:50'],
-      'recipe_yields'             =>  ['required', 'numeric', 'min:1', 'max:99'],
-      'recipe_portions'           =>  ['required', 'numeric', 'min:1', 'max:99'],
-      'time_h'                    =>  ['required', 'numeric', 'min:0', 'max:12'],
-      'time_m'                    =>  ['required', 'numeric', 'min:1', 'max:59'],
-      'recipe_instructions'       =>  ['required'],
-      'provision_categories'                =>  ['required'],
-      'provision_categories.*.quantity'     =>  ['required', 'numeric', 'min:0.01', 'max:99.99'],
+      'product_id'           =>  ['required', 'integer', 'exists:products,id'],
+      'recipe_title'         =>  ['required', 'unique:recipes,recipe_title', 'regex:/^[\p{L}\s0-9]+$/', 'min:5', 'max:50'],
+      'recipe_yields'        =>  ['required', 'numeric', 'min:1', 'max:99'],
+      'recipe_portions'      =>  ['required', 'numeric', 'min:1', 'max:99'],
+      'time_h'               =>  ['required', 'numeric', 'min:0', 'max:23'],
+      'time_m'               =>  ['required', 'numeric', 'min:1', 'max:59'],
+      'recipe_instructions'  =>  ['required'],
+      'provision_categories'            =>  ['required'],
+      'provision_categories.*.quantity' =>  ['required', 'numeric', 'min:0.01', 'max:99.99'],
     ], [
-      'product_id.required'            => ':attribute es obligatorio',
-      'recipe_title.unique'            => 'Ya existe una receta con el mismo titulo',
-      'recipe_title.regex'             => ':attribute solo puede tener, letras y numeros',
-      'recipe_title.min'               => ':attribute debe ser de 5 o mas caracteres',
-      'recipe_title.max'               => ':attribute puede ser de hasta 50 caracteres',
+      'product_id.required' => ':attribute es obligatorio',
+      'product_id.required' => 'Debe seleccionar un producto',
+      'product_id.integer'  => 'El producto seleccionado no es válido',
+      'product_id.exists'   => 'El producto seleccionado no existe',
+      'recipe_title.unique' => 'Ya existe una receta con el mismo titulo',
+      'recipe_title.regex'  => ':attribute solo puede tener, letras y numeros',
+      'recipe_title.min'    => ':attribute debe ser de 5 o mas caracteres',
+      'recipe_title.max'    => ':attribute puede ser de hasta 50 caracteres',
       'provision_categories.required'            => ':attribute debe tener al menos un suministro',
       'provision_categories.*.quantity.required' => ':attribute es obligatorio',
       'provision_categories.*.quantity.numeric'  => ':attribute debe ser un numero',
       'provision_categories.*.quantity.min'      => ':attribute debe ser minimo :min',
       'provision_categories.*.quantity.max'      => ':attribute debe ser maximo :max',
     ], [
-      'product_id'              => 'producto de la receta',
-      'recipe_title'            => 'titulo',
-      'recipe_yields'           => 'rendimiento',
-      'recipe_portions'         => 'porciones',
-      'recipe_preparation_time' => 'tiempo de preparación',
-      'recipe_instructions'     => 'instrucciones',
-      'provision_categories'              => 'lista de suministros',
-      'provision_categories.*.quantity'   => 'cantidad requerida',
+      'product_id'           => 'producto de la receta',
+      'recipe_title'         => 'titulo',
+      'recipe_yields'        => 'rendimiento',
+      'recipe_portions'      => 'porciones',
+      'time_h'               => 'horas',
+      'time_m'               => 'minutos',
+      'recipe_instructions'  => 'instrucciones',
+      'provision_categories' => 'lista de suministros',
+      'provision_categories.*.quantity' => 'cantidad requerida',
     ]);
 
     try {
