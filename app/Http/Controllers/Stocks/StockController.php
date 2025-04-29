@@ -38,6 +38,12 @@ class StockController extends Controller
     return view('stocks.recipes-create');
   }
 
+  //* ver receta
+  public function recipes_show($id): View
+  {
+    return view('stocks.recipes-show', ['id' => $id]);
+  }
+
   //* lista de productos
   public function products_index(): View
   {

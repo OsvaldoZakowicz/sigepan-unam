@@ -264,6 +264,9 @@ Route::middleware(['auth', 'verified', 'can:stock'])->group(function () {
   Route::get('stocks/recipes/create', [StockController::class, 'recipes_create'])
     ->name('stocks-recipes-create');
 
+  Route::get('stocks/recipes/show/{id}', [StockController::class, 'recipes_show'])
+    ->name('stocks-recipes-show');
+
   Route::get('stocks/products', [StockController::class, 'products_index'])
     ->name('stocks-products-index');
 
