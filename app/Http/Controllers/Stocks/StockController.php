@@ -62,6 +62,12 @@ class StockController extends Controller
     return view('stocks.products-show', ['id' => $id]);
   }
 
+  //* ver stock del producto
+  public function product_stock(int $id): View
+  {
+    return view('stocks.products-stock', ['id' => $id]);
+  }
+
   //* editar un producto
   public function products_edit(int $id): View
   {

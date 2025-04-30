@@ -40,7 +40,7 @@ class Stock extends Model
    * verifica si la fecha de 'expired_at' es anterior a la actual
    * @return bool Retorna true si el stock ha expirado, false en caso contrario
    */
-  public function getExpiredAtAttribute()
+  public function getIsExpiredAttribute()
   {
     return $this->expired_at->isPast();
   }

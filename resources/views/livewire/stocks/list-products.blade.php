@@ -82,7 +82,7 @@
               <x-table-th class="text-start">
                 etiquetas
               </x-table-th>
-              <x-table-th class="text-start">
+              <x-table-th class="text-end">
                 en stock
               </x-table-th>
               <x-table-th class="text-end">
@@ -125,10 +125,10 @@
                   @endforelse
                 </x-table-td>
                 <x-table-td class="text-end">
-                  stock
+                  {{ $product->total_stock }}
                 </x-table-td>
                 <x-table-td class="text-end">
-                  <span>$&nbsp;</span>
+                  <span>$</span>
                   {{ $product->product_price }}
                 </x-table-td>
                 <x-table-td class="text-start">
@@ -157,6 +157,15 @@
                         border_color="neutral-200"
                         text_color="neutral-600"
                         >elaborar
+                      </x-a-button>
+
+                      <x-a-button
+                        wire:navigate
+                        href="{{ route('stocks-products-product-stock', $product->id) }}"
+                        bg_color="neutral-100"
+                        border_color="neutral-200"
+                        text_color="neutral-600"
+                        >stock
                       </x-a-button>
 
                       <x-a-button
@@ -205,43 +214,44 @@
 
                   {{-- modal de elaboracion --}}
                   @if($show_elaboration_modal)
-                  <div class="fixed inset-0 bg-neutral-400 bg-opacity-20 overflow-y-auto h-full w-full flex items-center justify-center" id="elaborationModal">
-                    <div class="bg-white p-5 border rounded-md shadow-lg w-96 transform transition-all">
-                      <div class="text-start">
-                        <h3 class="text-lg leading-6 capitalize font-medium text-neutral-800">Elaborar Producto</h3>
-                        <div class="mt-4">
-                          <p class="text-sm text-start text-neutral-600">
-                            Para elaborar <span class="font-semibold">{{ $selected_product->product_name }}</span>, elija una receta.
-                          </p>
-                          <div>
-                            <select
-                              wire:model="selected_recipe"
-                              class="w-full mt-2 text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
-                              <option value="">Seleccione una receta...</option>
-                              @forelse ($selected_product->recipes as $recipe)
-                                <option value="{{ $recipe->id }}">{{ $recipe->recipe_title }}</option>
-                              @empty
-                                <option value="">El producto no tiene recetas</option>
-                              @endforelse
-                            </select>
+                    <div class="fixed inset-0 bg-neutral-400 bg-opacity-20 overflow-y-auto h-full w-full flex items-center justify-center" id="elaborationModal">
+                      <div class="bg-white p-5 border rounded-md shadow-lg w-96 transform transition-all">
+                        <div class="text-start">
+                          <h3 class="text-lg leading-6 capitalize font-medium text-neutral-800">Elaborar Producto</h3>
+                          <div class="mt-4">
+                            <p class="text-sm text-start text-neutral-600">
+                              Para elaborar <span class="font-semibold">{{ $selected_product->product_name }}</span>, elija una receta.
+                            </p>
+                            <div>
+                              <select
+                                wire:model="selected_recipe"
+                                class="w-full mt-2 text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
+                                <option value="">Seleccione una receta...</option>
+                                @forelse ($selected_product->recipes as $recipe)
+                                  <option value="{{ $recipe->id }}">{{ $recipe->recipe_title }}</option>
+                                @empty
+                                  <option value="">El producto no tiene recetas</option>
+                                @endforelse
+                              </select>
+                            </div>
                           </div>
-                        </div>
-                        <div class="flex justify-end gap-2 mt-6">
-                          <x-btn-button
-                            wire:click="$set('show_elaboration_modal', false)"
-                            color="neutral"
-                            >Cancelar
-                          </x-btn-button>
-                          <x-btn-button
-                            wire:click="elaborate()"
-                            color="emerald"
-                            >Confirmar
-                          </x-btn-button>
+                          <div class="flex justify-end gap-2 mt-6">
+                            <x-btn-button
+                              wire:click="$set('show_elaboration_modal', false)"
+                              color="neutral"
+                              >Cancelar
+                            </x-btn-button>
+                            <x-btn-button
+                              wire:click="elaborate()"
+                              color="emerald"
+                              >Confirmar
+                            </x-btn-button>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
                   @endif
+
                 </x-table-td>
               </tr>
             @empty

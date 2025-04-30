@@ -273,8 +273,13 @@ Route::middleware(['auth', 'verified', 'can:stock'])->group(function () {
   Route::get('stocks/products/create', [StockController::class, 'products_create'])
     ->name('stocks-products-create');
 
+  // mostrar detalle del producto
   Route::get('stocks/products/show/{id}', [StockController::class, 'products_show'])
     ->name('stocks-products-show');
+
+  // mostrar stock del procucto
+  Route::get('stocks/products/product/{id}/stock', [StockController::class, 'product_stock'])
+    ->name('stocks-products-product-stock');
 
   Route::get('stocks/products/edit/{id}', [StockController::class, 'products_edit'])
     ->name('stocks-products-edit');
