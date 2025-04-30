@@ -18,16 +18,16 @@
 
   <x-nav-link
     wire:navigate
-    :href="route('stocks-tags-index')"
-    :active="request()->routeIs('stocks-tags-*')"
-    >etiquetas
+    :href="route('stocks-recipes-index')"
+    :active="request()->routeIs('stocks-recipes-*')"
+    >recetas
   </x-nav-link>
 
   <x-nav-link
     wire:navigate
-    :href="route('stocks-recipes-index')"
-    :active="request()->routeIs('stocks-recipes-*')"
-    >recetas
+    :href="route('stocks-tags-index')"
+    :active="request()->routeIs('stocks-tags-*')"
+    >etiquetas
   </x-nav-link>
 
   <x-nav-link

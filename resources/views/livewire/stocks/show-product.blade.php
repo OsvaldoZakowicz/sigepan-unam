@@ -84,6 +84,14 @@
               @empty
                 <span>¡este producto no tiene recetas!</span>
               @endforelse
+              <x-a-button
+                wire:navigate
+                href="{{ route('stocks-recipes-create') }}"
+                bg_color="neutral-100"
+                border_color="neutral-200"
+                text_color="neutral-600"
+                >agregar receta
+              </x-a-button>
             </div>
           </div>
         </div>

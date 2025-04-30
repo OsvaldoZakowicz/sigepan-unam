@@ -7,6 +7,7 @@ use App\Models\Recipe;
 use App\Models\Tag;
 use App\Models\Stock;
 use App\Models\StockMovement;
+use App\Services\Stock\StockService;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
 use Livewire\Attributes\Url;
@@ -16,6 +17,9 @@ use Livewire\Component;
 class ListProducts extends Component
 {
   use WithPagination;
+
+  // servicios
+  private StockService $stock_service;
 
   #[Url]
   public string $search_product = '';
@@ -37,6 +41,7 @@ class ListProducts extends Component
   public function boot(): void
   {
     $this->tags = Tag::all();
+    $this->stock_service = new StockService();
   }
 
   /**
@@ -45,6 +50,17 @@ class ListProducts extends Component
    */
   public function openElaborationModal(Product $product): void
   {
+    if ($product->recipes->first() === null) {
+
+      $this->dispatch('toast-event', toast_data: [
+        'event_type' => 'info',
+        'title_toast' => toastTitle('',true),
+        'descr_toast' => 'El producto no tiene recetas'
+      ]);
+
+      return;
+    }
+
     $this->selected_product = $product;
     $this->show_elaboration_modal = true;
   }
@@ -55,11 +71,12 @@ class ListProducts extends Component
    */
   public function elaborate(): void
   {
-    // Validar que se haya seleccionado una receta
-    if (!$this->selected_recipe) {
-      // todo: validar que elija receta
-      return;
-    }
+    // validar si eligio receta
+    $this->validate([
+      'selected_recipe' => ['required']
+    ],[
+      'selected_recipe' => 'debe seleccionar una receta'
+    ]);
 
     $recipe = Recipe::findOrFail($this->selected_recipe);
     $today = now();
@@ -67,38 +84,40 @@ class ListProducts extends Component
     // elaborar un producto siguiendo una receta
     try {
 
-      // stock
-      $stock = Stock::create([
-        'product_id'     => $this->selected_product->id,
-        'recipe_id'      => $recipe->id,
-        'lote_code'      => 'lt' . $today->format('H:i:s'),
-        'quantity_total' => $recipe->recipe_yields,
-        'quantity_left'  => $recipe->recipe_yields,
-        'elaborated_at'  => $today,
-        'expired_at'     => $today->addDays($this->selected_product->product_expired_in),
-      ]);
+      // Preparar los datos del stock
+      $stock_data = [
+        'product_id'    => $this->selected_product->id,
+        'recipe_id'     => $recipe->id,
+        'elaborated_at' => $today,
+        'expired_at'    => $today->copy()->addDays($this->selected_product->product_expires_in),
+      ];
 
-      // movimiento de stock
-      $stock_movement = StockMovement::create([
-        'stock_id'      => $stock->id,
-        'quantity'      => $stock->quantity_total,
-        'movement_type' => 'elaboracion',
-        'registered_at' => $today,
-      ]);
+      // Crear el stock y su movimiento inicial usando el servicio
+      $this->stock_service->createStock($stock_data, $recipe->recipe_yields);
 
+      // Notificar éxito
       $this->dispatch('toast-event', toast_data: [
-        'event_type'  =>  'success',
-        'title_toast' =>  toastTitle('exitosa'),
-        'descr_toast' =>  'El producto fue elaborado.'
+        'event_type' => 'success',
+        'title_toast' => toastTitle('exitosa'),
+        'descr_toast' => 'El producto fue elaborado correctamente.'
       ]);
 
     } catch (\Exception $e) {
-      dd($e->getMessage());
-    }
 
-    // De momento solo cerramos el modal
-    $this->show_elaboration_modal = false;
-    $this->reset(['selected_recipe']);
+      // Notificar error
+      $this->dispatch('toast-event', toast_data: [
+        'event_type' => 'error',
+        'title_toast' => toastTitle('error'),
+        'descr_toast' => 'Error al elaborar el producto: ' . $e->getMessage()
+      ]);
+
+    } finally {
+
+      // Siempre cerrar el modal y limpiar la seleccion
+      $this->show_elaboration_modal = false;
+      $this->reset(['selected_recipe']);
+
+    }
   }
 
   /**

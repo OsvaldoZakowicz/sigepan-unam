@@ -47,6 +47,7 @@ class Product extends Model
   /**
    * Calcular el stock total disponible de este producto
    * sumatoria de cantidad restante
+   * $product->total_stock
    */
   public function getTotalStockAttribute()
   {

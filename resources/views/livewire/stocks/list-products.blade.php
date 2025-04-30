@@ -223,6 +223,9 @@
                               Para elaborar <span class="font-semibold">{{ $selected_product->product_name }}</span>, elija una receta.
                             </p>
                             <div>
+                              @error('selected_recipe')
+                                <span class="text-sm text-red-400">seleccione una receta</span>
+                              @enderror
                               <select
                                 wire:model="selected_recipe"
                                 class="w-full mt-2 text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
