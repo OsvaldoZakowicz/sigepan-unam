@@ -15,14 +15,35 @@ class Stock extends Model
   use HasFactory;
 
   protected $fillable = [
-    'product_id',       // producto asociado
-    'recipe_id',        // receta de elaboracion asociada
-    'lote_code',        // codigo de lote
-    'quantity_total',   // cantidad de productos elaborados para ese lote
-    'quantity_left',    // cantidad de productos restantes para ese lote (calculado)
-    'expired_at',       // fecha de vencimineto del lote
-    'elaborated_at',    // fecha de elaboracion del lote
+    'product_id',     // producto asociado
+    'recipe_id',      // receta de elaboracion asociada
+    'lote_code',      // codigo de lote
+    'quantity_total', // cantidad de productos elaborados para ese lote
+    'quantity_left',  // cantidad de productos restantes para ese lote (calculado)
+    'expired_at',     // fecha de vencimineto del lote
+    'elaborated_at',  // fecha de elaboracion del lote
   ];
+
+  /**
+   * Los atributos que deben ser convertidos
+   * @var array<string,string>
+   */
+  protected $casts = [
+    'quantity_total' => 'integer',
+    'quantity_left'  => 'integer',
+    'expired_at'     => 'datetime',
+    'elaborated_at'  => 'datetime',
+  ];
+
+  /**
+   * Verificar si el stock ha expirado
+   * verifica si la fecha de 'expired_at' es anterior a la actual
+   * @return bool Retorna true si el stock ha expirado, false en caso contrario
+   */
+  public function getExpiredAtAttribute()
+  {
+    return $this->expired_at->isPast();
+  }
 
   // * un stock pertenece a un producto
   public function product(): BelongsTo

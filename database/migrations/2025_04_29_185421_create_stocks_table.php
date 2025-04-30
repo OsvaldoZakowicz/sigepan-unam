@@ -14,14 +14,16 @@ return new class extends Migration
     Schema::create('stocks', function (Blueprint $table) {
       $table->id();
       // fk products
-      $table->foreignId('product_id')->constrained('products')->restrictOnDelete();
+      $table->foreignId('product_id')
+        ->constrained('products')->restrictOnDelete();
       // fk recipes
-      $table->foreignId('recipe_id')->constrained('recipes')->restrictOnDelete();
-      $table->string('lote_code', 20)->unique();
+      $table->foreignId('recipe_id')
+        ->constrained('recipes')->restrictOnDelete();
+      $table->string('lote_code', 30)->unique();
       $table->unsignedSmallInteger('quantity_total');
       $table->unsignedSmallInteger('quantity_left');
-      $table->date('elaborated_at');
-      $table->date('expired_at');
+      $table->timestamp('elaborated_at');
+      $table->timestamp('expired_at');
       $table->timestamps();
     });
   }

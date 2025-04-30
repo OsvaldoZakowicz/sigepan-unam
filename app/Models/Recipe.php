@@ -25,6 +25,15 @@ class Recipe extends Model implements Auditable
     'product_id',
   ];
 
+  /**
+   * los atributos que deben ser transformados
+   * @var array<string,string>
+   */
+  protected $casts = [
+    'recipe_yields'   => 'integer',
+    'recipe_portions' => 'integer',
+  ];
+
   //* una receta pertenece a un producto
   public function product(): BelongsTo
   {

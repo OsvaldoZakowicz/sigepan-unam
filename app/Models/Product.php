@@ -24,14 +24,33 @@ class Product extends Model
   ];
 
   /**
+   * Los atributos que deben ser convertidos
+   * @var array<string,string>
+   */
+  protected $casts = [
+    'product_price'      => 'decimal:2',
+    'product_expires_in' => 'integer',
+    'product_in_store'   => 'boolean', // true o false
+  ];
+
+  /**
    * obtener atributo deleted_at, y presentarlo
    * deleted_at es una fecha o null, cuando tiene una fecha indica el borrado
-  */
+   */
   protected function deletedAt(): Attribute
   {
     return Attribute::make(
-      get: fn (string|null $value) => $value ? 'borrado' : 'activo'
+      get: fn(string|null $value) => $value ? 'borrado' : 'activo'
     );
+  }
+
+  /**
+   * Calcular el stock total disponible de este producto
+   * sumatoria de cantidad restante
+   */
+  public function getTotalStockAttribute()
+  {
+    return $this->stocks()->sum('quantity_left');
   }
 
   //* un producto tiene muchos tags de producto
