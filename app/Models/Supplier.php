@@ -69,4 +69,10 @@ class Supplier extends Model implements Auditable
   {
     return $this->hasMany(Quotation::class, 'supplier_id', 'id');
   }
+
+  //* un proveedor tiene asociadas muchas compras
+  public function purchases(): HasMany
+  {
+    return $this->hasMany(Purchase::class, 'supplier_id', 'id');
+  }
 }

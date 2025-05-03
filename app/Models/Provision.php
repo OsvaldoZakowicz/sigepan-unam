@@ -98,4 +98,17 @@ class Provision extends Model
       ->withPivot(['has_stock', 'quantity', 'alternative_quantity', 'unit_price', 'total_price'])
       ->withTimestamps();
   }
+
+  //* un suministro esta asociado a muchos detalles de compra
+  public function purchase_details(): HasMany
+  {
+    return $this->hasMany(PurchaseDetail::class, 'provision_id', 'id');
+  }
+
+  //* un suministro tiene muchos registros de existencias
+  // NOTA incluye existencias de packs
+  public function existences(): HasMany
+  {
+    return $this->hasMany(Existence::class, 'provision_id', 'id');
+  }
 }

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Pack extends Model
 {
@@ -70,5 +71,11 @@ class Pack extends Model
     return $this->belongsToMany(PreOrder::class, 'pre_order_pack', 'pack_id', 'pre_order_id')
       ->withPivot(['has_stock', 'quantity', 'alternative_quantity', 'unit_price', 'total_price'])
       ->withTimestamps();
+  }
+
+  //* un pack esta asociado a muchos detalles de compras
+  public function purchase_details(): HasMany
+  {
+    return $this->hasMany(PurchaseDetail::class, 'pack_id', 'id');
   }
 }
