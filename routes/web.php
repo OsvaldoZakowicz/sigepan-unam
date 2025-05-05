@@ -10,6 +10,7 @@ use App\Http\Controllers\Stocks\StockController;
 use App\Http\Controllers\Store\PaymentController;
 use App\Http\Controllers\Store\StoreController;
 use App\Http\Controllers\Pdf\PDFController;
+use App\Http\Controllers\Purchase\PurchaseController;
 
 //* layout publico
 // retorna la vista tienda publica
@@ -292,6 +293,20 @@ Route::middleware(['auth', 'verified', 'can:stock'])->group(function () {
 
   Route::get('stocks/tags/edit/{id}', [StockController::class, 'tags_edit'])
     ->name('stocks-tags-edit');
+});
+
+//* modulo de compras
+Route::middleware(['auth', 'verified', 'can:compras'])->group(function () {
+
+  Route::get('purchases', [PurchaseController::class, 'purchases_index'])
+    ->name('purchases-purchases-index');
+
+  // NOTA: registrar una compra con una preorden (id de preorden opcional)
+  Route::get('purchases/create/{id?}', [PurchaseController::class, 'purchases_create'])
+    ->name('purchases-purchases-create');
+
+  Route::get('purchases/preorders', [PurchaseController::class, 'purchases_preorders_index'])
+    ->name('purchases-preorders-index');
 });
 
 
