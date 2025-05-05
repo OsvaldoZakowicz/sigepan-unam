@@ -14,6 +14,20 @@ class ListPurchases extends Component
   #[Url]
   public $search_purchase = '';
 
+  // propiedades para el modal
+  public bool $show_details_modal = false;
+  public ?Purchase $selected_purchase = null;
+
+  /**
+   * abrir modal de detalle de compra
+   * @param Purchase $purchase
+   */
+  public function openDetailsModal(Purchase $purchase): void
+  {
+    $this->selected_purchase = $purchase;
+    $this->show_details_modal = true;
+  }
+
   /**
    * buscar compras
    */
