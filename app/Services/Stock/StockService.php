@@ -4,6 +4,8 @@ namespace App\Services\Stock;
 
 use App\Models\Stock;
 use App\Models\StockMovement;
+use App\Models\Existence;
+use App\Models\Recipe;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -42,6 +44,82 @@ class StockService
   }
 
   /**
+   * Verifica si hay suficientes existencias para elaborar una receta
+   * @param Recipe $recipe
+   * @return bool|array Retorna true si hay suficientes existencias, o un array con las categorías faltantes
+   * @throws Exception
+   */
+  private function checkRecipeProvisions(Recipe $recipe): bool|array
+  {
+    // Obtener las categorías y cantidades requeridas por la receta
+    $required_categories = $recipe->provision_categories()
+      ->with('measure')
+      ->withPivot('quantity')
+      ->get();
+
+    $missing_categories = [];
+
+    foreach ($required_categories as $category) {
+      // sumar todas las existencias de provisiones en esta categoria
+      $total_existence = Existence::whereHas('provision', function ($query) use ($category) {
+        $query->where('provision_category_id', $category->id);
+      })->sum('quantity_amount');
+
+      // si no hay suficiente existencia para esta categoria
+      if ($total_existence < $category->pivot->quantity) {
+        $missing_categories[] = [
+          'category'  => $category->provision_category_name,
+          'required'  => convert_measure($category->pivot->quantity, $category->measure),
+          'available' => convert_measure($total_existence, $category->measure)
+        ];
+      }
+    }
+
+    return empty($missing_categories) ? true : $missing_categories;
+  }
+
+  private function consumeProvisions(Recipe $recipe): void
+  {
+    DB::transaction(function () use ($recipe) {
+      $required_categories = $recipe->provision_categories()
+        ->withPivot('quantity')
+        ->get();
+
+      foreach ($required_categories as $category) {
+        $remaining_quantity = $category->pivot->quantity;
+
+        // Obtener existencias ordenadas por fecha más antigua
+        $existences = Existence::whereHas('provision', function ($query) use ($category) {
+          $query->where('provision_category_id', $category->id);
+        })->where('quantity_amount', '>', 0)
+          ->orderBy('registered_at', 'asc')
+          ->get();
+
+        foreach ($existences as $existence) {
+          if ($remaining_quantity <= 0) break;
+
+          $quantity_to_consume = min($existence->quantity_amount, $remaining_quantity);
+
+          // Crear nuevo registro de existencia negativo con los campos correctos
+          Existence::create([
+            'provision_id'    => $existence->provision_id,
+            'quantity_amount' => -$quantity_to_consume, //negativo
+            'movement_type'   => 'elaboracion',
+            'registered_at'   => now(),
+
+          ]);
+
+          $remaining_quantity -= $quantity_to_consume;
+        }
+
+        if ($remaining_quantity > 0) {
+          throw new Exception("No se pudo consumir toda la cantidad requerida para la categoría {$category->provision_category_name}");
+        }
+      }
+    });
+  }
+
+  /**
    * Crear un nuevo stock con su movimiento inicial
    * @param array $stock_data Datos del stock a crear
    * @param int $initial_quantity Cantidad inicial del stock
@@ -52,6 +130,21 @@ class StockService
   {
     try {
       return DB::transaction(function () use ($stock_data, $initial_quantity) {
+
+        // Verificar existencias para la receta
+        $recipe = Recipe::findOrFail($stock_data['recipe_id']);
+        $provisions_check = $this->checkRecipeProvisions($recipe);
+
+        if ($provisions_check !== true) {
+          $missing = collect($provisions_check)
+            ->map(fn($item) => "{$item['category']}: necesita {$item['required']}, disponible {$item['available']}")
+            ->join("\n");
+
+          throw new Exception("No hay suficientes existencias:\n" . $missing);
+        }
+
+        // Consumir las existencias necesarias
+        $this->consumeProvisions($recipe);
 
         // Generar código de lote único
         $lote_code = $this->generateUniqueLoteCode();

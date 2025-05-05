@@ -106,9 +106,9 @@ class ListProducts extends Component
 
       // Notificar error
       $this->dispatch('toast-event', toast_data: [
-        'event_type' => 'error',
-        'title_toast' => toastTitle('error'),
-        'descr_toast' => 'Error al elaborar el producto: ' . $e->getMessage()
+        'event_type' => 'info',
+        'title_toast' => toastTitle('',true),
+        'descr_toast' => $e->getMessage()
       ]);
 
     } finally {
