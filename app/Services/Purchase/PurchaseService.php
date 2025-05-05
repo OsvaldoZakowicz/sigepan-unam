@@ -167,4 +167,26 @@ class PurchaseService
       'quantity_amount' => $total_volume
     ]);
   }
+
+  /**
+   * obtener una referencia a la preorden de la compra
+   * @param Purchase $purchase
+   */
+  public function getPreorderReference(Purchase $purchase)
+  {
+    if ($purchase->purchase_reference_id !== null && $purchase->purchase_reference_type !== null) {
+
+      $preorder = PreOrder::find($purchase->purchase_reference_id);
+      $order_data = json_decode($preorder->order, true);
+
+      return [
+        'id' => $preorder->id,
+        'order_code' => $order_data['code'],
+        'order_date' => $order_data['date']
+      ];
+
+    }
+
+    return false;
+  }
 }
