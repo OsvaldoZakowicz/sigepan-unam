@@ -21,7 +21,7 @@
         <div class="flex gap-1 justify-start items-start grow">
 
           {{-- termino de busqueda --}}
-          {{-- <div class="flex flex-col justify-end w-1/4">
+          <div class="flex flex-col justify-end w-1/4">
             <label for="">buscar compra</label>
             <input
               type="text"
@@ -31,12 +31,34 @@
               placeholder="ingrese un id, o termino de busqueda"
               class="text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
             />
-          </div> --}}
+          </div>
+
+          {{-- fecha de inicio --}}
+          <div class="flex flex-col justify-end w-1/6">
+            <label for="search_start_at">fecha de compra desde</label>
+            <input
+              type="date"
+              name="search_start_at"
+              id="search_start_at"
+              wire:model.live="search_start_at"
+              class="w-full text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"/>
+          </div>
+
+          {{-- fecha de fin --}}
+          <div class="flex flex-col justify-end w-1/6">
+            <label for="search_end_at">fecha de compra hasta</label>
+            <input
+              type="date"
+              name="search_end_at"
+              id="search_end_at"
+              wire:model.live="search_end_at"
+              class="w-full text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"/>
+          </div>
 
         </div>
 
         {{-- limpiar campos de busqueda --}}
-        {{-- <div class="flex flex-col self-start h-full">
+        <div class="flex flex-col self-start h-full">
           <x-a-button
             href="#"
             wire:click="resetSearchInputs()"
@@ -45,7 +67,7 @@
             text_color="neutral-600"
             >limpiar
           </x-a-button>
-        </div> --}}
+        </div>
 
       </x-slot:header>
 

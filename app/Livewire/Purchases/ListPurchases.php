@@ -17,6 +17,12 @@ class ListPurchases extends Component
   #[Url]
   public $search_purchase = '';
 
+  #[Url]
+  public $search_start_at = '';
+
+  #[Url]
+  public $search_end_at = '';
+
   // propiedades para el modal
   public bool $show_details_modal = false;
   public ?Purchase $selected_purchase = null;
@@ -66,7 +72,34 @@ class ListPurchases extends Component
    */
   public function searchPurchases()
   {
-    return Purchase::paginate(10);
+    return Purchase::with(['purchase_details', 'supplier'])
+      ->when($this->search_purchase, function ($query) {
+        $query->where('id', 'like', '%' . $this->search_purchase . '%')
+          ->orWhereHas('supplier', function ($query) {
+            $query->where('company_name', 'like', '%' . $this->search_purchase . '%');
+          });
+      })->when(
+        $this->search_start_at && $this->search_end_at,
+        function ($query) {
+          // buscar periodos que esten completamente dentro del rango de fechas
+          $query->where('purchase_date', '>=', $this->search_start_at)
+            ->where('purchase_date', '<=', $this->search_end_at);
+        }
+      )->when(
+        $this->search_start_at && !$this->search_end_at,
+        function ($query) {
+          // buscar periodos que coincidan con la fecha de inicio
+          $query->where('purchase_date', '>=', $this->search_start_at);
+        }
+      )->when(
+        !$this->search_start_at && $this->search_end_at,
+        function ($query) {
+          // buscar periodos que coincidan con la fecha de fin
+          $query->where('purchase_date', '<=', $this->search_end_at);
+        }
+      )
+      ->orderBy('id', 'desc')
+      ->paginate(10);
   }
 
   /**
@@ -84,7 +117,7 @@ class ListPurchases extends Component
    */
   public function resetSearchInputs(): void
   {
-    $this->reset(['search_product', 'tag_filter', 'in_store_filter']);
+    $this->reset(['search_purchase', 'search_start_at', 'search_end_at']);
   }
 
   public function render()
