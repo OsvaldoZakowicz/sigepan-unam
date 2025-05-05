@@ -285,6 +285,9 @@ Route::middleware(['auth', 'verified', 'can:stock'])->group(function () {
   Route::get('stocks/products/edit/{id}', [StockController::class, 'products_edit'])
     ->name('stocks-products-edit');
 
+  Route::get('stocks/existences', [StockController::class, 'existences_index'])
+    ->name('stocks-existences-index');
+
   Route::get('stocks/tags', [StockController::class, 'tags_index'])
     ->name('stocks-tags-index');
 

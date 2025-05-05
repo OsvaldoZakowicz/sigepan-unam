@@ -74,6 +74,12 @@ class StockController extends Controller
     return view('stocks.products-edit', ['id' => $id]);
   }
 
+  //* ver existencias
+  public function existences_index(): View
+  {
+    return view('stocks.existences-index');
+  }
+
   //* lista de tags
   public function tags_index(): View
   {

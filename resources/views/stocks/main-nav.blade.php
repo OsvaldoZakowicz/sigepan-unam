@@ -25,6 +25,13 @@
 
   <x-nav-link
     wire:navigate
+    :href="route('stocks-existences-index')"
+    :active="request()->routeIs('stocks-existences-*')"
+    >Existencias
+  </x-nav-link>
+
+  <x-nav-link
+    wire:navigate
     :href="route('stocks-tags-index')"
     :active="request()->routeIs('stocks-tags-*')"
     >etiquetas
