@@ -20,16 +20,44 @@ class ListExistences extends Component
 
   public $show_details_modal = false;
   public $selected_category = null;
+  public $total_amount = 0;
+
+  public $tipo_compra;
+  public $tipo_elaboracion;
+  public $tipo_perdida;
+
+  /**
+   * boot de datos constantes
+   * @return void
+   */
+  public function boot(): void
+  {
+    $this->tipo_compra = Existence::MOVEMENT_TYPE_COMPRA();
+    $this->tipo_elaboracion = Existence::MOVEMENT_TYPE_ELABORACION();
+    $this->tipo_perdida = Existence::MOVEMENT_TYPE_PERDIDA();
+  }
 
   /**
    * obtiene detalles de existencias por categoria
-   * @param ProvisionCategory $category
+   * @param array $provision_category
    * @return void
    */
-  public function showDetails(ProvisionCategory $category): void
+  public function showDetailsModal($provision_category): void
   {
-    $this->selected_category = $category;
+    $this->selected_category = ProvisionCategory::find($provision_category['id']);
+    $this->total_amount = $provision_category['total_amount'];
     $this->show_details_modal = true;
+  }
+
+  /**
+   * cierra el modal de detalles
+   * @return void
+   */
+  public function closeDetailsModal(): void
+  {
+    $this->show_details_modal = false;
+    $this->total_amount = 0;
+    $this->selected_category = null;
   }
 
   /**
@@ -45,6 +73,7 @@ class ListExistences extends Component
     return Provision::query()
       ->select(
         'provisions.id',
+        'provisions.provision_name',
         'provisions.provision_trademark_id',
         'provisions.provision_category_id',
         'existences.movement_type',
@@ -60,25 +89,15 @@ class ListExistences extends Component
   }
 
   /**
-   * cierra el modal de detalles
-   * @return void
-   */
-  public function closeDetails(): void
-  {
-    $this->show_details_modal = false;
-    $this->selected_category = null;
-  }
-
-  /**
    * buscar existencias por categoria
    * @return \Illuminate\Database\Eloquent\Collection
    */
   private function searchExistences()
   {
     return ProvisionCategory::query()
-      ->select('provision_categories.*')  // Seleccionamos todos los campos de la categoría
-      ->selectRaw('COALESCE(SUM(existences.quantity_amount), 0) as total_quantity')
-      ->with('measure')  // Eager loading de la relación measure
+      ->select('provision_categories.*')  // seleccionamos todos los campos de la categoria
+      ->selectRaw('COALESCE(SUM(existences.quantity_amount), 0) as total_amount')
+      ->with(['measure', 'provision_type'])  // eager loading de relaciones
       ->leftJoin('provisions', 'provision_categories.id', '=', 'provisions.provision_category_id')
       ->leftJoin('existences', 'provisions.id', '=', 'existences.provision_id')
       ->when($this->search_category, function ($query) {

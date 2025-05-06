@@ -11,13 +11,16 @@ class Existence extends Model
 {
   use HasFactory;
 
-
   /**
+   * Tipos de movimientos disponibles
    * * movement_type
    * compra - (suma existencias)
    * elaboracion - (resta existencias )
    * perdida - (resta existencias)
    */
+  protected static $MOVEMENT_TYPE_COMPRA = 'compra';
+  protected static $MOVEMENT_TYPE_ELABORACION = 'elaboracion';
+  protected static $MOVEMENT_TYPE_PERDIDA = 'perdida';
 
   /**
    * id de suministro (packs son suministros agrupados)
@@ -41,6 +44,30 @@ class Existence extends Model
     'registered_at'   => 'timestamp',
     'quantity_amount' => 'decimal:2',
   ];
+
+  /**
+   * Retorna el tipo de movimiento compra
+   */
+  public static function MOVEMENT_TYPE_COMPRA(): string
+  {
+    return self::$MOVEMENT_TYPE_COMPRA;
+  }
+
+  /**
+   * Retorna el tipo de movimiento elaboración
+   */
+  public static function MOVEMENT_TYPE_ELABORACION(): string
+  {
+    return self::$MOVEMENT_TYPE_ELABORACION;
+  }
+
+  /**
+   * Retorna el tipo de movimiento pérdida
+   */
+  public static function MOVEMENT_TYPE_PERDIDA(): string
+  {
+    return self::$MOVEMENT_TYPE_PERDIDA;
+  }
 
   //* un registro de existencias puede ser de una compra
   public function purchase(): HasMany

@@ -3,7 +3,7 @@
   <article class="m-2 border rounded-sm border-neutral-200">
 
     {{-- barra de titulo --}}
-    <x-title-section title="lista de existencias: ingredientes e insumos">
+    <x-title-section title="lista de existencias por categoria: ingredientes e insumos">
     </x-title-section>
 
     {{-- cuerpo --}}
@@ -16,7 +16,7 @@
 
           {{-- termino de busqueda --}}
           <div class="flex flex-col justify-end w-1/4">
-            <label for="">buscar producto</label>
+            <label for="">buscar categoria</label>
             <input
               type="text"
               name="search_category"
@@ -52,10 +52,14 @@
                 id
               </x-table-th>
               <x-table-th class="text-start">
-                ingrediente/insumo
+                categoria
               </x-table-th>
               <x-table-th class="text-start">
-                cantidad disponible
+                tipo
+              </x-table-th>
+              <x-table-th class="text-end">
+                existencias totales
+                <x-quest-icon title="kilogramos (kg), gramos (g), litros (L), mililitros (ml), metros (m), centimetros (cm)  o unidades (u)" />
               </x-table-th>
               <x-table-th class="text-start w-48">
                 acciones
@@ -63,23 +67,24 @@
             </tr>
           </x-slot:tablehead>
           <x-slot:tablebody>
-            @forelse ($provision_categories as $key => $prov_categ)
-              <tr wire:key="{{ $key }}" class="border">
+            @forelse ($provision_categories as $provision_category)
+              <tr wire:key="{{ $provision_category->id }}" class="border">
                 <x-table-td class="text-end">
-                    {{ $prov_categ->id }}
+                    {{ $provision_category->id }}
                 </x-table-td>
                 <x-table-td class="text-start">
-                    {{ $prov_categ->provision_category_name }}
-                </x-table-td>
-                <x-table-td class="text-start space-x-1">
-                    {{-- {{ number_format($prov_categ->total_quantity, 2) }} --}}
-                    {{ convert_measure($prov_categ->total_quantity, $prov_categ->measure()->first()) }}
+                    {{ $provision_category->provision_category_name }}
                 </x-table-td>
                 <x-table-td class="text-start">
-
+                  {{ $provision_category->provision_type()->first()->provision_type_name }}
+                </x-table-td>
+                <x-table-td class="text-end">
+                    {{ convert_measure($provision_category->total_amount, $provision_category->measure()->first()) }}
+                </x-table-td>
+                <x-table-td class="text-start">
                   <div class="flex justify-start gap-1">
                     <x-a-button
-                      wire:click="showDetails({{ $prov_categ->id }})"
+                      wire:click="showDetailsModal({{ $provision_category }})"
                       href="#"
                       bg_color="neutral-100"
                       border_color="neutral-200"
@@ -87,78 +92,6 @@
                       >detalles
                     </x-a-button>
                   </div>
-
-                  {{-- modal de detalles --}}
-                  @if($show_details_modal)
-                    <div class="fixed inset-0 bg-neutral-400 bg-opacity-20 overflow-y-auto h-full w-full flex items-center justify-center">
-                      <div class="bg-white p-5 border rounded-md shadow-lg w-3/4">
-                        <!-- Encabezado del modal -->
-                        <div class="flex justify-between items-center mb-4">
-                          <h3 class="text-lg font-semibold text-neutral-800">
-                            Detalles de {{ $selected_category->provision_category_name }}
-                          </h3>
-                          <button wire:click="closeDetails" class="text-neutral-500 hover:text-neutral-700">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                          </button>
-                        </div>
-
-                          <!-- Tabla de detalles -->
-                        <div class="mt-4">
-                          <table class="min-w-full divide-y divide-neutral-200">
-                            <thead class="bg-neutral-50">
-                              <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
-                                  ID
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
-                                  Marca
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
-                                  Tipo Movimiento
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
-                                  Fecha
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
-                                  Cantidad
-                                </th>
-                              </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-neutral-200">
-                              @forelse($provision_details as $detail)
-                                <tr>
-                                  <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-500">
-                                    {{ $detail->id }}
-                                  </td>
-                                  <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-900">
-                                    {{ $detail->trademark->provision_trademark_name }}
-                                  </td>
-                                  <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-500">
-                                    {{ $detail->movement_type }}
-                                  </td>
-                                  <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-500">
-                                    {{ \Carbon\Carbon::parse($detail->registered_at)->format('d/m/Y H:i') }}
-                                  </td>
-                                  <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-500">
-                                    {{ convert_measure($detail->quantity_amount, $selected_category->measure) }}
-                                  </td>
-                                </tr>
-                              @empty
-                                <tr>
-                                  <td colspan="5" class="px-6 py-4 whitespace-nowrap text-sm text-center text-neutral-500">
-                                    No hay movimientos registrados para esta categoría
-                                  </td>
-                                </tr>
-                              @endforelse
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                    </div>
-                  @endif
-
                 </x-table-td>
               </tr>
             @empty
@@ -168,6 +101,119 @@
             @endforelse
           </x-slot:tablebody>
         </x-table-base>
+
+        {{-- modal de detalles --}}
+        @if($show_details_modal)
+          <div class="fixed inset-0 z-50 bg-neutral-400 bg-opacity-20 overflow-y-auto h-full w-full flex items-center justify-center">
+            <div class="bg-white p-5 border rounded-md shadow-lg w-3/4">
+              <!-- encabezado del modal -->
+              <div class="flex justify-between items-center mb-4">
+                <div>
+                  <h3 class="text-lg font-semibold text-neutral-800">Detalles de existencias:</h3>
+                  <span>
+                    <span class="font-semibold">Categoria:</span>
+                    <span>{{ $selected_category->provision_category_name }}</span>
+                  </span>
+                </div>
+              </div>
+              {{-- cuerpo del modal --}}
+              <div class="mt-4">
+                <x-table-base>
+                  <x-slot:tablehead>
+                    <tr class="border bg-neutral-100">
+                      <x-table-th class="text-end w-12">
+                        id
+                      </x-table-th>
+                      <x-table-th class="text-start">
+                        suministro
+                      </x-table-th>
+                      <x-table-th class="text-start">
+                        marca
+                      </x-table-th>
+                      <x-table-th class="text-start">
+                        movimiento
+                        <x-quest-icon title="movimiento positivo (+) para compras y negativo (-) en elaboración o pérdida" />
+                      </x-table-th>
+                      <x-table-th class="text-end">
+                        fecha de movimiento
+                      </x-table-th>
+                      <x-table-th class="text-end">
+                        cantidad
+                        <x-quest-icon title="kilogramos (kg), gramos (g), litros (L), mililitros (ml), metros (m), centimetros (cm)  o unidades (u)" />
+                      </x-table-th>
+                    </tr>
+                  </x-slot:tablehead>
+                  <x-slot:tablebody>
+                    @forelse($provision_details as $detail)
+                      <tr>
+                        <x-table-td class="text-end">
+                          {{ $detail->id }}
+                        </x-table-td>
+                        <x-table-td class="text-start">
+                          {{ $detail->provision_name }}
+                        </x-table-td>
+                        <x-table-td class="text-start">
+                          {{ $detail->trademark->provision_trademark_name }}
+                        </x-table-td>
+                        <x-table-td class="text-start">
+                          @if ($detail->movement_type === $tipo_compra)
+                            <span class="text-emerald-600">
+                              &plus;{{ $detail->movement_type }}
+                            </span>
+                            <a href="#" wire:navigate class="text-blue-600 underline">ver</a>
+                            @else
+                            <span class="text-red-600">
+                              &minus;{{ $detail->movement_type }}
+                            </span>
+                            <a href="#" wire:navigate class="text-blue-600 underline">ver</a>
+                          @endif
+                        </x-table-td>
+                        <x-table-td class="text-end">
+                          {{ \Carbon\Carbon::parse($detail->registered_at)->format('d/m/Y H:i') }} hs.
+                        </x-table-td>
+                        <x-table-td class="text-end">
+                          @if ($detail->movement_type === $tipo_compra)
+                            <span class="text-emerald-600">
+                              &plus;{{ convert_measure($detail->quantity_amount, $selected_category->measure) }}
+                            </span>
+                          @else
+                            <span class="text-red-600">
+                              &minus;{{ convert_measure($detail->quantity_amount, $selected_category->measure) }}
+                            </span>
+                          @endif
+                        </x-table-td>
+                      </tr>
+                      @if ($loop->last)
+                        <tr>
+                          <x-table-td colspan="5" class="text-end font-semibold capitalize">
+                            Total:
+                            <x-quest-icon title="sumatoria de todos los movimientos de la categoría" />
+                          </x-table-td>
+                          <x-table-td class="text-end font-semibold">
+                            {{ convert_measure($total_amount, $selected_category->measure) }}
+                          </x-table-td>
+                        </tr>
+                      @endif
+                    @empty
+                      <tr>
+                        <x-table-td colspan="6" class="text-start">
+                          No hay movimientos registrados para esta categoría
+                        </x-table-td>
+                      </tr>
+                    @endforelse
+                  </x-slot:tablebody>
+                </x-table-base>
+              </div>
+              <div class="flex justify-end gap-2 mt-6">
+                <x-btn-button
+                  wire:click="closeDetailsModal()"
+                  color="neutral"
+                  >Cerrar
+                </x-btn-button>
+              </div>
+            </div>
+          </div>
+        @endif
 
       </x-slot:content>
 
