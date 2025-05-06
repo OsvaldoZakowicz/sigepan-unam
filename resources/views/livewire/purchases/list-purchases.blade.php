@@ -138,14 +138,26 @@
                   Detalle de la compra <span class="uppercase">{{ $selected_purchase->id }}</span>
                 </h3>
                 <div class="flex flex-col">
-                  <span><span class="font-semibold">Fecha de compra:</span> {{ $selected_purchase->purchase_date->format('d-m-Y') }}</span>
-                  <span><span class="font-semibold">Proveedor:</span> {{ $selected_purchase->supplier->company_name }}, <span class="font-semibold">CUIT:</span> {{ $selected_purchase->supplier->company_cuit }}</span>
+                  <span>
+                    <span class="font-semibold">Fecha de compra:</span>
+                    {{ $selected_purchase->purchase_date->format('d-m-Y') }}
+                  </span>
+                  <span>
+                    <span class="font-semibold">Proveedor:</span>
+                    {{ $selected_purchase->supplier->company_name }},
+                    <span class="font-semibold">CUIT:</span>
+                    {{ $selected_purchase->supplier->company_cuit }}
+                  </span>
                   @php
                     $preorder_reference = $this->preorderReference($selected_purchase);
                   @endphp
                   @if ($preorder_reference)
-                    <span><span class="font-semibold">Orden de compra:</span> {{ $preorder_reference['order_code'] }}, <span class="font-semibold">realizada el:</span> {{ $preorder_reference['order_date'] }}</span>
-                    <a wire:navigate href="#" class="underline text-blue-500">ver preorden</a>
+                    <span>
+                      <span class="font-semibold">Orden de compra:</span>
+                      <span class="text-xs uppercase">{{ $preorder_reference['order_code'] }}</span>,
+                      <span class="font-semibold">realizada el:</span> {{ $preorder_reference['order_date'] }}
+                    </span>
+                    <a wire:navigate href="#" class="underline text-blue-500">Ver preorden</a>
                   @else
                     <span>Compra registrada sin orden de compra previa</span>
                   @endif

@@ -3,6 +3,8 @@
 namespace App\Livewire\Purchases;
 
 use App\Models\PreOrder;
+use App\Services\Supplier\PreOrderService;
+use App\Models\Purchase;
 use Livewire\WithPagination;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -15,8 +17,22 @@ class ListPreOrders extends Component
 {
   use WithPagination;
 
+  private PreOrderService $preorder_service;
+
   #[Url]
   public $search_preorder = '';
+
+  #[Url]
+  public $search_start_at = '';
+
+  #[Url]
+  public $search_end_at = '';
+
+  #[Url]
+  public $status_filter = '';
+
+  // filtrado sin usar url
+  public $status_purchase_filter = '';
 
   // posibles estados de preorden
   public string $status_pending;
@@ -28,6 +44,8 @@ class ListPreOrders extends Component
    */
   public function boot(): void
   {
+    $this->preorder_service = new PreOrderService();
+
     // posibles estados de preorden
     $this->status_pending = PreOrder::getPendingStatus();
     $this->status_approved = PreOrder::getApprovedStatus();
@@ -35,11 +53,68 @@ class ListPreOrders extends Component
   }
 
   /**
-   * buscar compras
+   * comprobar si la preorden tiene una compra asociada
+   * @param PreOrder $preorder
+   * @return bool
    */
-  public function searchPurchases()
+  public function checkAsociatedPurchase(PreOrder $preorder): bool
   {
-    return PreOrder::paginate(10);
+    return $this->preorder_service->hasAssociatedPurchase($preorder);
+  }
+
+  /**
+   * ir a la vista de compra realizada
+   * @param PreOrder $preorder
+   */
+  public function goToPurchase(PreOrder $preorder)
+  {
+    $purchase = Purchase::where('purchase_reference_id', $preorder->id)
+      ->where('purchase_reference_type', get_class($preorder))
+      ->first();
+
+    if ($purchase) {
+      // almacenar el ID en la sesion para mantenerlo despues del redirect
+      session()->flash('pending_purchase_id', $purchase->id);
+      return redirect()->route('purchases-purchases-index');
+    }
+  }
+
+  /**
+   * buscar preordenes
+   */
+  public function searchPreOrders()
+  {
+    return PreOrder::with(['supplier'])
+      ->when($this->search_preorder, function ($query) {
+        $query->where('id', 'like', '%' . $this->search_preorder . '%')
+          ->orWhere('pre_order_code', 'like', '%' . $this->search_preorder . '%')
+          ->orWhereHas('supplier', function ($query) {
+            $query->where('company_name', 'like', '%' . $this->search_preorder . '%');
+          });
+      })->when(
+        $this->search_start_at && $this->search_end_at,
+        function ($query) {
+          // buscar preordenes que esten completamente dentro del rango de fechas
+          $query->where('created_at', '>=', $this->search_start_at)
+            ->where('created_at', '<=', $this->search_end_at);
+        }
+      )->when(
+        $this->search_start_at && !$this->search_end_at,
+        function ($query) {
+          // buscar preordenes que coincidan con la fecha de inicio
+          $query->where('created_at', '>=', $this->search_start_at);
+        }
+      )->when(
+        !$this->search_start_at && $this->search_end_at,
+        function ($query) {
+          // buscar preordenes que coincidan con la fecha de fin
+          $query->where('created_at', '<=', $this->search_end_at);
+        }
+      )->when($this->status_filter, function ($query) {
+        $query->where('status', $this->status_filter);
+      })
+      ->orderBy('id', 'desc')
+      ->paginate(10);
   }
 
   /**
@@ -57,12 +132,12 @@ class ListPreOrders extends Component
    */
   public function resetSearchInputs(): void
   {
-    $this->reset(['search_preorder']);
+    $this->reset(['search_preorder', 'search_start_at', 'search_end_at', 'status_filter', 'status_purchase_filter']);
   }
 
   public function render()
   {
-    $preorders = $this->searchPurchases();
+    $preorders = $this->searchPreOrders();
     return view('livewire.purchases.list-pre-orders', compact('preorders'));
   }
 }

@@ -4,6 +4,7 @@ namespace App\Livewire\Purchases;
 
 use App\Models\Purchase;
 use App\Services\Purchase\PurchaseService;
+use Livewire\Attributes\On;
 use Livewire\WithPagination;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -34,6 +35,22 @@ class ListPurchases extends Component
   public function boot(): void
   {
     $this->purchase_service = new PurchaseService();
+  }
+
+  /**
+   * montar datos
+   * @return void
+   */
+  public function mount(): void
+  {
+    // Verificar si hay un ID pendiente en la sesion
+    // en caso de que se llegue a esta vista por redireccion desde la lista de preordenes
+    if ($pending_purchase_id = session('pending_purchase_id')) {
+      $purchase = Purchase::find($pending_purchase_id);
+      if ($purchase) {
+        $this->openDetailsModal($purchase);
+      }
+    }
   }
 
   /**

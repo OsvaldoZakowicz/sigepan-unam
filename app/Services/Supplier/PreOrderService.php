@@ -7,6 +7,7 @@ use App\Models\PreOrder;
 use App\Models\Provision;
 use App\Models\Quotation;
 use App\Models\Supplier;
+use App\Models\Purchase;
 use Illuminate\Support\Collection;
 
 /**
@@ -160,5 +161,17 @@ class PreOrderService
       }
     }
     return $array;
+  }
+
+  /**
+   * Verifica si la preorden esta asociada a una compra
+   * @param PreOrder $preorder
+   * @return bool
+   */
+  public function hasAssociatedPurchase(PreOrder $preorder): bool
+  {
+    return Purchase::where('purchase_reference_id', $preorder->id)
+      ->where('purchase_reference_type', get_class($preorder))
+      ->exists();
   }
 }
