@@ -167,13 +167,21 @@ function limitText($text)
  */
 function convert_measure(float $quantity, Measure $measure): string
 {
+  // Usar valor absoluto
+  $absQuantity = abs($quantity);
+
+  // Si es unidad, retornar sin decimales
+  if ($measure->unit_name === 'unidad') {
+    return (int)$absQuantity . ' ' . $measure->unit_symbol;
+  }
+
   // Si es una unidad simple o la cantidad es mayor o igual a 1
-  if (is_null($measure->conversion_factor) || $quantity >= 1) {
-    return number_format($quantity, 2) . ' ' . $measure->unit_symbol;
+  if (is_null($measure->conversion_factor) || $absQuantity >= 1) {
+    return number_format($absQuantity, 2) . ' ' . $measure->unit_symbol;
   }
 
   // Convertir a la unidad menor
-  $convertedQuantity = $quantity * $measure->conversion_factor;
+  $convertedQuantity = $absQuantity * $measure->conversion_factor;
   return number_format($convertedQuantity, 2) . ' ' . $measure->conversion_symbol;
 }
 
@@ -185,17 +193,28 @@ function convert_measure(float $quantity, Measure $measure): string
  */
 function convert_measure_value(float $quantity, Measure $measure): array
 {
-  // Si es una unidad simple o la cantidad es mayor o igual a 1
-  if (is_null($measure->conversion_factor) || $quantity >= 1) {
+  // Usar valor absoluto
+  $absQuantity = abs($quantity);
+
+  // Si es unidad, retornar valor entero
+  if ($measure->unit_name === 'unidad') {
     return [
       'symbol' => $measure->unit_symbol,
-      'value' => $quantity
+      'value' => (int)$absQuantity
+    ];
+  }
+
+  // Si es una unidad simple o la cantidad es mayor o igual a 1
+  if (is_null($measure->conversion_factor) || $absQuantity >= 1) {
+    return [
+      'symbol' => $measure->unit_symbol,
+      'value' => $absQuantity
     ];
   }
 
   // Convertir a la unidad menor
   return [
     'symbol' => $measure->conversion_symbol,
-    'value' => $quantity * $measure->conversion_factor
+    'value' => $absQuantity * $measure->conversion_factor
   ];
 }
