@@ -157,7 +157,13 @@
                       <span class="text-xs uppercase">{{ $preorder_reference['order_code'] }}</span>,
                       <span class="font-semibold">realizada el:</span> {{ $preorder_reference['order_date'] }}
                     </span>
-                    <a wire:navigate href="#" class="underline text-blue-500">Ver preorden</a>
+                    {{-- todo --}}
+                    <a
+                      wire:navigate
+                      href="#"
+                      class="underline text-blue-500"
+                      >Ver preorden
+                    </a>
                   @else
                     <span>Compra registrada sin orden de compra previa</span>
                   @endif
@@ -212,7 +218,7 @@
 
                               $volume = $detail->provision
                                 ? convert_measure($detail->provision->provision_quantity, $detail->provision->measure)
-                                : convert_measure($detail->pack->provision->provision_quantity, $detail->pack->provision->measure);
+                                : convert_measure($detail->pack->pack_quantity, $detail->pack->provision->measure);
                             @endphp
                             <span>{{ $trademark }}/</span>
                             <span>{{ $type }}/</span>

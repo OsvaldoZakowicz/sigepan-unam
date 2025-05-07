@@ -109,7 +109,7 @@
               <!-- encabezado del modal -->
               <div class="flex justify-between items-center mb-4">
                 <div>
-                  <h3 class="text-lg font-semibold text-neutral-800">Detalles de existencias:</h3>
+                  <h3 class="text-lg font-semibold text-neutral-800">Detalle de movimientos sobre existencias:</h3>
                   <span>
                     <span class="font-semibold">Categoria:</span>
                     <span>{{ $selected_category->provision_category_name }}</span>
@@ -125,14 +125,11 @@
                         id
                       </x-table-th>
                       <x-table-th class="text-start">
-                        suministro
-                      </x-table-th>
-                      <x-table-th class="text-start">
-                        marca
-                      </x-table-th>
-                      <x-table-th class="text-start">
                         movimiento
                         <x-quest-icon title="movimiento positivo (+) para compras y negativo (-) en elaboración o pérdida" />
+                      </x-table-th>
+                      <x-table-th class="text-start">
+                        suministro
                       </x-table-th>
                       <x-table-th class="text-end">
                         fecha de movimiento
@@ -147,26 +144,35 @@
                     @forelse($provision_details as $detail)
                       <tr>
                         <x-table-td class="text-end">
-                          {{ $detail->id }}
-                        </x-table-td>
-                        <x-table-td class="text-start">
-                          {{ $detail->provision_name }}
-                        </x-table-td>
-                        <x-table-td class="text-start">
-                          {{ $detail->trademark->provision_trademark_name }}
+                          {{ $detail->existence_id }}
                         </x-table-td>
                         <x-table-td class="text-start">
                           @if ($detail->movement_type === $tipo_compra)
                             <span class="text-emerald-600">
                               &plus;{{ $detail->movement_type }}
                             </span>
-                            <a href="#" wire:navigate class="text-blue-600 underline">ver</a>
+                            <a
+                              href="#"
+                              wire:navigate
+                              wire:click="goToPurchase({{ $detail->purchase_id }})"
+                              class="text-blue-600 underline"
+                              >ver
+                            </a>
                             @else
                             <span class="text-red-600">
                               &minus;{{ $detail->movement_type }}
                             </span>
-                            <a href="#" wire:navigate class="text-blue-600 underline">ver</a>
+                            {{-- todo: ir a elaboracion (stock) --}}
+                            <a
+                              href="#"
+                              wire:navigate
+                              class="text-blue-600 underline"
+                              >ver
+                            </a>
                           @endif
+                        </x-table-td>
+                        <x-table-td class="text-start">
+                          {{ $detail->provision_name }}
                         </x-table-td>
                         <x-table-td class="text-end">
                           {{ \Carbon\Carbon::parse($detail->registered_at)->format('d/m/Y H:i') }} hs.
@@ -185,7 +191,7 @@
                       </tr>
                       @if ($loop->last)
                         <tr>
-                          <x-table-td colspan="5" class="text-end font-semibold capitalize">
+                          <x-table-td colspan="4" class="text-end font-semibold capitalize">
                             Total:
                             <x-quest-icon title="sumatoria de todos los movimientos de la categoría" />
                           </x-table-td>
@@ -196,7 +202,7 @@
                       @endif
                     @empty
                       <tr>
-                        <x-table-td colspan="6" class="text-start">
+                        <x-table-td colspan="5" class="text-start">
                           No hay movimientos registrados para esta categoría
                         </x-table-td>
                       </tr>

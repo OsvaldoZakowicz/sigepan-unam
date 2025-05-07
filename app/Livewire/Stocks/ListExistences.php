@@ -5,6 +5,7 @@ namespace App\Livewire\Stocks;
 use App\Models\Existence;
 use App\Models\Provision;
 use App\Models\ProvisionCategory;
+use App\Models\Purchase;
 use Illuminate\View\View;
 use Livewire\WithPagination;
 use Livewire\Attributes\Url;
@@ -35,6 +36,20 @@ class ListExistences extends Component
     $this->tipo_compra = Existence::MOVEMENT_TYPE_COMPRA();
     $this->tipo_elaboracion = Existence::MOVEMENT_TYPE_ELABORACION();
     $this->tipo_perdida = Existence::MOVEMENT_TYPE_PERDIDA();
+  }
+
+  /**
+   * ir a la vista de compra realizada
+   */
+  public function goToPurchase($purchase_id)
+  {
+    $purchase = Purchase::find((int)$purchase_id);
+
+    if ($purchase) {
+      // almacenar el ID en la sesion para mantenerlo despues del redirect
+      session()->flash('pending_purchase_id', $purchase->id);
+      return redirect()->route('purchases-purchases-index');
+    }
   }
 
   /**
@@ -76,6 +91,8 @@ class ListExistences extends Component
         'provisions.provision_name',
         'provisions.provision_trademark_id',
         'provisions.provision_category_id',
+        'existences.id as existence_id',
+        'existences.purchase_id',
         'existences.movement_type',
         'existences.registered_at',
         'existences.quantity_amount'
@@ -95,16 +112,25 @@ class ListExistences extends Component
   private function searchExistences()
   {
     return ProvisionCategory::query()
-      ->select('provision_categories.*')  // seleccionamos todos los campos de la categoria
+      ->select('provision_categories.*')
       ->selectRaw('COALESCE(SUM(existences.quantity_amount), 0) as total_amount')
-      ->with(['measure', 'provision_type'])  // eager loading de relaciones
+      ->with(['measure', 'provision_type'])
       ->leftJoin('provisions', 'provision_categories.id', '=', 'provisions.provision_category_id')
       ->leftJoin('existences', 'provisions.id', '=', 'existences.provision_id')
       ->when($this->search_category, function ($query) {
         return $query->where('provision_categories.provision_category_name', 'like', '%' . $this->search_category . '%')
           ->orWhere('provision_categories.id', 'like', '%' . $this->search_category . '%');
       })
-      ->groupBy('provision_categories.id', 'provision_categories.provision_category_name', 'provision_categories.measure_id')
+      // Incluir todas las columnas de provision_categories en el GROUP BY
+      ->groupBy(
+        'provision_categories.id',
+        'provision_categories.provision_category_name',
+        'provision_categories.measure_id',
+        'provision_categories.provision_type_id',
+        'provision_categories.provision_category_is_editable',
+        'provision_categories.created_at',
+        'provision_categories.updated_at'
+      )
       ->orderByRaw('COALESCE(SUM(existences.quantity_amount), 0) DESC')
       ->paginate(10);
   }
