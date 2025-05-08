@@ -4,6 +4,7 @@ namespace App\Livewire\Stocks;
 
 use App\Models\Product;
 use App\Models\Stock;
+use App\Models\StockMovement;
 use Illuminate\View\View;
 use Livewire\WithPagination;
 use Livewire\Attributes\Url;
@@ -24,6 +25,24 @@ class ShowProductStock extends Component
   // Propiedades para el modal
   public bool $show_movements_modal = false;
   public ?Stock $selected_stock = null;
+
+  // Tipos de movimientos
+  public $tipo_elaboracion;
+  public $tipo_venta;
+  public $tipo_merma;
+  public $tipo_perdida;
+
+  /**
+   * boot de datos constantes
+   * @return void
+   */
+  public function boot(): void
+  {
+    $this->tipo_elaboracion = StockMovement::MOVEMENT_TYPE_ELABORACION();
+    $this->tipo_venta = StockMovement::MOVEMENT_TYPE_VENTA();
+    $this->tipo_merma = StockMovement::MOVEMENT_TYPE_MERMA();
+    $this->tipo_perdida = StockMovement::MOVEMENT_TYPE_PERDIDA();
+  }
 
   /**
    * montar datos

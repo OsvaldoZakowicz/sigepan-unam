@@ -3,7 +3,7 @@
   <article class="m-2 border rounded-sm border-neutral-200">
 
     {{-- barra de titulo --}}
-    <x-title-section title="lista de stock del producto {{ $product->product_name }}">
+    <x-title-section title="lista de stock del producto: {{ $product->product_name }}">
       <x-a-button
         wire:navigate
         href="{{ route('stocks-products-index') }}"
@@ -107,7 +107,7 @@
                   {{ $stock->id }}
                 </x-table-td>
                 <x-table-td class="text-start">
-                  <span class="uppercase">{{ $stock->lote_code }}</span>
+                  <span class="text-xs uppercase">{{ $stock->lote_code }}</span>
                 </x-table-td>
                 <x-table-td class="text-start">
                   {{ $stock->recipe->recipe_title }}
@@ -138,70 +138,6 @@
                     >movimientos
                   </x-a-button>
 
-                  {{-- modal de movimientos del stock --}}
-                  @if($show_movements_modal && $selected_stock)
-                    <div class="fixed inset-0 bg-neutral-400 bg-opacity-20 overflow-y-auto h-full w-full flex items-center justify-center">
-                      <div class="bg-white p-5 border rounded-md shadow-lg w-3/4 transform transition-all">
-                        <div class="text-start">
-                          <h3 class="text-md leading-6 capitalize font-medium text-neutral-800">
-                            Movimientos del Lote <span class="uppercase">{{ $selected_stock->lote_code }}</span>
-                          </h3>
-
-                          <div class="mt-4">
-                            <x-table-base>
-                              <x-slot:tablehead>
-                                <tr class="border bg-neutral-100">
-                                  <x-table-th class="text-end w-12">
-                                    id
-                                  </x-table-th>
-                                  <x-table-th class="text-start">
-                                    tipo
-                                  </x-table-th>
-                                  <x-table-th class="text-end">
-                                    cantidad
-                                  </x-table-th>
-                                  <x-table-th class="text-start">
-                                    fecha
-                                  </x-table-th>
-                                </tr>
-                              </x-slot:tablehead>
-                              <x-slot:tablebody>
-                                @forelse ($selected_stock->stock_movements()->orderBy('id', 'desc')->get() as $movement)
-                                  <tr class="border">
-                                    <x-table-td class="text-end">
-                                      {{ $movement->id }}
-                                    </x-table-td>
-                                    <x-table-td class="text-start">
-                                      {{ $movement->movement_type }}
-                                    </x-table-td>
-                                    <x-table-td class="text-end">
-                                      {{ $movement->quantity }}
-                                    </x-table-td>
-                                    <x-table-td class="text-start">
-                                      {{ $movement->registered_at->format('d-m-Y H:i') }}
-                                    </x-table-td>
-                                  </tr>
-                                @empty
-                                  <tr class="border">
-                                    <td colspan="4" class="text-center">¡Sin movimientos registrados!</td>
-                                  </tr>
-                                @endforelse
-                              </x-slot:tablebody>
-                            </x-table-base>
-                          </div>
-
-                          <div class="flex justify-end gap-2 mt-6">
-                            <x-btn-button
-                              wire:click="$set('show_movements_modal', false)"
-                              color="neutral"
-                              >Cerrar
-                            </x-btn-button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  @endif
-
                 </x-table-td>
               </tr>
             @empty
@@ -211,6 +147,105 @@
             @endforelse
           </x-slot:tablebody>
         </x-table-base>
+
+        {{-- modal de movimientos del stock --}}
+        @if($show_movements_modal && $selected_stock)
+          <div class="fixed inset-0 bg-neutral-400 bg-opacity-20 overflow-y-auto h-full w-full flex items-center justify-center">
+            <div class="bg-white p-5 border rounded-md shadow-lg w-3/4 transform transition-all">
+              <div class="text-start">
+                <div>
+                  <h3 class="text-lg leading-6 capitalize font-medium text-neutral-800">
+                    Movimientos del Lote:
+                  </h3>
+                  <span>
+                    <span class="capitalize font-semibold">Producto:</span>
+                    <span>{{ $selected_stock->product->product_name }}</span>
+                  </span>
+                  <span>
+                    <span class="capitalize font-semibold">Lote:</span>
+                    <span class="uppercase text-xs">{{ $selected_stock->lote_code }}</span>
+                  </span>
+                  <span>
+                    <span class="capitalize font-semibold">Cantidad elaborada:</span>
+                    <span class="">{{ $selected_stock->quantity_total }}</span>
+                  </span>
+                  <span>
+                    <span class="capitalize font-semibold">Cantidad disponible:</span>
+                    <span class="">{{ $selected_stock->quantity_left }}</span>
+                  </span>
+                </div>
+                <div class="mt-4">
+                  <x-table-base>
+                    <x-slot:tablehead>
+                      <tr class="border bg-neutral-100">
+                        <x-table-th class="text-end w-12">
+                          id
+                        </x-table-th>
+                        <x-table-th class="text-start">
+                          tipo
+                          {{-- todo: tipos restantes --}}
+                          <x-quest-icon title="movimiento positivo (+) para elboracion y negativo (-) para ventas"/>
+                        </x-table-th>
+                        <x-table-th class="text-end">
+                          cantidad
+                        </x-table-th>
+                        <x-table-th class="text-start">
+                          fecha
+                        </x-table-th>
+                      </tr>
+                    </x-slot:tablehead>
+                    <x-slot:tablebody>
+                      @forelse ($selected_stock->stock_movements()->orderBy('id', 'desc')->get() as $movement)
+                        <tr class="border">
+                          <x-table-td class="text-end">
+                            {{ $movement->id }}
+                          </x-table-td>
+                          <x-table-td class="text-start">
+                            @if ($movement->movement_type === $tipo_elaboracion)
+                              <span class="text-emerald-600">
+                                &plus;{{ $movement->movement_type }}
+                              </span>
+                            @else
+                              <span class="text-red-600">
+                                &minus;{{ $movement->movement_type }}
+                              </span>
+                            @endif
+                          </x-table-td>
+                          <x-table-td class="text-end">
+                            @if ($movement->movement_type === $tipo_elaboracion)
+                              <span class="text-emerald-600">
+                                &plus;{{ $movement->quantity }}
+                              </span>
+                            @else
+                              <span class="text-red-600">
+                                &minus;{{ $movement->quantity }}
+                              </span>
+                            @endif
+                          </x-table-td>
+                          <x-table-td class="text-start">
+                            {{ $movement->registered_at->format('d-m-Y H:i') }} hs.
+                          </x-table-td>
+                        </tr>
+                      @empty
+                        <tr class="border">
+                          <td colspan="4" class="text-start">¡Sin movimientos registrados!</td>
+                        </tr>
+                      @endforelse
+                    </x-slot:tablebody>
+                  </x-table-base>
+                </div>
+
+                <div class="flex justify-end gap-2 mt-6">
+                  <x-btn-button
+                    wire:click="$set('show_movements_modal', false)"
+                    color="neutral"
+                    >Cerrar
+                  </x-btn-button>
+                </div>
+              </div>
+            </div>
+          </div>
+        @endif
 
       </x-slot:content>
 

@@ -86,7 +86,7 @@ class StockService
         // Crear el movimiento inicial
         $stock->stock_movements()->create([
           'quantity'      => $initial_quantity,
-          'movement_type' => 'elaboracion',
+          'movement_type' => StockMovement::MOVEMENT_TYPE_ELABORACION(),
           'registered_at' => $stock_data['elaborated_at'] ?? now(),
         ]);
 
