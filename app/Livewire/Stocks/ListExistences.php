@@ -6,6 +6,7 @@ use App\Models\Existence;
 use App\Models\Provision;
 use App\Models\ProvisionCategory;
 use App\Models\Purchase;
+use App\Models\Stock;
 use Illuminate\View\View;
 use Livewire\WithPagination;
 use Livewire\Attributes\Url;
@@ -43,12 +44,29 @@ class ListExistences extends Component
    */
   public function goToPurchase($purchase_id)
   {
-    $purchase = Purchase::find((int)$purchase_id);
+    $purchase = Purchase::find((int) $purchase_id);
 
     if ($purchase) {
       // almacenar el ID en la sesion para mantenerlo despues del redirect
       session()->flash('pending_purchase_id', $purchase->id);
       return redirect()->route('purchases-purchases-index');
+    }
+  }
+
+  /**
+   * ir a la vista de elaboracion realizada
+   * la ruta requiere redirigir a traves del producto
+   */
+  public function goToStock($stock_id)
+  {
+    $stock = Stock::find((int) $stock_id)
+      ->with('product')
+      ->first();
+
+    if ($stock) {
+      // almacenar el ID en la sesion para mantenerlo despues del redirect
+      session()->flash('pending_stock_id', $stock->id);
+      return redirect()->route('stocks-products-product-stock', $stock->product->id);
     }
   }
 
@@ -93,6 +111,7 @@ class ListExistences extends Component
         'provisions.provision_category_id',
         'existences.id as existence_id',
         'existences.purchase_id',
+        'existences.stock_id',
         'existences.movement_type',
         'existences.registered_at',
         'existences.quantity_amount'

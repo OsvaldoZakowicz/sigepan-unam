@@ -62,4 +62,10 @@ class Stock extends Model
   {
     return $this->hasMany(StockMovement::class, 'stock_id', 'id');
   }
+
+  // * un stock, al elaborarse, impacta en n existencias
+  public function stock_existences(): HasMany
+  {
+    return $this->hasMany(Existence::class, 'stock_id', 'id');
+  }
 }

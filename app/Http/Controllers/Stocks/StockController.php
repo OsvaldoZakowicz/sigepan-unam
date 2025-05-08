@@ -9,6 +9,7 @@ use Illuminate\View\View;
 class StockController extends Controller
 {
   //* lista de stock de productos
+  // ! funcion sin uso
   public function stocks_index(): View
   {
     return view('stocks.stocks-index');

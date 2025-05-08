@@ -33,6 +33,17 @@ class ShowProductStock extends Component
   public function mount(int $id): void
   {
     $this->product = Product::findOrFail($id);
+
+    // verificar si hay un ID pendiente en la sesion
+    // en caso de que se llegue a esta vista por redireccion desde la lista de existencias
+    if ($stock_id = session('pending_stock_id')) {
+      $stock = Stock::find($stock_id)
+        ->with('stock_movements')
+        ->first();
+      if ($stock) {
+        $this->openMovementsModal($stock);
+      }
+    }
   }
 
   /**

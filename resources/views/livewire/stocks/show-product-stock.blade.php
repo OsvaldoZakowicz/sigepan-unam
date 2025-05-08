@@ -138,7 +138,7 @@
                     >movimientos
                   </x-a-button>
 
-                  {{-- Modal de movimientos --}}
+                  {{-- modal de movimientos del stock --}}
                   @if($show_movements_modal && $selected_stock)
                     <div class="fixed inset-0 bg-neutral-400 bg-opacity-20 overflow-y-auto h-full w-full flex items-center justify-center">
                       <div class="bg-white p-5 border rounded-md shadow-lg w-3/4 transform transition-all">

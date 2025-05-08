@@ -20,6 +20,10 @@ return new class extends Migration
       $table->foreignId('purchase_id')
         ->nullable()
         ->constrained('purchases')->restrictOnDelete();
+      // fk stocks
+      $table->foreignId('stock_id')
+        ->nullable()
+        ->constrained('stocks')->restrictOnDelete();
       $table->enum('movement_type', ['compra', 'elaboracion', 'perdida']);
       $table->timestamp('registered_at');
       $table->decimal('quantity_amount');

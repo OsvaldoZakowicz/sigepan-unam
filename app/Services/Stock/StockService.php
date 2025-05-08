@@ -43,81 +43,6 @@ class StockService
     } while ($exists);
   }
 
-  /**
-   * Verifica si hay suficientes existencias para elaborar una receta
-   * @param Recipe $recipe
-   * @return bool|array Retorna true si hay suficientes existencias, o un array con las categorías faltantes
-   * @throws Exception
-   */
-  private function checkRecipeProvisions(Recipe $recipe): bool|array
-  {
-    // Obtener las categorías y cantidades requeridas por la receta
-    $required_categories = $recipe->provision_categories()
-      ->with('measure')
-      ->withPivot('quantity')
-      ->get();
-
-    $missing_categories = [];
-
-    foreach ($required_categories as $category) {
-      // sumar todas las existencias de provisiones en esta categoria
-      $total_existence = Existence::whereHas('provision', function ($query) use ($category) {
-        $query->where('provision_category_id', $category->id);
-      })->sum('quantity_amount');
-
-      // si no hay suficiente existencia para esta categoria
-      if ($total_existence < $category->pivot->quantity) {
-        $missing_categories[] = [
-          'category'  => $category->provision_category_name,
-          'required'  => convert_measure($category->pivot->quantity, $category->measure),
-          'available' => convert_measure($total_existence, $category->measure)
-        ];
-      }
-    }
-
-    return empty($missing_categories) ? true : $missing_categories;
-  }
-
-  private function consumeProvisions(Recipe $recipe): void
-  {
-    DB::transaction(function () use ($recipe) {
-      $required_categories = $recipe->provision_categories()
-        ->withPivot('quantity')
-        ->get();
-
-      foreach ($required_categories as $category) {
-        $remaining_quantity = $category->pivot->quantity;
-
-        // Obtener existencias ordenadas por fecha más antigua
-        $existences = Existence::whereHas('provision', function ($query) use ($category) {
-          $query->where('provision_category_id', $category->id);
-        })->where('quantity_amount', '>', 0)
-          ->orderBy('registered_at', 'asc')
-          ->get();
-
-        foreach ($existences as $existence) {
-          if ($remaining_quantity <= 0) break;
-
-          $quantity_to_consume = min($existence->quantity_amount, $remaining_quantity);
-
-          // Crear nuevo registro de existencia negativo con los campos correctos
-          Existence::create([
-            'provision_id'    => $existence->provision_id,
-            'quantity_amount' => -$quantity_to_consume, //negativo
-            'movement_type'   => 'elaboracion',
-            'registered_at'   => now(),
-
-          ]);
-
-          $remaining_quantity -= $quantity_to_consume;
-        }
-
-        if ($remaining_quantity > 0) {
-          throw new Exception("No se pudo consumir toda la cantidad requerida para la categoría {$category->provision_category_name}");
-        }
-      }
-    });
-  }
 
   /**
    * Crear un nuevo stock con su movimiento inicial
@@ -129,9 +54,10 @@ class StockService
   public function createStock(array $stock_data, int $initial_quantity): Stock
   {
     try {
+
       return DB::transaction(function () use ($stock_data, $initial_quantity) {
 
-        // Verificar existencias para la receta
+        // verificar existencias para la receta
         $recipe = Recipe::findOrFail($stock_data['recipe_id']);
         $provisions_check = $this->checkRecipeProvisions($recipe);
 
@@ -142,9 +68,6 @@ class StockService
 
           throw new Exception("No hay suficientes existencias:\n" . $missing);
         }
-
-        // Consumir las existencias necesarias
-        $this->consumeProvisions($recipe);
 
         // Generar código de lote único
         $lote_code = $this->generateUniqueLoteCode();
@@ -167,9 +90,14 @@ class StockService
           'registered_at' => $stock_data['elaborated_at'] ?? now(),
         ]);
 
+        // consumir las existencias necesarias
+        $this->consumeProvisions($recipe, $stock);
+
         return $stock;
       });
+
     } catch (Exception $e) {
+
       throw new Exception("Error al crear el stock: " . $e->getMessage());
     }
   }
@@ -207,5 +135,98 @@ class StockService
     } catch (Exception $e) {
       throw new Exception("Error al registrar el movimiento: " . $e->getMessage());
     }
+  }
+
+  /**
+   * Verifica si hay suficientes existencias para elaborar una receta
+   * @param Recipe $recipe
+   * @return bool|array Retorna true si hay suficientes existencias, o un array con las categorías faltantes
+   * @throws Exception
+   */
+  private function checkRecipeProvisions(Recipe $recipe): bool|array
+  {
+    // obtener las categorias y cantidades requeridas por la receta
+    $required_categories_for_recipe = $recipe->provision_categories()
+      ->with('measure')
+      ->withPivot('quantity')
+      ->get();
+
+    $missing_categories = [];
+
+    // por cada categoria requerida
+    foreach ($required_categories_for_recipe as $category_for_recipe) {
+
+      // sumar todas las existencias de provisiones en esta categoria
+      $total_existence = Existence::whereHas('provision', function ($query) use ($category_for_recipe) {
+        $query->where('provision_category_id', $category_for_recipe->id);
+      })->sum('quantity_amount');
+
+      // si no hay suficiente existencia para esta categoria
+      if ($total_existence < $category_for_recipe->pivot->quantity) {
+        $missing_categories[] = [
+          'category'  => $category_for_recipe->provision_category_name,
+          'required'  => convert_measure($category_for_recipe->pivot->quantity, $category_for_recipe->measure),
+          'available' => convert_measure($total_existence, $category_for_recipe->measure)
+        ];
+      }
+    }
+
+    return empty($missing_categories) ? true : $missing_categories;
+  }
+
+  /**
+   * Consume suministros necesarios en la elaboracion del stock
+   * a partir de una receta.
+   * @param Recipe $recipe
+   * @param Stock $stock
+   * @return void
+   */
+  private function consumeProvisions(Recipe $recipe, Stock $stock): void
+  {
+    // mensaje de error
+    $exception_msg = "No se pudo consumir toda la cantidad requerida para la categoría";
+
+    DB::transaction(function () use ($recipe, $stock, $exception_msg) {
+
+      // categorias de suministros que requiere la receta
+      $required_categories = $recipe->provision_categories()
+        ->withPivot('quantity')
+        ->get();
+
+      // por cada categoria requerida en la receta
+      foreach ($required_categories as $category) {
+        $remaining_quantity = $category->pivot->quantity;
+
+        // obtener existencias ordenadas por fecha mas antigua
+        $existences = Existence::whereHas('provision', function ($query) use ($category) {
+          $query->where('provision_category_id', $category->id);
+        })->where('quantity_amount', '>', 0)
+          ->orderBy('registered_at', 'asc')
+          ->get();
+
+        // por cada existencia de la categoria
+        foreach ($existences as $existence) {
+          if ($remaining_quantity <= 0) break;
+
+          $quantity_to_consume = min($existence->quantity_amount, $remaining_quantity);
+
+          // crear nuevo registro de existencia negativo
+          Existence::create([
+            'provision_id'    => $existence->provision_id,
+            'stock_id'        => $stock->id,
+            'quantity_amount' => -$quantity_to_consume, //negativo
+            'movement_type'   => Existence::MOVEMENT_TYPE_ELABORACION(),
+            'registered_at'   => now(),
+
+          ]);
+
+          $remaining_quantity -= $quantity_to_consume;
+        }
+
+        if ($remaining_quantity > 0) {
+          throw new Exception("{$exception_msg} {$category->provision_category_name}");
+        }
+      }
+    });
   }
 }

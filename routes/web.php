@@ -250,6 +250,7 @@ Route::middleware(['auth', 'verified', 'can:presupuestos'])->group(function () {
 //* modulo de stock
 Route::middleware(['auth', 'verified', 'can:stock'])->group(function () {
 
+  // ! ruta sin uso
   Route::get('stocks', [StockController::class, 'stocks_index'])
     ->name('stocks-stocks-index');
 

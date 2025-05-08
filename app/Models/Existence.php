@@ -24,7 +24,8 @@ class Existence extends Model
 
   /**
    * id de suministro (packs son suministros agrupados)
-   * id de compra
+   * id de compra (puede ser null)
+   * id de stock (puede ser null)
    * tipo movimiento
    * fecha de registro
    * cantidad en existencias AFECTADAS (decimal: Kg, g, L, mL, ...) (puede ser negativo)
@@ -32,6 +33,7 @@ class Existence extends Model
   protected $fillable = [
     'provision_id',
     'purchase_id',
+    'stock_id',
     'movement_type',
     'registered_at',
     'quantity_amount',
@@ -69,13 +71,19 @@ class Existence extends Model
     return self::$MOVEMENT_TYPE_PERDIDA;
   }
 
-  //* un registro de existencias puede ser de una compra
-  public function purchase(): HasMany
+  // * un registro de existencias puede ser resultado de una compra
+  public function purchase(): BelongsTo
   {
-    return $this->hasMany(Purchase::class, 'purchase_id', 'id');
+    return $this->belongsTo(Purchase::class, 'purchase_id', 'id');
   }
 
-  //* un registro de existencias es de un suministro
+  // * un registro de existencias puede ser resultado de un stock
+  public function stock(): BelongsTo
+  {
+    return $this->belongsTo(Stock::class, 'stock_id', 'id');
+  }
+
+  // * un registro de existencias es de un suministro
   public function provision(): BelongsTo
   {
     return $this->belongsTo(Provision::class, 'provision_id', 'id');

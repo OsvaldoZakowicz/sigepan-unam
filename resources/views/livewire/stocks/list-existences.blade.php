@@ -109,7 +109,9 @@
               <!-- encabezado del modal -->
               <div class="flex justify-between items-center mb-4">
                 <div>
-                  <h3 class="text-lg font-semibold text-neutral-800">Detalle de movimientos sobre existencias:</h3>
+                  <h3 class="text-lg font-semibold text-neutral-800">
+                    Detalle de movimientos sobre existencias:
+                  </h3>
                   <span>
                     <span class="font-semibold">Categoria:</span>
                     <span>{{ $selected_category->provision_category_name }}</span>
@@ -162,10 +164,10 @@
                             <span class="text-red-600">
                               &minus;{{ $detail->movement_type }}
                             </span>
-                            {{-- todo: ir a elaboracion (stock) --}}
                             <a
                               href="#"
                               wire:navigate
+                              wire:click="goToStock({{ $detail->stock_id }})"
                               class="text-blue-600 underline"
                               >ver
                             </a>
