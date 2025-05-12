@@ -80,4 +80,12 @@ class Product extends Model
   {
     return $this->hasMany(Stock::class, 'product_id', 'id');
   }
+
+  //* un producto esta en muchas ventas
+  public function sales(): BelongsToMany
+  {
+    return $this->belongsToMany(Sale::class, 'product_sale')
+      ->withPivot('sale_quantity', 'unit_price', 'subtotal_price')
+      ->withTimestamps();
+  }
 }
