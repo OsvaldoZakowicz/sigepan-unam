@@ -11,6 +11,7 @@ use App\Models\Profile;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use OwenIt\Auditing\Contracts\Auditable;
 use App\Models\Supplier;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable implements MustVerifyEmail, Auditable
 {
@@ -85,5 +86,12 @@ class User extends Authenticatable implements MustVerifyEmail, Auditable
   public function supplier(): HasOne
   {
     return $this->hasOne(Supplier::class);
+  }
+
+  // * un usuario puede tener ventas asociadas
+  // usuario con rol cliente
+  public function sales(): HasMany
+  {
+    return $this->hasMany(Sale::class, 'user_id', 'id');
   }
 }

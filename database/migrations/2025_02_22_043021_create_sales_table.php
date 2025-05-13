@@ -13,9 +13,16 @@ return new class extends Migration
   {
     Schema::create('sales', function (Blueprint $table) {
       $table->id();
-      // fk order_id
-      // no puedo borrar una orden si tiene una venta asociada
-      $table->foreignId('order_id')->constrained()->restrictOnDelete();
+      // fk order_id (nullable)
+      $table->foreignId('order_id')
+        ->nullable()
+        ->constrained()->restrictOnDelete();
+      // fk user_id (nullable)
+      $table->foreignId('user_id')
+        ->nullable()
+        ->constrained()->restrictOnDelete();
+      $table->enum('client_type', ['cliente registrado', 'cliente no registrado']);
+      $table->enum('sale_type', ['venta web', 'venta presencial']);
       $table->string('payment_type');
       $table->string('payment_id')->nullable();
       $table->string('status')->nullable();
