@@ -52,7 +52,15 @@ new class extends Component {
             </x-nav-link>
           @endcan
 
-          {{-- proveedores --}}
+          @can('ventas')
+            <x-nav-link
+              :href="route('sales-sales-index')"
+              :active="request()->routeIs('sales-*')"
+              wire:navigate
+              >Ventas
+            </x-nav-link>
+          @endcan
+
           @can('compras')
             <x-nav-link
               :href="route('purchases-purchases-index')"

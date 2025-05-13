@@ -11,6 +11,7 @@ use App\Http\Controllers\Store\PaymentController;
 use App\Http\Controllers\Store\StoreController;
 use App\Http\Controllers\Pdf\PDFController;
 use App\Http\Controllers\Purchase\PurchaseController;
+use App\Http\Controllers\Sale\SaleController;
 
 //* layout publico
 // retorna la vista tienda publica
@@ -297,6 +298,14 @@ Route::middleware(['auth', 'verified', 'can:stock'])->group(function () {
 
   Route::get('stocks/tags/edit/{id}', [StockController::class, 'tags_edit'])
     ->name('stocks-tags-edit');
+});
+
+//* modulo de ventas
+Route::middleware(['auth', 'verified', 'can:ventas'])->group(function  () {
+
+  Route::get('sales', [SaleController::class, 'sales_index'])
+    ->name('sales-sales-index');
+
 });
 
 //* modulo de compras
