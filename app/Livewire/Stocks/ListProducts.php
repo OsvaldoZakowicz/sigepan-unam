@@ -24,11 +24,6 @@ class ListProducts extends Component
   #[Url]
   public string $search_product = '';
 
-  #[Url]
-  public string $tag_filter = '';
-
-  public Collection $tags;
-
   // modal de elaboracion
   public bool $show_elaboration_modal = false;
   public ?Product $selected_product = null;
@@ -40,7 +35,6 @@ class ListProducts extends Component
    */
   public function boot(): void
   {
-    $this->tags = Tag::all();
     $this->stock_service = new StockService();
   }
 
@@ -184,11 +178,6 @@ class ListProducts extends Component
         $query->where('product_name', 'like', '%' . $this->search_product . '%')
           ->orWhere('product_price', '<=', (float) $this->search_product);
       })
-      ->when($this->tag_filter, function ($query) {
-        $query->whereHas('tags', function ($q) {
-          $q->where('tags.id', (int) $this->tag_filter);
-        });
-      })
       ->orderBy('deleted_at', 'asc') // primero los NO borrados (deleted_at null)
       ->orderBy('id', 'desc')
       ->paginate(10);
@@ -211,7 +200,7 @@ class ListProducts extends Component
    */
   public function resetSearchInputs(): void
   {
-    $this->reset(['search_product', 'tag_filter', 'in_store_filter']);
+    $this->reset(['search_product']);
   }
 
   /**

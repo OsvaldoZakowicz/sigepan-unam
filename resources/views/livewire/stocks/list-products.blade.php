@@ -33,25 +33,6 @@
             />
           </div>
 
-          {{-- filtro de etiquetas --}}
-          <div class="flex flex-col justify-end w-1/4">
-            <label for="tag_filter">filtrar por etiquetas</label>
-            <select
-              name="tag_filter"
-              id="tag_filter"
-              wire:model.live="tag_filter"
-              wire:click="resetPagination()"
-              class="text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
-              >
-              <option value="">seleccione una etiqueta ...</option>
-              @forelse ($tags as $tag)
-                <option value="{{ $tag->id }}">{{ $tag->tag_name }}</option>
-              @empty
-                <option value="">no hay etiquetas disponibles</option>
-              @endforelse
-            </select>
-          </div>
-
         </div>
 
         {{-- limpiar campos de busqueda --}}
@@ -79,14 +60,12 @@
               <x-table-th class="text-start">
                 producto
               </x-table-th>
-              <x-table-th class="text-start">
-                etiquetas
-              </x-table-th>
               <x-table-th class="text-end">
                 en stock
               </x-table-th>
               <x-table-th class="text-end">
                 $&nbsp;precio
+                <x-quest-icon title="precio predeterminado" />
               </x-table-th>
               <x-table-th class="text-start">
                 <span>publicado</span>
@@ -109,27 +88,12 @@
                 <x-table-td class="text-start">
                   {{ $product->product_name }}
                 </x-table-td>
-                <x-table-td class="text-start space-x-1">
-                  @forelse ($product->tags as $tag)
-                    @if ($loop->index < 2)
-                      <span class="py-1 px-2 rounded-md text-xs lowercase text-neutral-600 bg-blue-200 border-blue-300">
-                        {{ $tag->tag_name }}
-                      </span>
-                    @else
-                      <span class="py-1 px-2 rounded-md text-xs lowercase text-neutral-600 bg-blue-200 border-blue-300">
-                        +{{ $product->tags->count() }}
-                      </span>
-                    @endif
-                  @empty
-                    <span>ninguna</span>
-                  @endforelse
-                </x-table-td>
                 <x-table-td class="text-end">
                   {{ $product->total_stock }}
                 </x-table-td>
                 <x-table-td class="text-end">
                   <span>$</span>
-                  {{ $product->product_price }}
+                  {{ $product->defaultPrice()->price }}
                 </x-table-td>
                 <x-table-td class="text-start">
                   @if ($product->product_in_store)
