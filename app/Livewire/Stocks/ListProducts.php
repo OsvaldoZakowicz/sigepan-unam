@@ -175,8 +175,7 @@ class ListProducts extends Component
     $products = Product::withTrashed()
       ->with('tags')
       ->when($this->search_product, function ($query) {
-        $query->where('product_name', 'like', '%' . $this->search_product . '%')
-          ->orWhere('product_price', '<=', (float) $this->search_product);
+        $query->where('product_name', 'like', '%' . $this->search_product . '%');
       })
       ->orderBy('deleted_at', 'asc') // primero los NO borrados (deleted_at null)
       ->orderBy('id', 'desc')
