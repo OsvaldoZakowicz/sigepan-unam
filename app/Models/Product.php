@@ -16,7 +16,6 @@ class Product extends Model
 
   protected $fillable = [
     'product_name',
-    'product_price',
     'product_short_description',
     'product_expires_in',
     'product_in_store',
@@ -28,9 +27,11 @@ class Product extends Model
    * @var array<string,string>
    */
   protected $casts = [
-    'product_price'      => 'decimal:2',
     'product_expires_in' => 'integer',
-    'product_in_store'   => 'boolean', // true o false
+    'product_in_store'   => 'boolean',
+    'created_at'         => 'datetime',
+    'updated_at'         => 'datetime',
+    'deleted_at'         => 'datetime',
   ];
 
   /**
@@ -87,5 +88,48 @@ class Product extends Model
     return $this->belongsToMany(Sale::class, 'product_sale')
       ->withPivot('sale_quantity', 'unit_price', 'subtotal_price')
       ->withTimestamps();
+  }
+
+  /**
+   * Obtiene los precios asociados a este producto.
+   */
+  public function prices(): HasMany
+  {
+    return $this->hasMany(Price::class);
+  }
+
+  /**
+   * Obtiene el precio predeterminado para este producto.
+   */
+  public function defaultPrice()
+  {
+    return $this->prices()->where('is_default', true)->first();
+  }
+
+  /**
+   * Obtiene el precio apropiado para una cantidad específica.
+   */
+  public function getPriceForQuantity(int $quantity)
+  {
+    return Price::findPriceForQuantity($this->id, $quantity) ?? $this->defaultPrice();
+  }
+
+  /**
+   * Agrega un nuevo precio para este producto.
+   */
+  public function addPrice(int $quantity, float $price, string $description, bool $isDefault = false): Price
+  {
+    $newPrice = $this->prices()->create([
+      'quantity' => $quantity,
+      'price' => $price,
+      'description' => $description,
+      'is_default' => $isDefault,
+    ]);
+
+    if ($isDefault) {
+      $newPrice->setAsDefault();
+    }
+
+    return $newPrice;
   }
 }

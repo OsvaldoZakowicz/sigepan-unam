@@ -30,6 +30,7 @@
 
             <div class="flex justify-start items-stretch gap-4">
 
+              {{-- columna 1 --}}
               <div class="flex flex-col gap-4 w-1/2">
                 <div class="flex gap-4">
                   {{-- nombre del producto --}}
@@ -45,22 +46,6 @@
                       wire:model="product_name"
                       type="text"
                       class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
-                    />
-                  </div>
-                  {{-- precio --}}
-                  <div class="flex flex-col gap-1 min-h-fit w-full">
-                    <span>
-                      <label for="product_price">$&nbsp;precio del producto</label>
-                      <span class="text-red-600">*</span>
-                    </span>
-                    @error('product_price')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
-                    <input
-                      name="product_price"
-                      id="product_price"
-                      wire:model="product_price"
-                      type="text"
-                      placeholder="$"
-                      class="p-1 text-sm text-right border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
                     />
                   </div>
                 </div>
@@ -154,6 +139,8 @@
                   </div>
                 </div>
               </div>
+
+              {{-- columna 2 --}}
               <div class="flex flex-col gap-4 w-1/2">
                 {{-- imagen del producto --}}
                 <div class="flex flex-col gap-1 min-h-fit w-full">
@@ -179,6 +166,146 @@
               </div>
 
             </div>
+
+          </x-div-toggle>
+
+          <x-div-toggle x-data="{ open: true }" title="precios del producto" class="w-full p-2">
+
+            {{-- leyenda --}}
+            <x-slot:subtitle>
+              <span class="text-sm text-neutral-600">establezca el/los precios del producto</span>
+            </x-slot:subtitle>
+
+            @error('prices_list')
+              <x-slot:messages class="my-2">
+                <span class="text-red-400">¡Debe agregar al menos un precio al producto!</span>
+              </x-slot:messages>
+            @enderror
+
+            {{-- formulario para agregar precio --}}
+            <div class="flex gap-2 mb-2 items-end w-full">
+
+              {{-- cantidad del producto --}}
+              <div class="flex flex-col">
+                <span>
+                  <label for="quantity">Cantidad del producto</label>
+                  <span class="text-red-600">*</span>
+                </span>
+                @error('quantity')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
+                <input
+                  type="number"
+                  wire:model="quantity"
+                  min="1"
+                  class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                  />
+              </div>
+
+              {{-- precio --}}
+              <div class="flex flex-col">
+                <span>
+                  <label for="price">Precio</label>
+                  <span class="text-red-600">*</span>
+                </span>
+                @error('price')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
+                <input
+                  type="number"
+                  wire:model="price"
+                  step="0.01"
+                  min="0"
+                  placeholder="0,00"
+                  class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                />
+              </div>
+
+              {{-- descripcion del precio --}}
+              <div class="flex flex-col w-1/3">
+                <span>
+                  <label for="price_description">Descripción del precio</label>
+                  <span class="text-red-600">*</span>
+                </span>
+                @error('price_description')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
+                <input
+                  type="text"
+                  wire:model="price_description"
+                  placeholder="ej: 'unidad', 'media docena', 'docena', ..."
+                  class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                />
+              </div>
+
+              {{-- precio predeterminado --}}
+              <div class="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  wire:model="is_default"
+                  id="is_default"
+                  class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                />
+                <label for="is_default">Precio predeterminado</label>
+              </div>
+
+              {{-- boton agregar --}}
+              <button
+                type="button"
+                wire:click="addPrice"
+                class="ml-auto px-4 py-1 bg-neutral-100 border border-neutral-300 text-neutral-600 rounded text-xs uppercase">
+                Agregar precio
+              </button>
+            </div>
+
+            {{-- lista de precios --}}
+            <x-table-base class="w-full">
+              <x-slot:tablehead>
+                <tr class="bg-neutral-100 border">
+                  <x-table-th class="text-start">
+                    Cantidad
+                  </x-table-th>
+                  <x-table-th class="text-start">
+                    $Precio
+                  </x-table-th>
+                  <x-table-th class="text-start">
+                    Descripción
+                  </x-table-th>
+                  <x-table-th class="text-start">
+                    Predeterminado
+                  </x-table-th>
+                  <x-table-th class="text-start">
+                    Acciones
+                  </x-table-th>
+                </tr>
+              </x-slot:tablehead>
+              <x-slot:tablebody>
+                @forelse($prices_list as $index => $price)
+                  <tr class="border">
+                    <x-table-td class="">
+                      {{ $price['quantity'] }}
+                    </x-table-td>
+                    <x-table-td class="">
+                      ${{ number_format($price['price'], 2) }}
+                    </x-table-td>
+                    <x-table-td class="">
+                      {{ $price['description'] }}
+                    </x-table-td>
+                    <x-table-td class="">
+                      {{ $price['is_default'] ? 'Sí' : 'No' }}
+                    </x-table-td>
+                    <x-table-td class="">
+                      <button
+                        type="button"
+                        wire:click="removePrice({{ $index }})"
+                        class="px-4 py-1 bg-red-100 border border-red-300 text-neutral-600 rounded text-xs uppercase">
+                          Eliminar
+                      </button>
+                    </x-table-td>
+                  </tr>
+                @empty
+                  <tr>
+                    <x-table-td colspan="5" class="text-start">
+                      ¡No hay precios definidos!
+                    </x-table-td>
+                  </tr>
+                @endforelse
+              </x-slot:tablebody>
+            </x-table-base>
 
           </x-div-toggle>
 

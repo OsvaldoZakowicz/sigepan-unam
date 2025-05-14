@@ -14,7 +14,6 @@ return new class extends Migration
     Schema::create('products', function (Blueprint $table) {
       $table->id();
       $table->string('product_name', 50)->unique();
-      $table->decimal('product_price');
       $table->string('product_short_description', 150);
       $table->smallInteger('product_expires_in', false, true);
       $table->boolean('product_in_store')->default(false);
