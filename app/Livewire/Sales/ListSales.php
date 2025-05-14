@@ -4,6 +4,8 @@ namespace App\Livewire\Sales;
 
 use App\Models\Sale;
 use App\Models\Product;
+use App\Services\Sale\SaleService;
+use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
 use Livewire\WithPagination;
@@ -24,6 +26,11 @@ class ListSales extends Component
   public Collection $products_for_sale;
   public $total_for_sale = 0;
 
+  // busqueda de clientes
+  public $user_search = '';
+  public $selected_user_id = null;
+  public $users = [];
+
   /**
    * montar datos
    * @return void
@@ -31,6 +38,36 @@ class ListSales extends Component
   public function mount(): void
   {
     $this->setProductsForSale();
+  }
+
+  /**
+   * al escribir en el input de busqueda de usuarios
+   * filtra la busqueda por nombre o email coincidentes
+   */
+  public function updatedUserSearch($value)
+  {
+    if (strlen($value) >= 2) {
+      $this->users = User::role('cliente')
+        ->where(function ($query) use ($value) {
+          $query->where('name', 'like', "%{$value}%")
+            ->orWhere('email', 'like', "%{$value}%");
+        })
+        ->limit(10)
+        ->get();
+    } else {
+      $this->users = [];
+    }
+  }
+
+  /**
+   * busca el usuario elegido y obtiene
+   * nombre y email
+   */
+  public function selectUser($id)
+  {
+    $this->selected_user_id = $id;
+    $user = User::find($id);
+    $this->user_search = $user->name . ' - ' . $user->email;
   }
 
   /**
@@ -211,9 +248,12 @@ class ListSales extends Component
   {
     // validar que haya productos en la lista
     $validated = $this->validate([
-      'products_for_sale'                 => ['required', 'array', 'min:1'],
-      'products_for_sale.*.product'       => ['required'],
-      'products_for_sale.*.sale_quantity' => ['required', 'integer', 'min:1'],
+      'selected_user_id'                   => ['nullable'],
+      'products_for_sale'                  => ['required', 'array', 'min:1'],
+      'products_for_sale.*.product'        => ['required'],
+      'products_for_sale.*.sale_quantity'  => ['required', 'integer', 'min:1'],
+      'products_for_sale.*.unit_price'     => ['required'],
+      'products_for_sale.*.subtotal_price' => ['required'],
     ], [
       'products_for_sale.required' => 'Debe agregar al menos un producto a la venta',
       'products_for_sale.min'      => 'Debe agregar al menos un producto a la venta',
@@ -222,10 +262,41 @@ class ListSales extends Component
       'products_for_sale.*.sale_quantity.integer'  => 'La cantidad debe ser un numero',
     ]);
 
-    // luego de validar obtengo:
-    // ['products_for_sale' => [ ['product' => 'Product', 'sale_quantity' => (int)'n'], [...] ] ]
+    try {
 
-    dd($validated);
+      // preparar array de datos para la venta
+      $new_sale_data = [
+        'user_id'      => $this->selected_user_id,
+        'client_type'  => $this->selected_user_id ? Sale::CLIENT_TYPE_REGISTERED() : Sale::CLIENT_TYPE_UNREGISTERED(),
+        'sale_type'    => Sale::SALE_TYPE_PRESENCIAL(),
+        'payment_type' => 'efectivo',
+        'total_price'  => $this->total_for_sale,
+        'products'     => $validated['products_for_sale']
+      ];
+
+      // crear venta presencial
+      $sale_service = new SaleService();
+      $sale_service->createPresentialSale($new_sale_data);
+
+      $this->closeNewSaleModal();
+
+      $this->reset(['selected_user_id', 'user_search', 'users', 'search_product', 'total_for_sale']);
+
+      $this->dispatch('toast-event', toast_data: [
+        'event_type'  =>  'success',
+        'title_toast' =>  toastTitle('exitosa'),
+        'descr_toast' =>  'Venta realizada.'
+      ]);
+    } catch (\Exception $e) {
+
+      $this->closeNewSaleModal();
+
+      $this->dispatch('toast-event', toast_data: [
+        'event_type'  =>  'error',
+        'title_toast' =>  toastTitle('fallida'),
+        'descr_toast' =>  $e->getMessage()
+      ]);
+    }
   }
 
   /**

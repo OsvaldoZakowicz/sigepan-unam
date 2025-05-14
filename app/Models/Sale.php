@@ -79,7 +79,6 @@ class Sale extends Model
     return $this->belongsTo(User::class, 'user_id', 'id');
   }
 
-
   // * una venta puede pertenecer a una orden (pedido en la tienda)
   public function order(): BelongsTo
   {

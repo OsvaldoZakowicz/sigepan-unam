@@ -19,6 +19,8 @@
 
       <x-slot:header class="">
 
+        {{-- todo: implementar busqueda --}}
+
         {{-- busqueda --}}
         <div class="flex gap-1 justify-start items-start grow">
 
@@ -84,6 +86,15 @@
               </x-table-th>
               <x-table-th class="text-start">
                 tipo de venta
+                <x-quest-icon title="venta realizada en el local o registrada en la tienda online" />
+              </x-table-th>
+              <x-table-th class="text-start">
+                forma de pago
+                <x-quest-icon title="forma de pago que uso el cliente" />
+              </x-table-th>
+              <x-table-th class="text-start">
+                cliente
+                <x-quest-icon title="clientes registrados o no en la tienda online" />
               </x-table-th>
               <x-table-th class="text-end">
                 $total
@@ -98,18 +109,29 @@
           </x-slot:tablehead>
           <x-slot:tablebody>
             @forelse ($sales as $sale)
-              <tr class="border bg-neutral-100">
+              <tr class="border">
                 <x-table-td class="text-end">
                   {{ $sale->id }}
                 </x-table-td>
                 <x-table-td class="text-start">
+                  {{ $sale->sale_type }}
+                </x-table-td>
+                <x-table-td class="text-start">
+                  {{-- todo: si es mp, mostrar datos de el pago --}}
                   {{ $sale->payment_type }}
+                </x-table-td>
+                <x-table-td class="text-start">
+                  @if ($sale->user()->exists())
+                    <span class="capitalize">{{ $sale->user->name }}</span>
+                  @else
+                    <span class="text-neutral-400">{{ $sale->client_type }}</span>
+                  @endif
                 </x-table-td>
                 <x-table-td class="text-end">
                   ${{ number_format($sale->total_price, 2) }}
                 </x-table-td>
                 <x-table-td class="text-end">
-                  {{ $sale->created_at->format('d-m-Y H:i') }}
+                  {{ $sale->created_at->format('d-m-Y H:i') }} hs.
                 </x-table-td>
                 <x-table-td class="text-start">
                   -
@@ -136,12 +158,67 @@
                   Nueva venta
                 </h3>
 
-                {{-- seccion de busqueda --}}
+                {{-- seccion de cliente --}}
+                <x-div-toggle
+                  x-data="{ open: false }"
+                  title="cliente"
+                  subtitle="añada un cliente a esta venta"
+                  class="mt-2 p-2"
+                  >
+                  <div class="flex gap-1 justify-start items-start grow mb-1">
+                    {{-- busqueda de usuarios cliente --}}
+                    <div x-data="{
+                      open: false,
+                      search: '',
+                      selected: null
+                      }" class="relative w-1/3">
+                      <div class="flex flex-col gap-1">
+                        <label class="text-sm font-semibold text-neutral-600">Buscar cliente</label>
+                        <input
+                          type="text"
+                          x-model="search"
+                          @focus="open = true"
+                          @click.outside="open = false"
+                          wire:model.live="user_search"
+                          placeholder="Buscar por nombre o email"
+                          class="text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                        >
+                      </div>
+
+                      <!-- Lista de resultados -->
+                      <div
+                        x-show="open"
+                        x-transition
+                        class="absolute z-50 w-full mt-1 bg-white border border-neutral-200 rounded-sm shadow-lg">
+                        <ul class="max-h-60 overflow-auto py-1">
+                          @forelse($users as $user)
+                            <li
+                              wire:key="{{ $user->id }}"
+                              wire:click="selectUser({{ $user->id }})"
+                              @click="
+                                selected = {{ $user->id }};
+                                search = '{{ $user->name }}';
+                                open = false;
+                              "
+                              class="px-3 py-2 text-sm cursor-pointer hover:bg-neutral-100"
+                            >
+                              {{ $user->name }} - {{ $user->email }}
+                            </li>
+                          @empty
+                            <li class="px-3 py-2 text-sm text-neutral-500">No se encontraron resultados</li>
+                          @endforelse
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </x-div-toggle>
+
+                {{-- seccion de busqueda de productos --}}
                 <x-div-toggle
                   x-data="{ open: false }"
                   title="buscar productos"
                   subtitle="busque productos para agregarlos a la lista de ventas"
-                  class="mt-4 p-2"
+                  class="mt-1 p-2"
                   >
                   {{-- busqueda --}}
                   <div class="flex gap-1 justify-start items-start grow mb-1">
@@ -306,6 +383,7 @@
                   <span class="text-xl font-semibold">${{ number_format($total_for_sale, 2) }}</span>
                 </div>
 
+                {{-- botones de venta --}}
                 <div class="flex justify-end gap-2 mt-6">
                   <x-btn-button
                     color="neutral"
