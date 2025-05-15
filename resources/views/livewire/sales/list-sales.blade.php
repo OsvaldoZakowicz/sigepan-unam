@@ -25,44 +25,46 @@
         <div class="flex gap-1 justify-start items-start grow">
 
           {{-- termino de busqueda --}}
-          {{-- <div class="flex flex-col justify-end w-1/4">
-            <label for="">buscar compra</label>
+          <div class="flex flex-col justify-end w-1/4">
+            <label for="">buscar venta</label>
             <input
               type="text"
-              name="search_purchase"
-              wire:model.live="search_purchase"
+              name="search_sale"
+              wire:model.live="search_sale"
               wire:click="resetPagination()"
-              placeholder="ingrese un id, o termino de busqueda"
+              placeholder="ingrese un id de venta, o cliente"
               class="text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
             />
-          </div> --}}
+          </div>
 
-          {{-- fecha de inicio --}}
-          {{-- <div class="flex flex-col justify-end w-1/6">
-            <label for="search_start_at">fecha de compra desde</label>
+          {{-- fecha de venta desde --}}
+          <div class="flex flex-col justify-end w-1/6">
+            <label for="search_start_at">fecha de venta desde</label>
             <input
               type="date"
               name="search_start_at"
               id="search_start_at"
               wire:model.live="search_start_at"
+              wire:click="resetPagination()"
               class="w-full text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"/>
-          </div> --}}
+          </div>
 
-          {{-- fecha de fin --}}
-          {{-- <div class="flex flex-col justify-end w-1/6">
-            <label for="search_end_at">fecha de compra hasta</label>
+          {{-- fecha de venta hasta --}}
+          <div class="flex flex-col justify-end w-1/6">
+            <label for="search_end_at">fecha de venta hasta</label>
             <input
               type="date"
               name="search_end_at"
               id="search_end_at"
               wire:model.live="search_end_at"
+              wire:click="resetPagination()"
               class="w-full text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"/>
-          </div> --}}
+          </div>
 
         </div>
 
         {{-- limpiar campos de busqueda --}}
-        {{-- <div class="flex flex-col self-start h-full">
+        <div class="flex flex-col self-start h-full">
           <x-a-button
             href="#"
             wire:click="resetSearchInputs()"
@@ -71,7 +73,7 @@
             text_color="neutral-600"
             >limpiar
           </x-a-button>
-        </div> --}}
+        </div>
 
       </x-slot:header>
 
@@ -328,7 +330,7 @@
 
                 {{-- seccion de lista de compras --}}
                 <div class="mt-4">
-                  {{-- Lista de errores --}}
+                  {{-- Lista de mensajes --}}
                   <div class="mb-1">
                     {{-- Error general de products_for_sale --}}
                     @error('products_for_sale')
@@ -348,6 +350,16 @@
                         <span class="block text-red-400 text-sm mb-1">{{ $error }}</span>
                       @endif
                     @endforeach
+
+                    {{-- mensaje de informacion, producto ya en la lista --}}
+                    <div
+                      x-data="{ show: false, message: '' }"
+                      x-on:already-on-list.window="
+                        show = true;
+                        message = 'El producto ya está en la lista de venta';
+                        setTimeout(() => show = false, 3000)"
+                      ><span x-show="show" x-transition class="block text-blue-400 text-sm mb-1" x-text="message"></span>
+                    </div>
                   </div>
                   <x-table-base>
                     <x-slot:tablehead>

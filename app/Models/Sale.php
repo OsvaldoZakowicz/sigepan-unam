@@ -46,7 +46,8 @@ class Sale extends Model
    * @var array<string,string>
    */
   protected $casts = [
-    'total_price'      => 'decimal:2',
+    'total_price' => 'decimal:2',
+    'created_at'  => 'datetime',
   ];
 
   // retorna el tipo de venta web

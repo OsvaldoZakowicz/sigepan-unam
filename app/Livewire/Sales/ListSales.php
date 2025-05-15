@@ -16,6 +16,18 @@ class ListSales extends Component
 {
   use WithPagination;
 
+  // ventas en la lista
+  #[Url]
+  public $search_sale = '';
+
+  #[Url]
+  public $search_start_at = '';
+
+  #[Url]
+  public $search_end_at = '';
+
+
+  // productos en el modal
   #[Url]
   public $search_product = '';
 
@@ -97,21 +109,22 @@ class ListSales extends Component
         return $product_for_sale['product']->id === $product->id;
       }
     )) {
-      // todo: avisar que el producto ya esta en la lista
+
+      $this->dispatch('already-on-list');
       return;
     }
 
     // Obtener el precio por defecto
-    $defaultPrice = $product->defaultPrice();
+    $default_price = $product->defaultPrice();
 
     // agregar producto a la coleccion
     $this->products_for_sale->push([
       'product'           => $product,
-      'selected_price_id' => $defaultPrice->id, // Agregar ID del precio seleccionado
-      'price'             => $defaultPrice->price,
+      'selected_price_id' => $default_price->id, // Agregar ID del precio seleccionado
+      'price'             => $default_price->price,
       'sale_quantity'     => 1,
-      'unit_price'        => $defaultPrice->price,
-      'subtotal_price'    => $defaultPrice->price,
+      'unit_price'        => $default_price->price,
+      'subtotal_price'    => $default_price->price,
     ]);
 
     // calcular total
@@ -126,19 +139,21 @@ class ListSales extends Component
   public function removeProductForSale(int $key): void
   {
     $this->products_for_sale->pull($key);
-    // calcular total
     $this->calculateTotalForSale();
   }
 
   /**
-   * Actualizar precios cuando cambia el precio seleccionado
+   * al elegir un precio para el producto en la lista de venta, actualizar el producto
+   * se define el precio elegido, la cantidad pasa a 1, se indica el precio unitario
+   * y se recalcula el precio subtotal del producto
+   * @return void
    */
   public function updateSelectedPrice($productIndex, $priceId): void
   {
-    // Convertir la colección en array para modificarla
+    // convertir la coleccion en array para modificarla
     $products = $this->products_for_sale->toArray();
 
-    // Obtener el producto y el precio seleccionado
+    // obtener el producto y el precio seleccionado
     $productForSale = $products[$productIndex];
     $product = $productForSale['product'];
     $selectedPrice = $product->prices->find($priceId);
@@ -147,17 +162,17 @@ class ListSales extends Component
       return;
     }
 
-    // Actualizar los valores en el array
+    // actualizar los valores en el array
     $products[$productIndex]['selected_price_id'] = $selectedPrice->id;
     $products[$productIndex]['price'] = $selectedPrice->price;
     $products[$productIndex]['unit_price'] = $selectedPrice->price;
-    $products[$productIndex]['sale_quantity'] = 1; // Reiniciar cantidad a 1
-    $products[$productIndex]['subtotal_price'] = $selectedPrice->price; // El subtotal será igual al precio unitario * 1
+    $products[$productIndex]['sale_quantity'] = 1; // reiniciar cantidad a 1
+    $products[$productIndex]['subtotal_price'] = $selectedPrice->price; // el subtotal sera igual al precio unitario * 1
 
-    // Reasignar la colección completa
+    // reasignar la coleccion completa
     $this->products_for_sale = collect($products);
 
-    // Recalcular total
+    // recalcular total
     $this->calculateTotalForSale();
   }
 
@@ -199,8 +214,9 @@ class ListSales extends Component
   }
 
   /**
-   * actualizar total de la venta mientras cambia la cantidad de productos
-   * de la lista y cantidades
+   * calcular el costo total de la venta
+   * reduciendo los subtotales
+   * @return void
    */
   public function calculateTotalForSale(): void
   {
@@ -224,21 +240,54 @@ class ListSales extends Component
    */
   public function closeNewSaleModal(): void
   {
-    $this->setProductsForSale(); // reestablecer coleccion de productos!
+    $this->setProductsForSale();
     $this->show_new_sale_modal = false;
   }
 
   /**
    * buscar ventas
+   * por id, cliente, fechas
    */
   public function searchSales()
   {
-    return Sale::paginate(10);
+    return Sale::with(['user', 'order'])
+        ->when(
+          $this->search_sale,
+          function ($query) {
+            $query->where('id', '=', $this->search_sale)
+                  ->orWhereHas('user', function ($query) {
+                      $query->role('cliente')
+                            ->where('user.name', 'like', '%' . $this->search_sale . '%')
+                            ->orWhere('user.email', 'like', '%' . $this->search_sale . '%');
+            });
+          }
+        )
+        ->when(
+          $this->search_start_at && $this->search_end_at,
+          function ($query) {
+            $query->where('created_at', '>=', $this->search_start_at)
+                  ->where('created_at', '<=', $this->search_end_at);
+          }
+        )
+        ->when(
+          $this->search_start_at && !$this->search_end_at,
+          function ($query) {
+            $query->where('created_at', '>=', $this->search_start_at);
+          }
+        )
+        ->when(
+          !$this->search_start_at && $this->search_end_at,
+          function ($query) {
+            $query->where('created_at', '<=', $this->search_end_at);
+          }
+        )
+        ->orderBy('id', 'desc')
+        ->paginate(10);
   }
 
   /**
    * buscar productos en el modal de venta
-   * retorna productos disponibles para la venta
+   * retorna productos disponibles para la venta con su stock y precios
    */
   public function searchProducts()
   {
@@ -267,11 +316,13 @@ class ListSales extends Component
    */
   public function resetSearchInputs(): void
   {
-    $this->reset(['search_product']);
+    $this->reset(['search_product', 'search_sale', 'search_start_at', 'search_end_at']);
   }
 
   /**
    * guardar venta
+   * registra una venta con productos y decrementa stock
+   * valida si hay stock suficiente
    */
   public function save()
   {
@@ -316,6 +367,7 @@ class ListSales extends Component
     }
 
     try {
+
       // preparar array de datos para la venta
       $new_sale_data = [
         'user_id'      => $this->selected_user_id,
@@ -331,6 +383,7 @@ class ListSales extends Component
       $sale_service->createPresentialSale($new_sale_data);
 
       $this->closeNewSaleModal();
+
       $this->reset(['selected_user_id', 'user_search', 'users', 'search_product', 'total_for_sale']);
 
       $this->dispatch('toast-event', toast_data: [
@@ -339,7 +392,9 @@ class ListSales extends Component
         'descr_toast' =>  'Venta realizada.'
       ]);
     } catch (\Exception $e) {
+
       $this->closeNewSaleModal();
+
       $this->dispatch('toast-event', toast_data: [
         'event_type'  =>  'error',
         'title_toast' =>  toastTitle('fallida'),

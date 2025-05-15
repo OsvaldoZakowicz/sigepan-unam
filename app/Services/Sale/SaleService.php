@@ -34,7 +34,7 @@ class SaleService
       ]);
 
       // Productos vendidos y movimientos de stock
-      $stockService = new StockService();
+      $stock_service = new StockService();
 
       foreach ($new_sale_data['products'] as $product) {
         // Relacionar producto con la venta
@@ -45,39 +45,39 @@ class SaleService
         ]);
 
         // Obtener el precio seleccionado y calcular cantidad total a descontar
-        $selectedPrice = Price::find($product['selected_price_id']);
-        $totalUnitsToDeduct = $selectedPrice->quantity * $product['sale_quantity'];
+        $selected_price = Price::find($product['selected_price_id']);
+        $total_units_to_deduct = $selected_price->quantity * $product['sale_quantity'];
 
         // Obtener stocks disponibles ordenados por fecha de vencimiento
-        $availableStocks = Stock::where('product_id', $product['product']->id)
+        $available_stocks = Stock::where('product_id', $product['product']->id)
           ->where('quantity_left', '>', 0)
           ->orderBy('expired_at')
           ->get();
 
-        $remainingUnits = $totalUnitsToDeduct;
+        $remaining_units = $total_units_to_deduct;
 
-        foreach ($availableStocks as $stock) {
-          if ($remainingUnits <= 0) break;
+        foreach ($available_stocks as $stock) {
+          if ($remaining_units <= 0) break;
 
           // Calcular cuántas unidades podemos tomar de este stock
-          $unitsToDeduct = min($remainingUnits, $stock->quantity_left);
+          $units_to_deduct = min($remaining_units, $stock->quantity_left);
 
           // Registrar movimiento negativo (venta)
-          $stockService->registerMovement(
+          $stock_service->registerMovement(
             $stock->id,
-            -$unitsToDeduct,
+            -$units_to_deduct,
             StockMovement::MOVEMENT_TYPE_VENTA()
           );
 
-          $remainingUnits -= $unitsToDeduct;
+          $remaining_units -= $units_to_deduct;
         }
 
         // Si quedaron unidades sin descontar, no hay suficiente stock
-        if ($remainingUnits > 0) {
+        if ($remaining_units > 0) {
 
           throw new \Exception(
             "Stock insuficiente para el producto {$product['product']->product_name}. " .
-              "Faltan {$remainingUnits} unidades."
+              "Faltan {$remaining_units} unidades."
           );
         }
       }
