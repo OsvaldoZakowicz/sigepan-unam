@@ -101,12 +101,17 @@ class ListSales extends Component
       return;
     }
 
+    // Obtener el precio por defecto
+    $defaultPrice = $product->defaultPrice();
+
     // agregar producto a la coleccion
     $this->products_for_sale->push([
-      'product'        => $product,
-      'sale_quantity'  => 1,
-      'unit_price'     => $product->product_price,
-      'subtotal_price' => $product->product_price,
+      'product'           => $product,
+      'selected_price_id' => $defaultPrice->id, // Agregar ID del precio seleccionado
+      'price'             => $defaultPrice->price,
+      'sale_quantity'     => 1,
+      'unit_price'        => $defaultPrice->price,
+      'subtotal_price'    => $defaultPrice->price,
     ]);
 
     // calcular total
@@ -126,6 +131,37 @@ class ListSales extends Component
   }
 
   /**
+   * Actualizar precios cuando cambia el precio seleccionado
+   */
+  public function updateSelectedPrice($productIndex, $priceId): void
+  {
+    // Convertir la colección en array para modificarla
+    $products = $this->products_for_sale->toArray();
+
+    // Obtener el producto y el precio seleccionado
+    $productForSale = $products[$productIndex];
+    $product = $productForSale['product'];
+    $selectedPrice = $product->prices->find($priceId);
+
+    if (!$selectedPrice) {
+      return;
+    }
+
+    // Actualizar los valores en el array
+    $products[$productIndex]['selected_price_id'] = $selectedPrice->id;
+    $products[$productIndex]['price'] = $selectedPrice->price;
+    $products[$productIndex]['unit_price'] = $selectedPrice->price;
+    $products[$productIndex]['sale_quantity'] = 1; // Reiniciar cantidad a 1
+    $products[$productIndex]['subtotal_price'] = $selectedPrice->price; // El subtotal será igual al precio unitario * 1
+
+    // Reasignar la colección completa
+    $this->products_for_sale = collect($products);
+
+    // Recalcular total
+    $this->calculateTotalForSale();
+  }
+
+  /**
    * actualizar subtotal cuando cambia la cantidad del producto a vender
    * @param mixed $value nuevo valor de la propiedad
    * @param string $key nombre de la propiedad actualizada
@@ -135,14 +171,7 @@ class ListSales extends Component
   {
     // verificar si el cambio es en sale_quantity
     if (str_contains($key, 'sale_quantity')) {
-
-      // early return si no es un string numerico
-      if (!is_string($value) || !ctype_digit($value)) {
-        return;
-      }
-
-      // early return si al convertirlo no es mayor que 0
-      if ((int)$value <= 0) {
+      if (!is_string($value) || !ctype_digit($value) || (int)$value <= 0) {
         return;
       }
 
@@ -155,7 +184,7 @@ class ListSales extends Component
       // obtener el item a modificar
       $item = $products[$index];
 
-      // actualizar el subtotal
+      // actualizar el subtotal con el precio unitario actual
       $item['subtotal_price'] = (int)$value * $item['unit_price'];
 
       // actualizar el item en la coleccion
@@ -213,7 +242,7 @@ class ListSales extends Component
    */
   public function searchProducts()
   {
-    return Product::with('stocks')
+    return Product::with(['stocks', 'prices'])
       ->whereHas('stocks', function ($query) {
         $query->where('quantity_left', '>', 0);
       })
@@ -248,22 +277,45 @@ class ListSales extends Component
   {
     // validar que haya productos en la lista
     $validated = $this->validate([
-      'selected_user_id'                   => ['nullable'],
-      'products_for_sale'                  => ['required', 'array', 'min:1'],
-      'products_for_sale.*.product'        => ['required'],
-      'products_for_sale.*.sale_quantity'  => ['required', 'integer', 'min:1'],
-      'products_for_sale.*.unit_price'     => ['required'],
-      'products_for_sale.*.subtotal_price' => ['required'],
+      'selected_user_id'                      => ['nullable'],
+      'products_for_sale'                     => ['required', 'array', 'min:1'],
+      'products_for_sale.*.product'           => ['required'],
+      'products_for_sale.*.selected_price_id' => ['required'],
+      'products_for_sale.*.sale_quantity'     => ['required', 'integer', 'min:1'],
+      'products_for_sale.*.unit_price'        => ['required'],
+      'products_for_sale.*.subtotal_price'    => ['required'],
     ], [
       'products_for_sale.required' => 'Debe agregar al menos un producto a la venta',
       'products_for_sale.min'      => 'Debe agregar al menos un producto a la venta',
-      'products_for_sale.*.sale_quantity.required' => 'La cantidad es requerida',
-      'products_for_sale.*.sale_quantity.min'      => 'La cantidad debe ser mayor a 0',
-      'products_for_sale.*.sale_quantity.integer'  => 'La cantidad debe ser un numero',
+      'products_for_sale.*.sale_quantity.required' => 'La cantidad a vender es requerida',
+      'products_for_sale.*.sale_quantity.min'      => 'La cantidad a vender debe ser mayor a 0',
+      'products_for_sale.*.sale_quantity.integer'  => 'La cantidad a vender debe ser un numero',
     ]);
 
-    try {
+    // Validar stock disponible para cada producto
+    foreach ($this->products_for_sale as $index => $product_for_sale) {
 
+      $product = $product_for_sale['product'];
+      $selectedPrice = $product->prices->find($product_for_sale['selected_price_id']);
+
+      // Calcular cantidad total que se intenta vender
+      $totalQuantityToSell = $selectedPrice->quantity * $product_for_sale['sale_quantity'];
+
+      // Obtener stock disponible
+      $availableStock = $product->getTotalStockAttribute();
+
+      if ($totalQuantityToSell > $availableStock) {
+        $this->addError(
+          "products_for_sale.{$index}.sale_quantity",
+          "Stock insuficiente para {$product->product_name}. " .
+            "Stock disponible: {$availableStock} unidades. " .
+            "Cantidad solicitada: {$totalQuantityToSell} unidades."
+        );
+        return;
+      }
+    }
+
+    try {
       // preparar array de datos para la venta
       $new_sale_data = [
         'user_id'      => $this->selected_user_id,
@@ -279,7 +331,6 @@ class ListSales extends Component
       $sale_service->createPresentialSale($new_sale_data);
 
       $this->closeNewSaleModal();
-
       $this->reset(['selected_user_id', 'user_search', 'users', 'search_product', 'total_for_sale']);
 
       $this->dispatch('toast-event', toast_data: [
@@ -288,9 +339,7 @@ class ListSales extends Component
         'descr_toast' =>  'Venta realizada.'
       ]);
     } catch (\Exception $e) {
-
       $this->closeNewSaleModal();
-
       $this->dispatch('toast-event', toast_data: [
         'event_type'  =>  'error',
         'title_toast' =>  toastTitle('fallida'),

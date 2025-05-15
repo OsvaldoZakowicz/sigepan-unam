@@ -150,7 +150,7 @@
         {{-- modal de registro de ventas --}}
         @if ($show_new_sale_modal)
           <div class="fixed z-50 inset-0 bg-neutral-400 bg-opacity-40 overflow-y-auto h-full w-full flex items-center justify-center">
-            <div class="bg-white p-5 border rounded-md shadow-lg w-3/4 transform transition-all">
+            <div class="bg-white p-5 border rounded-md shadow-lg w-5/6 transform transition-all">
               <div class="text-start">
 
                 {{-- titulo del modal --}}
@@ -243,11 +243,13 @@
                         <x-table-th class="text-start">
                           producto
                         </x-table-th>
-                        <x-table-th class="text-end">
-                          $precio unitario
+                        <x-table-th class="text-start">
+                          $precios
+                          <x-quest-icon title="precio por defecto usado y listado de todos los precios" />
                         </x-table-th>
                         <x-table-th class="text-end">
                           cantidad disponible
+                          <x-quest-icon title="en unidades" />
                         </x-table-th>
                         <x-table-th class="text-end w-12">
                           elegir
@@ -263,8 +265,37 @@
                           <x-table-td class="text-start">
                             {{ $product->product_name }}
                           </x-table-td>
-                          <x-table-td class="text-end">
-                            ${{ number_format($product->product_price, 2) }}
+                          <x-table-td class="text-start">
+                            <div class="w-full flex gap-1">
+                              {{-- precio por defecto --}}
+                              <span class="font-semibold">
+                                <span class="text-sm">{{ $product->defaultPrice()->description }}&nbsp;({{ $product->defaultPrice()->quantity }} unidad/es)</span>
+                                <span class="text-sm">${{ $product->defaultPrice()->price }}</span>
+                              </span>
+                              {{-- lista de precios --}}
+                              <div x-data="{ open: false }" class="relative">
+                                {{-- texto con desplegable de lista --}}
+                                <button
+                                  @click="open = !open"
+                                  class="flex items-center text-blue-700 hover:text-blue-900">
+                                  <span class="underline">Lista de Precios</span>
+                                </button>
+                                {{-- lista desplegable --}}
+                                <ul x-show="open"
+                                  @click.away="open = false"
+                                  class="absolute z-10 mt-1 p-1 w-96 bg-white border border-gray-200 rounded-sm shadow-lg">
+                                  <li class="p-1 w-full text-start capitalize font-semibold border-b">lista de precios:</li>
+                                  @forelse ($product->prices as $price)
+                                    <li class="p-1 w-full flex justify-between hover:bg-gray-100 @if ($price->is_default) font-semibold @endif">
+                                      <span class="text-sm">{{ $price->description }}&nbsp;({{ $price->quantity }} unidad/es)</span>
+                                      <span class="text-sm">${{ $price->price }}</span>
+                                    </li>
+                                  @empty
+                                    <li class="p-2 text-gray-500">¡sin precios!</li>
+                                  @endforelse
+                                </ul>
+                              </div>
+                            </div>
                           </x-table-td>
                           <x-table-td class="text-end">
                             {{ $product->getTotalStockAttribute() }}
@@ -297,9 +328,27 @@
 
                 {{-- seccion de lista de compras --}}
                 <div class="mt-4">
-                  @error('products_for_sale')
-                    <span class="text-red-400 text-sm">{{ $message }}</span>
-                  @enderror
+                  {{-- Lista de errores --}}
+                  <div class="mb-1">
+                    {{-- Error general de products_for_sale --}}
+                    @error('products_for_sale')
+                      <span class="block text-red-400 text-sm mb-1">{{ $message }}</span>
+                    @enderror
+
+                    {{-- Errores de cantidades por producto --}}
+                    @foreach($products_for_sale as $index => $product)
+                      @error("products_for_sale.{$index}.sale_quantity")
+                        <span class="block text-red-400 text-sm mb-1">{{ $message }}</span>
+                      @enderror
+                    @endforeach
+
+                    {{-- Otros errores relacionados a products_for_sale --}}
+                    @foreach($errors->all() as $error)
+                      @if(str_contains($error, 'products_for_sale'))
+                        <span class="block text-red-400 text-sm mb-1">{{ $error }}</span>
+                      @endif
+                    @endforeach
+                  </div>
                   <x-table-base>
                     <x-slot:tablehead>
                       <tr class="border bg-neutral-100">
@@ -309,8 +358,13 @@
                         <x-table-th class="text-start">
                           Producto
                         </x-table-th>
+                        <x-table-th class="text-start">
+                          Precios
+                          <x-quest-icon title="elija uno de los precios del producto"/>
+                        </x-table-th>
                         <x-table-th class="text-end">
                           Cantidad a vender
+                          <x-quest-icon title="indique cuanto desea comprar el cliente" />
                         </x-table-th>
                         <x-table-th class="text-end">
                           $Precio unitario
@@ -332,11 +386,25 @@
                           <x-table-td class="text-start">
                             {{ $pfs['product']->product_name }}
                           </x-table-td>
+                          <x-table-td class="text-start">
+                            {{-- select precios o combos --}}
+                            <div class="flex justify-end items-center">
+                              {{-- En la sección de precios de la tabla --}}
+                              <select
+                                wire:model="products_for_sale.{{ $key }}.selected_price_id"
+                                wire:change="updateSelectedPrice({{ $key }}, $event.target.value)"
+                                class="p-1 w-full text-sm text-start border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                                >
+                                @foreach ($pfs['product']->prices as $price)
+                                  <option value="{{ $price->id }}">
+                                    {{ $price->description }} ({{ $price->quantity }} unidad/es) - ${{ number_format($price->price, 2) }}
+                                  </option>
+                                @endforeach
+                              </select>
+                            </div>
+                          </x-table-td>
                           <x-table-td class="text-end w-56">
                             {{-- input cantidad a vender --}}
-                            @error('products_for_sale.'.$key.'.sale_quantity')
-                              <span class="text-red-400 text-xs">{{ $message }}</span>
-                            @enderror
                             <div class="flex justify-end items-center">
                               <input
                                 id="products_for_sale_{{ $key }}_sale_quantity"
