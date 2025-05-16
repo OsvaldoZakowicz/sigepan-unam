@@ -16,7 +16,17 @@
       </p>
       <p class="renglon">
         <span class="meta">Establecimiento:</span>
-        <span class="dato"></span>
+        <span class="dato">
+          {{ $sale_data['header']['establecimiento']['razon_social'] }}
+          <span>&nbsp;CUIT: {{ $sale_data['header']['establecimiento']['cuit'] }}</span>
+          <span>&nbsp;Inicio de actividades: {{ $sale_data['header']['establecimiento']['inicio_actividades'] }}</span>
+        </span>
+      </p>
+      <p class="renglon">
+        <span class="meta">Contáctenos:</span>
+        <span class="dato">
+          <span>&nbsp;Tel: {{ $sale_data['header']['establecimiento']['telefono'] }} | Correo: {{ $sale_data['header']['establecimiento']['email'] }}</span>
+        </span>
       </p>
       <p class="renglon">
         <span class="meta">Cliente:</span>

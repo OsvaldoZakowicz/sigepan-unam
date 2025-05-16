@@ -2,6 +2,7 @@
 
 namespace App\Services\Sale;
 
+use App\Models\DatoNegocio;
 use App\Models\Sale;
 use App\Models\Stock;
 use App\Models\StockMovement;
@@ -102,7 +103,7 @@ class SaleService
   }
 
   /**
-   * A partir de una venta, obtener los datos de presentancion
+   * A partir de una venta, obtener los datos de presentacion
    * para un comprobante en PDF.
    * @param Sale $sale
    * @return array ['header' => [], 'detail' => []]
@@ -116,7 +117,7 @@ class SaleService
     $sale_data = [
       'id'              => $sale->id,
       'fecha'           => $sale->sold_on->format('d-m-Y H:i'),
-      'establecimiento' => '', // todo
+      'establecimiento' => DatoNegocio::obtenerTodos(),
       'cliente'         => $client,
       'forma_de_pago'   => $sale->payment_type,
       'total'           => number_format($sale->total_price, 2),
