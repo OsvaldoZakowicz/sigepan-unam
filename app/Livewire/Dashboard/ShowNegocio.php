@@ -172,8 +172,11 @@ class ShowNegocio extends Component
     $this->cargarDatosNegocio();
     $this->mostrarModal = false;
 
-    // Notificación de éxito (puedes personalizar esto según tus necesidades)
-    session()->flash('mensaje', 'Datos del negocio actualizados correctamente.');
+    $this->dispatch('toast-event', toast_data: [
+      'event_type'  => 'success',
+      'title_toast' => toastTitle(),
+      'descr_toast' => 'datos del negocio modificados correctamente.'
+    ]);
   }
 
   /**
