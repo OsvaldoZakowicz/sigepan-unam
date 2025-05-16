@@ -29,7 +29,9 @@ class StockMovement extends Model
     'stock_id',       // stock donde se aplico el movimiento
     'quantity',       // cantidad del movimiento (puede ser negativo para salidas)
     'movement_type',  // tipo de movimiento
-    'registered_at'   // fecha en la que se llevo a cabo el movimiento
+    'registered_at',  // fecha en la que se llevo a cabo el movimiento
+    'movement_reference_id',   // id de referencia (stock, venta, otro)
+    'movement_reference_type', // modelo de referencia (stock, venta, otro)
   ];
 
   /**

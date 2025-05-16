@@ -29,6 +29,7 @@ class SaleService
         'user_id'      => $new_sale_data['user_id'],
         'client_type'  => $new_sale_data['client_type'],
         'sale_type'    => $new_sale_data['sale_type'],
+        'sold_on'      => $new_sale_data['sold_on'],
         'payment_type' => $new_sale_data['payment_type'],
         'total_price'  => $new_sale_data['total_price']
       ]);
@@ -37,11 +38,17 @@ class SaleService
       $stock_service = new StockService();
 
       foreach ($new_sale_data['products'] as $product) {
+
+        // Preparar detalle
+        $product_price = $product['product']->prices->find($product['selected_price_id']);
+        $details = $product_price->description . ' (' . $product_price->quantity . ') a $' . $product_price->price;
+
         // Relacionar producto con la venta
         $sale->products()->attach($product['product']->id, [
           'sale_quantity'  => $product['sale_quantity'],
           'unit_price'     => $product['unit_price'],
           'subtotal_price' => $product['subtotal_price'],
+          'details'        => $details,
         ]);
 
         // Obtener el precio seleccionado y calcular cantidad total a descontar
@@ -66,7 +73,9 @@ class SaleService
           $stock_service->registerMovement(
             $stock->id,
             -$units_to_deduct,
-            StockMovement::MOVEMENT_TYPE_VENTA()
+            StockMovement::MOVEMENT_TYPE_VENTA(),
+            $sale->id, // id de la venta
+            get_class($sale) // App\Models\Sale
           );
 
           $remaining_units -= $units_to_deduct;

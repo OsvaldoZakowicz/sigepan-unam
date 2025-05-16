@@ -373,10 +373,13 @@ class ListSales extends Component
         'user_id'      => $this->selected_user_id,
         'client_type'  => $this->selected_user_id ? Sale::CLIENT_TYPE_REGISTERED() : Sale::CLIENT_TYPE_UNREGISTERED(),
         'sale_type'    => Sale::SALE_TYPE_PRESENCIAL(),
+        'sold_on'      => now(),
         'payment_type' => 'efectivo',
         'total_price'  => $this->total_for_sale,
         'products'     => $validated['products_for_sale']
       ];
+
+      //dd($new_sale_data);
 
       // crear venta presencial
       $sale_service = new SaleService();

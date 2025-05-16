@@ -95,7 +95,6 @@ class StockService
 
         return $stock;
       });
-
     } catch (Exception $e) {
 
       throw new Exception("Error al crear el stock: " . $e->getMessage());
@@ -107,13 +106,27 @@ class StockService
    * @param int $stock_id ID del stock
    * @param int $quantity Cantidad del movimiento (negativo para salidas)
    * @param string $movement_type Tipo de movimiento
+   * @param string $movement_reference_id id de referencia (stock, venta, otro...)
+   * @param string $movement_reference_type modelo de referencia (stock, venta, otro...)
    * @return StockMovement
    * @throws Exception
    */
-  public function registerMovement(int $stock_id, int $quantity, string $movement_type): StockMovement
-  {
+  public function registerMovement(
+    int $stock_id,
+    int $quantity,
+    string $movement_type,
+    string $movement_reference_id,
+    string $movement_reference_type
+  ): StockMovement {
     try {
-      return DB::transaction(function () use ($stock_id, $quantity, $movement_type) {
+      return DB::transaction(function () use (
+        $stock_id,
+        $quantity,
+        $movement_type,
+        $movement_reference_id,
+        $movement_reference_type
+      ) {
+
         $stock = Stock::findOrFail($stock_id);
 
         // Verificar que haya suficiente stock para movimientos negativos
@@ -127,9 +140,11 @@ class StockService
 
         // Registrar el movimiento
         return $stock->stock_movements()->create([
-          'quantity'      => $quantity,
-          'movement_type' => $movement_type,
-          'registered_at' => now(),
+          'quantity'                => $quantity,
+          'movement_type'           => $movement_type,
+          'registered_at'           => now(),
+          'movement_reference_id'   => $movement_reference_id,
+          'movement_reference_type' => $movement_reference_type,
         ]);
       });
     } catch (Exception $e) {
