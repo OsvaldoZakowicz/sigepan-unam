@@ -13,6 +13,7 @@ return new class extends Migration
   {
     Schema::table('sales', function (Blueprint $table) {
       $table->timestamp('sold_on')->after('sale_type');
+      $table->string('sale_pdf_path')->nullable()->after('full_response');
     });
   }
 
@@ -22,7 +23,7 @@ return new class extends Migration
   public function down(): void
   {
     Schema::table('sales', function (Blueprint $table) {
-      $table->dropColumn(['sold_on']);
+      $table->dropColumn(['sold_on', 'sale_pdf_path']);
     });
   }
 };

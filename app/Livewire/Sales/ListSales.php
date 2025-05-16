@@ -6,6 +6,7 @@ use App\Models\Sale;
 use App\Models\Product;
 use App\Services\Sale\SaleService;
 use App\Models\User;
+use App\Services\Pdf\PdfService;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
 use Livewire\WithPagination;
@@ -409,7 +410,11 @@ class ListSales extends Component
 
       // crear venta presencial
       $sale_service = new SaleService();
-      $sale_service->createPresentialSale($new_sale_data);
+      $sale = $sale_service->createPresentialSale($new_sale_data);
+
+      // crear comprobante de venta
+      $pdf_service = new PdfService();
+      $pdf_service->generateSalePDF($sale, $sale_service->generateSaleData($sale));
 
       $this->closeNewSaleModal();
 
@@ -430,6 +435,20 @@ class ListSales extends Component
         'descr_toast' =>  $e->getMessage()
       ]);
     }
+  }
+
+  /**
+   * abrir pdf en una nueva pestaña,
+   * para poder visualizar y descargar.
+   * @param int $id id de venta base para el pdf
+   * @return void
+   */
+  public function openPdfSale($id): void
+  {
+    // denerar URL para ver el pdf
+    $pdfUrl = route('open-pdf-sale', ['id' => $id]);
+    // disparar evento para abrir el PDF en nueva pestaña
+    $this->dispatch('openPdfInNewTab', url: $pdfUrl);
   }
 
   /**

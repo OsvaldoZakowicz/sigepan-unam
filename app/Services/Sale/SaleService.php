@@ -100,4 +100,43 @@ class SaleService
       throw $e;
     }
   }
+
+  /**
+   * A partir de una venta, obtener los datos de presentancion
+   * para un comprobante en PDF.
+   * @param Sale $sale
+   * @return array ['header' => [], 'detail' => []]
+   */
+  public function generateSaleData(Sale $sale): array
+  {
+    $client = ($sale->user()->exists())
+      ? $sale->user->name . ' - ' . $sale->user->email
+      : $sale->client_type;
+
+    $sale_data = [
+      'id'              => $sale->id,
+      'fecha'           => $sale->sold_on->format('d-m-Y H:i'),
+      'establecimiento' => '', // todo
+      'cliente'         => $client,
+      'forma_de_pago'   => $sale->payment_type,
+      'total'           => number_format($sale->total_price, 2),
+    ];
+
+    $sale_detail = [];
+    foreach ($sale->products as $key => $product) {
+      array_push($sale_detail, [
+        'nro' => $key+1,
+        'producto' => $product->product_name,
+        'detalle'  => $product->pivot->details,
+        'cantidad' => $product->pivot->sale_quantity,
+        'precio_unitario' => number_format($product->pivot->unit_price, 2),
+        'subtotal'        => number_format($product->pivot->subtotal_price, 2)
+      ]);
+    }
+
+    return [
+      'header' => $sale_data,
+      'detail' => $sale_detail,
+    ];
+  }
 }

@@ -46,4 +46,26 @@ class PdfService
     $preorder->order_pdf = $pdf_path;
     $preorder->save();
   }
+
+  /**
+   * * generar PDF de comprobante de venta
+   * guardar PDF en local disk
+   * guardar en la BD la ruta al PDF.
+   * @param Sale $sale venta
+   * @param array $sale_data datos de la venta
+   * @return void
+   */
+  public function generateSalePDF($sale, $sale_data)
+  {
+    $pdf = Pdf::loadView('pdf.sales.sale', ['sale_data' => $sale_data])
+      ->setPaper('a4');
+
+    // nombre y guardado
+    $codigo = $sale_data['header']['id'] . str_replace([' ', ':', '-'], '', $sale_data['header']['fecha']);
+    $pdf_path = 'ventas/comprobante_venta_' . $codigo . '.pdf';
+    $pdf->save(storage_path('app/public/' . $pdf_path));
+
+    $sale->sale_pdf_path = $pdf_path;
+    $sale->save();
+  }
 }

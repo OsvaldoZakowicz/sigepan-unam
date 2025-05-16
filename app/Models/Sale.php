@@ -40,6 +40,7 @@ class Sale extends Model
     'merchant_order_id',  // MP
     'total_price',        // precio total de la venta
     'full_response',      // respuesta completa de MP (u otro medio de pago)
+    'sale_pdf_path',      // ruta al pdf comprobante de venta
   ];
 
   /**

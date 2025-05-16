@@ -245,7 +245,7 @@ Route::middleware(['auth', 'verified', 'can:presupuestos'])->group(function () {
   //*---------------------------- PDFs
 
   Route::get('preorders/pdf/download/{id}', [PDFController::class, 'download_pdf_order'])
-    ->name('download-pdf-order');
+  ->name('download-pdf-order');
 });
 
 //* modulo de stock
@@ -256,13 +256,13 @@ Route::middleware(['auth', 'verified', 'can:stock'])->group(function () {
     ->name('stocks-stocks-index');
 
   Route::get('stocks/measures', [StockController::class, 'measures_index'])
-    ->name('stocks-measures-index');
+  ->name('stocks-measures-index');
 
   Route::get('stocks/measures/create', [StockController::class, 'measures_create'])
-    ->name('stocks-measures-create');
+  ->name('stocks-measures-create');
 
   Route::get('stocks/recipes', [StockController::class, 'recipes_index'])
-    ->name('stocks-recipes-index');
+  ->name('stocks-recipes-index');
 
   Route::get('stocks/recipes/create', [StockController::class, 'recipes_create'])
     ->name('stocks-recipes-create');
@@ -290,7 +290,7 @@ Route::middleware(['auth', 'verified', 'can:stock'])->group(function () {
   Route::get('stocks/existences', [StockController::class, 'existences_index'])
     ->name('stocks-existences-index');
 
-  Route::get('stocks/tags', [StockController::class, 'tags_index'])
+    Route::get('stocks/tags', [StockController::class, 'tags_index'])
     ->name('stocks-tags-index');
 
   Route::get('stocks/tags/create', [StockController::class, 'tags_create'])
@@ -305,6 +305,10 @@ Route::middleware(['auth', 'verified', 'can:ventas'])->group(function  () {
 
   Route::get('sales', [SaleController::class, 'sales_index'])
     ->name('sales-sales-index');
+
+  //*---------------------------- PDFs
+  Route::get('sales/pdf/open/{id}', [PDFController::class, 'open_pdf_sale'])
+    ->name('open-pdf-sale');
 
 });
 

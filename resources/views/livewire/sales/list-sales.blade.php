@@ -156,6 +156,17 @@
                       >ver
                     </x-a-button>
 
+                    @if ($sale->sale_pdf_path)
+                      <x-a-button
+                        href="#"
+                        wire:click="openPdfSale({{ $sale->id }})"
+                        bg_color="neutral-100"
+                        border_color="neutral-200"
+                        text_color="neutral-600"
+                        >comprobante
+                      </x-a-button>
+                    @endif
+
                   </div>
                 </x-table-td>
               </tr>
@@ -619,4 +630,16 @@
     </x-content-section>
 
   </article>
+
+  {{-- manejar eventos --}}
+  <script>
+
+    /* evento: abrir pdf en nueva pestaña para visualizar */
+    document.addEventListener('livewire:initialized', () => {
+        Livewire.on('openPdfInNewTab', ({ url }) => {
+            window.open(url, '_blank');
+        });
+    });
+
+  </script>
 </div>
