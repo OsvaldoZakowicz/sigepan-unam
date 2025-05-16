@@ -32,6 +32,7 @@ class Sale extends Model
     'user_id',            // id del usuario que compra (nullable)
     'client_type',        // tipo de cliente: registrado o no registrado
     'sale_type',          // tipo de venta: web o presencial
+    'sold_on',            // fecha de la venta
     'payment_type',       // tipo de pago: efectivo, mercado pago, tarjeta, etc
     'payment_id',         // numero de transaccion MP
     'status',             // estado del pago MP
@@ -47,7 +48,7 @@ class Sale extends Model
    */
   protected $casts = [
     'total_price' => 'decimal:2',
-    'created_at'  => 'datetime',
+    'sold_on'     => 'datetime',
   ];
 
   // retorna el tipo de venta web
@@ -90,7 +91,7 @@ class Sale extends Model
   public function products(): BelongsToMany
   {
     return $this->belongsToMany(Product::class, 'product_sale')
-      ->withPivot('sale_quantity', 'unit_price', 'subtotal_price')
+      ->withPivot('sale_quantity', 'unit_price', 'subtotal_price', 'details')
       ->withTimestamps();
   }
 }
