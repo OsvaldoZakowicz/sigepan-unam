@@ -16,7 +16,8 @@ class ListSales extends Component
 {
   use WithPagination;
 
-  // ventas en la lista
+  // * ventas en la lista
+
   #[Url]
   public $search_sale = '';
 
@@ -27,7 +28,8 @@ class ListSales extends Component
   public $search_end_at = '';
 
 
-  // productos en el modal
+  // * productos en el modal
+
   #[Url]
   public $search_product = '';
 
@@ -42,6 +44,10 @@ class ListSales extends Component
   public $user_search = '';
   public $selected_user_id = null;
   public $users = [];
+
+  // * modal ver venta
+  public bool $show_sale_modal = false;
+  public $selected_sale = null;
 
   /**
    * montar datos
@@ -245,44 +251,64 @@ class ListSales extends Component
   }
 
   /**
+   * abrir modal ver venta
+   * @return void
+   */
+  public function openShowSaleModal(Sale $sale): void
+  {
+    $this->show_sale_modal = true;
+    $this->selected_sale = $sale;
+  }
+
+  /**
+   * cerrar modal ver venta
+   * @return void
+   */
+  public function closeShowSaleModal(): void
+  {
+    $this->show_sale_modal = false;
+    $this->selected_sale = null;
+  }
+
+  /**
    * buscar ventas
    * por id, cliente, fechas
    */
   public function searchSales()
   {
     return Sale::with(['user', 'order'])
-        ->when(
-          $this->search_sale,
-          function ($query) {
-            $query->where('id', '=', $this->search_sale)
-                  ->orWhereHas('user', function ($query) {
-                      $query->role('cliente')
-                            ->where('user.name', 'like', '%' . $this->search_sale . '%')
-                            ->orWhere('user.email', 'like', '%' . $this->search_sale . '%');
+      ->when(
+        $this->search_sale,
+        function ($query) {
+          $query->where('id', '=', $this->search_sale)
+            ->orWhereHas('user', function ($query) {
+              $query->role('cliente')
+                ->where('user.name', 'like', '%' . $this->search_sale . '%')
+                ->orWhere('user.email', 'like', '%' . $this->search_sale . '%');
             });
-          }
-        )
-        ->when(
-          $this->search_start_at && $this->search_end_at,
-          function ($query) {
-            $query->where('created_at', '>=', $this->search_start_at)
-                  ->where('created_at', '<=', $this->search_end_at);
-          }
-        )
-        ->when(
-          $this->search_start_at && !$this->search_end_at,
-          function ($query) {
-            $query->where('created_at', '>=', $this->search_start_at);
-          }
-        )
-        ->when(
-          !$this->search_start_at && $this->search_end_at,
-          function ($query) {
-            $query->where('created_at', '<=', $this->search_end_at);
-          }
-        )
-        ->orderBy('id', 'desc')
-        ->paginate(10);
+        }
+      )
+      ->when(
+        $this->search_start_at && $this->search_end_at,
+        function ($query) {
+          $query->where('sold_on', '>=', $this->search_start_at . ' 00:00:00')
+            ->where('sold_on', '<=', $this->search_end_at . ' 23:59:59');
+        }
+      )
+      ->when(
+        $this->search_start_at && !$this->search_end_at,
+        function ($query) {
+          $query->where('sold_on', '>=', $this->search_start_at . ' 00:00:00');
+        }
+      )
+      ->when(
+        !$this->search_start_at && $this->search_end_at,
+        function ($query) {
+          $query->where('sold_on', '<=', $this->search_end_at . ' 23:59:59');
+        }
+      )
+      ->orderBy('id', 'desc')
+      ->paginate(10);
   }
 
   /**

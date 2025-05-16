@@ -19,8 +19,6 @@
 
       <x-slot:header class="">
 
-        {{-- todo: implementar busqueda --}}
-
         {{-- busqueda --}}
         <div class="flex gap-1 justify-start items-start grow">
 
@@ -101,6 +99,10 @@
               <x-table-th class="text-end">
                 $total
               </x-table-th>
+              <x-table-th class="text-start">
+                estado
+                <x-quest-icon title="indica si los productos de la venta fueron entregados o estan pendientes" />
+              </x-table-th>
               <x-table-th class="text-end">
                 fecha de venta
               </x-table-th>
@@ -132,16 +134,34 @@
                 <x-table-td class="text-end">
                   ${{ number_format($sale->total_price, 2) }}
                 </x-table-td>
+                <x-table-td class="text-start">
+                  @if ($sale->order()->exists())
+                    {{-- todo: tiene orden, estado del pedido --}}
+                  @else
+                    <x-text-tag color="emerald">productos entregados</x-text-tag>
+                  @endif
+                </x-table-td>
                 <x-table-td class="text-end">
                   {{ $sale->created_at->format('d-m-Y H:i') }} hs.
                 </x-table-td>
                 <x-table-td class="text-start">
-                  -
+                  <div class="flex gap-1">
+
+                    <x-a-button
+                      href="#"
+                      wire:click="openShowSaleModal({{ $sale }})"
+                      bg_color="neutral-100"
+                      border_color="neutral-200"
+                      text_color="neutral-600"
+                      >ver
+                    </x-a-button>
+
+                  </div>
                 </x-table-td>
               </tr>
             @empty
               <tr class="border">
-                <x-table-td colspan="5">
+                <x-table-td colspan="6">
                   <span>¡sin ventas ralizadas!</span>
                 </x-table-td>
               </tr>
@@ -476,6 +496,115 @@
                     >Vender
                   </x-btn-button>
                 </div>
+              </div>
+            </div>
+          </div>
+        @endif
+
+        {{-- modal de ver venta --}}
+        @if ($show_sale_modal && $selected_sale)
+          <div class="fixed z-50 inset-0 bg-neutral-400 bg-opacity-40 overflow-y-auto h-full w-full flex items-center justify-center">
+            <div class="bg-white p-5 border rounded-md shadow-lg w-3/4 transform transition-all">
+              <div class="w-full text-start">
+                {{-- encabezado --}}
+                <header class="border border-neutral-100 p-1 mb-2">
+                  <h3 class="text-lg font-semibold">Comprobante de venta</h3>
+                  <small class="text-xs uppercase">documento no valido como factura</small>
+                  <div class="flex flex-col gap-1">
+                    <span>
+                      <span class="font-semibold">Id de venta:</span>
+                      {{ $selected_sale->id }}
+                    </span>
+                    <span>
+                      <span class="font-semibold">Fecha:</span>
+                      {{ $selected_sale->sold_on->format('d-m-Y H:i') }} hs.
+                    </span>
+                    <span>
+                      <span class="font-semibold">Establecimiento:</span>
+                      {{-- todo: info panaderia --}}
+                    </span>
+                    <span>
+                      <span class="font-semibold">Cliente:</span>
+                      @if ($selected_sale->user()->exists())
+                        {{ $selected_sale->user->name . ' - ' . $selected_sale->user->email }}
+                      @else
+                        {{ $selected_sale->client_type }}
+                      @endif
+                    </span>
+                    <span>
+                      <span class="font-semibold">Forma de pago:</span>
+                      {{ $selected_sale->payment_type }}
+                    </span>
+                  </div>
+                </header>
+                {{-- cuerpo con detalle y total --}}
+                <section class="w-full max-h-56 overflow-y-auto overflow-x-auto mb-1">
+                  <x-table-base>
+                    <x-slot:tablehead>
+                      <tr class="border bg-neutral-100">
+                        <x-table-th class="text-end w-12">
+                          #
+                        </x-table-th>
+                        <x-table-th class="text-start">
+                          producto
+                        </x-table-th>
+                        <x-table-th class="text-start">
+                          detalle
+                        </x-table-th>
+                        <x-table-th class="text-end">
+                          cantidad
+                        </x-table-th>
+                        <x-table-th class="text-end">
+                          $precio unitario
+                        </x-table-th>
+                        <x-table-th class="text-end">
+                          $subtotal
+                        </x-table-th>
+                      </tr>
+                    </x-slot:tablehead>
+                    <x-slot:tablebody>
+                      @foreach ($selected_sale->products as $key => $product_sale)
+                      <tr class="border" wire:key="{{ $key }}">
+                        <x-table-td class="text-end w-12">
+                          {{ $key+1 }}
+                        </x-table-td>
+                        <x-table-td class="text-start">
+                          {{ $product_sale->product_name }}
+                        </x-table-td>
+                        <x-table-td class="text-start">
+                          {{ $product_sale->pivot->details }}
+                        </x-table-td>
+                        <x-table-td class="text-end">
+                          {{ $product_sale->pivot->sale_quantity }}
+                        </x-table-td>
+                        <x-table-td class="text-end">
+                          ${{ number_format($product_sale->pivot->unit_price, 2) }}
+                        </x-table-td>
+                        <x-table-td class="text-end">
+                          ${{ number_format($product_sale->pivot->subtotal_price, 2) }}
+                        </x-table-td>
+                      </tr>
+                      @endforeach
+                      <tr class="border">
+                        <x-table-td class="text-end font-semibold capitalize" colspan="5">$total:</x-table-td>
+                        <x-table-td class="text-end font-semibold">${{ number_format($selected_sale->total_price, 2) }}</x-table-td>
+                      </tr>
+                    </x-slot:tablebody>
+                  </x-table-base>
+                </section>
+                {{-- pie con datos extra --}}
+                <footer class="w-full border border-neutral-100 p-1 mb-2">
+                  <div class="w-full flex justify-end">
+                    <x-a-button
+                      href="#"
+                      wire:click="closeShowSaleModal()"
+                      bg_color="neutral-600"
+                      border_color="neutral-600"
+                      text_color="neutral-100"
+                      >cerrar
+                    </x-a-button>
+                  </div>
+                </footer>
               </div>
             </div>
           </div>
