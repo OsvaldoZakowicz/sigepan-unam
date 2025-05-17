@@ -1,14 +1,13 @@
-<nav class="bg-gradient-to-r from-orange-100 via-amber-200 to-orange-900 py-8 px-6 flex justify-between items-center">
-
+<nav class="bg-neutral-800 py-6 px-6 flex justify-between items-center">
   {{-- * navegacion de la vista bienvenida --}}
-  <div>
-    <span class="text-3xl italic text-orange-900 font-light capitalize">panaderia</span>
-  </div>
+
+  {{-- titulo de la panaderia --}}
+  <span class="text-3xl italic text-orange-100 font-light capitalize">Nuestra Panadería</span>
 
   {{-- * una vez autenticados, mostrar segun rol dashboard o tienda --}}
   <div class="flex items-center gap-8">
     @auth
-      <span class="text-orange-800 capitalize italic font-semibold">
+      <span class="text-orange-100 capitalize italic font-light">
         bienvenido {{ auth()->user()->name }}, {{ auth()->user()->roles->first()->name }}
       </span>
 

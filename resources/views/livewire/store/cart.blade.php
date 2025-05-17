@@ -1,15 +1,15 @@
-<div class="mt-24 pt-5 bg-gradient-to-r from-orange-100 via-amber-200 to-orange-900 h-screen">
+<div class="mt-20 pt-5 bg-gradient-to-r from-orange-100 via-amber-200 to-orange-900 h-screen">
 
   {{-- componente de carrito final --}}
-	<div class="bg-white rounded-lg flex justify-between gap-8 items-start w-full max-w-6xl mx-auto p-6 h-4/5">
+	<div class="bg-white rounded-lg flex justify-between gap-8 items-start w-full max-w-7xl mx-auto p-6 h-4/5">
 
-    <div class="w-2/3">
+    {{-- vista del carrito --}}
+    <div class="w-5/6">
+
       {{-- cabecera --}}
       <div class="flex justify-between items-center mb-4">
-
         {{-- titulo de seccion --}}
         <h2 class="text-xl text-neutral-700 font-semibold">Carrito de Compras</h2>
-
         {{-- boton para volver --}}
         <a
           wire:navigate
@@ -22,35 +22,41 @@
             </svg>
           </span>
         </a>
-
       </div>
 
       {{-- vista de productos --}}
       <div class="space-y-4 max-h-72 p-3 overflow-y-auto overflow-x-hidden">
-        @forelse($cart as $item)
+        @forelse($cart as $key => $item)
           {{-- item del carrito --}}
-          <div wire:key="{{ $loop->index }}" class="flex flex-col items-center justify-between border-b pb-2">
+          <div wire:key="{{ $key }}" class="flex flex-col items-center justify-between border-b pb-2">
             {{-- item --}}
             <div class="w-full flex justify-between items-center">
-              {{-- imagen y precio unitario --}}
-              <div class="flex items-center gap-2 w-2/3">
+              {{-- imagen, nombre y stock --}}
+              <div class="flex items-center gap-2">
                 <img
                   src="{{ Storage::url($item['product']->product_image_path) }}"
                   alt="{{ $item['product']->product_name }}"
-                  class="w-16 h-16 object-cover rounded"
+                  class="w-12 h-12 object-cover rounded"
                 />
                 <div>
-                  <h3 class="font-semibold">{{ $item['product']->product_name }}</h3>
-                  <p class="text-gray-500">${{ number_format($item['product']->product_price, 2) }} c/u</p>
+                  <h3 class="font-semibold capitalize">{{ $item['product']->product_name }}</h3>
+                  <p class="font-semibold uppercase text-xs text-emerald-600">{{ $item['product']->getTotalStockAttribute() }} unidades disponibles!</p>
                 </div>
               </div>
+              {{-- detalle --}}
+              <div class="flex flex-col items-start justify-start">
+                <span class="font-semibold capitalize">detalle:</span>
+                <span>{{ $item['details'] }}</span>
+              </div>
               {{-- cantidad --}}
-              <div class="flex items-center justify-end w-1/6">
-                <p class="font-semibold">cantidad:&nbsp;{{ $item['quantity'] }}</p>
+              <div class="flex flex-col items-end justify-start">
+                <span class="font-semibold capitalize">cantidad:</span>
+                <span>{{ $item['order_quantity'] }}</span>
               </div>
               {{-- precio --}}
-              <div class="flex items-center justify-end w-1/6">
-                <p class="font-semibold">${{ number_format($item['subtotal'], 2) }}</p>
+              <div class="flex flex-col items-end justify-start">
+                <span class="font-semibold capitalize">$subtotal:</span>
+                <span>${{ number_format($item['subtotal_price'], 2) }}</span>
               </div>
             </div>
           </div>
@@ -63,17 +69,17 @@
 
       {{-- total --}}
       <div class="flex justify-end items-center w-full p-6">
-        <span class="text-2xl font-bold text-orange-800">total:&nbsp;$&nbsp;{{ number_format($total_price, 2) }}</span>
+        <span class="text-2xl font-bold text-orange-800 capitalize">total:&nbsp;$&nbsp;{{ number_format($total_price, 2) }}</span>
       </div>
     </div>
 
-    {{-- espacio para pedidos --}}
+    {{-- espacio para realizar el pedido --}}
     <div class="">
       {{-- titulo de seccion --}}
       <h3 class="text-lg text-neutral-700 font-semibold">Hacer pedido</h3>
       <p class="text-lg text-neutral-700">para registrar su pedido, realice el pago del mismo</p>
       {{-- boton MP --}}
-      <div id="wallet_container"></div>
+      {{-- <div id="wallet_container"></div> --}}
     </div>
 
   </div>

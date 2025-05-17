@@ -17,13 +17,13 @@ class PaymentController extends Controller
   public function cart_index()
   {
     // Verificar si hay un carrito en la sesión
-    if (!Session::has('cart')) {
+    if (!Session::has('products_for_cart')) {
 
       // Si no hay carrito, redirigir a la tienda
       return redirect()->route('store-store-index');
     }
 
-    $cart = Session::get('cart');
+    $cart = Session::get('products_for_cart');
 
     return view('store.cart-index', compact('cart'));
   }

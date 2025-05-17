@@ -25,10 +25,7 @@ class Store extends Component
   #[Url]
   public $search_by_tag = '';
 
-  public Collection $cart;
-  public bool $show_cart_modal = false;
-  public float $cart_total = 0;
-  public int $cart_total_items = 0;
+  // etiquetas para busqueda en tienda
   public Collection $tags;
 
   // preferencia de pago MP
@@ -39,6 +36,12 @@ class Store extends Component
 
   // usuario
   public User|null $user = null;
+
+  // carrito
+  public Collection $products_for_cart;
+  public bool $show_cart_modal = false;
+  public $total_for_sale = 0;
+  public int $cart_total_items = 0;
 
   /**
    * boot de constantes
@@ -62,12 +65,26 @@ class Store extends Component
     ($this->is_logged_in) ? $this->user = Auth::user() : null;
 
     // iniciar carrito de compras vacio
-    $this->cart = collect();
+    $this->setProductsForCart();
 
     // Verificar si existe un carrito en la sesion
-    if (Session::has('cart')) {
-      $this->cart = collect(Session::get('cart'));
+    if (Session::has('products_for_cart')) {
+      $this->products_for_cart = collect(Session::get('products_for_cart'));
     }
+  }
+
+  /**
+   * preparar coleccion de productos a vender
+   * esta coleccion tendra los productos buscados y elegidos en el modal
+   * de registro de ventas
+   * ['products_for_cart' => []]
+   * @return void
+   */
+  protected function setProductsForCart(): void
+  {
+    $this->fill([
+      'products_for_cart' => collect()
+    ]);
   }
 
   /**
@@ -77,6 +94,7 @@ class Store extends Component
    */
   public function showCartModal(): void
   {
+    // debe estar loggeado para poder usar el carrito de compras
     if (!$this->is_logged_in) {
 
       $this->dispatch('toast-event', toast_data: [
@@ -88,7 +106,22 @@ class Store extends Component
       return;
     }
 
+    // calcular total, si hay productos
+    if (!$this->products_for_cart->isEmpty()) {
+      $this->calculateTotalForSale();
+    }
+
     $this->show_cart_modal = true;
+  }
+
+  /**
+   * Cierra el modal del carrito de compras
+   * @return void
+   */
+  public function hideCartModal(): void
+  {
+    $this->show_cart_modal = false;
+    $this->resetValidation(); // Limpia todos los errores
   }
 
   /**
@@ -98,6 +131,7 @@ class Store extends Component
    */
   public function addToCart(Product $product): void
   {
+    // debe estar loggeado para poder usar el carrito de compras
     if (!$this->is_logged_in) {
 
       $this->dispatch('toast-event', toast_data: [
@@ -109,38 +143,205 @@ class Store extends Component
       return;
     }
 
-    if (!$this->cart->contains('id', $product->id)) {
+    // Si el producto ya existe, retornar
+    if ($this->products_for_cart->contains(
+      function ($product_on_cart) use ($product) {
+        return $product_on_cart['product']->id === $product->id;
+      }
+    )) {
 
-      $this->cart->push([
-        'id' => $product->id,
-        'product' => $product,
-        'quantity' => 1,
-        'subtotal' => $product->product_price
+      $this->dispatch('toast-event', toast_data: [
+        'event_type'  =>  'info',
+        'title_toast' =>  toastTitle('', true),
+        'descr_toast' =>  'Ya tiene este producto en su carrito de compras!'
       ]);
+
+      return;
     }
 
-    $this->calculateTotal();
+    // obtener el precio por defecto
+    $default_price = $product->defaultPrice();
+
+    // el detalle es una combinacion de datos de precio, cantidad y descripcion
+    // depende del precio o precios del producto (por defecto o seleccionado)
+    $details = $default_price->description . ' (' . $default_price->quantity . ') a $' . $default_price->price;
+
+    // agregar producto a la coleccion
+    $this->products_for_cart->push([
+      'product'           => $product,
+      'selected_price_id' => $default_price->id,
+      'price'             => $default_price->price,
+      'details'           => $details,
+      'order_quantity'    => 1,
+      'unit_price'        => $default_price->price,
+      'subtotal_price'    => $default_price->price,
+    ]);
+
+    // calcular total
+    $this->calculateTotalForSale();
     $this->showCartModal();
   }
 
   /**
+   * quitar producto de la lista de productos a vender
+   * @param $key posicion de la lista
+   * @return void
+   */
+  public function removeProductForSale(int $key): void
+  {
+    $this->products_for_cart->pull($key);
+    $this->calculateTotalForSale();
+    $this->resetValidation(); // Limpia todos los errores
+  }
+
+  /**
+   * calcular el costo total de la venta
+   * reduciendo los subtotales
+   * @return void
+   */
+  public function calculateTotalForSale(): void
+  {
+    $this->total_for_sale = $this->products_for_cart->reduce(function ($carry, $product) {
+      return $carry + $product['subtotal_price'];
+    }, 0);
+  }
+
+  /**
+   * al elegir un precio para el producto en la lista de venta, actualizar el producto
+   * se define el precio elegido, la cantidad pasa a 1, se indica el precio unitario
+   * y se recalcula el precio subtotal del producto
+   * @return void
+   */
+  public function updateSelectedPrice($productIndex, $priceId): void
+  {
+    // convertir la coleccion en array para modificarla
+    $products = $this->products_for_cart->toArray();
+
+    // obtener el producto y el precio seleccionado
+    $productForSale = $products[$productIndex];
+    $product        = $productForSale['product'];
+    $selected_price = $product->prices->find($priceId);
+
+    if (!$selected_price) {
+      return;
+    }
+
+    // preparar un nuevo detalle segun el nuevo precio elegido
+    $details = $selected_price->description . ' (' . $selected_price->quantity . ') a $' . $selected_price->price;
+
+    // actualizar los valores en el array
+    $products[$productIndex]['selected_price_id'] = $selected_price->id;
+    $products[$productIndex]['price']             = $selected_price->price;
+    $products[$productIndex]['details']           = $details;
+    $products[$productIndex]['unit_price']        = $selected_price->price;
+    $products[$productIndex]['order_quantity']    = 1; // reiniciar cantidad a 1
+    $products[$productIndex]['subtotal_price']    = $selected_price->price;
+
+    // reasignar la coleccion completa
+    $this->products_for_cart = collect($products);
+
+    // recalcular total
+    $this->calculateTotalForSale();
+  }
+
+  /**
+   * actualizar subtotal cuando cambia la cantidad del producto a vender
+   * @param mixed $value nuevo valor de la propiedad
+   * @param string $key nombre de la propiedad actualizada
+   * @return void
+   */
+  public function updatedProductsForCart($value, $key): void
+  {
+    // verificar si el cambio es en order_quantity
+    if (str_contains($key, 'order_quantity')) {
+      if (!is_string($value) || !ctype_digit($value) || (int)$value <= 0) {
+        return;
+      }
+
+      // obtener el indice del producto
+      $index = explode('.', $key)[0];
+
+      // obtener la coleccion actual
+      $products = collect($this->products_for_cart);
+
+      // obtener el item a modificar
+      $item = $products[$index];
+
+      // actualizar el subtotal con el precio unitario actual
+      $item['subtotal_price'] = (int)$value * $item['unit_price'];
+
+      // actualizar el item en la coleccion
+      $products[$index] = $item;
+
+      // reasignar la coleccion
+      $this->products_for_cart = $products;
+
+      // calcular total
+      $this->calculateTotalForSale();
+    }
+  }
+
+  /**
    * proceder al pedido y pago del carrito
+   * almacena temporalmente el carrito en sesion
    */
   public function proceedToCheckout()
   {
-    if ($this->user->email_verified_at === null) {
+    try {
 
-      // Guardar el carrito con una duración específica (e.g., 24 horas)
-      Session::put('cart', $this->cart);
+      // validar productos de carrito
+      $this->validate([
+        'products_for_cart'                     => ['required', 'array', 'min:1'],
+        'products_for_cart.*.product'           => ['required'],
+        'products_for_cart.*.selected_price_id' => ['required'],
+        'products_for_cart.*.order_quantity'    => ['required', 'integer', 'min:1'],
+      ], [
+        'products_for_cart.required'                  => 'Debe agregar al menos un producto al carrito',
+        'products_for_cart.min'                       => 'Debe agregar al menos un producto al carrito',
+        'products_for_cart.*.order_quantity.required' => 'Tiene que elegir una cantidad a comprar',
+        'products_for_cart.*.order_quantity.min'      => 'La cantidad a comprar tiene que ser mayor a 0',
+        'products_for_cart.*.order_quantity.integer'  => 'La cantidad a comprar tiene que ser un numero',
+      ]);
 
-      // Redireccionar a la verificación de email
-      return redirect()->route('verification.notice');
+      // validar stock disponible para cada producto
+      foreach ($this->products_for_cart as $index => $product_for_cart) {
+
+        $product = $product_for_cart['product'];
+        $selected_price = $product->prices->find($product_for_cart['selected_price_id']);
+
+        // Calcular cantidad total que se intenta vender
+        $total_quantity_to_sell = $selected_price->quantity * $product_for_cart['order_quantity'];
+
+        // Obtener stock disponible
+        $available_stock = $product->getTotalStockAttribute();
+
+        if ($total_quantity_to_sell > $available_stock) {
+          $this->addError(
+            "products_for_cart.{$index}.order_quantity",
+            "No tenemos stock suficiente para {$product->product_name}. " .
+              "Stock disponible: {$available_stock} unidades. " .
+              "Cantidad solicitada: {$total_quantity_to_sell} unidades."
+          );
+          return;
+        }
+      }
+
+      // si no ha verificado el email, no puede continuar
+      if ($this->user->email_verified_at === null) {
+        // Guardar el carrito con una duración específica (e.g., 24 horas)
+        Session::put('products_for_cart', $this->products_for_cart);
+        // Redireccionar a la verificación de email
+        return redirect()->route('verification.notice');
+      }
+
+      // Si ya está verificado, proceder normalmente
+      Session::put('products_for_cart', $this->products_for_cart);
+      return $this->redirectRoute('store-store-cart-index');
+
+    } catch (\Illuminate\Validation\ValidationException $e) {
+      $this->show_cart_modal = true; // mantener modal abierto
+      throw $e; // re lanzar la excepcion para que livewire maneje los errores
     }
-
-    // Si ya está verificado, proceder normalmente
-    Session::put('cart', $this->cart);
-
-    return redirect()->route('store-store-cart-index');
   }
 
   /**
@@ -149,119 +350,9 @@ class Store extends Component
    */
   public function resetCart(): void
   {
-    $this->cart = collect();
-    Session::forget('cart');
-  }
-
-  /**
-   * intercepta cualquier cambio en las cantidades del carrito
-   * @param string $name nombre del input cantidad del carrito para cada item
-   * @param $value valor del input
-   * @return void
-   */
-  public function updated($name, $value): void
-  {
-    if (str_starts_with($name, 'cart.') && str_ends_with($name, '.quantity')) {
-      $parts = explode('.', $name);
-      $index = $parts[1];
-      $product_id = $this->cart[$index]['id'];
-
-      // Validar que sea numérico y convertir a entero
-      if (!is_numeric($value) || (int) $value <= 0) {
-        $this->fixCartItemQuantity($index, $product_id);
-        return;
-      }
-    }
-  }
-
-  /**
-   * manejar la corrección de valores invalidos
-   * @param $index
-   * @param $product_id
-   * @return void
-   */
-  private function fixCartItemQuantity($index, $product_id): void
-  {
-    $currentItem = $this->cart->firstWhere('id', $product_id);
-    // Asegurar que sea numérico y al menos 1
-    $valid_quantity = is_numeric($currentItem['quantity']) ?
-      max(1, (int) $currentItem['quantity']) : 1;
-
-    $this->cart = $this->cart->map(function ($item, $key) use ($index, $product_id, $valid_quantity) {
-      if ($key == $index && $item['id'] === $product_id) {
-        return [
-          'id' => $item['id'],
-          'product' => $item['product'],
-          'quantity' => $valid_quantity,
-          'subtotal' => $item['product']->product_price * $valid_quantity
-        ];
-      }
-      return $item;
-    })->values();
-
-    $this->calculateTotal();
-    $this->dispatch('quantity-error', 'Por favor, ingrese solo números mayores a 0');
-  }
-
-  /**
-   * Actualiza la cantidad de un producto en el carrito y recalcula el subtotal
-   * @param int $product_id ID del producto a actualizar
-   * @param int $quantity Nueva cantidad del producto
-   * @return void
-   */
-  public function updateQuantity($product_id, $quantity): void
-  {
-    // Validar que sea numérico
-    if (!is_numeric($quantity)) {
-      return;
-    }
-
-    $quantity = max(1, (int) $quantity);
-
-    $this->cart = $this->cart->map(function ($item) use ($product_id, $quantity) {
-
-      if ($item['id'] === $product_id) {
-        return [
-          'id' => $item['id'],
-          'product' => $item['product'],
-          'quantity' => $quantity,
-          'subtotal' => $item['product']->product_price * $quantity
-        ];
-      }
-
-      return $item;
-    })->values();
-
-    $this->calculateTotal();
-  }
-
-  /**
-   * Elimina un objeto del carrito de compras.
-   * @param int $product_id id del producto a eliminar
-   * @return void
-   */
-  public function removeFromCart(int $product_id): void
-  {
-    $this->cart = $this->cart->filter(function ($item) use ($product_id) {
-      return $item['id'] !== $product_id;
-    })->values();
-
-    // al modificar el carrito, se elimina de sesion.
-    // cuando se proceda al checkout de compra, se crea nuevamente en sesion
-    if (Session::has('cart')) {
-      Session::forget('cart');
-    }
-
-    $this->calculateTotal();
-  }
-
-  /**
-   * Calcula el total del carrito sumando los subtotales de todos los productos
-   * @return void
-   */
-  private function calculateTotal(): void
-  {
-    $this->cart_total = $this->cart->sum('subtotal');
+    $this->setProductsForCart();
+    Session::forget('products_for_cart');
+    $this->resetValidation(); // Limpia todos los errores
   }
 
   /**
@@ -292,8 +383,7 @@ class Store extends Component
     $products = Product::with('tags')
       ->where('product_in_store', true)
       ->when($this->search_products, function ($query) {
-        $query->where('product_name', 'like', '%' . $this->search_products . '%')
-          ->orWhere('product_price', '<=', (float) $this->search_products);
+        $query->where('product_name', 'like', '%' . $this->search_products . '%');
       })
       ->when($this->search_by_tag, function ($query) {
         $query->whereHas('tags', function ($q) {

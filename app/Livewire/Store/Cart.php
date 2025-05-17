@@ -12,8 +12,9 @@ use Livewire\Component;
 
 class Cart extends Component
 {
+  // carrito de compras
   public Collection $cart;
-  public float $total_price;
+  public float $total_price = 0;
 
   public $preference_id;
 
@@ -24,14 +25,15 @@ class Cart extends Component
   public function mount(): void
   {
     // Verificar si existe un carrito en la sesion
-    if (Session::has('cart')) {
+    if (Session::has('products_for_cart')) {
 
       // recuperar carrito
-      $this->cart = collect(Session::get('cart'));
+      // * renombrando a 'cart'
+      $this->cart = collect(Session::get('products_for_cart'));
 
       // precio total
-      $this->total_price = $this->cart->reduce(function ($carry, $cart_item) {
-        return $carry + $cart_item['subtotal'];
+      $this->total_price = $this->cart->reduce(function ($carry, $product) {
+        return $carry + $product['subtotal_price'];
       }, 0);
 
     }
@@ -96,7 +98,7 @@ class Cart extends Component
   public function render(): View
   {
     // disparar la creacion de preferencias
-    $this->createPreference();
+    //$this->createPreference();
 
     return view('livewire.store.cart');
   }
