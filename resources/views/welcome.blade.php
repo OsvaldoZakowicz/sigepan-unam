@@ -21,6 +21,7 @@
 </head>
 
 {{-- vista de bienvenida --}}
+{{-- * PLANTILLA BASE PARA LA TIENDA --}}
 <body class="antialiased font-sans min-h-screen flex flex-col">
 
   <header class="fixed top-0 w-full bg-white z-40">
@@ -102,8 +103,8 @@
     @yield('view_content')
   </main>
 
-  <footer class="w-full h-60 bg-neutral-900">
-
+  <footer class="w-full h-96 bg-neutral-900">
+    @yield('view_footer')
   </footer>
 
   {{-- livewire --}}

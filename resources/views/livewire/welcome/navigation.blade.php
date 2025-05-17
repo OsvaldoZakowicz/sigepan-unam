@@ -1,8 +1,9 @@
 <nav class="bg-neutral-800 py-6 px-6 flex justify-between items-center">
-  {{-- * navegacion de la vista bienvenida --}}
+
+  {{-- * navegacion de la vista bienvenida Y TIENDA --}}
 
   {{-- titulo de la panaderia --}}
-  <span class="text-3xl italic text-orange-100 font-light capitalize">Nuestra Panadería</span>
+  @livewire('store.navigation-section')
 
   {{-- * una vez autenticados, mostrar segun rol dashboard o tienda --}}
   <div class="flex items-center gap-8">
@@ -10,24 +11,20 @@
       <span class="text-orange-100 capitalize italic font-light">
         bienvenido {{ auth()->user()->name }}, {{ auth()->user()->roles->first()->name }}
       </span>
-
       <span class="border-l-2 border-orange-100 h-6"></span>
-
       @can('panel')
         <a wire:navigate href="{{ url('/dashboard') }}" class="text-white font-semibold border-b-2 line-clamp-2 capitalize">
           {{__('Dashboard')}}
         </a>
       @endcan
-
       @can('tienda')
         <x-nav-link-store
           :href="route('store-store-index')"
-          :active="request()->routeIs('store-store-index')"
+          :active="request()->routeIs('store-store-index') || request()->routeIs('store-store-cart-index')"
           wire:navigate
           >tienda
         </x-nav-link-store>
       @endcan
-
       @can('tienda')
         <x-nav-link-store
           :href="route('store-store-orders-list')"
@@ -36,7 +33,6 @@
           >mis pedidos
         </x-nav-link-store>
       @endcan
-
       {{-- dropdown del menu desktop --}}
       <div class="hidden sm:flex sm:items-center sm:ms-6">
         <x-dropdown align="right" width="48">
@@ -81,21 +77,16 @@
           </x-slot>
         </x-dropdown>
       </div>
-
     @else
-
       {{-- * nadie autenticado, mostrar login y register --}}
-
       <a wire:navigate href="{{ route('login') }}" class="text-white font-semibold border-b-2 line-clamp-2 capitalize">
         {{__('Log in')}}
       </a>
-
       @if (Route::has('register'))
         <a wire:navigate href="{{ route('register') }}" class="text-white font-semibold border-b-2 line-clamp-2 capitalize">
           {{__('Register')}}
         </a>
       @endif
-
     @endauth
   </div>
 
