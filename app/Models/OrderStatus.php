@@ -10,16 +10,50 @@ class OrderStatus extends Model
 {
   use HasFactory;
 
-  public const PENDIENTE = 'pendiente';
-  public const EN_PROCESO = 'en proceso';
-  public const FINALIZADO = 'finalizado';
-  public const ENTREGADO = 'entregado';
-  public const CANCELADO = 'cancelado';
+  /**
+   * * estados de una orden
+   * respecto a la entrega del producto
+   */
+  protected static $ORDER_STATUS_PENDIENTE = 'pendiente';
+  protected static $ORDER_STATUS_ENTREGADO = 'entregado';
+  protected static $ORDER_STATUS_CANCELADO = 'cancelado';
 
-  protected $fillable = [
-    'id',
-    'status',
-  ];
+  /**
+   * atributos del estado
+   */
+  protected $fillable = [ 'status' ];
+
+  /**
+   * los atributos que deben convertirse
+   */
+  protected $casts = [ 'status' => 'string' ];
+
+  /**
+   * obtener estado pendiente
+   * @return string
+   */
+  public static function ORDER_STATUS_PENDIENTE(): string
+  {
+    return self::$ORDER_STATUS_PENDIENTE;
+  }
+
+  /**
+   * obtener estado entregado
+   * @return string
+   */
+  public static function ORDER_STATUS_ENTREGADO(): string
+  {
+    return self::$ORDER_STATUS_ENTREGADO;
+  }
+
+  /**
+   * obtener estado cancelado
+   * @return string
+   */
+  public static function ORDER_STATUS_CANCELADO(): string
+  {
+    return self::$ORDER_STATUS_CANCELADO;
+  }
 
   // * un estado de orden puede estar en muchas ordenes
   public function orders(): HasMany

@@ -14,11 +14,9 @@ class OrderStatusSeeder extends Seeder
   public function run(): void
   {
     $statuses = [
-      'pendiente',
-      'en proceso',
-      'finalizado',
-      'entregado',
-      'cancelado',
+      OrderStatus::ORDER_STATUS_PENDIENTE(),
+      OrderStatus::ORDER_STATUS_ENTREGADO(),
+      OrderStatus::ORDER_STATUS_CANCELADO(),
     ];
 
     foreach ($statuses as $status) {
