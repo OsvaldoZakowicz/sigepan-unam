@@ -1,11 +1,8 @@
 <div class="mt-20 pt-5 bg-gradient-to-r from-orange-100 via-amber-200 to-orange-900 h-screen">
-
   {{-- componente de carrito final --}}
 	<div class="bg-white rounded-lg flex justify-between gap-8 items-start w-full max-w-7xl mx-auto p-6 h-4/5">
-
     {{-- vista del carrito --}}
     <div class="w-5/6">
-
       {{-- cabecera --}}
       <div class="flex justify-between items-center mb-4">
         {{-- titulo de seccion --}}
@@ -23,7 +20,6 @@
           </span>
         </a>
       </div>
-
       {{-- vista de productos --}}
       <div class="space-y-4 max-h-72 p-3 overflow-y-auto overflow-x-hidden">
         @forelse($cart as $key => $item)
@@ -66,20 +62,18 @@
           </div>
         @endforelse
       </div>
-
       {{-- total --}}
       <div class="flex justify-end items-center w-full p-6">
         <span class="text-2xl font-bold text-orange-800 capitalize">total:&nbsp;$&nbsp;{{ number_format($total_price, 2) }}</span>
       </div>
     </div>
-
     {{-- espacio para realizar el pedido --}}
     <div class="">
       {{-- titulo de seccion --}}
       <h3 class="text-lg text-neutral-700 font-semibold">Hacer pedido</h3>
       <p class="text-lg text-neutral-700">para registrar su pedido, realice el pago del mismo</p>
-      {{-- boton MP --}}
-      {{-- <div id="wallet_container"></div> --}}
+      {{-- * boton MP --}}
+      <div id="wallet_container"></div>
     </div>
 
   </div>

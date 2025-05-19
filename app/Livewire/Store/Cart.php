@@ -2,12 +2,14 @@
 
 namespace App\Livewire\Store;
 
+use App\Services\Sale\OrderService;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\View\View;
 use MercadoPago\MercadoPagoConfig;
 use MercadoPago\Client\Preference\PreferenceClient;
+use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 
 class Cart extends Component
@@ -16,7 +18,11 @@ class Cart extends Component
   public Collection $cart;
   public float $total_price = 0;
 
+  // id de la preferencia de pagos para el boton de MP.
   public $preference_id;
+
+  // servicio de ordenes
+  protected OrderService $order_service;
 
   /**
    * montar datos
@@ -31,64 +37,38 @@ class Cart extends Component
       // * renombrando a 'cart'
       $this->cart = collect(Session::get('products_for_cart'));
 
-      // precio total
+      // precio total para la vista
       $this->total_price = $this->cart->reduce(function ($carry, $product) {
         return $carry + $product['subtotal_price'];
       }, 0);
 
+      // servicio de ordenes
+      $this->order_service = new OrderService();
+    } else {
+      return;
     }
   }
 
   /**
-   * crear preferencia de pago para MP
+   * Crear preferencia de pago para MP
+   *
    * @return void
    */
   public function createPreference(): void
   {
-    // carrito vacio
-    if ($this->cart->isEmpty()) {
+
+    // todo: crear orden con estado de pago pendiente
+
+    // configurar preferencia de pago
+    $new_preference = $this->order_service->createMercadoPagoPreference($this->cart);
+
+    if (isset($result['error'])) {
+      //$this->error = $result['error'];
       return;
     }
 
-    // configuracion
-    MercadoPagoConfig::setAccessToken(env('MERCADO_PAGO_ACCESS_TOKEN'));
-
-    // preparar items del carrito
-    $items = $this->cart->map(function ($cart_item) {
-      return [
-        "id"          => $cart_item['product']->id,
-        "title"       => $cart_item['product']->product_name,
-        "quantity"    => (int) $cart_item['quantity'],
-        "unit_price"  => (float) $cart_item['product']->product_price,
-        "currency_id" => "ARS",
-      ];
-    });
-
-    // nueva preferencia
-    $client = new PreferenceClient();
-
-    try {
-
-      // completar preferencia
-      $preference = $client->create([
-        "items"=> $items,
-        "back_urls" => [
-            "success" => route('store-store-payment-success'),
-            "failure" => route('store-store-payment-failure'),
-            "pending" => route('store-store-payment-pending')
-        ],
-        "auto_return" => "approved",
-        "statement_descriptor" => "SiGePAN",
-        "external_reference" => Auth::check() ? Auth::id() : session()->getId(),
-      ]);
-
-      // publicar id de preferencia
-      $this->preference_id = $preference->id;
-
-    } catch (\MercadoPago\Exceptions\MPApiException $e) {
-
-      dd($e->getMessage(), $e->getCode());
-    }
+    // guardar informacion del id de preferencia, proceder al pago
+    $this->preference_id = $new_preference['preference_id'];
   }
 
   /**
@@ -98,7 +78,7 @@ class Cart extends Component
   public function render(): View
   {
     // disparar la creacion de preferencias
-    //$this->createPreference();
+    $this->createPreference();
 
     return view('livewire.store.cart');
   }

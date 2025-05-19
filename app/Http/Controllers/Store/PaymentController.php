@@ -50,48 +50,7 @@ class PaymentController extends Controller
    */
   public function payment_success(Request $request): View
   {
-    // Obtener carrito
-    // [['id' => 1, 'product' => App\Models\Product, 'quantity' => 2, 'subtotal' => 100], ...]
-    $cart = Session::get('cart');
-
-    $order_status_id = OrderStatus::where('status', OrderStatus::PENDIENTE)->first()->id;
-    $user_id = Auth::id();
-    $order_origin = Order::WEB;
-    $total_price = $cart->reduce(fn ($carry, $item) => $carry + $item['subtotal'], 0);
-
-    // crear pedido
-    $order = Order::create([
-      'order_code'      => 'ORD-' . time(),
-      'order_status_id' => $order_status_id, // pendiente
-      'user_id'         => $user_id, // usuario logueado
-      'employee_id'     => null, // empleado logueado
-      'order_origin'    => $order_origin,
-      'total_price'     => $total_price,
-    ]);
-
-    // agregar productos al pedido
-    foreach ($cart as $item) {
-      $order->products()->attach($item['id'], [
-        'quantity'       => $item['quantity'],
-        'unit_price'     => $item['product']->product_price,
-        'subtotal_price' => $item['subtotal'],
-      ]);
-    }
-
-    // crear venta
-    $sale = $order->sale()->create([
-      'payment_type'       => 'mercado pago',
-      'payment_id'         => $request->payment_id,
-      'status'             => $request->status,
-      'external_reference' => $request->external_reference,
-      'merchant_order_id'  => $request->merchant_order_id,
-      'total_price'        => $total_price,
-      'full_response'      => json_encode($request->all()),
-    ]);
-
-    // limpiar carrito y regenerar sesión
-    Session::forget('cart');
-    Session::regenerate();
+    // todo: obtener orden que se pago con: $request->external_reference,
 
     return view('store.payment-success');
   }
