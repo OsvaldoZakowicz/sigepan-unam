@@ -4,10 +4,12 @@ namespace App\Services\Sale;
 
 use App\Models\DatoNegocio;
 use App\Models\Sale;
+use App\Models\Order;
 use App\Models\Stock;
 use App\Models\StockMovement;
 use App\Services\Stock\StockService;
 use App\Models\Price;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class SaleService
@@ -90,6 +92,89 @@ class SaleService
               "Faltan {$remaining_units} unidades."
           );
         }
+      }
+
+      DB::commit();
+      return $sale;
+
+    } catch (\Exception $e) {
+
+      DB::rollBack();
+      throw $e;
+    }
+  }
+
+  /**
+   * crear una venta desde la web.
+   *
+   * Formato de request:
+   * "collection_id" => "102720537383"                                    // * Numero de transaccion
+   * "collection_status" => "approved"                                    // * estado del pago
+   * "payment_id" => "102720537383"                                       // * Numero de transaccion
+   * "status" => "approved"                                               // * estado del pago
+   * "external_reference" => "10"                                         // * referencia externa (codigo de orden)
+   * "payment_type" => "account_money"                                    // * tipo de pago
+   * "merchant_order_id" => "28733638120"                                 //
+   * "preference_id" => "2272238706-4d152f14-0bd7-43e2-8c0f-a8ac472f4361" // * id de preferencia
+   * "site_id" => "MLA"                                                   // * sitio (MLA en este caso)
+   * "processing_mode" => "aggregator"                                    //
+   * "merchant_account_id" => "null"
+   *
+   * @param string $order_code codigo de orden
+   * @param Request $request request completo
+   * @return Sale
+   * @throws Exception
+   */
+  public function createOnlineSale(string $order_code, Request $request): Sale
+  {
+    try {
+
+      // obtener la orden pagada
+      $order = Order::where('order_code', $order_code)->first();
+
+      // Actualizar estado del pago de la orden
+      $order->payment_status = Order::ORDER_PAYMENT_STATUS_APROBADO();
+      $order->save();
+
+      // a partir de datos del request, crear un json 'full_response' para mercado pago
+      $mp_response = [
+        'mp' => [
+          'collection_id' => $request->collection_id,
+          'collection_status' => $request->collection_status,
+          'payment_id' => $request->payment_id,
+          'status' => $request->status,
+          'external_reference' => $request->external_reference,
+          'payment_type' => $request->payment_type,
+          'merchant_order_id' => $request->merchant_order_id,
+          'preference_id' => $request->preference_id,
+          'site_id' => $request->site_id,
+          'processing_mode' => $request->processing_mode,
+          'merchant_account_id' => $request->merchant_account_id
+        ]
+      ];
+
+      DB::beginTransaction();
+
+      // Crear venta
+      $sale = Sale::create([
+        'user_id'      => $order->user_id,
+        'order_id'     => $order->id,
+        'client_type'  => Sale::CLIENT_TYPE_REGISTERED(),
+        'sale_type'    => Sale::SALE_TYPE_WEB(),
+        'sold_on'      => now()->format('d-m-Y H:i'),
+        'payment_type' => 'mercado pago',
+        'total_price'  => (float) $order->total_price,
+        'full_response' => json_encode($mp_response),
+      ]);
+
+      // relacionar productos a la venta
+      foreach ($order->products as $product) {
+        $sale->products()->attach($product->id, [
+          'sale_quantity'  => $product->pivot->order_quantity,
+          'unit_price'     => $product->pivot->unit_price,
+          'subtotal_price' => $product->pivot->subtotal_price,
+          'details'        => $product->pivot->details,
+        ]);
       }
 
       DB::commit();

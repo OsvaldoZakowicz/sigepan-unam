@@ -34,12 +34,12 @@ class Sale extends Model
     'sale_type',          // tipo de venta: web o presencial
     'sold_on',            // fecha de la venta
     'payment_type',       // tipo de pago: efectivo, mercado pago, tarjeta, etc
-    'payment_id',         // numero de transaccion MP
-    'status',             // estado del pago MP
-    'external_reference', // referencia externa al pago MP
-    'merchant_order_id',  // MP
+    'payment_id',         // !numero de transaccion (null)
+    'status',             // !estado del pago MP (null)
+    'external_reference', // !referencia externa al pago MP (null)
+    'merchant_order_id',  // !MP (null)
     'total_price',        // precio total de la venta
-    'full_response',      // respuesta completa de MP (u otro medio de pago)
+    'full_response',      // ?respuesta completa de MP (u otro medio de pago) (null, completar solo esto)
     'sale_pdf_path',      // ruta al pdf comprobante de venta
   ];
 

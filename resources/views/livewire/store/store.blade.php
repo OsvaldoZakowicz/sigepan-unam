@@ -130,7 +130,7 @@
 
     {{-- modal del carrito --}}
     @if ($show_cart_modal)
-      <div class="fixed inset-0 z-50 overflow-y-auto">
+      <div class="fixed inset-0 z-40 overflow-y-auto">
         <div class="flex items-center justify-center min-h-screen px-4">
           <div class="fixed inset-0 bg-neutral-900 opacity-40"></div> {{-- fondo negro --}}
           <div class="relative bg-white rounded-lg w-full max-w-5xl p-6">
@@ -268,12 +268,12 @@
                   {{-- boton proceder al pedido --}}
                   <a
                     href="#"
-                    wire:click="proceedToCheckout()"
+                    wire:click="showConfirmationModal()"
                     class="inline-flex justify-between items-center mt-auto py-1 px-2 rounded border-2 border-orange-950 bg-orange-800 text-orange-100"
-                    >proceder al pedido
+                    >hacer pedido
                     <span class="text-orange-100 ml-1">
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                       </svg>
                     </span>
                   </a>
@@ -281,6 +281,46 @@
               @endif
             </div>
 
+          </div>
+        </div>
+      </div>
+    @endif
+
+    {{-- modal de confirmacion --}}
+    @if ($show_confirmation_modal)
+      <div class="fixed inset-0 z-50 overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen px-4">
+          <div class="fixed inset-0 bg-neutral-900 opacity-40"></div> {{-- fondo negro --}}
+          <div class="relative bg-white rounded-lg w-full max-w-md p-6">
+            <div class="mb-4 pb-2 space-y-2 border-b border-neutral-200">
+              <span class="font-semibold text-orange-800 text-2xl">¿Hacer el pedido?</span>
+              <p class="">Por favor confirme si desea hacer el pedido de los productos del carrito. Una vez confirmado, se continuará con el pago.</p>
+            </div>
+            <div class="flex justify-between items-center">
+              {{-- cancelar --}}
+              <button
+                wire:click="closeConfirmationModal()"
+                class="inline-flex justify-between items-center mt-auto py-1 px-2 rounded border-2 border-orange-950 bg-orange-200 text-orange-800"
+                >cancelar
+                <span class="text-orange-500">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                </span>
+              </button>
+              {{-- boton proceder al pedido --}}
+              <a
+                href="#"
+                wire:click="proceedToCheckout()"
+                class="inline-flex justify-between items-center mt-auto py-1 px-2 rounded border-2 border-orange-950 bg-orange-800 text-orange-100"
+                >confirmar
+                <span class="text-orange-100 ml-1">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                </span>
+              </a>
+            </div>
           </div>
         </div>
       </div>

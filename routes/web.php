@@ -25,7 +25,8 @@ Route::middleware(['auth', 'can:tienda'])->group(function () {
   // acceso a la ruta para perfil de cliente en tienda
 
   // carrito de compras para el pago
-  Route::get('store/cart', [PaymentController::class, 'cart_index'])
+  // muestra el pedido como una orden ya realizada (id de orden)
+  Route::get('store/cart/{id}', [PaymentController::class, 'cart_index'])
     ->middleware('verified')
     ->name('store-store-cart-index');
 

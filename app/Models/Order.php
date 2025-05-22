@@ -35,10 +35,34 @@ class Order extends Model
   protected $casts = [
     'order_code'   => 'string',
     'total_price'  => 'decimal:2',
-    'ordered_at'   => 'timestamp',
-    'delivered_at' => 'timestamp',
+    'ordered_at'   => 'datetime',
+    'delivered_at' => 'datetime',
     'payment_status' => 'string',
   ];
+
+  /**
+   * Retorna el estado de pago "aprobado"
+   */
+  public static function ORDER_PAYMENT_STATUS_APROBADO(): string
+  {
+    return self::$ORDER_PAYMENT_STATUS_APROBADO;
+  }
+
+  /**
+   * Retorna el estado de pago "rechazado"
+   */
+  public static function ORDER_PAYMENT_STATUS_RECHAZADO(): string
+  {
+    return self::$ORDER_PAYMENT_STATUS_RECHAZADO;
+  }
+
+  /**
+   * Retorna el estado de pago "pendiente"
+   */
+  public static function ORDER_PAYMENT_STATUS_PENDIENTE(): string
+  {
+    return self::$ORDER_PAYMENT_STATUS_PENDIENTE;
+  }
 
   // * una orden tiene un estado de orden
   public function status(): BelongsTo
@@ -58,5 +82,11 @@ class Order extends Model
   public function sale(): HasOne
   {
     return $this->hasOne(Sale::class, 'order_id', 'id');
+  }
+
+  // * una orden es de un usuario
+  public function user(): BelongsTo
+  {
+    return $this->belongsTo(User::class, 'user_id', 'id');
   }
 }

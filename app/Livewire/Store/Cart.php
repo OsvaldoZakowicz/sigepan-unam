@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Store;
 
+use App\Models\Order;
 use App\Services\Sale\OrderService;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -14,9 +15,9 @@ use Livewire\Component;
 
 class Cart extends Component
 {
-  // carrito de compras
-  public Collection $cart;
-  public float $total_price = 0;
+
+  // orden (o pedido)
+  public $order;
 
   // id de la preferencia de pagos para el boton de MP.
   public $preference_id;
@@ -26,41 +27,25 @@ class Cart extends Component
 
   /**
    * montar datos
+   * @param $id del pedido realizado
    * @return void
    */
-  public function mount(): void
+  public function mount($id): void
   {
-    // Verificar si existe un carrito en la sesion
-    if (Session::has('products_for_cart')) {
+    $this->order = Order::findOrFail($id);
 
-      // recuperar carrito
-      // * renombrando a 'cart'
-      $this->cart = collect(Session::get('products_for_cart'));
-
-      // precio total para la vista
-      $this->total_price = $this->cart->reduce(function ($carry, $product) {
-        return $carry + $product['subtotal_price'];
-      }, 0);
-
-      // servicio de ordenes
-      $this->order_service = new OrderService();
-    } else {
-      return;
-    }
+    // servicio de ordenes
+    $this->order_service = new OrderService();
   }
 
   /**
    * Crear preferencia de pago para MP
-   *
    * @return void
    */
   public function createPreference(): void
   {
-
-    // todo: crear orden con estado de pago pendiente
-
     // configurar preferencia de pago
-    $new_preference = $this->order_service->createMercadoPagoPreference($this->cart);
+    $new_preference = $this->order_service->createMercadoPagoPreference($this->order);
 
     if (isset($result['error'])) {
       //$this->error = $result['error'];

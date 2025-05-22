@@ -94,4 +94,10 @@ class User extends Authenticatable implements MustVerifyEmail, Auditable
   {
     return $this->hasMany(Sale::class, 'user_id', 'id');
   }
+
+  // * un usuario puede tener ordenes o pedidos asociados
+  public function orders(): HasMany
+  {
+    return $this->hasMany(Order::class, 'user_id', 'id');
+  }
 }

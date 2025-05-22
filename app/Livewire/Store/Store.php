@@ -5,10 +5,12 @@ namespace App\Livewire\Store;
 use App\Models\Product;
 use App\Models\Tag;
 use App\Models\User;
+use App\Services\Sale\OrderService;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Url;
 use Livewire\WithPagination;
 use Livewire\Component;
@@ -40,8 +42,11 @@ class Store extends Component
   // carrito
   public Collection $products_for_cart;
   public bool $show_cart_modal = false;
-  public $total_for_sale = 0;
+  public float $total_for_sale = 0;
   public int $cart_total_items = 0;
+
+  // modal de confirmacion
+  public bool $show_confirmation_modal = false;
 
   /**
    * boot de constantes
@@ -282,7 +287,26 @@ class Store extends Component
   }
 
   /**
-   * proceder al pedido y pago del carrito
+   * mostrar un modal de confirmacion para realizar el pedido
+   * @return void
+   */
+  public function showConfirmationModal(): void
+  {
+    $this->show_confirmation_modal = true;
+  }
+
+  /**
+   * cerrar el modal de confirmacion para realizar el pedido
+   * @return void
+   */
+  public function closeConfirmationModal(): void
+  {
+    $this->show_confirmation_modal = false;
+  }
+
+  /**
+   * * hacer el pedido creando una orden
+   * * proceder al pago
    * almacena temporalmente el carrito en sesion
    */
   public function proceedToCheckout()
@@ -335,12 +359,36 @@ class Store extends Component
       }
 
       // Si ya está verificado, proceder normalmente
-      Session::put('products_for_cart', $this->products_for_cart);
-      return $this->redirectRoute('store-store-cart-index');
+      $order_service = new OrderService();
+      $order = $order_service->createOrder($this->products_for_cart, $this->user, $this->total_for_sale);
+
+      session()->flash('operation-success', toastSuccessBody('pedido', 'realizado'));
+      return $this->redirectRoute('store-store-cart-index', ['id' => $order->id]);
 
     } catch (\Illuminate\Validation\ValidationException $e) {
+
       $this->show_cart_modal = true; // mantener modal abierto
       throw $e; // re lanzar la excepcion para que livewire maneje los errores
+
+    } catch (\Illuminate\Database\QueryException $e) {
+
+      Log::error('Error de base de datos al crear orden:', [
+        'message' => $e->getMessage(),
+        'code' => $e->getCode()
+      ]);
+
+      session()->flash('operation-error', 'Error al procesar el pedido. Por favor intente nuevamente.');
+      return;
+
+    } catch (\Exception $e) {
+
+      Log::error('Error general al crear orden:', [
+        'message' => $e->getMessage(),
+        'code' => $e->getCode()
+      ]);
+
+      session()->flash('operation-error', 'Ocurrió un error inesperado. Por favor intente nuevamente.');
+      return;
     }
   }
 

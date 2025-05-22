@@ -9,6 +9,7 @@ use MercadoPago\MercadoPagoConfig;
 use MercadoPago\Client\Preference\PreferenceClient;
 use MercadoPago\Exceptions\MPApiException;
 use Exception;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class OrderService
@@ -72,14 +73,66 @@ class OrderService
 
   /**
    * todo: crear orden
+   * crear orden (o pedido) de productos desde la tienda online
+   * @param array $cart carrito de compras
+   * @param User $user usuario autenticado en la tienda
+   * @param float $total de la compra
+   * @return Order $order
    */
+  public function createOrder($cart, $user, $total): Order
+  {
+
+    try {
+
+      // codigo de orden
+      $new_order_code = $this->generateUniqueOrderCode();
+
+      // estado de entrega de productos pendiente
+      $new_order_status = OrderStatus::ORDER_STATUS_PENDIENTE();
+
+      // estado de pago pendiente
+      $new_order_payment_status = Order::ORDER_PAYMENT_STATUS_PENDIENTE();
+
+      DB::beginTransaction();
+
+      // crear orden
+      $order = Order::create([
+        'order_code'      => $new_order_code,
+        'order_status_id' => $new_order_status,
+        'user_id'         => $user->id,
+        'total_price'     => $total,
+        'ordered_at'      => now()->format('Y-m-d H:i:s'),
+        'delivered_at'    => null,
+        'payment_status'  => $new_order_payment_status,
+      ]);
+
+      // vincular los productos a la orden
+      foreach ($cart as $cart_item) {
+        $order->products()->attach($cart_item['product']->id, [
+          'order_quantity' => $cart_item['order_quantity'],
+          'unit_price' => $cart_item['unit_price'],
+          'subtotal_price' => $cart_item['subtotal_price'],
+          'details' => $cart_item['details']
+        ]);
+      }
+
+      DB::commit();
+      return $order;
+
+    } catch (\Exception $e) {
+
+      DB::rollBack();
+      throw $e;
+    }
+
+  }
 
   /**
    * crear preferencia de pago.
-   * @param array $cart carrito de compras
+   * @param $order orden de compra
    * @return array datos de preferencia o error
    */
-  public function createMercadoPagoPreference($cart): array
+  public function createMercadoPagoPreference($order): array
   {
     try {
       // configuración token de acceso
@@ -87,12 +140,12 @@ class OrderService
 
       // Preparar los items del carrito de compras
       $items = [];
-      foreach ($cart as $cart_item) {
+      foreach ($order->products as $product) {
         $items[] = [
-          "title"       => $cart_item['product']->product_name,
-          "description" => $cart_item['details'],
-          "quantity"    => (int)$cart_item['order_quantity'],
-          "unit_price"  => (float)$cart_item['unit_price']
+          "title"       => $product->product_name,
+          "description" => $product->pivot->details,
+          "quantity"    => (int) $product->pivot->order_quantity,
+          "unit_price"  => (float) $product->pivot->unit_price
         ];
       }
 
@@ -104,7 +157,7 @@ class OrderService
       $base_url = env('NGROK_URL', env('APP_URL'));
 
       // referencia externa, codigo de orden
-      $external_reference = $this->generateUniqueOrderCode();
+      $external_reference = $order->order_code;
 
       // descriptor del nombre del negocio
       $statement_descriptor = DatoNegocio::obtenerValor('razon_social');

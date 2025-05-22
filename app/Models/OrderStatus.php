@@ -30,29 +30,29 @@ class OrderStatus extends Model
 
   /**
    * obtener estado pendiente
-   * @return string
+   * @return int $id de estado pendiente
    */
-  public static function ORDER_STATUS_PENDIENTE(): string
+  public static function ORDER_STATUS_PENDIENTE()
   {
-    return self::$ORDER_STATUS_PENDIENTE;
+    return OrderStatus::where('status', self::$ORDER_STATUS_PENDIENTE)->first()->id;
   }
 
   /**
    * obtener estado entregado
-   * @return string
+   * @return int $id de estado entregado
    */
-  public static function ORDER_STATUS_ENTREGADO(): string
+  public static function ORDER_STATUS_ENTREGADO()
   {
-    return self::$ORDER_STATUS_ENTREGADO;
+    return OrderStatus::where('status', self::$ORDER_STATUS_ENTREGADO)->first()->id;
   }
 
   /**
    * obtener estado cancelado
-   * @return string
+   * @return int $id de estado cancelado
    */
-  public static function ORDER_STATUS_CANCELADO(): string
+  public static function ORDER_STATUS_CANCELADO()
   {
-    return self::$ORDER_STATUS_CANCELADO;
+    return OrderStatus::where('status', self::$ORDER_STATUS_CANCELADO)->first()->id;
   }
 
   // * un estado de orden puede estar en muchas ordenes
