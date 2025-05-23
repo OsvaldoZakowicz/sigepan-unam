@@ -1,12 +1,12 @@
-<div class="mt-20 pt-5 bg-gradient-to-r from-orange-100 via-amber-200 to-orange-900 h-screen">
+<div wire:poll class="mt-20 pt-5 bg-gradient-to-r from-orange-100 via-amber-200 to-orange-900 h-screen">
   {{-- componente de mis pedidos --}}
   <div class="bg-white rounded-lg flex justify-between gap-8 items-start w-full max-w-6xl mx-auto p-6 h-4/5">
 
     <div class="w-full">
       {{-- cabecera --}}
-      <div class="flex justify-between items-center mb-4">
+      <div class="flex justify-start items-center mb-4 gap-2">
         {{-- titulo de seccion --}}
-        <h2 class="text-xl text-neutral-700 font-semibold">Mis pedidos</h2>
+        <h2 class="text-xl text-neutral-700 font-semibold">Mis pedidos en la tienda</h2>
       </div>
 
       {{-- tabla de pedidos --}}
@@ -27,7 +27,8 @@
                 fecha de pedido
               </th>
               <th class="border p-1 text-left">
-                entrega de la compra
+                estado del pedido
+                <x-quest-icon title="indica en que estado esta el pedido, pendiente de entrega, entregado o cancelado" />
               </th>
               <th class="border p-1 text-left">
                 acciones
@@ -82,7 +83,6 @@
                   @endif
                   {{-- aun no se confirma el pago o no realizo pago --}}
                   @if ($order->payment_status === $order_payment_status_pendiente)
-                    {{-- todo: crear preferencia a partir de la orden, mostrar ventana orden y preferencia --}}
                     <button
                       type="button"
                       wire:click="redirectToPay({{ $order->id }})"
@@ -91,7 +91,7 @@
                     </button>
                     <button
                       type="button"
-                      wire:click="showPayment({{ $order->id}})"
+                      wire:click="showCancelOrderModal({{ $order->id }})"
                       class="inline-flex justify-between items-center text-xs py-1 px-2 rounded border-2 border-orange-950 bg-orange-200 text-orange-800"
                       >cancelar pedido
                     </button>
@@ -175,42 +175,101 @@
       </div>
 
       {{-- modal: detalles del pago --}}
-      <div
-        x-data="{ show: @entangle('show_payment_modal') }"
-        x-show="show"
-        x-cloak
-        class="fixed inset-0 z-50 overflow-y-auto"
-        x-transition>
-        <div class="flex items-center justify-center min-h-screen px-4">
+      @if ($show_payment_modal && $payment_order && $payment_order->sale)
+        <div class="fixed inset-0 z-50 overflow-y-auto">
+          <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="fixed inset-0 bg-neutral-950 opacity-40"></div> {{-- fondo negro --}}
+            <div class="relative bg-white rounded-lg w-full max-w-2xl p-6">
+              <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl text-neutral-700 font-semibold">detalles del pago:</h2>
+                <button
+                  wire:click="closePayment()"
+                  class="inline-flex justify-between items-center mt-auto py-1 px-2 text-sm rounded border-2 border-orange-950 bg-orange-200 text-orange-800"
+                  >cerrar
+                </button>
+              </div>
 
-          <div class="fixed inset-0 bg-neutral-950 opacity-40"></div>
-
-          <div class="relative bg-white rounded-lg w-full max-w-2xl p-6">
-            <div class="flex justify-between items-center mb-4">
-              <h2 class="text-xl text-neutral-700 font-semibold">detalles del pago</h2>
-              <button
-                wire:click="closePayment()"
-                class="inline-flex justify-between items-center mt-auto py-2 px-4 rounded border-2 border-orange-950 bg-orange-200 text-orange-800"
-                >cerrar
-              </button>
-            </div>
-
-            <div class="space-y-4">
-              @if ($payment_order && $payment_order->sale)
-                <div class="space-y-2">
-                  <p><span class="font-bold">pago vía:</span> {{ $payment_order->order_origin }}</p>
-                  <p><span class="font-bold">tipo:</span> {{ $payment_order->sale->payment_type }}</p>
-                  <p><span class="font-bold">plataforma:</span> {{ json_decode($payment_order->sale->full_response)->site_id }}</p>
-                  <p><span class="font-bold">estado del pago:</span> {{ __( $payment_order->sale->status ) }}</p>
-                  <p><span class="font-bold">número de operación:</span> {{ $payment_order->sale->payment_id }}</p>
-                  <p><span class="font-bold">fecha de pago:</span> {{ formatDateTime($payment_order->sale->created_at, 'd-m-Y H:i') }}</p>
-                  <p><span class="font-bold">monto:</span> ${{ number_format($payment_order->sale->total_price, 2) }}</p>
-                </div>
+              {{-- * datos si es comprobante de forma de pago virtual --}}
+              @if ($payment_order->sale->sale_type === $sale_type_web)
+                @php
+                  $sale_payment_data = json_decode($payment_order->sale->full_response, true);
+                @endphp
+                {{-- si se trata de comprobante de mercado pago --}}
+                @if (count($sale_payment_data['mp']) !== 0)
+                  <div class="space-y-4">
+                    <div class="flex flex-col justify-start items-start gap-1">
+                      <span>
+                        <span class="font-semibold">Orden:&nbsp;</span>
+                        <span class="text-sm uppercase">{{ $payment_order->order_code }}</span>
+                      </span>
+                      <span>
+                        <span class="font-bold">pago vía:</span>
+                        <span>Mercado Pago</span>
+                      </span>
+                      <span>
+                        <span class="font-bold">estado del pago:</span>
+                        <span>{{ __($sale_payment_data['mp']['status']) }}</span>
+                      </span>
+                      <span>
+                        <span class="font-bold">número de operación:</span>
+                        <span>{{ $sale_payment_data['mp']['payment_id'] }} (nro de comprobante de mercado pago)</span>
+                      </span>
+                      <span>
+                        <span class="font-bold">fecha de pago:</span>
+                        <span>{{ $payment_order->sale->sold_on->format('d-m-Y H:i') }} hs.</span>
+                      </span>
+                      <span>
+                        <span class="font-bold">monto:</span>
+                        <span>${{ number_format($payment_order->sale->total_price, 2) }}</span>
+                      </span>
+                    </div>
+                  </div>
+                @endif
               @endif
             </div>
           </div>
         </div>
-      </div>
+      @endif
+
+      {{-- modal para cncelar pedido --}}
+      @if ($show_cancel_modal)
+        <div class="fixed inset-0 z-50 overflow-y-auto">
+          <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="fixed inset-0 bg-neutral-950 opacity-40"></div> {{-- fondo negro --}}
+            <div class="relative bg-white rounded-lg w-full max-w-md p-6">
+              <div class="mb-4 pb-2 space-y-2 border-b border-neutral-200">
+                <span class="font-semibold text-orange-800 text-2xl">¿Cancelar el pedido?</span>
+                <p class="">Por favor confirme si desea cancelar el pedido. Esta accion es irreversible!</p>
+              </div>
+              <div class="flex justify-between items-center">
+                {{-- cancelar --}}
+                <button
+                  wire:click="closeCancelOrderModal()"
+                  class="inline-flex justify-between items-center mt-auto py-1 px-2 rounded border-2 border-orange-950 bg-orange-200 text-orange-800"
+                  >cancelar
+                  <span class="text-orange-500">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                  </span>
+                </button>
+                {{-- boton proceder al pedido --}}
+                <a
+                  href="#"
+                  wire:click="cancelOrder({{ $cancel_order }})"
+                  class="inline-flex justify-between items-center mt-auto py-1 px-2 rounded border-2 border-orange-950 bg-orange-800 text-orange-100"
+                  >confirmar
+                  <span class="text-orange-100 ml-1">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                  </span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      @endif
 
     </div>
 

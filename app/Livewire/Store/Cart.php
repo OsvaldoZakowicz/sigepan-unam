@@ -28,11 +28,23 @@ class Cart extends Component
   /**
    * montar datos
    * @param $id del pedido realizado
-   * @return void
    */
-  public function mount($id): void
+  public function mount($id)
   {
     $this->order = Order::findOrFail($id);
+
+    // si la orden ya esta pagada, retornar a la lista de ordenes
+    // no mostrar esta vista para pedidos ya pagados
+    if($this->order->payment_status === Order::ORDER_PAYMENT_STATUS_APROBADO()) {
+      session()->flash('operation-info', 'El pedido ya fue pagado!');
+      return $this->redirectRoute('store-store-orders-list');
+    }
+
+    // si la orden fue cancelada, no se puede pagar
+    if($this->order->payment_status === Order::ORDER_PAYMENT_STATUS_RECHAZADO()) {
+      session()->flash('operation-info', 'El pedido esta cancelado, no se puede pagar!');
+      return $this->redirectRoute('store-store-orders-list');
+    }
 
     // servicio de ordenes
     $this->order_service = new OrderService();

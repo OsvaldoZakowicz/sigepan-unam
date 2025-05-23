@@ -72,7 +72,6 @@ class OrderService
   }
 
   /**
-   * todo: crear orden
    * crear orden (o pedido) de productos desde la tienda online
    * @param array $cart carrito de compras
    * @param User $user usuario autenticado en la tienda
@@ -118,13 +117,11 @@ class OrderService
 
       DB::commit();
       return $order;
-
     } catch (\Exception $e) {
 
       DB::rollBack();
       throw $e;
     }
-
   }
 
   /**
@@ -196,6 +193,47 @@ class OrderService
       ]);
 
       return ['error' => 'Error al procesar el pago. Por favor, intente nuevamente.'];
+    }
+  }
+
+  /**
+   * cancelar un pedido (u orden)
+   * una orden puede cancelarse si su estado de pago es pendiente y su
+   * entrega de pedido es pendiente, en otros casos no.
+   * @param int $id id de orden
+   * @return array resultado de la operación
+   */
+  public function cancelOrder(int $id): array
+  {
+    try {
+      // buscar la orden
+      $order = Order::findOrFail($id);
+
+      // verificar que sea cancelable
+      if (
+        $order->payment_status !== Order::ORDER_PAYMENT_STATUS_PENDIENTE() ||
+        $order->order_status_id !== OrderStatus::ORDER_STATUS_PENDIENTE()
+      ) {
+        return [
+          'success' => false,
+          'message' => 'El pedido no puede ser cancelado porque ya fue pagado o entregado'
+        ];
+      }
+
+      // actualizar estado a cancelado
+      $order->payment_status = Order::ORDER_PAYMENT_STATUS_RECHAZADO();
+      $order->order_status_id = OrderStatus::ORDER_STATUS_CANCELADO();
+      $order->save();
+
+      return [
+        'success' => true,
+        'message' => 'Pedido cancelado exitosamente'
+      ];
+    } catch (\Exception $e) {
+      return [
+        'success' => false,
+        'message' => 'Error al cancelar el pedido: ' . $e->getMessage()
+      ];
     }
   }
 }

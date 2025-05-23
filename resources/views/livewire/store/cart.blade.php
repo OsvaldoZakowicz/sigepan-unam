@@ -11,7 +11,7 @@
         <a
           wire:navigate
           href="{{ route('store-store-index') }}"
-          class="inline-flex justify-between items-center mt-auto py-2 px-4 rounded border-2 border-orange-950 bg-orange-200 text-orange-800"
+          class="inline-flex justify-between items-center mt-auto py-1 px-2 text-md rounded border-2 border-orange-950 bg-orange-200 text-orange-800"
           >volver a la tienda
           <span class="text-orange-800">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
