@@ -20,14 +20,14 @@ class StockMovement extends Model
    * merma: disminucion del stock por una elaboracion menor a la esperada.
    * perdida: disminucion del stock por vencimiento o falla en la produccion.
    */
-  protected static $MOVEMENT_TYPE_ELABORACION = 'elaboracion';
-  protected static $MOVEMENT_TYPE_VENTA = 'venta';
-  protected static $MOVEMENT_TYPE_VENTA_CANCELADA = 'venta cancelada';
-  protected static $MOVEMENT_TYPE_MERMA = 'merma';
-  protected static $MOVEMENT_TYPE_PERDIDA = 'perdida';
-  protected static $MOVEMENT_TYPE_VENCIMIENTO = 'vencimiento';
-  protected static $MOVEMENT_TYPE_PEDIDO = 'pedido';
-  protected static $MOVEMENT_TYPE_PEDIDO_CANCELADO = 'pedido cancelado';
+  protected static $MOVEMENT_TYPE_ELABORACION      = 'elaboracion';     // positivo (crea)
+  protected static $MOVEMENT_TYPE_VENTA            = 'venta';           // negativo
+  protected static $MOVEMENT_TYPE_VENTA_CANCELADA  = 'venta cancelada'; // positivo (reintegra)
+  protected static $MOVEMENT_TYPE_MERMA            = 'merma';           // negativo
+  protected static $MOVEMENT_TYPE_PERDIDA          = 'perdida';         // negativo
+  protected static $MOVEMENT_TYPE_VENCIMIENTO      = 'vencimiento';     // negativo
+  protected static $MOVEMENT_TYPE_PEDIDO           = 'pedido';          // negativo
+  protected static $MOVEMENT_TYPE_PEDIDO_CANCELADO = 'pedido cancelado';// positivo (reintegra)
 
   protected $fillable = [
     'stock_id',       // stock donde se aplico el movimiento
@@ -125,6 +125,36 @@ class StockMovement extends Model
   public static function MOVEMENT_TYPE_PEDIDO_CANCELADO(): string
   {
     return self::$MOVEMENT_TYPE_PEDIDO_CANCELADO;
+  }
+
+  /**
+   * retorna un array de movimientos de tipo positivo
+   * solo para fines de frontend.
+   * @return array
+   */
+  public static function POSITIVE_MOVEMENTS(): array
+  {
+    return [
+      self::$MOVEMENT_TYPE_ELABORACION,
+      self::$MOVEMENT_TYPE_VENTA_CANCELADA,
+      self::$MOVEMENT_TYPE_PEDIDO_CANCELADO,
+    ];
+  }
+
+  /**
+   * retorna un array de movimientos de tipo negativo
+   * solo para fines de frontend.
+   * @return array
+   */
+  public static function NEGATIVE_MOVEMENTS(): array
+  {
+    return [
+      self::$MOVEMENT_TYPE_MERMA,
+      self::$MOVEMENT_TYPE_PEDIDO,
+      self::$MOVEMENT_TYPE_PERDIDA,
+      self::$MOVEMENT_TYPE_VENTA,
+      self::$MOVEMENT_TYPE_VENCIMIENTO,
+    ];
   }
 
 

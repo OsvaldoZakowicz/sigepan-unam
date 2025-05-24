@@ -145,7 +145,7 @@ class OrderService
           $stock_service->registerMovement(
             $stock->id,
             -$units_to_deduct,
-            StockMovement::MOVEMENT_TYPE_VENTA(),
+            StockMovement::MOVEMENT_TYPE_PEDIDO(),
             $order->id,
             get_class($order)
           );
@@ -253,6 +253,8 @@ class OrderService
   public function cancelOrder(int $id): array
   {
     try {
+      DB::beginTransaction();
+
       // buscar la orden
       $order = Order::findOrFail($id);
 
@@ -267,16 +269,40 @@ class OrderService
         ];
       }
 
+      // Obtener todos los movimientos de stock asociados a esta orden
+      $stock_movements = StockMovement::where('movement_reference_id', $order->id)
+        ->where('movement_reference_type', get_class($order))
+        ->get();
+
+      $stock_service = new StockService();
+
+      // Revertir cada movimiento
+      foreach ($stock_movements as $movement) {
+        // Como el movimiento original fue negativo (salida),
+        // aquí usamos la cantidad positiva para revertirlo
+        $stock_service->registerMovement(
+          $movement->stock_id,
+          abs($movement->quantity), // convertimos a positivo
+          StockMovement::MOVEMENT_TYPE_PEDIDO_CANCELADO(),
+          $order->id,
+          get_class($order)
+        );
+      }
+
       // actualizar estado a cancelado
       $order->payment_status = Order::ORDER_PAYMENT_STATUS_RECHAZADO();
       $order->order_status_id = OrderStatus::ORDER_STATUS_CANCELADO();
       $order->save();
+
+      DB::commit();
 
       return [
         'success' => true,
         'message' => 'Pedido cancelado exitosamente'
       ];
     } catch (\Exception $e) {
+      DB::rollBack();
+
       return [
         'success' => false,
         'message' => 'Error al cancelar el pedido: ' . $e->getMessage()

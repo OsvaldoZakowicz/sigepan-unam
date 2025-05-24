@@ -26,7 +26,10 @@ class ShowProductStock extends Component
   public bool $show_movements_modal = false;
   public ?Stock $selected_stock = null;
 
-  // Tipos de movimientos
+  // Tipos de movimientos positivos
+  public $positive_movements;
+  public $negative_movements;
+
   public $tipo_elaboracion;
   public $tipo_venta;
   public $tipo_merma;
@@ -42,6 +45,9 @@ class ShowProductStock extends Component
     $this->tipo_venta = StockMovement::MOVEMENT_TYPE_VENTA();
     $this->tipo_merma = StockMovement::MOVEMENT_TYPE_MERMA();
     $this->tipo_perdida = StockMovement::MOVEMENT_TYPE_PERDIDA();
+
+    $this->positive_movements = StockMovement::POSITIVE_MOVEMENTS();
+    $this->negative_movements = StockMovement::NEGATIVE_MOVEMENTS();
   }
 
   /**

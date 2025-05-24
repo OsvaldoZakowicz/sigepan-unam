@@ -201,7 +201,7 @@
                             {{ $movement->id }}
                           </x-table-td>
                           <x-table-td class="text-start">
-                            @if ($movement->movement_type === $tipo_elaboracion)
+                            @if (in_array($movement->movement_type, $positive_movements))
                               <span class="text-emerald-600">
                                 &plus;{{ $movement->movement_type }}
                               </span>
@@ -212,13 +212,14 @@
                             @endif
                           </x-table-td>
                           <x-table-td class="text-end">
-                            @if ($movement->movement_type === $tipo_elaboracion)
+                            @if (in_array($movement->movement_type, $positive_movements))
                               <span class="text-emerald-600">
                                 &plus;{{ $movement->quantity }}
                               </span>
                             @else
+                              {{-- la cantidad ya es negativa --}}
                               <span class="text-red-600">
-                                &minus;{{ $movement->quantity }}
+                                {{ $movement->quantity }}
                               </span>
                             @endif
                           </x-table-td>

@@ -153,16 +153,39 @@ class Orders extends Component
       $result = $orderService->cancelOrder($id);
 
       if ($result['success']) {
-        session()->flash('operation-success', toastSuccessBody('pedido', 'cancelado'));
+
+        // cerrar modal
+        $this->closeCancelOrderModal();
+
+        $this->dispatch('toast-event', toast_data: [
+          'event_type'  =>  'success',
+          'title_toast' =>  toastTitle('exitosa'),
+          'descr_toast' =>  'El pedido fue cancelado.'
+        ]);
+
       } else {
-        session()->flash('operation-error', toastErrorBody('pedido', $result['message']));
+
+        // cerrar modal
+        $this->closeCancelOrderModal();
+
+        $this->dispatch('toast-event', toast_data: [
+          'event_type'  =>  'info',
+          'title_toast' =>  toastTitle('exitosa'),
+          'descr_toast' =>  toastErrorBody('pedido', $result['message'])
+        ]);
+
       }
     } catch (\Exception $e) {
-      session()->flash('operation-error', toastErrorBody('pedido', 'Error al cancelar el pedido'));
-    }
 
-    // cerrar modal
-    $this->closeCancelOrderModal();
+      // cerrar modal
+      $this->closeCancelOrderModal();
+
+      $this->dispatch('toast-event', toast_data: [
+        'event_type'  =>  'error',
+        'title_toast' =>  toastTitle('exitosa'),
+        'descr_toast' =>  toastErrorBody('pedido', 'Error al cancelar el pedido')
+      ]);
+    }
   }
 
   /**
