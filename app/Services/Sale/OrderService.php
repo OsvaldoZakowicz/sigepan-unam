@@ -5,6 +5,9 @@ namespace App\Services\Sale;
 use App\Models\DatoNegocio;
 use App\Models\Order;
 use App\Models\OrderStatus;
+use App\Services\Stock\StockService;
+use App\Models\Stock;
+use App\Models\StockMovement;
 use MercadoPago\MercadoPagoConfig;
 use MercadoPago\Client\Preference\PreferenceClient;
 use MercadoPago\Exceptions\MPApiException;
@@ -105,14 +108,58 @@ class OrderService
         'payment_status'  => $new_order_payment_status,
       ]);
 
-      // vincular los productos a la orden
+      // instanciar servicio de stock
+      $stock_service = new StockService();
+
+      // vincular los productos a la orden y reducir stock
       foreach ($cart as $cart_item) {
+
+        // Vincular producto con la orden
         $order->products()->attach($cart_item['product']->id, [
           'order_quantity' => $cart_item['order_quantity'],
           'unit_price' => $cart_item['unit_price'],
           'subtotal_price' => $cart_item['subtotal_price'],
           'details' => $cart_item['details']
         ]);
+
+        // Extraer la cantidad del detalle (entre parentesis)
+        preg_match('/\((\d+)\)/', $cart_item['details'], $matches);
+        $units_per_item = (int)$matches[1];
+        $total_units_to_deduct = $units_per_item * $cart_item['order_quantity'];
+
+        // Obtener stocks disponibles ordenados por fecha de vencimiento
+        $available_stocks = Stock::where('product_id', $cart_item['product']->id)
+          ->where('quantity_left', '>', 0)
+          ->orderBy('expired_at')
+          ->get();
+
+        $remaining_units = $total_units_to_deduct;
+
+        foreach ($available_stocks as $stock) {
+          if ($remaining_units <= 0) break;
+
+          // Calcular cuántas unidades podemos tomar de este stock
+          $units_to_deduct = min($remaining_units, $stock->quantity_left);
+
+          // Registrar movimiento negativo
+          $stock_service->registerMovement(
+            $stock->id,
+            -$units_to_deduct,
+            StockMovement::MOVEMENT_TYPE_VENTA(),
+            $order->id,
+            get_class($order)
+          );
+
+          $remaining_units -= $units_to_deduct;
+        }
+
+        // Si quedaron unidades sin descontar, no hay suficiente stock
+        if ($remaining_units > 0) {
+          throw new \Exception(
+            "Stock insuficiente para el producto {$cart_item['product']->product_name}. " .
+              "Faltan {$remaining_units} unidades."
+          );
+        }
       }
 
       DB::commit();

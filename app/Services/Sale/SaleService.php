@@ -106,20 +106,8 @@ class SaleService
 
   /**
    * crear una venta desde la web.
-   *
-   * Formato de request:
-   * "collection_id" => "102720537383"                                    // * Numero de transaccion
-   * "collection_status" => "approved"                                    // * estado del pago
-   * "payment_id" => "102720537383"                                       // * Numero de transaccion
-   * "status" => "approved"                                               // * estado del pago
-   * "external_reference" => "10"                                         // * referencia externa (codigo de orden)
-   * "payment_type" => "account_money"                                    // * tipo de pago
-   * "merchant_order_id" => "28733638120"                                 //
-   * "preference_id" => "2272238706-4d152f14-0bd7-43e2-8c0f-a8ac472f4361" // * id de preferencia
-   * "site_id" => "MLA"                                                   // * sitio (MLA en este caso)
-   * "processing_mode" => "aggregator"                                    //
-   * "merchant_account_id" => "null"
-   *
+   * registra la venta de un pedido ya existente, registra el pago del pedido
+   * NO reduce el stock ya que no crea movimiento de stock.
    * @param string $order_code codigo de orden
    * @param Request $request request completo
    * @return Sale
@@ -139,16 +127,16 @@ class SaleService
       // a partir de datos del request, crear un json 'full_response' para mercado pago
       $mp_response = [
         'mp' => [
-          'collection_id' => $request->collection_id,
-          'collection_status' => $request->collection_status,
-          'payment_id' => $request->payment_id,
-          'status' => $request->status,
-          'external_reference' => $request->external_reference,
-          'payment_type' => $request->payment_type,
-          'merchant_order_id' => $request->merchant_order_id,
-          'preference_id' => $request->preference_id,
-          'site_id' => $request->site_id,
-          'processing_mode' => $request->processing_mode,
+          'collection_id'       => $request->collection_id,
+          'collection_status'   => $request->collection_status,
+          'payment_id'          => $request->payment_id,
+          'status'              => $request->status,
+          'external_reference'  => $request->external_reference, // referencia externa, codigo de orden en este caso
+          'payment_type'        => $request->payment_type,
+          'merchant_order_id'   => $request->merchant_order_id,
+          'preference_id'       => $request->preference_id,
+          'site_id'             => $request->site_id,
+          'processing_mode'     => $request->processing_mode,
           'merchant_account_id' => $request->merchant_account_id
         ]
       ];
