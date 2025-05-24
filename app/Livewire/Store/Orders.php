@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\OrderStatus;
 use App\Services\Sale\OrderService;
 use App\Models\Sale;
+use App\Models\DatoTienda;
 use Illuminate\View\View;
 use Livewire\WithPagination;
 use Livewire\Attributes\Url;
@@ -54,6 +55,9 @@ class Orders extends Component
   public bool $show_cancel_modal = false;
   public $cancel_order = null;
 
+  // datos de informacion sobre el pedido
+  public $datos_tienda = null;
+
   /**
    * montar datos constantes
    * @return void
@@ -70,6 +74,9 @@ class Orders extends Component
 
     $this->sale_type_web = Sale::SALE_TYPE_WEB();
     $this->sale_type_presencial = Sale::SALE_TYPE_PRESENCIAL();
+
+    // datos de informacion sobre el pedido
+    $this->datos_tienda = DatoTienda::obtenerTodos();
   }
 
   /**

@@ -78,12 +78,18 @@
       </div>
     </div>
     {{-- espacio para pagar el pedido --}}
-    <div class="">
+    <div class="max-w-72">
       {{-- titulo de seccion --}}
       <h3 class="text-lg text-neutral-700 font-semibold">¡Listo, registramos su pedido!</h3>
       <p class="text-lg text-neutral-700">puede realizar el pago del mismo a continuacion!</p>
       {{-- * boton MP --}}
       <div id="wallet_container"></div>
+      {{-- datos extra sobre el pedido --}}
+      <div class="flex flex-col gap-2 p-2 text-sm">
+        <span><span class="font-semibold text-orange-600">Horario de atencion:&nbsp;</span>{{ $datos_tienda['horario_atencion'] ?? '' }}</span>
+        <span><span class="font-semibold text-orange-600">Retiro del pedido:&nbsp;</span>{{ $datos_tienda['lugar_retiro_productos'] ?? '' }}</span>
+        <span><span class="font-semibold text-orange-600">Esperamos el pago del producto hasta:&nbsp;</span>{{ $datos_tienda['tiempo_espera_pago'] ?? '' }}</span>
+      </div>
     </div>
 
   </div>

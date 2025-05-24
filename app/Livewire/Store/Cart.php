@@ -4,6 +4,7 @@ namespace App\Livewire\Store;
 
 use App\Models\Order;
 use App\Services\Sale\OrderService;
+use App\Models\DatoTienda;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
@@ -24,6 +25,9 @@ class Cart extends Component
 
   // servicio de ordenes
   protected OrderService $order_service;
+
+  // datos de informacion sobre el pedido
+  public $datos_tienda = null;
 
   /**
    * montar datos
@@ -48,6 +52,9 @@ class Cart extends Component
 
     // servicio de ordenes
     $this->order_service = new OrderService();
+
+    // datos de informacion sobre el pedido
+    $this->datos_tienda = DatoTienda::obtenerTodos();
   }
 
   /**

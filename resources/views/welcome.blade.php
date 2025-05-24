@@ -103,7 +103,7 @@
     @yield('view_content')
   </main>
 
-  <footer class="w-full h-96 bg-neutral-900">
+  <footer class="w-full min-h-96 bg-neutral-900">
     @yield('view_footer')
   </footer>
 

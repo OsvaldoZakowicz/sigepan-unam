@@ -38,7 +38,7 @@
       </div>
 
       {{-- tabla de pedidos --}}
-      <div class="w-full">
+      <div class="w-full max-h-72 overflow-y-auto overflow-x-auto">
         <table class="w-full border border-collapse">
           <thead class="bg-orange-100">
             <tr class="text-neutral-800 capitalize">
