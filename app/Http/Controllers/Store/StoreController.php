@@ -19,4 +19,10 @@ class StoreController extends Controller
   {
     return view('store.orders-index');
   }
+
+  // * mostrar compras del cliente
+  public function purchases_list(): View
+  {
+    return view('store.purchases-index');
+  }
 }

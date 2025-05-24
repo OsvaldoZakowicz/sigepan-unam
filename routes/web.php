@@ -35,6 +35,11 @@ Route::middleware(['auth', 'can:tienda'])->group(function () {
     ->middleware('verified')
     ->name('store-store-orders-list');
 
+  // compras del cliente
+  Route::get('store/purchases', [StoreController::class, 'purchases_list'])
+    ->middleware('verified')
+    ->name('store-store-purchases-list');
+
   // compra exitosa
   Route::get('store/payment/success', [PaymentController::class, 'payment_success'])
     ->middleware('verified')
@@ -53,6 +58,12 @@ Route::middleware(['auth', 'can:tienda'])->group(function () {
   // * redirecciona a / y retorna 'welcome'
   Route::get('client/logout', ClientLogOutController::class)
     ->name('client-logout');
+
+  //*---------------------------- PDFs
+
+  // * NOTA: PDF de venta es el mismo que pdf de compra del cliente, pero va por otra ruta
+  Route::get('store/purchases/pdf/open/{id}', [PDFController::class, 'open_pdf_sale'])
+    ->name('open-pdf-purchase');
 });
 
 //* layout interno panel

@@ -33,6 +33,14 @@
           >mis pedidos
         </x-nav-link-store>
       @endcan
+      @can('tienda')
+        <x-nav-link-store
+          :href="route('store-store-purchases-list')"
+          :active="request()->routeIs('store-store-purchases-*')"
+          wire:navigate
+          >mis compras
+        </x-nav-link-store>
+      @endcan
       {{-- dropdown del menu desktop --}}
       <div class="hidden sm:flex sm:items-center sm:ms-6">
         <x-dropdown align="right" width="48">
