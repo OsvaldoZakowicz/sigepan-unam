@@ -67,7 +67,7 @@
             {{-- ir al perfil --}}
             @can('tienda-perfil')
               <x-dropdown-link
-                :href="route('profile')"
+                :href="route('profile-client')"
                 wire:navigate
                 >{{ __('Profile') }}
               </x-dropdown-link>

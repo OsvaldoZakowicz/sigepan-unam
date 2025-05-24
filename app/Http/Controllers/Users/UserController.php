@@ -58,4 +58,10 @@ class UserController extends Controller
   {
     return view('users.users-complete-profile');
   }
+
+  // * completar perfil de usuario cliente
+  public function profile_client_complete()
+  {
+    return view('users.users-client-complete-profile');
+  }
 }

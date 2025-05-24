@@ -20,7 +20,7 @@ Route::get('store', [StoreController::class, 'store_index'])
 
 //* modulo de clientes
 // acceso solo a rol cliente
-Route::middleware(['auth', 'can:tienda'])->group(function () {
+Route::middleware(['auth', 'can:tienda', 'can:tienda-perfil'])->group(function () {
 
   // acceso a la ruta para perfil de cliente en tienda
 
@@ -54,6 +54,15 @@ Route::middleware(['auth', 'can:tienda'])->group(function () {
   Route::get('store/payment/pending', [PaymentController::class, 'payment_pending'])
     ->middleware('verified')
     ->name('store-store-payment-pending');
+
+  // vista del perfil CLIENTE, actualizar usuario y password, borrar cuenta
+  Route::view('profile/client', 'profile-client')
+    ->middleware(['can:tienda', 'can:tienda-perfil'])
+    ->name('profile-client');
+
+  Route::get('profile/client/complete', [UserController::class, 'profile_client_complete'])
+    ->middleware(['can:tienda', 'can:tienda-perfil'])
+    ->name('profile-client-complete');
 
   // * redirecciona a / y retorna 'welcome'
   Route::get('client/logout', ClientLogOutController::class)
