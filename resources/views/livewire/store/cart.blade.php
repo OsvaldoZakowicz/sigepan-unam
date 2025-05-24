@@ -85,11 +85,13 @@
       {{-- * boton MP --}}
       <div id="wallet_container"></div>
       {{-- datos extra sobre el pedido --}}
-      <div class="flex flex-col gap-2 p-2 text-sm">
-        <span><span class="font-semibold text-orange-600">Horario de atencion:&nbsp;</span>{{ $datos_tienda['horario_atencion'] ?? '' }}</span>
-        <span><span class="font-semibold text-orange-600">Retiro del pedido:&nbsp;</span>{{ $datos_tienda['lugar_retiro_productos'] ?? '' }}</span>
-        <span><span class="font-semibold text-orange-600">Esperamos el pago del producto hasta:&nbsp;</span>{{ $datos_tienda['tiempo_espera_pago'] ?? '' }}</span>
-      </div>
+      @if ($datos_tienda)
+        <div class="flex flex-col gap-2 p-2 text-sm">
+          <span><span class="font-semibold text-orange-600">Horario de atencion:&nbsp;</span>{{ $datos_tienda['horario_atencion'] ?? '' }}</span>
+          <span><span class="font-semibold text-orange-600">Retiro del pedido:&nbsp;</span>{{ $datos_tienda['lugar_retiro_productos'] ?? '' }}</span>
+          <span><span class="font-semibold text-orange-600">Esperamos el pago del producto hasta:&nbsp;</span>{{ $datos_tienda['tiempo_espera_pago'] ?? '' }}</span>
+        </div>
+      @endif
     </div>
 
   </div>
