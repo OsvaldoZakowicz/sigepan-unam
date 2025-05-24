@@ -9,11 +9,24 @@ use App\Services\Sale\OrderService;
 use App\Models\Sale;
 use Illuminate\View\View;
 use Livewire\WithPagination;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 
 class Orders extends Component
 {
   use WithPagination;
+
+  #[Url]
+  public $search_order = ''; // codigo de orden
+
+  #[Url]
+  public $search_payment_status = ''; // estado del pago
+
+  #[Url]
+  public $search_order_status = ''; // estado de la orden
+
+  #[Url]
+  public $search_order_date = ''; // fecha de pedido
 
   // posibles estados del pago
   public $order_payment_status_pendiente = '';
@@ -162,7 +175,6 @@ class Orders extends Component
           'title_toast' =>  toastTitle('exitosa'),
           'descr_toast' =>  'El pedido fue cancelado.'
         ]);
-
       } else {
 
         // cerrar modal
@@ -173,7 +185,6 @@ class Orders extends Component
           'title_toast' =>  toastTitle('exitosa'),
           'descr_toast' =>  toastErrorBody('pedido', $result['message'])
         ]);
-
       }
     } catch (\Exception $e) {
 
@@ -198,6 +209,18 @@ class Orders extends Component
       $query->withTrashed();
     }, 'status', 'sale'])
       ->where('user_id', Auth::id())
+      ->when($this->search_order, function ($query) {
+        $query->where('order_code', 'like', '%' . $this->search_order . '%');
+      })
+      ->when($this->search_order_date, function ($query) {
+        $query->whereDate('ordered_at', $this->search_order_date);
+      })
+      ->when($this->search_payment_status, function ($query) {
+        $query->where('payment_status', $this->search_payment_status);
+      })
+      ->when($this->search_order_status, function ($query) {
+          $query->where('order_status_id', $this->search_order_status);
+      })
       ->orderBy('created_at', 'desc')
       ->paginate(10);
 

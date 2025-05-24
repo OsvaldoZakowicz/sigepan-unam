@@ -6,7 +6,35 @@
       {{-- cabecera --}}
       <div class="flex justify-start items-center mb-4 gap-2">
         {{-- titulo de seccion --}}
-        <h2 class="text-xl text-neutral-700 font-semibold">Mis compras en la tienda</h2>
+        <h2 class="text-xl text-neutral-700 font-semibold">Mis compras</h2>
+      </div>
+
+      {{-- seccion de busqueda --}}
+      <div class="flex flex-col md:flex-row gap-4 mb-4">
+        <div class="w-full md:w-1/2">
+          <label for="search_purchase" class="block text-sm font-medium text-neutral-700 mb-1">
+            Buscar por ID, tipo de compra, forma de pago o código de orden
+          </label>
+          <input
+            type="text"
+            id="search_purchase"
+            wire:model.live="search_purchase"
+            class="rounded-md w-full py-1 px-2 text-sm bg-orange-100 text-orange-800 font-light border-orange-600 focus:ring-orange-800 focus:border-orange-800 focus:outline-none"
+            placeholder="Buscar..."
+          />
+        </div>
+
+        <div class="w-full md:w-1/2">
+          <label for="search_purchase_date" class="block text-sm font-medium text-neutral-700 mb-1">
+            Buscar por fecha de compra
+          </label>
+          <input
+            type="date"
+            id="search_purchase_date"
+            wire:model.live="search_purchase_date"
+            class="rounded-md w-full py-1 px-2 text-sm bg-orange-100 text-orange-800 font-light border-orange-600 focus:ring-orange-800 focus:border-orange-800 focus:outline-none"
+          />
+        </div>
       </div>
 
       {{-- tabla de pedidos --}}
@@ -67,7 +95,7 @@
               </tr>
             @empty
               <tr class="">
-                <td colspan="6" class="border p-1 text-left text-neutral-600 capitalize">¡aún no has hecho una compra!</td>
+                <td colspan="6" class="border p-1 text-left text-neutral-600 capitalize">¡sin registros!</td>
               </tr>
             @endforelse
           </tbody>

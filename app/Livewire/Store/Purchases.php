@@ -7,11 +7,18 @@ use App\Models\DatoNegocio;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Livewire\WithPagination;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 
 class Purchases extends Component
 {
   use WithPagination;
+
+  #[Url]
+  public $search_purchase = ''; // id, tipo de venta o codigo de orden
+
+  #[Url]
+  public $search_purchase_date = ''; // fecha de compra
 
   // modal de comprobante de pago
   public bool $show_payment_modal = false;
@@ -39,7 +46,7 @@ class Purchases extends Component
     $inicio_actividades = DatoNegocio::obtenerValor('inicio_actividades') ?
       date('d-m-Y', strtotime(DatoNegocio::obtenerValor('inicio_actividades'))) : '';
 
-    $this->establecimiento = $razon_social. ' CUIT: ' . $cuit . ' inicio de actividades: ' . $inicio_actividades;
+    $this->establecimiento = $razon_social . ' CUIT: ' . $cuit . ' inicio de actividades: ' . $inicio_actividades;
   }
 
   /**
@@ -83,18 +90,30 @@ class Purchases extends Component
    * buscar mis compras
    * @return mixed
    */
-  public function searchSales()
+  public function searchPurchases()
   {
-    $sales = Sale::with([
+    return Sale::with([
       'products' => function ($query) {
         $query->withTrashed();
       },
-      'order'])
+      'order'
+    ])
       ->where('user_id', Auth::id())
+      ->when($this->search_purchase, function ($query) {
+        $query->where(function ($q) {
+          $q->where('id', 'like', '%' . $this->search_purchase . '%')
+            ->orWhere('payment_type', 'like', '%' . $this->search_purchase . '%')
+            ->orWhere('sale_type', 'like', '%' . $this->search_purchase . '%')
+            ->orWhereHas('order', function ($orderQuery) {
+              $orderQuery->where('order_code', 'like', '%' . $this->search_purchase . '%');
+            });
+        });
+      })
+      ->when($this->search_purchase_date, function ($query) {
+        $query->whereDate('sold_on', $this->search_purchase_date);
+      })
       ->orderBy('created_at', 'desc')
       ->paginate(10);
-
-    return $sales;
   }
 
   /**
@@ -103,7 +122,7 @@ class Purchases extends Component
    */
   public function render(): View
   {
-    $sales = $this->searchSales();
+    $sales = $this->searchPurchases();
     return view('livewire.store.purchases', compact('sales'));
   }
 }

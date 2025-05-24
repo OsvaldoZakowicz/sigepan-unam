@@ -6,7 +6,68 @@
       {{-- cabecera --}}
       <div class="flex justify-start items-center mb-4 gap-2">
         {{-- titulo de seccion --}}
-        <h2 class="text-xl text-neutral-700 font-semibold">Mis pedidos en la tienda</h2>
+        <h2 class="text-xl text-neutral-700 font-semibold">Mis pedidos</h2>
+      </div>
+
+      {{-- seccion de busqueda --}}
+      <div class="flex flex-col md:flex-row gap-4 mb-4">
+        <div class="w-full md:w-1/2">
+          <label for="search_order" class="block text-sm font-medium text-neutral-700 mb-1">
+            Buscar por código de orden
+          </label>
+          <input
+            type="text"
+            id="search_order"
+            wire:model.live="search_order"
+            class="rounded-md w-full py-1 px-2 text-sm bg-orange-100 text-orange-800 font-light border-orange-600 focus:ring-orange-800 focus:border-orange-800 focus:outline-none"
+            placeholder="Buscar..."
+          />
+        </div>
+
+        <div class="w-full md:w-1/2">
+          <label for="search_order_date" class="block text-sm font-medium text-neutral-700 mb-1">
+            Buscar por fecha de pedido
+          </label>
+          <input
+            type="date"
+            id="search_order_date"
+            wire:model.live="search_order_date"
+            class="rounded-md w-full py-1 px-2 text-sm bg-orange-100 text-orange-800 font-light border-orange-600 focus:ring-orange-800 focus:border-orange-800 focus:outline-none"
+          />
+        </div>
+      </div>
+      <div class="flex flex-col md:flex-row gap-4 mb-4">
+        <div class="w-full md:w-1/2">
+          <label for="search_payment_status" class="block text-sm font-medium text-neutral-700 mb-1">
+            Filtrar por estado de pago
+          </label>
+          <select
+            id="search_payment_status"
+            wire:model.live="search_payment_status"
+            class="rounded-md w-full py-1 px-2 text-sm bg-orange-100 text-orange-800 font-light border-orange-600 focus:ring-orange-800 focus:border-orange-800 focus:outline-none"
+          >
+            <option value="">Todos</option>
+            <option value="{{ $order_payment_status_pendiente }}">Pendiente</option>
+            <option value="{{ $order_payment_status_aprobado }}">Aprobado</option>
+            <option value="{{ $order_payment_status_rechazado }}">Rechazado</option>
+          </select>
+        </div>
+
+        <div class="w-full md:w-1/2">
+          <label for="search_order_status" class="block text-sm font-medium text-neutral-700 mb-1">
+            Filtrar por estado de pedido
+          </label>
+          <select
+            id="search_order_status"
+            wire:model.live="search_order_status"
+            class="rounded-md w-full py-1 px-2 text-sm bg-orange-100 text-orange-800 font-light border-orange-600 focus:ring-orange-800 focus:border-orange-800 focus:outline-none"
+          >
+            <option value="">Todos</option>
+            <option value="{{ $order_status_pendiente }}">Pendiente</option>
+            <option value="{{ $order_status_entregado }}">Entregado</option>
+            <option value="{{ $order_status_cancelado }}">Cancelado</option>
+          </select>
+        </div>
       </div>
 
       {{-- tabla de pedidos --}}
@@ -99,8 +160,8 @@
                 </td>
               </tr>
             @empty
-              <tr class="h-12">
-                <td colspan="6" class="border p-1 text-left text-neutral-600 capitalize">¡aún no has hecho un pedido!</td>
+              <tr class="">
+                <td colspan="6" class="border p-1 text-left text-neutral-600 capitalize">¡sin registros!</td>
               </tr>
             @endforelse
           </tbody>
