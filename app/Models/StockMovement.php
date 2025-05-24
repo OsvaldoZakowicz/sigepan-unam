@@ -22,13 +22,17 @@ class StockMovement extends Model
    */
   protected static $MOVEMENT_TYPE_ELABORACION = 'elaboracion';
   protected static $MOVEMENT_TYPE_VENTA = 'venta';
+  protected static $MOVEMENT_TYPE_VENTA_CANCELADA = 'venta cancelada';
   protected static $MOVEMENT_TYPE_MERMA = 'merma';
   protected static $MOVEMENT_TYPE_PERDIDA = 'perdida';
+  protected static $MOVEMENT_TYPE_VENCIMIENTO = 'vencimiento';
+  protected static $MOVEMENT_TYPE_PEDIDO = 'pedido';
+  protected static $MOVEMENT_TYPE_PEDIDO_CANCELADO = 'pedido cancelado';
 
   protected $fillable = [
     'stock_id',       // stock donde se aplico el movimiento
     'quantity',       // cantidad del movimiento (puede ser negativo para salidas)
-    'movement_type',  // tipo de movimiento
+    'movement_type',  // tipo de movimiento (string)
     'registered_at',  // fecha en la que se llevo a cabo el movimiento
     'movement_reference_id',   // id de referencia (stock, venta, otro)
     'movement_reference_type', // modelo de referencia (stock, venta, otro)
@@ -64,6 +68,16 @@ class StockMovement extends Model
   }
 
   /**
+   * retorna el tipo de movimiento 'venta cancelada'
+   * venta: - disminucion del stock por venta.
+   * @return string
+   */
+  public static function MOVEMENT_TYPE_VENTA_CANCELADA(): string
+  {
+    return self::$MOVEMENT_TYPE_VENTA_CANCELADA;
+  }
+
+  /**
    * retorna el tipo de movimiento 'merma'
    * merma: - disminucion del stock por una elaboracion menor a la esperada.
    * @return string
@@ -81,6 +95,36 @@ class StockMovement extends Model
   public static function MOVEMENT_TYPE_PERDIDA(): string
   {
     return self::$MOVEMENT_TYPE_PERDIDA;
+  }
+
+  /**
+   * retorna el tipo de movimiento 'vencimiento'
+   * perdida: - disminucion del stock por vencimiento o falla en la produccion.
+   * @return string
+   */
+  public static function MOVEMENT_TYPE_VENCIMIENTO(): string
+  {
+    return self::$MOVEMENT_TYPE_VENCIMIENTO;
+  }
+
+  /**
+   * retorna el tipo de movimiento 'pedido'
+   * perdida: - disminucion del stock por vencimiento o falla en la produccion.
+   * @return string
+   */
+  public static function MOVEMENT_TYPE_PEDIDO(): string
+  {
+    return self::$MOVEMENT_TYPE_PEDIDO;
+  }
+
+  /**
+   * retorna el tipo de movimiento 'pedido cancelado'
+   * perdida: - disminucion del stock por vencimiento o falla en la produccion.
+   * @return string
+   */
+  public static function MOVEMENT_TYPE_PEDIDO_CANCELADO(): string
+  {
+    return self::$MOVEMENT_TYPE_PEDIDO_CANCELADO;
   }
 
 

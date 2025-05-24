@@ -17,7 +17,7 @@ return new class extends Migration
       $table->foreignId('stock_id')
         ->constrained('stocks')->restrictOnDelete();
       $table->integer('quantity'); // puede ser negativo para salidas
-      $table->enum('movement_type', ['venta', 'elaboracion', 'merma', 'perdida']);
+      $table->string('movement_type');
       $table->timestamp('registered_at');
       $table->unsignedBigInteger('movement_reference_id')->nullable(); // id de referencia al movimiento
       $table->string('movement_reference_type')->nullable(); // modelo de referencia al movimiento
