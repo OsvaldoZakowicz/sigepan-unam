@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Store;
 
 use App\Http\Controllers\Controller;
+use App\Models\DatoTienda;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Order;
 use App\Models\OrderStatus;
@@ -23,9 +24,9 @@ class PaymentController extends Controller
   /**
    * * pago exitoso
    * @param Request $request respuesta de MP.
-   * //@return View
+   * @return View
    */
-  public function payment_success(Request $request)
+  public function payment_success(Request $request): View
   {
     // servicio de ventas
     $sale_service = new SaleService();
@@ -51,22 +52,26 @@ class PaymentController extends Controller
 
   }
 
-  // * pago fallido
+  /**
+   * * pago fallido
+   * cuando en la vista de MP el cliente pulsa "volver al sitio". No hace el pago
+   * @param Request $request respuesta de MP.
+   * @return View
+   */
   public function payment_failure(Request $request): View
   {
-    Log::info('Pago fallido', $request->all());
+    // Log::info('Pago fallido', $request->all());
+    // dd('fallido: ', $request->all());
 
-    dd('fallido: ', $request->all());
-
-    return view('store.payment-failure');
+    $datos_tienda_pago = DatoTienda::obtenerValor('tiempo_espera_pago');
+    return view('store.payment-failure', compact('datos_tienda_pago'));
   }
 
   // * pago pendiente
   public function payment_pending(Request $request): View
   {
-    Log::info('Pago pendiente', $request->all());
-
-    dd('pendiente: ',$request->all());
+    //Log::info('Pago pendiente', $request->all());
+    //dd('pendiente: ',$request->all());
 
     return view('store.payment-pending');
   }

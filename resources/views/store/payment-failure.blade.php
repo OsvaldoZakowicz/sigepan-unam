@@ -22,15 +22,16 @@
 
   <div class="w-full h-screen flex justify-center items-center">
 
-    <article class="space-y-6 max-w-xs bg-white rounded-md p-8 shadow-lg capitalize text-center">
-      <svg class="w-24 h-24 mx-auto text-amber-500" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <article class="space-y-6 bg-white rounded-md p-8 shadow-lg capitalize text-center">
+      <svg class="w-24 h-24 mx-auto text-red-500" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
         <circle cx="50" cy="50" r="48" stroke="currentColor" stroke-width="4"/>
-        <path d="M50 25V60" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
-        <circle cx="50" cy="75" r="3" fill="currentColor"/>
+        <path d="M35 35L65 65M65 35L35 65" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
-      <h1 class="text-neutral-800 text-2xl">¡Tu pago está pendiente!</h1>
-      <p class="text-neutral-600 font-semibold text-lg">verifica el estado del pago que haz realizado</p>
-      <p class="text-neutral-600 font-semibold text-lg">gracias por tu pedido</p>
+      <h1 class="text-neutral-800 text-2xl">¡No realizó el pago!</h1>
+      <p class="text-neutral-600 font-semibold text-lg">el pago del pedido aún esta pendiente. Puede cerrar esta pestaña.</p>
+      @if ($datos_tienda_pago)
+        <small class="text-neutral-600">{{ $datos_tienda_pago }}</small>
+      @endif
     </article>
 
   </div>

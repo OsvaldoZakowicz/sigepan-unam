@@ -28,14 +28,7 @@
         <path d="M30 50L45 65L70 35" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
       <h1 class="text-neutral-800 text-2xl">¡pago exitoso!</h1>
-      <p class="text-neutral-600 font-semibold text-lg">gracias por tu pedido</p>
-      <div class="w-full flex justify-center items-center">
-        <a
-          href="{{ route('store-store-orders-list')}}"
-          class="inline-flex justify-between items-center mt-auto py-2 px-4 rounded border-2 border-orange-950 bg-orange-700 text-white"
-          >ver mis pedidos
-        </a>
-      </div>
+      <p class="text-neutral-600 font-semibold text-lg">gracias por tu pedido, puede cerrar esta pestaña!</p>
     </article>
 
   </div>
