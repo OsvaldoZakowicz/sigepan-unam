@@ -12,6 +12,7 @@ use App\Http\Controllers\Store\StoreController;
 use App\Http\Controllers\Pdf\PDFController;
 use App\Http\Controllers\Purchase\PurchaseController;
 use App\Http\Controllers\Sale\SaleController;
+use App\Http\Controllers\Stats\StatsController;
 
 //* layout publico
 // retorna la vista tienda publica
@@ -92,6 +93,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
   Route::get('profile/complete', [UserController::class, 'profile_complete'])
     ->middleware(['can:panel', 'can:panel-perfil'])
     ->name('profile-complete');
+});
+
+// * modulo de estadisticas
+Route::middleware(['auth', 'verified'])->group(function () {
+
+  Route::get('stats', [StatsController::class, 'stats_index'])
+    ->name('stats-stats-index');
+
 });
 
 //* modulo de usuarios

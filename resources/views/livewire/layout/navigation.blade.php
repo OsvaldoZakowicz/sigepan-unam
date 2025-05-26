@@ -41,6 +41,14 @@ new class extends Component {
             </x-nav-link>
           @endcan
 
+          {{-- todo: permiso de ruta --}}
+          <x-nav-link
+            :href="route('stats-stats-index')"
+            :active="request()->routeIs('stats-*')"
+            wire:navigate
+            >Estadisticas
+          </x-nav-link>
+
           {{-- stock --}}
           {{-- * temporalmente dirige a productos --}}
           @can('stock')

@@ -114,6 +114,9 @@
 
   {{-- livewire --}}
   @livewireScripts()
+
+  {{-- scripts específicos de cada vista --}}
+  @stack('scripts')
 </body>
 
 </html>
