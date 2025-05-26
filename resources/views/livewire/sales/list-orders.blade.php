@@ -238,18 +238,28 @@
                     >cerrar
                   </x-a-button>
                 </div>
+                {{-- cliente --}}
                 <div class="flex flex-col justify-start items-start mb-2 gap-1">
-                  <span>
-                    <span class="font-semibold">Cliente:&nbsp;</span>
-                    <span>{{ $details_order->user->name }} - </span>
-                    <span>{{ $details_order->user->profile->dni ? 'DNI: ' . $details_order->user->profile->dni : ''  }}</span>
-                  </span>
-                  <span>
-                    <span class="font-semibold">Contacto:&nbsp;</span>
-                    <span>{{ $details_order->user->profile->phone_number ? 'Tel: ' . $details_order->user->profile->phone_number : '' }} - </span>
-                    <span>{{ $details_order->user->email ? 'Email: ' . $details_order->user->email : ''  }}</span>
-                  </span>
+                  @if ($details_order->user->profile()->exists())
+                    <span>
+                      <span class="font-semibold">Cliente:&nbsp;</span>
+                      <span class="capitalize">{{ $details_order->user->name }} - </span>
+                      <span>{{ $details_order->user->profile->dni ? 'DNI: ' . $details_order->user->profile->dni : ''  }}</span>
+                    </span>
+                    <span>
+                      <span class="font-semibold">Contacto:&nbsp;</span>
+                      <span>{{ $details_order->user->profile->phone_number ? 'Tel: ' . $details_order->user->profile->phone_number : '' }} - </span>
+                      <span>{{ 'Email: ' . $details_order->user->email}}</span>
+                    </span>
+                  @else
+                    <span>
+                      <span class="font-semibold">Cliente:&nbsp;</span>
+                      <span class="capitalize">{{ $details_order->user->name }} - </span>
+                      <span>{{ 'Email: ' . $details_order->user->email }}</span>
+                    </span>
+                  @endif
                 </div>
+                {{-- pedido --}}
                 <div class="space-y-4">
                   @if ($details_order && $details_order->products)
                     @foreach ($details_order->products as $product)
