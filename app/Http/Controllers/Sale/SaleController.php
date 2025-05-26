@@ -13,4 +13,10 @@ class SaleController extends Controller
   {
     return view('sales.sales-index');
   }
+
+  //* mostrar todos los pedidos
+  public function sales_orders_index(): View
+  {
+    return view('sales.sales-orders-index');
+  }
 }

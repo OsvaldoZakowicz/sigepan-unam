@@ -122,11 +122,11 @@
                 </td>
                 <td class="border p-1 text-left">
                   @if ($order->status->id === $order_status_pendiente)
-                    <x-text-tag color="orange">entrega&nbsp;{{ $order->status->status }}</x-text-tag>
+                    <x-text-tag color="orange">pedido&nbsp;{{ $order->status->status }}</x-text-tag>
                   @elseif ($order->status->id === $order_status_entregado)
-                    <x-text-tag color="emerald">entrega&nbsp;{{ $order->status->status }}</x-text-tag>
+                    <x-text-tag color="emerald">pedido&nbsp;{{ $order->status->status }}</x-text-tag>
                   @else
-                    <x-text-tag color="red">entrega&nbsp;{{ $order->status->status}}</x-text-tag>
+                    <x-text-tag color="red">pedido&nbsp;{{ $order->status->status}}</x-text-tag>
                   @endif
                 </td>
                 <td class="border p-1 text-start">

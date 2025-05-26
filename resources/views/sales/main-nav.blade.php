@@ -8,4 +8,11 @@
     >ventas
   </x-nav-link>
 
+  <x-nav-link
+    wire:navigate
+    :href="route('sales-orders-index')"
+    :active="request()->routeIs('sales-orders-*')"
+    >pedidos
+  </x-nav-link>
+
 </div>

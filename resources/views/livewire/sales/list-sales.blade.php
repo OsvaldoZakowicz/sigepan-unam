@@ -113,7 +113,7 @@
           </x-slot:tablehead>
           <x-slot:tablebody>
             @forelse ($sales as $sale)
-              <tr class="border">
+              <tr class="border" wire:key="{{ $sale->id }}">
                 <x-table-td class="text-end">
                   {{ $sale->id }}
                 </x-table-td>
@@ -135,10 +135,18 @@
                   ${{ number_format($sale->total_price, 2) }}
                 </x-table-td>
                 <x-table-td class="text-start">
+                  {{-- debe existir la orden --}}
                   @if ($sale->order()->exists())
-                    {{-- todo: tiene orden, estado del pedido --}}
+                    @if ($sale->order->status->id === $order_status_pendiente)
+                      <x-text-tag color="orange">pedido&nbsp;{{ $sale->order->status->status }}</x-text-tag>
+                    @elseif ($sale->order->status->id === $order_status_entregado)
+                      <x-text-tag color="emerald">pedido&nbsp;{{ $sale->order->status->status }}</x-text-tag>
+                    @else
+                      <x-text-tag color="red">pedido&nbsp;{{ $sale->order->status->status}}</x-text-tag>
+                    @endif
                   @else
-                    <x-text-tag color="emerald">productos entregados</x-text-tag>
+                    {{-- venta directa --}}
+                    <x-text-tag color="emerald">pedido entregado</x-text-tag>
                   @endif
                 </x-table-td>
                 <x-table-td class="text-end">
@@ -156,16 +164,14 @@
                       >ver
                     </x-a-button>
 
-                    @if ($sale->sale_pdf_path)
-                      <x-a-button
-                        href="#"
-                        wire:click="openPdfSale({{ $sale->id }})"
-                        bg_color="neutral-100"
-                        border_color="neutral-200"
-                        text_color="neutral-600"
-                        >comprobante
-                      </x-a-button>
-                    @endif
+                    <x-a-button
+                      href="#"
+                      wire:click="showPayment({{ $sale->id }})"
+                      bg_color="neutral-100"
+                      border_color="neutral-200"
+                      text_color="neutral-600"
+                      >comprobante
+                    </x-a-button>
 
                   </div>
                 </x-table-td>
@@ -616,6 +622,66 @@
                     </x-a-button>
                   </div>
                 </footer>
+              </div>
+            </div>
+          </div>
+        @endif
+
+        {{-- modal: detalles del pago --}}
+        @if ($show_payment_modal && $selected_sale_payment)
+          <div class="fixed inset-0 z-50 overflow-y-auto">
+            <div class="flex items-center justify-center min-h-screen px-4">
+              <div class="fixed inset-0 bg-neutral-950 opacity-40"></div> {{-- fondo negro --}}
+              <div class="relative bg-white rounded-lg w-full max-w-2xl p-6">
+                <div class="flex justify-between items-center mb-4">
+                  <h2 class="text-xl text-neutral-700 font-semibold">detalles del pago:</h2>
+                  <x-a-button
+                    href="#"
+                    wire:click="closePayment()"
+                    bg_color="neutral-100"
+                    border_color="neutral-200"
+                    text_color="neutral-600"
+                    >cerrar
+                  </x-a-button>
+                </div>
+
+                {{-- * datos si es comprobante de forma de pago virtual --}}
+                @if ($selected_sale_payment->sale_type === $sale_type_web)
+                  @php
+                    $sale_payment_data = json_decode($selected_sale_payment->full_response, true);
+                  @endphp
+                  {{-- si se trata de comprobante de mercado pago --}}
+                  @if (count($sale_payment_data['mp']) !== 0)
+                    <div class="space-y-4">
+                      <div class="flex flex-col justify-start items-start gap-1">
+                        <span>
+                          <span class="font-semibold">Orden:&nbsp;</span>
+                          <span class="text-sm uppercase">{{ $selected_sale_payment->order->order_code }}</span>
+                        </span>
+                        <span>
+                          <span class="font-bold">pago vía:</span>
+                          <span>Mercado Pago</span>
+                        </span>
+                        <span>
+                          <span class="font-bold">estado del pago:</span>
+                          <span>{{ __($sale_payment_data['mp']['status']) }}</span>
+                        </span>
+                        <span>
+                          <span class="font-bold">número de operación:</span>
+                          <span>{{ $sale_payment_data['mp']['payment_id'] }} (nro de comprobante de mercado pago)</span>
+                        </span>
+                        <span>
+                          <span class="font-bold">fecha de pago:</span>
+                          <span>{{ $selected_sale_payment->sold_on->format('d-m-Y H:i') }} hs.</span>
+                        </span>
+                        <span>
+                          <span class="font-bold">monto:</span>
+                          <span>${{ number_format($selected_sale_payment->total_price, 2) }}</span>
+                        </span>
+                      </div>
+                    </div>
+                  @endif
+                @endif
               </div>
             </div>
           </div>

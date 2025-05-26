@@ -327,6 +327,9 @@ Route::middleware(['auth', 'verified', 'can:ventas'])->group(function  () {
   Route::get('sales', [SaleController::class, 'sales_index'])
     ->name('sales-sales-index');
 
+  Route::get('sales/orders', [SaleController::class, 'sales_orders_index'])
+    ->name('sales-orders-index');
+
   //*---------------------------- PDFs
   Route::get('sales/pdf/open/{id}', [PDFController::class, 'open_pdf_sale'])
     ->name('open-pdf-sale');

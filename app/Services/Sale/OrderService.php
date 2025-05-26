@@ -309,4 +309,51 @@ class OrderService
       ];
     }
   }
+
+  /**
+   * entregar un pedido (u orden)
+   * una orden puede entregarse si su estado de pago es aprobado
+   * y su entrega de pedido es pendiente
+   * @param int $id id dde orden
+   * @return array resultado de la operacion
+   */
+  public function entregaOrder(int $id): array
+  {
+    try {
+      DB::beginTransaction();
+
+      // buscar la orden
+      $order = Order::findOrFail($id);
+
+      // verificar que sea entregable
+      if (
+        $order->payment_status !== Order::ORDER_PAYMENT_STATUS_APROBADO() ||
+        $order->order_status_id !== OrderStatus::ORDER_STATUS_PENDIENTE()
+      ) {
+        return [
+          'success' => false,
+          'message' => 'El pedido no puede ser entregado porque adeuda el pago, o ya fue entregado antes'
+        ];
+      }
+
+      // actualizar estado de orden a entregado y establecer fecha de entrega actual
+      $order->order_status_id = OrderStatus::ORDER_STATUS_ENTREGADO();
+      $order->delivered_at = now()->format('d-m-Y H:i');
+      $order->save();
+
+      DB::commit();
+
+      return [
+        'success' => true,
+        'message' => 'Pedido entregado exitosamente'
+      ];
+    } catch (\Exception $e) {
+      DB::rollBack();
+
+      return [
+        'success' => false,
+        'message' => 'Error al entregar el pedido: ' . $e->getMessage()
+      ];
+    }
+  }
 }

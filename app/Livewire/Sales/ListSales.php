@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Services\Sale\SaleService;
 use App\Models\User;
 use App\Services\Pdf\PdfService;
+use App\Models\OrderStatus;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
 use Livewire\WithPagination;
@@ -50,6 +51,19 @@ class ListSales extends Component
   public bool $show_sale_modal = false;
   public $selected_sale = null;
 
+  // * modal comprobante de venta (o pago)
+  public bool $show_payment_modal = false;
+  public $selected_sale_payment = null;
+
+  // posibles estados de la entrega del producto
+  public $order_status_pendiente;
+  public $order_status_entregado;
+  public $order_status_cancelado;
+
+  // tipos de ventas
+  public $sale_type_web = '';
+  public $sale_type_presencial = ''; // provisorio
+
   /**
    * montar datos
    * @return void
@@ -57,6 +71,13 @@ class ListSales extends Component
   public function mount(): void
   {
     $this->setProductsForSale();
+
+    $this->order_status_pendiente = OrderStatus::ORDER_STATUS_PENDIENTE();
+    $this->order_status_entregado = OrderStatus::ORDER_STATUS_ENTREGADO();
+    $this->order_status_cancelado = OrderStatus::ORDER_STATUS_CANCELADO();
+
+    $this->sale_type_web = Sale::SALE_TYPE_WEB();
+    $this->sale_type_presencial = Sale::SALE_TYPE_PRESENCIAL();
   }
 
   /**
@@ -435,6 +456,37 @@ class ListSales extends Component
         'descr_toast' =>  $e->getMessage()
       ]);
     }
+  }
+
+  /**
+   * mostrar modal de comprobante de pago
+   * @param int $id
+   * @return void
+   */
+  public function showPayment(int $id): void
+  {
+    // venta con productos y orden
+    $sale = Sale::with(['order', 'products'])->findOrFail($id);
+
+    // si la venta no tiene orden o pedido previo, mostrar comprobante pdf
+    if (!$sale->order()->exists()) {
+      $this->openPdfSale($sale->id);
+      return;
+    }
+
+    // proceder a mostrar comprobante del pedido
+    $this->selected_sale_payment = $sale;
+    $this->show_payment_modal = true;
+  }
+
+  /**
+   * cerrar modal de comprobante de pago
+   * @return void
+   */
+  public function closePayment(): void
+  {
+    $this->show_payment_modal = false;
+    $this->selected_sale_payment = null;
   }
 
   /**
