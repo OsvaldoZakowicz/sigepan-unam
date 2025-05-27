@@ -15,19 +15,42 @@ class DatabaseSeeder extends Seeder
   {
     // seeders
     $this->call([
-      GenderSeeder::class,
+      // * permisos y roles
       PermissionSeeder::class,
       RoleSeeder::class,
-      // usuarios siempre despues de roles y permisos
+
+      // * generos
+      GenderSeeder::class,
+
+      // * usuarios (siempre despues de roles y permisos)
+      // usuarios internos de prueba
       UserSeeder::class,
-      MeasureSeeder::class,
-      ProvisionTypeSeeder::class,
-      // categorias de suministros siempr despues de unidad de medida y tipo
-      ProvisionCategorySeeder::class,
-      ProvisionTrademarkSeeder::class,
-      PeriodStatusSeeder::class,
+      // todo: clientes de prueba
+
+      // * proveedores
+      // condiciones frente al iva
       IvaConditionSeeder::class,
+      SupplierSeeder::class,
+
+      // * suministros
+      // unidades de medida
+      MeasureSeeder::class,
+      // tipos de suministros
+      ProvisionTypeSeeder::class,
+      // marcas de suministros
+      ProvisionTrademarkSeeder::class,
+      // categorias de suministros (siempre despues de unidad de medida y tipo)
+      ProvisionCategorySeeder::class,
+
+      // * periodos de presupustos y ordenes de compra
+      PeriodStatusSeeder::class,
+
+      // * productos
+      // etiquetas de productos
       TagSeeder::class,
+
+      // * ventas
+      // estado de las ordenes
       OrderStatusSeeder::class,
     ]);
 
