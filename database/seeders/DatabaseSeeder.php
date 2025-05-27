@@ -25,7 +25,8 @@ class DatabaseSeeder extends Seeder
       // * usuarios (siempre despues de roles y permisos)
       // usuarios internos de prueba
       UserSeeder::class,
-      // todo: clientes de prueba
+      // clientes de prueba para la tienda
+      ClientSeeder::class,
 
       // * proveedores
       // condiciones frente al iva
