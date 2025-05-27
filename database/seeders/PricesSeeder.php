@@ -291,6 +291,7 @@ class PricesSeeder extends Seeder
 
     // Asignar suministros ingrediente a proveedores de ingredientes
     foreach ($suministros_ingrediente as $suministro) {
+
       // Encontrar la categoría del suministro en el array
       $categoria_key = array_key_first(array_filter($provision_categories, function ($data) use ($suministro) {
         return $data['category']->provision_category_name === $suministro->provision_category->provision_category_name;
@@ -318,8 +319,15 @@ class PricesSeeder extends Seeder
       // Asignar a proveedores de ingredientes
       foreach ($proveedores_ingredientes as $proveedor) {
         if ($proveedor->provisions()->where('provision_id', $suministro->id)->doesntExist()) {
-          // Calcular precio aleatorio dentro del rango para cada proveedor
-          $price = rand($price_range[0] * 100, $price_range[1] * 100) / 100;
+          // Convertir el rango a centavos
+          $min_cents = (int)($price_range[0] * 100);
+          $max_cents = (int)($price_range[1] * 100);
+
+          // Obtener un número aleatorio entre los centavos
+          $price_in_cents = rand($min_cents, $max_cents);
+
+          // Convertir de vuelta a decimales
+          $price = $price_in_cents / 100;
 
           $proveedor->provisions()->attach($suministro->id, [
             'price' => $price,
@@ -332,7 +340,25 @@ class PricesSeeder extends Seeder
 
     // Asignar suministros insumo a proveedores de insumos
     foreach ($suministros_insumo as $suministro) {
-      // ...similar lógica para encontrar categoría y marca...
+
+      // Encontrar la categoría del suministro en el array
+      $categoria_key = array_key_first(array_filter($provision_categories, function ($data) use ($suministro) {
+        return $data['category']->provision_category_name === $suministro->provision_category->provision_category_name;
+      }));
+
+      if (!$categoria_key) continue;
+
+      // Encontrar la marca y sus precios
+      $marca = array_filter($provision_categories[$categoria_key]['trademarks'], function ($trademark) use ($suministro) {
+        return $trademark['name']->id === $suministro->provision_trademark_id;
+      });
+
+      if (empty($marca)) continue;
+
+      $marca = array_values($marca)[0];
+
+      // Encontrar el índice del precio según la cantidad
+      $quantity_index = array_search($suministro->provision_quantity, $marca['quantity']);
 
       if ($quantity_index === false) continue;
 
@@ -341,8 +367,15 @@ class PricesSeeder extends Seeder
       // Asignar a proveedores de insumos
       foreach ($proveedores_insumos as $proveedor) {
         if ($proveedor->provisions()->where('provision_id', $suministro->id)->doesntExist()) {
-          // Calcular precio aleatorio dentro del rango para cada proveedor
-          $price = rand($price_range[0] * 100, $price_range[1] * 100) / 100;
+          // Convertir el rango a centavos
+          $min_cents = (int)($price_range[0] * 100);
+          $max_cents = (int)($price_range[1] * 100);
+
+          // Obtener un número aleatorio entre los centavos
+          $price_in_cents = rand($min_cents, $max_cents);
+
+          // Convertir de vuelta a decimales
+          $price = $price_in_cents / 100;
 
           $proveedor->provisions()->attach($suministro->id, [
             'price' => $price,
