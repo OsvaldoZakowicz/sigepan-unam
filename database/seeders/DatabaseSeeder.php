@@ -50,7 +50,7 @@ class DatabaseSeeder extends Seeder
       PeriodStatusSeeder::class,
 
       // * compras y existencias
-      // todo: seeder de compras con existencias
+      PurchaseSeeder::class,
 
       // * productos
       // etiquetas de productos

@@ -17,7 +17,7 @@ return new class extends Migration
       $table->foreignId('supplier_id')
         ->constrained('suppliers')->restrictOnDelete();
       $table->timestamp('purchase_date');
-      $table->decimal('total_price');
+      $table->decimal('total_price', 10, 2);
       $table->enum('status', ['completada', 'parcial', 'cancelada', 'devuelta'])
         ->default('completada');
       $table->unsignedBigInteger('purchase_reference_id')->nullable(); // preorden de compra referente

@@ -25,8 +25,8 @@ return new class extends Migration
         ->nullable()
         ->constrained('packs')->restrictOnDelete();
       $table->smallInteger('item_count');
-      $table->decimal('unit_price');
-      $table->decimal('subtotal_price');
+      $table->decimal('unit_price', 10, 2);
+      $table->decimal('subtotal_price', 10, 2);
       $table->timestamps();
     });
   }

@@ -11,20 +11,15 @@ class PurchaseDetail extends Model
   use HasFactory;
 
   /**
-   * id de compra
-   * id de suministro
-   * id de pack
-   * cantidad comprada (entero)
-   * precio unitario
-   * subtotal
+   * atributos de un detalle
    */
   protected $fillable = [
-    'purchase_id',
-    'provision_id',
-    'pack_id',
-    'item_count',
-    'unit_price',
-    'subtotal_price',
+    'purchase_id',    // id de compra
+    'provision_id',   // id de suministro
+    'pack_id',        // id de pack
+    'item_count',     // cantidad comprada (entero)
+    'unit_price',     // precio unitario
+    'subtotal_price', // subtotal
   ];
 
   /**
