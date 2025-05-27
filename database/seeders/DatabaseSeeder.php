@@ -42,6 +42,8 @@ class DatabaseSeeder extends Seeder
       ProvisionTrademarkSeeder::class,
       // categorias de suministros (siempre despues de unidad de medida y tipo)
       ProvisionCategorySeeder::class,
+      // suministros
+      ProvisionSeeder::class,
 
       // * periodos de presupustos y ordenes de compra
       PeriodStatusSeeder::class,

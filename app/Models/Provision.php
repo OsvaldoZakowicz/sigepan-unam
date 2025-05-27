@@ -26,6 +26,15 @@ class Provision extends Model
   ];
 
   /**
+   * atributos que deben convertise
+   */
+  protected $casts = [
+    'provision_name'              => 'string',
+    'provision_quantity'          => 'decimal:2',
+    'provision_short_description' => 'string'
+  ];
+
+  /**
    * obtener atributo deleted_at, y presentarlo
    * deleted_at es una fecha o null, cuando tiene una fecha indica el borrado
   */
