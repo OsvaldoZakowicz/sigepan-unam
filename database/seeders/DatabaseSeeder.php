@@ -28,11 +28,6 @@ class DatabaseSeeder extends Seeder
       // clientes de prueba para la tienda
       ClientSeeder::class,
 
-      // * proveedores
-      // condiciones frente al iva
-      IvaConditionSeeder::class,
-      SupplierSeeder::class,
-
       // * suministros
       // unidades de medida
       MeasureSeeder::class,
@@ -42,19 +37,33 @@ class DatabaseSeeder extends Seeder
       ProvisionTrademarkSeeder::class,
       // categorias de suministros (siempre despues de unidad de medida y tipo)
       ProvisionCategorySeeder::class,
-      // suministros
+      // suministros (siempre antes de proveedor y precios)
       ProvisionSeeder::class,
+
+      // * proveedores
+      // condiciones frente al iva
+      IvaConditionSeeder::class,
+      SupplierSeeder::class,
+      PricesSeeder::class,
 
       // * periodos de presupustos y ordenes de compra
       PeriodStatusSeeder::class,
 
+      // * compras y existencias
+      // todo: seeder de compras con existencias
+
       // * productos
       // etiquetas de productos
       TagSeeder::class,
+      // todo: seeder de productos con precio
+      // todo: seeder de recetas
+      // todo: seeder de elaboracion de productos
 
       // * ventas
       // estado de las ordenes
       OrderStatusSeeder::class,
+      // todo: seeder de ventas con movimiento de stock
+
     ]);
 
   }
