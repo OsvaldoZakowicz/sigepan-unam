@@ -144,6 +144,12 @@ class ProvisionCategorySeeder extends Seeder
       'provision_type_id'       => $tipo_ingrediente->id
     ]);
 
+    ProvisionCategory::create([
+      'provision_category_name' => 'sal entrefina',
+      'measure_id'              => $medida_kg->id,
+      'provision_type_id'       => $tipo_ingrediente->id
+    ]);
+
     // -----------------------TIPO INSUMOS----------------------------
 
     ProvisionCategory::create([
