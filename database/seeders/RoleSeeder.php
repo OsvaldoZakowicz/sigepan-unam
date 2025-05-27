@@ -18,17 +18,16 @@ class RoleSeeder extends Seeder
       'is_internal' => true
     ];
 
-    $gerente = Role::create(Arr::add($tableAttributesInternRoles, 'name', 'gerente'));
-    $panadero = Role::create(Arr::add($tableAttributesInternRoles, 'name', 'panadero'));
-    $vendedor = Role::create(Arr::add($tableAttributesInternRoles, 'name', 'vendedor'));
-    $repartidor = Role::create(Arr::add($tableAttributesInternRoles, 'name', 'repartidor'));
-    $proveedor = Role::create(Arr::add($tableAttributesInternRoles, 'name', 'proveedor'));
+    $gerente       = Role::create(Arr::add($tableAttributesInternRoles, 'name', 'gerente'));
+    $panadero      = Role::create(Arr::add($tableAttributesInternRoles, 'name', 'panadero'));
+    $vendedor      = Role::create(Arr::add($tableAttributesInternRoles, 'name', 'vendedor'));
+    $proveedor     = Role::create(Arr::add($tableAttributesInternRoles, 'name', 'proveedor'));
     $administrador = Role::create(Arr::add($tableAttributesInternRoles, 'name', 'administrador'));
-    $auditor = Role::create(Arr::add($tableAttributesInternRoles, 'name', 'auditor'));
+    $auditor       = Role::create(Arr::add($tableAttributesInternRoles, 'name', 'auditor'));
 
     // permisos
     $gerente->syncPermissions([
-      'panel','panel-perfil','usuarios','stock','proveedores','ventas','compras','tienda'
+      'panel','panel-perfil','usuarios','stock','proveedores','ventas','compras','estadisticas'
     ]);
 
     $panadero->syncPermissions([
@@ -39,16 +38,13 @@ class RoleSeeder extends Seeder
       'panel','panel-perfil','ventas'
     ]);
 
-    $repartidor->syncPermissions([
-      'panel','panel-perfil','ventas'
-    ]);
-
     $proveedor->syncPermissions([
       'panel','panel-perfil','presupuestos','ordenes'
     ]);
 
+    // * todos los permisos
     $administrador->syncPermissions([
-      'panel','panel-perfil','usuarios','auditoria','stock','proveedores','ventas','compras','tienda','presupuestos','ordenes'
+      'panel','panel-perfil','usuarios','auditoria','stock','proveedores','ventas','compras','tienda','presupuestos','ordenes','estadisticas'
     ]);
 
     $auditor->syncPermissions([
