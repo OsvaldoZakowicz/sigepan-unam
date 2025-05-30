@@ -55,10 +55,10 @@ class DatabaseSeeder extends Seeder
       // * productos
       // etiquetas de productos
       TagSeeder::class,
-      // seeder de productos con precio y etiquetas (siempre despues de etiquetas)
+      // productos con precio y etiquetas (siempre despues de etiquetas)
       ProductSeeder::class,
-      // todo: seeder de recetas
-
+      // recetas (siempre despues de productos, existencias, compras, categorias ...)
+      RecipeSeeder::class,
       // todo: seeder de elaboracion de productos
 
       // * ventas
