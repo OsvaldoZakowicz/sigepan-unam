@@ -78,8 +78,9 @@ class ElaborationAndSalesSeeder extends Seeder
           // crear el stock y su movimiento inicial usando el servicio
           $this->stock_service->createStock($stock_data, $recipe->recipe_yields);
 
-          // avanzar la fecha para la siguiente elaboracion
-          $current_date->addHours(rand(1, 3));
+          // avanzar la hora para la siguiente elaboracion
+          $current_date->addHours(1);
+
         } catch (\Exception $e) {
           echo "error elaborando {$product->product_name}: {$e->getMessage()}\n";
           break;
@@ -145,8 +146,9 @@ class ElaborationAndSalesSeeder extends Seeder
         // crear la venta
         $this->sale_service->createPresentialSale($sale_data);
 
-        // avanzar algunas horas
-        $current_date->addHours(rand(1, 2));
+        // avanzar 2 minutos
+        $current_date->addMinutes(2);
+
       } catch (\Exception $e) {
         echo "error creando venta: {$e->getMessage()}\n";
         continue;
