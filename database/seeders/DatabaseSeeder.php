@@ -66,6 +66,10 @@ class DatabaseSeeder extends Seeder
       // elaboracion de productos + ventas
       ElaborationAndSalesSeeder::class,
 
+      // * datos del negocio y tienda
+      DatoNegocioSeeder::class,
+      DatoTiendaSeeder::class,
+
     ]);
 
   }
