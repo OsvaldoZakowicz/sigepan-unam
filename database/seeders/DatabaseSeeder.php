@@ -59,12 +59,12 @@ class DatabaseSeeder extends Seeder
       ProductSeeder::class,
       // recetas (siempre despues de productos, existencias, compras, categorias ...)
       RecipeSeeder::class,
-      // todo: seeder de elaboracion de productos
 
-      // * ventas
-      // estado de las ordenes
+      // * elaboracion de productos y ventas
+      // estado de las ordenes (pedidos) del cliente
       OrderStatusSeeder::class,
-      // todo: seeder de ventas con movimiento de stock
+      // elaboracion de productos + ventas
+      ElaborationAndSalesSeeder::class,
 
     ]);
 

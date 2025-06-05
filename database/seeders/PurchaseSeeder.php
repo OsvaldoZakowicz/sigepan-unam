@@ -198,12 +198,12 @@ class PurchaseSeeder extends Seeder
           'inapack' => [
             'name' => ProvisionTrademark::where('provision_trademark_name', 'inapack')->first(),
             'quantity_variant' => 1,
-            'quantity_to_buy'  => 250,
+            'quantity_to_buy'  => 1000,
           ],
           'empacar' => [
             'name' => ProvisionTrademark::where('provision_trademark_name', 'empacar')->first(),
             'quantity_variant' => 1,
-            'quantity_to_buy'  => 250,
+            'quantity_to_buy'  => 1000,
           ],
         ],
       ],
@@ -214,12 +214,12 @@ class PurchaseSeeder extends Seeder
           'inapack' => [
             'name' => ProvisionTrademark::where('provision_trademark_name', 'inapack')->first(),
             'quantity_variant'   => 1,
-            'quantity_to_buy'  => 250,
+            'quantity_to_buy'  => 1000,
           ],
           'empacar' => [
             'name' => ProvisionTrademark::where('provision_trademark_name', 'empacar')->first(),
             'quantity_variant' => 1,
-            'quantity_to_buy'  => 250,
+            'quantity_to_buy'  => 1000,
           ],
         ],
       ],
