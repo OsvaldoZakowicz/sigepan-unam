@@ -51,9 +51,9 @@
       <x-slot:content>
         <div class="w-full flex flex-col gap-4">
           {{-- contenedor del grafico --}}
-          <div class="flex justify-start items-center w-full h-3/4">
+          <div class="flex justify-start items-center w-1/2">
             {{-- grafico --}}
-            <div class="border border-neutral-300 rounded-md p-2">
+            <div class="flex justify-center items-center border border-neutral-300 rounded-sm p-2" style="position: relative; height:70vh; width:100vw">
               <canvas id="sales_chart"></canvas>
             </div>
           </div>
@@ -129,6 +129,7 @@
           },
           options: {
             responsive: true,
+            autoPadding: true,
             scales: {
                 y: {
                   stacked: true, // Habilitar apilamiento
