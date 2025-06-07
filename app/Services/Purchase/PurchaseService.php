@@ -8,13 +8,24 @@ use App\Models\PurchaseDetail;
 use App\Models\Existence;
 use App\Models\Provision;
 use App\Models\Pack;
+use App\Models\Supplier;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class PurchaseService
 {
   /**
+   * retornar lista de proveedores activos
+   */
+  public function getActiveSuppliers()
+  {
+    return Supplier::where('status_is_active', '1')
+      ->orderBy('company_name')->get();
+  }
+
+  /**
    * procesar una pre orden y recuperar sus datos de orden definitiva
+   * para obtener suministros que fueron comprados.
    * @param PreOrder $preorder
    * @return array
    */

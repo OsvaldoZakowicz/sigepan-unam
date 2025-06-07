@@ -48,9 +48,17 @@
                         wire:model="formdt_supplier_id"
                         class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
                         >
-                        <option value="">seleccione un proveedor ...</option>
+                        <option
+                          wire:click="$set('formdt_supplier_id', '')"
+                          value=""
+                          >seleccione un proveedor ...
+                        </option>
                         @forelse ($suppliers as $supplier)
-                          <option value="{{ $supplier->id }}">{{ $supplier->company_name }}</option>
+                          <option
+                            wire:click="getProvisionsAndPacksForSupplier({{ $supplier->id }})"
+                            value="{{ $supplier->id }}"
+                            >{{ $supplier->company_name }}
+                          </option>
                         @empty
                           <option value="">sin proveedores registrados.</option>
                         @endforelse
@@ -59,6 +67,8 @@
 
                   </div>
                   {{-- fecha de compra --}}
+                  {{-- con preorden, la fecha de compra no debe ser anterior a la fecha de preorden --}}
+                  {{-- sin preorden, la fecha de compra puede ser cualquiera --}}
                   <div class="flex flex-col gap-1 min-h-fit w-full md:w-1/2">
                     <span>
                       <label for="formdt_purchase_date">fecha de compra</label>
@@ -72,6 +82,8 @@
                       wire:model="formdt_purchase_date"
                       id="formdt_purchase_date"
                       name="formdt_purchase_date"
+                      min="{{ $date_min }}"
+                      max="{{ $date_max }}"
                       class="p-1 w-full text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
                     />
                   </div>
@@ -136,9 +148,9 @@
             {{-- leyenda --}}
             <x-slot:subtitle>
               @if ($with_preorder)
-                <span class="text-sm text-neutral-600">suministros y/o packs adquiridos</span>
+                <span class="text-sm text-neutral-600">suministros y/o packs comprados</span>
               @else
-                <span class="text-sm text-neutral-600">complete los detalles de la compra indicando suministros y/o packs adquiridos</span>
+                <span class="text-sm text-neutral-600">complete los detalles de la compra indicando suministros y/o packs</span>
               @endif
             </x-slot:subtitle>
 
@@ -157,7 +169,7 @@
                     <tr>
                       <th
                         scope="col"
-                        class="px-3 py-2 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider"
+                        class="px-3 py-2 text-right text-xs font-medium text-neutral-500 uppercase tracking-wider"
                         >#
                       </th>
                       <th
@@ -188,7 +200,7 @@
                       <th
                         scope="col"
                         class="px-3 py-2 text-right text-xs font-medium text-neutral-500 uppercase tracking-wider
-                        ">Total
+                        ">Subtotal
                       </th>
                     </tr>
                   </thead>
@@ -266,8 +278,85 @@
               </div>
             @else
 
-              {{-- componente de busqueda de suministros y packs --}}
-              {{-- tabla con vista de los resultados de busqueda e inputs dinamicos por fila --}}
+              {{-- una vz elegido un proveedor, buscar entre sus suministros y packs para el detalle --}}
+              @if ($formdt_supplier_id)
+                {{-- componente de busqueda de suministros y packs --}}
+                @livewire('purchases.search-provision', ['supplier_id' => $formdt_supplier_id])
+
+                {{-- tabla con vista de los resultados de busqueda e inputs dinamicos por fila --}}
+                <div class="overflow-x-auto">
+                  <x-table-base>
+                    <x-slot:tablehead>
+                      <tr class="bg-neutral-100 border">
+                        <x-table-th class="text-right">
+                          #
+                        </x-table-th>
+                        <x-table-th class="text-left">
+                          Suministro/Pack
+                        </x-table-th>
+                        <x-table-th class="text-left">
+                          Marca/Tipo/Volumen
+                        </x-table-th>
+                        <x-table-th class="text-right">
+                          Cantidad comprada
+                        </x-table-th>
+                        <x-table-th class="text-right">
+                          Volumen total
+                        </x-table-th>
+                        <x-table-th class="text-right">
+                          Precio unit.
+                        </x-table-th>
+                        <x-table-th class="text-right">
+                          Subtotal
+                        </x-table-th>
+                      </tr>
+                    </x-slot:tablehead>
+                    <x-slot:tablebody>
+                      @forelse ($formdt_purchase_items as $key => $item )
+                        <tr class="border">
+                          <x-table-td class="text-right">
+                            <span>{{ $key+1 }}</span>
+                          </x-table-td>
+                          <x-table-td class="text-left">
+                            <span>{{ $item['name'] }}</span>
+                          </x-table-td>
+                          <x-table-td class="text-left">
+                            <span>
+                              <span> {{$item['trademark']}} / {{ $item['type'] }} </span>
+                              <span class="lowercase"> / de {{ $item['unit_volume']['value'] }}{{ $item['unit_volume']['symbol'] }} </span>
+                            </span>
+                          </x-table-td>
+                          <x-table-td class="text-rigth">
+                            {{-- Input para cantidad --}}
+                            <input
+                              type="number"
+                              min="1"
+                              wire:model.live="formdt_purchase_items.{{$key}}.item_count"
+                              wire:change="updateItemQuantity({{$key}}, $event.target.value)"
+                              class="w-20 px-2 py-1 text-right text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                            >
+                          </x-table-td>
+                          <x-table-td class="text-rigth">
+                            <span>{{ $item['total_volume']['value'] }}{{ $item['total_volume']['symbol'] }}</span>
+                          </x-table-td>
+                          <x-table-td class="text-rigth">
+                            <span>${{ number_format($item['unit_price'], 2) }}</span>
+                          </x-table-td>
+                          <x-table-td class="text-rigth">
+                            <span>${{ number_format($item['subtotal_price'], 2) }}</span>
+                          </x-table-td>
+                        </tr>
+                      @empty
+                        <tr class="border">
+                          <x-table-td colspan="7">¡sin registros!</x-table-td>
+                        </tr>
+                      @endforelse
+                    </x-slot:tablebody>
+                  </x-table-base>
+                </div>
+              @else
+                <span>seleccione un proveedor para comenzar</span>
+              @endif
 
             @endif
 
@@ -283,7 +372,7 @@
 
           <x-a-button
             wire:navigate
-            href="{{ route('purchases-preorders-index') }}"
+            href="{{ route('purchases-purchases-index') }}"
             bg_color="neutral-600"
             border_color="neutral-600"
             >cancelar
