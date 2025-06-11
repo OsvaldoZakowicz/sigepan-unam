@@ -18,7 +18,7 @@
       <x-slot:header class="">
 
         {{-- busqueda --}}
-        <div class="flex gap-1 justify-start items-start grow">
+        <div class="flex gap-1 justify-start items-end grow">
 
           {{-- termino de busqueda --}}
           <div class="flex flex-col justify-end w-1/4">
@@ -41,7 +41,8 @@
               name="search_start_at"
               id="search_start_at"
               wire:model.live="search_start_at"
-              class="w-full text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"/>
+              class="w-full text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+            />
           </div>
 
           {{-- fecha de fin --}}
@@ -52,22 +53,21 @@
               name="search_end_at"
               id="search_end_at"
               wire:model.live="search_end_at"
-              class="w-full text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"/>
+              class="w-full text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+            />
           </div>
 
-        </div>
-
-        {{-- limpiar campos de busqueda --}}
-        <div class="flex flex-col self-start h-full">
+          {{-- limpiar campos de busqueda --}}
           <x-a-button
             href="#"
             wire:click="resetSearchInputs()"
             bg_color="neutral-200"
             border_color="neutral-300"
             text_color="neutral-600"
-            >limpiar
+            >limpiar filtros
           </x-a-button>
         </div>
+
 
       </x-slot:header>
 
@@ -103,7 +103,7 @@
                   {{ $purchase->supplier->company_name }}
                 </x-table-td>
                 <x-table-td class="text-end">
-                  ${{ number_format($purchase->total_price, 2) }}
+                  ${{ toMoneyFormat($purchase->total_price) }}
                 </x-table-td>
                 <x-table-td class="text-end">
                   {{ $purchase->purchase_date->format('d-m-Y') }}
@@ -146,7 +146,11 @@
                     <span class="font-semibold">Proveedor:</span>
                     {{ $selected_purchase->supplier->company_name }},
                     <span class="font-semibold">CUIT:</span>
-                    {{ $selected_purchase->supplier->company_cuit }}
+                    {{ $selected_purchase->supplier->company_cuit }},
+                    <span class="font-semibold">Tel:</span>
+                    {{ $selected_purchase->supplier->phone_number }},
+                    <span class="font-semibold">Correo:</span>
+                    {{ $selected_purchase->supplier->user->email }},
                   </span>
                   @php
                     $preorder_reference = $this->preorderReference($selected_purchase);
@@ -168,7 +172,7 @@
                     <span>Compra registrada sin orden de compra previa</span>
                   @endif
                 </div>
-                <div class="mt-4">
+                <div class="mt-4 max-h-72 overflow-y-auto overflow-x-auto">
                   <x-table-base>
                     <x-slot:tablehead>
                       <tr class="border bg-neutral-100">
@@ -183,6 +187,10 @@
                         </x-table-th>
                         <x-table-th class="text-end">
                           Cantidad comprada
+                        </x-table-th>
+                        <x-table-th class="text-end">
+                          Volumen total
+                          <x-quest-icon title="kilogramos (kg), gramos (g), litros (l), mililitros (ml), metro (m), centimetro (cm), unidad (u)"/>
                         </x-table-th>
                         <x-table-th class="text-end">
                           $Precio unitario
@@ -228,21 +236,29 @@
                             {{ $detail->item_count }}
                           </x-table-td>
                           <x-table-td class="text-end">
-                            ${{ number_format($detail->unit_price, 2) }}
+                            @php
+                              $total_volume = $detail->provision
+                                ? convert_measure($detail->provision->provision_quantity * $detail->item_count, $detail->provision->measure)
+                                : convert_measure($detail->pack->pack_quantity * $detail->item_count, $detail->pack->provision->measure);
+                            @endphp
+                            <span>{{ $total_volume }}</span>
                           </x-table-td>
                           <x-table-td class="text-end">
-                            ${{ number_format($detail->subtotal_price, 2) }}
+                            ${{ toMoneyFormat($detail->unit_price) }}
+                          </x-table-td>
+                          <x-table-td class="text-end">
+                            ${{ toMoneyFormat($detail->subtotal_price) }}
                           </x-table-td>
                         </tr>
                         @if ($loop->last)
                           <tr class="border">
-                            <x-table-td colspan="5" class="capitalize font-semibold text-end">$Total</x-table-td>
-                            <x-table-td class="text-end font-semibold">${{ number_format($selected_purchase->total_price, 2) }}</x-table-td>
+                            <x-table-td colspan="6" class="capitalize font-semibold text-end">$Total</x-table-td>
+                            <x-table-td class="text-end font-semibold">${{ toMoneyFormat($selected_purchase->total_price) }}</x-table-td>
                           </tr>
                         @endif
                       @empty
                         <tr class="border">
-                          <td colspan="6" class="text-start">¡Sin detalles registrados!</td>
+                          <td colspan="7" class="text-start">¡Sin detalles registrados!</td>
                         </tr>
                       @endforelse
                     </x-slot:tablebody>

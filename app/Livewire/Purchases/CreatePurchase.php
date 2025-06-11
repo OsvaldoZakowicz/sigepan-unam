@@ -8,6 +8,7 @@ use App\Services\Purchase\PurchaseService;
 use App\Models\Provision;
 use App\Models\Pack;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Carbon;
 use Livewire\Attributes\On;
 use Livewire\WithPagination;
 use Illuminate\View\View;
@@ -37,8 +38,8 @@ class CreatePurchase extends Component
   public $formdt_purchase_items; // items adquiridos (desde la preorden, o generados manualmente)
 
   // rango de fechas de compra
-  public $date_max;
-  public $date_min;
+  public $date_max = null;
+  public $date_min = null;
 
   // total de la compra (cuando los items son generados manualmente)
   public $total;
@@ -52,12 +53,6 @@ class CreatePurchase extends Component
    */
   public function mount(PurchaseService $purchase_service, $id = null)
   {
-    // fecha maxima de registro de compra, hasta el dia actual
-    $this->date_max = now()->format('Y-m-d');
-
-    // fecha minima de registro de compra, un mes antes
-    $this->date_min = now()->subDays(30)->format('Y-m-d');
-
     if ($id !== null) {
 
       // * compra desde preorden
@@ -66,8 +61,10 @@ class CreatePurchase extends Component
       $this->preorder          = PreOrder::findOrFail($id);
       $this->order_data        = $purchase_service->getOrderData($this->preorder);
 
+      // fecha maxima de registro de compra, hasta el dia actual
+      $this->date_max = now()->format('Y-m-d');
       // fecha minima de registro de compra, con preorden, la misma fecha que se ordeno
-      $this->date_min = $this->order_data['order_date'];
+      $this->date_min = Carbon::createFromFormat('d-m-Y', $this->order_data['order_date'])->format('Y-m-d');
 
       $this->formdt_purchase_items = collect()
         ->merge($this->order_data['provisions'])
@@ -75,6 +72,11 @@ class CreatePurchase extends Component
     } else {
 
       // * compra desde cero
+
+      // fecha maxima de registro de compra, hasta el dia actual
+      $this->date_max = now()->format('Y-m-d');
+      // fecha minima de registro de compra, un mes antes
+      $this->date_min = now()->subDays(30)->format('Y-m-d');
 
       // coleccion de suministros que se registraran en la compra, para detalle de compra
       $this->formdt_purchase_items = collect();

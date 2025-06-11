@@ -17,9 +17,7 @@
 
           {{-- datos de la compra --}}
           <x-fieldset-base tema="registrar compra" class="w-full p-2">
-
             <div class="w-full flex justify-start items-start gap-4">
-
               {{-- columna de inputs 1 --}}
               <div class="flex flex-col gap-4 w-1/2">
                 <div class="flex gap-4 min-h-fit">
@@ -135,12 +133,10 @@
               </div>
 
             </div>
-
           </x-fieldset-base>
 
           {{-- lista de suministros y packs comprados --}}
           <x-div-toggle x-data="{ open: true }" title="detalles de la compra" class="w-full p-2">
-
             {{-- leyenda --}}
             <x-slot:subtitle>
               @if ($with_preorder)
@@ -159,118 +155,75 @@
             {{-- si existe preorden, listar suministros y packs de la pre orden, y el total --}}
             {{-- si no existe preorden, buscar y elegir suministros y/o packs --}}
             @if ($with_preorder)
-              <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-neutral-200">
-                  <thead class="bg-neutral-50">
-                    <tr>
-                      <th
-                        scope="col"
-                        class="px-3 py-2 text-right text-xs font-medium text-neutral-500 uppercase tracking-wider"
-                        >#
-                      </th>
-                      <th
-                        scope="col"
-                        class="px-3 py-2 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider"
-                        >Suministro/Pack
-                      </th>
-                      <th
-                        scope="col"
-                        class="px-3 py-2 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider"
-                        >Marca/Tipo/volumen
-                      </th>
-                      <th
-                        scope="col"
-                        class="px-3 py-2 text-right text-xs font-medium text-neutral-500 uppercase tracking-wider
-                        ">Cantidad comprada
-                      </th>
-                      <th
-                        scope="col"
-                        class="px-3 py-2 text-right text-xs font-medium text-neutral-500 uppercase tracking-wider
-                        ">Volumen total
-                      </th>
-                      <th
-                        scope="col"
-                        class="px-3 py-2 text-right text-xs font-medium text-neutral-500 uppercase tracking-wider
-                        ">Precio Unit.
-                      </th>
-                      <th
-                        scope="col"
-                        class="px-3 py-2 text-right text-xs font-medium text-neutral-500 uppercase tracking-wider
-                        ">Subtotal
-                      </th>
+              <div class="max-h-72 overflow-x-auto overflow-y-auto">
+                <x-table-base>
+                  <x-slot:tablehead>
+                    <tr class="border bg-neutral-100">
+                      <x-table-th class="text-end">
+                        #
+                      </x-table-th>
+                      <x-table-th class="text-start">
+                        Suministro/Pack
+                      </x-table-th>
+                      <x-table-th class="text-start">
+                        Marca/Tipo/Volumen
+                      </x-table-th>
+                      <x-table-th class="text-end">
+                        Cantidad comprada
+                      </x-table-th>
+                      <x-table-th class="text-end">
+                        Volumen total
+                        <x-quest-icon title="kilogramos (kg), gramos (g), litros (l), mililitros (ml), metro (m), centimetro (cm), unidad (u)" />
+                      </x-table-th>
+                      <x-table-th class="text-end">
+                        Precio unit.
+                        <x-quest-icon title="precio unitario del proveedor para el suministro o pack" />
+                      </x-table-th>
+                      <x-table-th class="text-end">
+                        Subtotal
+                        <x-quest-icon title="subtotal de la compra del suministro o pack" />
+                      </x-table-th>
                     </tr>
-                  </thead>
-                  <tbody class="bg-white divide-y divide-neutral-200">
-                    @foreach($formdt_purchase_items as $key => $item)
-                      {{-- suministros --}}
-                      @if ($item['item_type'] === $this->getProvisionType())
-                        <tr>
-                          <td class="px-3 py-2 whitespace-nowrap text-sm font-medium">
-                            {{ $key+1 }}
-                          </td>
-                          <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-neutral-800">
-                            {{ $item['name'] }}
-                          </td>
-                          <td class="px-3 py-2 whitespace-nowrap text-sm text-neutral-500">
-                            <span>
-                              <span> {{$item['trademark']}} / {{ $item['type'] }} </span>
-                              <span class="lowercase"> / de {{ $item['unit_volume']['value'] }}{{ $item['unit_volume']['symbol'] }} </span>
-                            </span>
-                          </td>
-                          <td class="px-3 py-2 whitespace-nowrap text-sm text-neutral-500 text-right">
-                            <span>{{ $item['item_count'] }}</span>
-                          </td>
-                          <td class="px-3 py-2 whitespace-nowrap text-sm text-neutral-500 text-right">
-                            <span>{{ $item['total_volume']['value'] }}{{ $item['total_volume']['symbol'] }}</span>
-                          </td>
-                          <td class="px-3 py-2 whitespace-nowrap text-sm text-neutral-500 text-right">
-                            <span>${{ number_format($item['unit_price'], 2) }}</span>
-                          </td>
-                          <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-neutral-800 text-right">
-                            <span>${{ number_format($item['subtotal_price'], 2) }}</span>
-                          </td>
-                        </tr>
-                      @endif
-                      {{-- packs --}}
-                      @if ($item['item_type'] === $this->getPackType())
-                        <tr>
-                          <td class="px-3 py-2 whitespace-nowrap text-sm font-medium">
-                            {{ $key+1 }}
-                          </td>
-                          <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-neutral-800">
-                            {{ $item['name'] }}
-                          </td>
-                          <td class="px-3 py-2 whitespace-nowrap text-sm text-neutral-500">
-                            <span>
-                              <span> {{$item['trademark']}} / {{ $item['type'] }} </span>
-                              <span class="lowercase"> / de {{ $item['unit_volume']['value'] }}{{ $item['unit_volume']['symbol'] }} </span>
-                            </span>
-                          </td>
-                          <td class="px-3 py-2 whitespace-nowrap text-sm text-neutral-500 text-right">
-                            <span>{{ $item['item_count'] }}</span>
-                          </td>
-                          <td class="px-3 py-2 whitespace-nowrap text-sm text-neutral-500 text-right">
-                            <span>{{ $item['total_volume']['value'] }}{{ $item['total_volume']['symbol'] }}</span>
-                          </td>
-                          <td class="px-3 py-2 whitespace-nowrap text-sm text-neutral-500 text-right">
-                            <span>${{ number_format($item['unit_price'], 2) }}</span>
-                          </td>
-                          <td class="px-3 py-2 whitespace-nowrap text-sm font-medium text-neutral-800 text-right">
-                            <span>${{ number_format($item['subtotal_price'], 2) }}</span>
-                          </td>
-                        </tr>
-                      @endif
-                    @endforeach
-                  </tbody>
-                  <tfoot class="bg-neutral-100">
-                    <tr>
-                      <td colspan="6" class="px-3 py-2 text-normal font-medium text-neutral-800 text-right">Total:</td>
-                      <td class="px-3 py-2 text-normal font-bold text-neutral-800 text-right">
-                        ${{ number_format($order_data['total_price'], 2) }}
-                      </td>
+                  </x-slot:tablehead>
+                  <x-slot:tablebody>
+                  @forelse ($formdt_purchase_items as $key => $item)
+                    <tr wire:key="{{ $key }}" class="border">
+                      <x-table-td class="text-end">
+                        <span>{{ $key+1 }}</span>
+                      </x-table-td>
+                      <x-table-td class="text-start">
+                        <span>{{ $item['name'] }}</span>
+                      </x-table-td>
+                      <x-table-td class="text-start">
+                        <span>
+                          <span> {{$item['trademark']}} / {{ $item['type'] }} </span>
+                          <span class="lowercase"> / de {{ $item['unit_volume']['value'] }}{{ $item['unit_volume']['symbol'] }} </span>
+                        </span>
+                      </x-table-td>
+                      <x-table-td class="text-end">
+                        {{ $item['item_count'] }}
+                      </x-table-td>
+                      <x-table-td class="text-end">
+                        <span>{{ $item['total_volume']['value'] }}{{ $item['total_volume']['symbol'] }}</span>
+                      </x-table-td>
+                      <x-table-td class="text-end">
+                        <span>${{ toMoneyFormat($item['unit_price']) }}</span>
+                      </x-table-td>
+                      <x-table-td class="text-end">
+                        ${{ toMoneyFormat($item['subtotal_price']) }}
+                      </x-table-td>
                     </tr>
-                  </tfoot>
-                </table>
+                    @if ($loop->last)
+                      <tr class="border">
+                        <x-table-td colspan="6" class="font-semibold text-end capitalize">total</x-table-td>
+                        <x-table-td class="font-semibold text-end">${{ toMoneyFormat((float) $order_data['total_price']) }}</x-table-td>
+                      </tr>
+                    @endif
+                  @empty
+
+                  @endforelse
+                  </x-slot:tablebody>
+                </x-table-base>
               </div>
             @else
               {{-- una vz elegido un proveedor, buscar entre sus suministros y packs para el detalle --}}
@@ -283,7 +236,7 @@
                 @error('formdt_purchase_items*')
                   <span class="text-red-400">{{ $message }}</span>
                 @enderror
-                <div class="overflow-x-auto">
+                <div class="max-h-72 overflow-x-auto overflow-y-auto">
                   <x-table-base>
                     <x-slot:tablehead>
                       <tr class="bg-neutral-100 border">
@@ -399,7 +352,6 @@
                 <span>Seleccione un proveedor para comenzar</span>
               @endif
             @endif
-
           </x-div-toggle>
 
         </form>
