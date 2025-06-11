@@ -27,17 +27,21 @@ class CreatePurchase extends Component
   public $order_data;
 
   // datos para el formulario de compras
-  public $with_preorder = false;
-  public $formdt_supplier_id;
-  public $formdt_purchase_date;
-  public $formdt_order_code;
-  public $formdt_order_date;
-  public $formdt_purchase_items;
-  public $suppliers;
+  public $with_preorder = false; // por defecto sin preorden
+  public $suppliers;             // proveedores elegibles
+
+  public $formdt_supplier_id;    // id provedor
+  public $formdt_purchase_date;  // fecha de compra
+  public $formdt_order_code;     // codigo de orden obtenida de la preorden
+  public $formdt_order_date;     // fecha de orden obtenida de la preorden
+  public $formdt_purchase_items; // items adquiridos (desde la preorden, o generados manualmente)
 
   // rango de fechas de compra
   public $date_max;
   public $date_min;
+
+  // total de la compra (cuando los items son generados manualmente)
+  public $total;
 
 
   /**
@@ -77,6 +81,9 @@ class CreatePurchase extends Component
 
       // proveedores disponibles para registrar una compra
       $this->suppliers = $purchase_service->getActiveSuppliers();
+
+      // total del la compra
+      $this->total = 0;
     }
   }
 
@@ -103,14 +110,14 @@ class CreatePurchase extends Component
    * * cuando no hay preorden asociada.
    * refresca el cuadro de busqueda
    */
-  public function getProvisionsAndPacksForSupplier(int $id)
+  public function getProvisionsAndPacksForSupplier()
   {
-    // buscar el proveedor elegido
-    $selected_supplier = Supplier::with(['provisions', 'packs'])
-      ->where('id', $id)->first();
 
     // refrescar el componente de busqueda para el nuevo proveedor
     $this->dispatch('refresh-search', supplier_id: $this->formdt_supplier_id);
+
+    // si ya habia seleccionado proveedor, y creado una lista de detalle, la misma debe vaciarse
+    $this->formdt_purchase_items = collect();
   }
 
   /**
@@ -144,14 +151,14 @@ class CreatePurchase extends Component
         ->first()
         ->pivot;
 
-      $unit_price = $pivot_data->price;
-      $subtotal_price = $unit_price * $quantity;
+      $unit_price     = (float) $pivot_data->price;
+      $subtotal_price = (float) $unit_price * $quantity;
 
       $this->formdt_purchase_items->push([
         'item_type'      => $this->provision_type,
         'id'             => $provision->id,
         'name'           => $provision->provision_name,
-        'description'    => $provision->description,
+        'description'    => $provision->provision_short_description,
         'trademark'      => $provision->trademark->provision_trademark_name,
         'type'           => $provision->type->provision_type_name,
         'unit_volume'    => $unit_volume,
@@ -160,28 +167,138 @@ class CreatePurchase extends Component
         'unit_price'     => $unit_price,
         'subtotal_price' => $subtotal_price
       ]);
+
+      // luego de agregar un item, calcular total
+      $this->calculateTotal();
+    } else {
+      $this->dispatch('toast-event', toast_data: [
+        'event_type' => 'info',
+        'title_toast' => toastTitle('', true),
+        'descr_toast' => 'el suministro ya existe en la lista de detalle de compra!'
+      ]);
     }
   }
 
   /**
-   * Actualizar cantidad de un item y recalcular totales
-   * @param int $key Índice del item en la colección
-   * @param int $quantity Nueva cantidad
+   * * agregar suministros en packs a la lista de items de la compra
+   * * el evento proviene de SearchProvision::class para Compras (Purchase)
+   * @param Pack $pack un pack de suministros
+   * @return void
    */
-  public function updateItemQuantity(int $key, int $quantity): void
+  #[On('add-pack')]
+  public function addPack(Pack $pack): void
   {
-    // Obtener el item
+    // verificar si el pack ya esta en la coleccion
+    $exists = $this->formdt_purchase_items->contains(function ($item) use ($pack) {
+      return $item['item_type'] === $this->pack_type && $item['id'] === $pack->id;
+    });
+
+    if (!$exists) {
+      // calcular volumen unitario (del pack) y crear item con el formato requerido
+      $unit_volume = convert_measure_value($pack->pack_quantity, $pack->provision->measure);
+
+      // por defecto agregamos 1 unidad, luego se puede editar
+      $quantity = 1;
+      $total_volume = convert_measure_value(
+        $pack->pack_quantity * $quantity,
+        $pack->provision->measure
+      );
+
+      // obtener el precio desde la tabla pivote para el proveedor seleccionado
+      $pivot_data = $pack->suppliers()
+        ->where('supplier_id', $this->formdt_supplier_id)
+        ->first()
+        ->pivot;
+
+      $unit_price     = (float) $pivot_data->price;
+      $subtotal_price = (float) $unit_price * $quantity;
+
+      $this->formdt_purchase_items->push([
+        'item_type'      => $this->pack_type,
+        'id'             => $pack->id,
+        'name'           => $pack->pack_name,
+        'description'    => $pack->provision->provision_short_description,
+        'trademark'      => $pack->provision->trademark->provision_trademark_name,
+        'type'           => $pack->provision->type->provision_type_name,
+        'unit_volume'    => $unit_volume,
+        'item_count'     => $quantity,
+        'total_volume'   => $total_volume,
+        'unit_price'     => $unit_price,
+        'subtotal_price' => $subtotal_price,
+      ]);
+
+      // luego de agregar un item, calcular total
+      $this->calculateTotal();
+    } else {
+      $this->dispatch('toast-event', toast_data: [
+        'event_type' => 'info',
+        'title_toast' => toastTitle('', true),
+        'descr_toast' => 'el pack ya existe en la lista de detalle de compra!'
+      ]);
+    }
+  }
+
+  /**
+   * remover un suministro de la lista de precios
+   * @param int $key clave del array de precios para el suministro
+   * @return void
+   */
+  public function removeItem(int $key): void
+  {
+    $this->formdt_purchase_items->pull($key);
+    $this->calculateTotal();
+
+    // elemento eliminado de la lista
+    $this->dispatch('toast-event', toast_data: [
+      'event_type' => 'info',
+      'title_toast' => toastTitle('', true),
+      'descr_toast' => 'el item fue quitado de la lista de detalle de compra con éxito!'
+    ]);
+  }
+
+  /**
+   * vaciar la lista de suministros
+   * @return void
+   */
+  public function resetList(): void
+  {
+    $this->formdt_purchase_items = collect();
+    $this->total = 0;
+
+    // lista vaciada correctamente
+    $this->dispatch('toast-event', toast_data: [
+      'event_type' => 'info',
+      'title_toast' => toastTitle('', true),
+      'descr_toast' => 'se vació la lista de detalle de compra con éxito!'
+    ]);
+  }
+
+  /**
+   * actualizar cantidad de un item y recalcular totales
+   * @param int $key indice del item en la coleccion
+   * @param $quantity nueva cantidad
+   */
+  public function updateItemQuantity(int $key, $quantity): void
+  {
+    // early return si NO es un numero entero
+    // no actualiza cantidad ni subtotal
+    // delega el manejo de errores en el campo item_count a las validaciones en save()
+    if (!is_numeric($quantity) || !ctype_digit((string)$quantity)) {
+      return;
+    }
+
+    // obtener el item
     $item = $this->formdt_purchase_items->get($key);
 
-    // Validar cantidad mínima
+    // validar cantidad minima
     if ($quantity < 1) {
       $quantity = 1;
     }
 
-    // Actualizar cantidad
+    // actualizar cantidad
     $item['item_count'] = $quantity;
 
-    // Recalcular volumen total
+    // recalcular volumen total suministro
     if ($item['item_type'] === $this->provision_type) {
       $provision = Provision::find($item['id']);
       $item['total_volume'] = convert_measure_value(
@@ -190,15 +307,67 @@ class CreatePurchase extends Component
       );
     }
 
-    // Recalcular subtotal
-    $item['subtotal_price'] = $item['unit_price'] * $quantity;
+    // recalcular volumen total pack
+    if ($item['item_type'] === $this->pack_type) {
+      $pack = Pack::find($item['id']);
+      $item['total_volume'] = convert_measure_value(
+        $pack->pack_quantity * $quantity,
+        $pack->provision->measure
+      );
+    }
 
-    // Actualizar item en la colección
+    // recalcular subtotal
+    // $item['unit_price'] es float
+    $subtotal = (float) $item['unit_price'] * $quantity;
+    $item['subtotal_price'] = $subtotal; // float
+
+    // actualizar item en la coleccion
     $this->formdt_purchase_items->put($key, $item);
+
+    // recalcular el total
+    $this->calculateTotal();
+  }
+
+  /**
+   * dar formato de moneda al subtotal
+   * @param int $key indice del item en la coleccion
+   * @param $amount cantidad subtotal
+   */
+  public function formatItemSubtotal(int $key, $amount)
+  {
+    if (!is_numeric($amount) || (float) $amount <= 0) {
+
+      // formato invalido, recalcular original
+      $item = $this->formdt_purchase_items->get($key);
+      $item['subtotal_price'] = (float) $item['unit_price'] * $item['item_count'];
+    } else {
+
+      // obtener el item y asignar valor
+      $item = $this->formdt_purchase_items->get($key);
+      $item['subtotal_price'] = $amount;
+    }
+
+    // actualizar item en la coleccion
+    $this->formdt_purchase_items->put($key, $item);
+
+    // recalcular el total
+    $this->calculateTotal();
+  }
+
+  /**
+   * calcular un total a mostrar al final de la tabla
+   * @return void
+   */
+  public function calculateTotal(): void
+  {
+    $this->total = $this->formdt_purchase_items->reduce(function ($carry, $item) {
+      return $carry + $item['subtotal_price'];
+    }, 0);
   }
 
   /**
    * guardar compra
+   *
    */
   public function save(PurchaseService $purchase_service)
   {
@@ -207,19 +376,51 @@ class CreatePurchase extends Component
         'formdt_supplier_id'    => ['required_if:with_preorder,false'],
         'formdt_purchase_date'  => ['required'],
         'formdt_purchase_items' => ['required'],
+        'formdt_purchase_items.*.item_count'     => ['required', 'numeric', 'min:1', 'max:999', 'regex:/^\d{1,3}$/'],
+        'formdt_purchase_items.*.subtotal_price' => ['required', 'numeric', 'min:0.01'],
       ],
       [
-        'formdt_supplier_id.required_if' => 'Debe elegir un proveedor para registrar la compra',
-        'formdt_purchase_date.required'  => 'Debe indicar la fecha de la compra',
-        'formdt_purchase_items.required' => 'Debe indicar al menos un suministro o pack adquirido'
+        'formdt_supplier_id.required_if' => 'Debe elegir un proveedor para registrar la compra.',
+        'formdt_purchase_date.required'  => 'Debe indicar la fecha de la compra.',
+        'formdt_purchase_items.required' => 'Debe indicar al menos un suministro o pack adquirido.',
+        'formdt_purchase_items.*.item_count.required' => 'Debe indicar una cantidad comprada válida.',
+        'formdt_purchase_items.*.item_count.numeric'  => 'La cantidad debe ser un número.',
+        'formdt_purchase_items.*.item_count.min'      => 'La cantidad debe ser mayor a cero.',
+        'formdt_purchase_items.*.item_count.max'      => 'La cantidad no puede exceder los 3 dígitos.',
+        'formdt_purchase_items.*.item_count.regex'    => 'La cantidad debe ser un entero de máximo 3 dígitos.',
+        'formdt_purchase_items.*.subtotal_price.required' => 'Debe indicar un subtotal',
+        'formdt_purchase_items.*.subtotal_price.numeric'  => 'El subtotal debe ser un número válido.',
+        'formdt_purchase_items.*.subtotal_price.min'      => 'El subtotal debe ser mayor a 0.',
       ]
     );
 
     try {
 
-      $this->order_data['purchase_date'] = $validated['formdt_purchase_date'];
-      $this->order_data['status'] = 'completada'; // todo: es necesario un estado?
-      $purchase = $purchase_service->createPurchase($this->order_data, $this->formdt_purchase_items);
+      // sanitizamos los datos justo antes de pasarlos al service
+      $sanitized_items = collect($this->formdt_purchase_items)->map(function ($item) {
+        return array_merge($item, [
+          'item_count'     => (int) $item['item_count'],
+          'unit_price'     => (float) $item['unit_price'],
+          'subtotal_price' => (float) $item['subtotal_price'],
+        ]);
+      });
+
+      if ($this->with_preorder) {
+
+        $this->order_data['purchase_date'] = $validated['formdt_purchase_date'];
+        $this->order_data['status']        = 'completada'; //? es necesario un estado?
+
+        $purchase_service->createPurchase($this->order_data, $sanitized_items);
+      } else {
+
+        $new_purchase_data = [
+          'supplier'      => Supplier::find($validated['formdt_supplier_id']),
+          'purchase_date' => $validated['formdt_purchase_date'],
+          'status'        => 'completada', //? es necesario un estado?
+        ];
+
+        $purchase_service->createPurchase($new_purchase_data, $sanitized_items);
+      }
 
       $this->reset();
 

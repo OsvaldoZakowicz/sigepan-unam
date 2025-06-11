@@ -218,3 +218,25 @@ function convert_measure_value(float $quantity, Measure $measure): array
     'value' => $absQuantity * $measure->conversion_factor
   ];
 }
+
+/**
+ * convierte un numero float a formato de moneda para mostrar
+ * Ej: 1200.35 -> 1.200,35
+ */
+function toMoneyFormat(float $amount): string
+{
+  return number_format($amount, 2, ',', '.');
+}
+
+/**
+ * convierte un string en formato moneda a float
+ * Ej: "1.200,35" -> 1200.35
+ */
+function toFloat(string $amount): float
+{
+  // primero quitamos los puntos de miles
+  $without_thousands = str_replace('.', '', $amount);
+  // luego reemplazamos la coma decimal por punto
+  $with_dot = str_replace(',', '.', $without_thousands);
+  return (float) $with_dot;
+}

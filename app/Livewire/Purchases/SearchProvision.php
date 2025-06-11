@@ -46,7 +46,7 @@ class SearchProvision extends Component
   public $provision_types;
 
   // toggle del objetivo de busqueda
-  public $toggle;
+  public $toggle = false;
 
   /**
    * boot de datos
@@ -68,7 +68,7 @@ class SearchProvision extends Component
   public function mount($supplier_id): void
   {
     $this->supplier = Supplier::findOrFail($supplier_id);
-    $this->toggle = false;
+    $this->reset('toggle');
   }
 
   /**
@@ -155,6 +155,17 @@ class SearchProvision extends Component
   public function resetPagination(): void
   {
     $this->resetPage();
+  }
+
+  /**
+   * limpiar filtros
+   * @return void
+   */
+  public function clearFilters(): void
+  {
+    $this->reset([
+      'search', 'search_tr', 'search_ty', 'search_pack', 'search_tr_pack', 'search_ty_pack', 'paginas'
+    ]);
   }
 
   /**
