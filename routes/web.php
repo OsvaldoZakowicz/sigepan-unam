@@ -357,6 +357,11 @@ Route::middleware(['auth', 'verified', 'can:compras'])->group(function () {
 
   Route::get('purchases/preorders', [PurchaseController::class, 'purchases_preorders_index'])
     ->name('purchases-preorders-index');
+
+  //*---------------------------- PDFs
+
+  Route::get('purchases/details/order/pdf/show/{id}', [PDFController::class, 'open_pdf_order'])
+    ->name('open-pdf-order-from-purchase');
 });
 
 

@@ -161,13 +161,17 @@
                       <span class="text-xs uppercase">{{ $preorder_reference['order_code'] }}</span>,
                       <span class="font-semibold">realizada el:</span> {{ $preorder_reference['order_date'] }}
                     </span>
-                    {{-- todo --}}
-                    <a
-                      wire:navigate
+                    <x-a-button
                       href="#"
-                      class="underline text-blue-500"
-                      >Ver preorden
-                    </a>
+                      wire:click="openPdfOrder({{ $preorder_reference['id'] }})"
+                      bg_color="neutral-100"
+                      border_color="neutral-200"
+                      text_color="neutral-600"
+                      title="ver orden de compras y descargar pdf"
+                      class="mt-2"
+                      >ver orden PDF
+                      <x-svg-pdf-paper/>
+                    </x-a-button>
                   @else
                     <span>Compra registrada sin orden de compra previa</span>
                   @endif
@@ -284,6 +288,18 @@
       </x-slot:footer>
 
     </x-content-section>
+
+    {{-- manejar eventos --}}
+    <script>
+
+      /* evento: abrir pdf en nueva pestaña para visualizar */
+      document.addEventListener('livewire:initialized', () => {
+          Livewire.on('openPdfInNewTab', ({ url }) => {
+              window.open(url, '_blank');
+          });
+      });
+
+    </script>
 
   </article>
 </div>

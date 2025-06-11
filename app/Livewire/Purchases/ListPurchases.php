@@ -85,6 +85,21 @@ class ListPurchases extends Component
   }
 
   /**
+   * abrir pdf de orden en una nueva pestaña,
+   * para poder visualizar y descargar.
+   * @param int $id id de preorden base para el pdf
+   * @return void
+   */
+  public function openPdfOrder($id): void
+  {
+    // denerar URL para ver el pdf
+    $pdfUrl = route('open-pdf-order-from-purchase', ['id' => $id]);
+
+    // disparar evento para abrir el PDF en nueva pestaña
+    $this->dispatch('openPdfInNewTab', url: $pdfUrl);
+  }
+
+  /**
    * buscar compras
    */
   public function searchPurchases()

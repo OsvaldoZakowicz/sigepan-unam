@@ -16,6 +16,8 @@ class PDFController extends Controller
 {
   /**
    * vista de un pdf de una orden de compra
+   * * contactado desde la ruta: preorders/pdf/show/{id}
+   * * contactado desde la ruta: purchases/details/order/pdf/show/{id}
    * @param int $id id de preorden base para la generacion del pdf
    * @return \Illuminate\Http\Response
    */
