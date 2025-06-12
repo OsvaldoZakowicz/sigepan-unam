@@ -33,7 +33,7 @@ class PDFController extends Controller
       ->setOption('encoding', 'UTF-8');
 
     // orden_compra_order_... .pdf
-    $pdf_name = 'orden_compra_' . $order_data['code'] . '.pdf';
+    $pdf_name = 'orden_compra_' . $order_data['order_code'] . '.pdf';
 
     // stream a una pestaña del navegador
     return $pdf->stream($pdf_name);
@@ -56,7 +56,7 @@ class PDFController extends Controller
       ->setOption('encoding', 'UTF-8');
 
     // orden_compra_order_... .pdf
-    $pdf_name = 'orden_compra_' . $order_data['code'] . '.pdf';
+    $pdf_name = 'orden_compra_' . $order_data['order_code'] . '.pdf';
 
     // stream a una pestaña del navegador
     return $pdf->download($pdf_name);

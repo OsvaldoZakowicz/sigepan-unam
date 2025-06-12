@@ -8,6 +8,7 @@ use App\Models\Provision;
 use App\Models\Quotation;
 use App\Models\Supplier;
 use App\Models\Purchase;
+use App\Models\DatoNegocio;
 use Illuminate\Support\Collection;
 
 /**
@@ -18,7 +19,6 @@ class PreOrderService
 
   /**
    * generar datos finales de la orden de compra
-   * todo: Datos de panaderia
    * @param PreOrder $preorder pre orden base
    * @param Quotation|null $quotation puede o no existir un presupuesto previo
    * @param Collection $preorder_items conjunto de suministros y/o packs
@@ -26,25 +26,48 @@ class PreOrderService
    */
   public function generateOrderData(PreOrder $preorder, ?Quotation $quotation, Collection $preorder_items): array
   {
+    // datos de suministros y packs de la preorden junto al total
     $body_order_data = $this->generateBodyOrderData($preorder_items);
 
-    $anexo = json_decode($preorder->details, true);
+    // datos del anexo de la preorden
+    $body_anexo_data = json_decode($preorder->details, true);
+
+    // presupuesto asociado
+    if ($quotation) {
+      $budget_date = formatDateTime($quotation->created_at, 'd-m-Y');
+      $budget_code = $quotation->quotation_code;
+    } else {
+      $budget_date = null;
+      $budget_code = null;
+    }
+
+    // datos del negocio panaderia
+    $issuer_name    = DatoNegocio::obtenerValor('razon_social');
+    $issuer_cuit    = DatoNegocio::obtenerValor('cuit');
+    $issuer_email   = DatoNegocio::obtenerValor('email');
+    $issuer_phone   = DatoNegocio::obtenerValor('telefono');
+    $issuer_start   = DatoNegocio::obtenerValor('inicio_actividades');
+    $issuer_address = DatoNegocio::obtenerValor('domicilio');
 
     $order_data = [
-      'code'            =>  (string) substr($preorder->pre_order_code, 3), // quitar el prefijo 'pre'
-      'date'            =>  (string) now()->format('d-m-Y'), // fecha de la orden
-      'budget_date'     =>  (string) ($quotation) ? formatDateTime($quotation->created_at, 'd-m-Y') : '-',  // fecha de el presupuesto previo
-      'issuer_name'     =>  (string) 'Panadería',
-      'issuer_cuit'     =>  (string) '99999999999',
-      'issuer_email'    =>  (string) 'Email@Ejemplo.Com',
-      'issuer_phone'    =>  (string) '3758252525',
-      'provider_name'   =>  (string) $preorder->supplier->company_name,
-      'provider_cuit'   =>  (string) $preorder->supplier->company_cuit,
-      'provider_email'  =>  (string) $preorder->supplier->user->email,
-      'provider_phone'  =>  (string) $preorder->supplier->phone_number,
+      'order_code'      =>  substr($preorder->pre_order_code, 3),
+      'order_date'      =>  now()->format('d-m-Y'),
+      'budget_date'     =>  $budget_date,
+      'budget_code'     =>  $budget_code,
+      'issuer_name'     =>  $issuer_name,
+      'issuer_cuit'     =>  $issuer_cuit,
+      'issuer_email'    =>  $issuer_email,
+      'issuer_phone'    =>  $issuer_phone,
+      'issuer_start'    =>  $issuer_start,
+      'issuer_address'  =>  $issuer_address,
+      'provider_name'   =>  $preorder->supplier->company_name,
+      'provider_cuit'   =>  $preorder->supplier->company_cuit,
+      'provider_email'  =>  $preorder->supplier->user->email,
+      'provider_phone'  =>  $preorder->supplier->phone_number,
+      'provider_address'=>  $preorder->supplier->full_address,
       'items'           =>  $body_order_data['body_items'],
       'total'           =>  $body_order_data['body_total_price'],
-      'anexo'           =>  $anexo,
+      'anexo'           =>  $body_anexo_data,
     ];
 
     return $this->utf8EncodeArray($order_data);
@@ -65,13 +88,13 @@ class PreOrderService
 
     $body_items = $purchasable_items->map(function ($item) {
       return [
-        'item_id'           =>  (string) $item['item_id'],
-        'item_name'         =>  (string) $this->getItemName($item['item_object']),
-        'item_desc'         =>  (string) $this->getItemTrademarkAndVolume($item['item_object']),
-        'item_type'         =>  (string) $item['item_type'],
-        'item_quantity'     =>  (string) $this->getItemQuantity($item),
-        'item_unit_price'   =>  (string) $item['item_unit_price'],
-        'item_total_price'  =>  (string) $item['item_total_price'],
+        'item_id'           =>  $item['item_id'],
+        'item_name'         =>  $this->getItemName($item['item_object']),
+        'item_desc'         =>  $this->getItemTrademarkAndVolume($item['item_object']),
+        'item_type'         =>  $item['item_type'],
+        'item_quantity'     =>  $this->getItemQuantity($item),
+        'item_unit_price'   =>  $item['item_unit_price'],
+        'item_total_price'  =>  $item['item_total_price'],
       ];
     });
 

@@ -75,4 +75,20 @@ class Supplier extends Model implements Auditable
   {
     return $this->hasMany(Purchase::class, 'supplier_id', 'id');
   }
+
+  //* retorna la direccion completa como string
+  public function getFullAddressAttribute(): string
+  {
+    if (!$this->address) {
+      return '';
+    }
+
+    return sprintf(
+      '%s %s, %s, %s',
+      $this->address->street,
+      $this->address->number,
+      $this->address->city,
+      $this->address->postal_code
+    );
+  }
 }

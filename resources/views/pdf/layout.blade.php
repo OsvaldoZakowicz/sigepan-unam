@@ -13,6 +13,7 @@
       color: #333;
       margin: 0;
       padding: 20px;
+      box-sizing: border-box;
     }
 
     .contenedor {
@@ -20,6 +21,14 @@
       padding: 5px;
       margin-bottom: 5px;
       border: 1px solid gray;
+    }
+
+    .sub_contenedor {
+      display: inline-block;
+      width: auto;
+      height: auto;
+      padding: 5px;
+      border-left: 1px solid gray;
     }
 
     h3,
@@ -61,6 +70,15 @@
       width: 100%;
     }
 
+    .no-borders,
+    .no-borders thead,
+    .no-borders tbody,
+    .no-borders tr,
+    .no-borders th,
+    .no-borders td {
+      border: none !important;
+    }
+
     table,
     thead,
     tbody,
@@ -82,6 +100,12 @@
 
     .td-text {
       text-align: left;
+    }
+
+    hr {
+      border: 0;
+      border-top: 1px solid gray;
+      margin: 5px 0;
     }
 
   </style>

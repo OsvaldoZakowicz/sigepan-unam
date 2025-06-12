@@ -174,11 +174,14 @@ class RespondPreOrder extends Component
     if ($this->preorder->details) {
       $details = json_decode($this->preorder->details, true);
 
-      $this->delivery_type     = $details['delivery_type'] ?? [];
-      $this->delivery_date     = $details['delivery_date'] ?? null;
-      $this->payment_method    = $details['payment_method'] ?? [];
+      $this->delivery_type = $details['delivery_type'] ?? [];
+      $this->payment_method = $details['payment_method'] ?? [];
       $this->short_description = $details['short_description'] ?? null;
-      $this->accept_terms      = $details['accept_terms'] ?? false;
+      $this->accept_terms = $details['accept_terms'] ?? false;
+      // convertir el formato de la fecha
+      $this->delivery_date = $details['delivery_date'] ?
+        \Carbon\Carbon::createFromFormat('d-m-Y', $details['delivery_date'])->format('Y-m-d') :
+        null;
     }
   }
 
@@ -338,10 +341,13 @@ class RespondPreOrder extends Component
 
     try {
 
+      // Convertir la fecha al formato interno antes de guardar
+      $delivery_date = \Carbon\Carbon::createFromFormat('Y-m-d', $validated['delivery_date'])->format('d-m-Y');
+
       // detalles finales para la pre orden
       $details = [
         'delivery_type'     => $validated['delivery_type'],
-        'delivery_date'     => $validated['delivery_date'],
+        'delivery_date'     => $delivery_date,
         'payment_method'    => $validated['payment_method'],
         'short_description' => $validated['short_description'],
         'accept_terms'      => $validated['accept_terms'],

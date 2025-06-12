@@ -40,7 +40,7 @@ class PdfService
     )
       ->setPaper('a4');
     //ordenes/orden_compra_order_... .pdf
-    $pdf_path = 'ordenes/orden_compra_' . $order_data['code'] . '.pdf';
+    $pdf_path = 'ordenes/orden_compra_' . $order_data['order_code'] . '.pdf';
     $pdf->save(storage_path('app/public/' . $pdf_path));
 
     $preorder->order_pdf = $pdf_path;

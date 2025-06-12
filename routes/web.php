@@ -249,6 +249,7 @@ Route::middleware(['auth', 'verified', 'can:proveedores'])->group(function () {
 
   Route::get('preorders/pdf/show/{id}', [PDFController::class, 'open_pdf_order'])
     ->name('open-pdf-order');
+
 });
 
 //* seccion de presupuestos (quotations) y preordenes para proveedores
