@@ -5,6 +5,7 @@ namespace App\Livewire\Purchases;
 use App\Models\PreOrder;
 use App\Services\Supplier\PreOrderService;
 use App\Models\Purchase;
+use Illuminate\View\View;
 use Livewire\WithPagination;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -80,6 +81,15 @@ class ListPreOrders extends Component
   }
 
   /**
+   * ir a la vista de preorden
+   * @param PreOrder $preorder
+   */
+  public function goToPreorder(PreOrder $preorder)
+  {
+    return redirect()->route('suppliers-preorders-response', ['id' => $preorder->id]);
+  }
+
+  /**
    * buscar preordenes
    */
   public function searchPreOrders()
@@ -132,10 +142,16 @@ class ListPreOrders extends Component
    */
   public function resetSearchInputs(): void
   {
-    $this->reset(['search_preorder', 'search_start_at', 'search_end_at', 'status_filter', 'status_purchase_filter']);
+    $this->reset([
+      'search_preorder', 'search_start_at', 'search_end_at', 'status_filter', 'status_purchase_filter'
+    ]);
   }
 
-  public function render()
+  /**
+   * renderizar vista
+   * @return View
+   */
+  public function render(): View
   {
     $preorders = $this->searchPreOrders();
     return view('livewire.purchases.list-pre-orders', compact('preorders'));

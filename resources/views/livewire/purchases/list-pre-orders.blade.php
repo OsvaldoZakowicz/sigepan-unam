@@ -11,12 +11,11 @@
     <x-content-section>
 
       <x-slot:header class="">
-
         {{-- busqueda --}}
-        <div class="flex gap-1 justify-start items-start grow">
+        <div class="flex gap-1 justify-start items-end">
 
           {{-- termino de busqueda --}}
-          <div class="flex flex-col justify-end w-1/4">
+          <div class="flex flex-col justify-end">
             <label for="">buscar preorden</label>
             <input
               type="text"
@@ -29,8 +28,8 @@
           </div>
 
           {{-- filtrar por estado --}}
-          <div class="flex flex-col justify-end w-56">
-            <label for="">estado</label>
+          <div class="flex flex-col justify-end w-48">
+            <label for="">estado de preorden</label>
             <select
               name="status_filter"
               id="status_filter"
@@ -46,8 +45,8 @@
           </div>
 
           {{-- filtrar por estado de la compra --}}
-          <div class="flex flex-col justify-end w-56">
-            <label for="">estado de la compra</label>
+          <div class="flex flex-col justify-end w-48">
+            <label for="">estado de compra</label>
             <select
               name="status_purchase_filter"
               id="status_purchase_filter"
@@ -62,7 +61,7 @@
           </div>
 
           {{-- fecha de inicio --}}
-          <div class="flex flex-col justify-end w-1/6">
+          <div class="flex flex-col justify-end w-48">
             <label for="search_start_at">fecha de preorden desde</label>
             <input
               type="date"
@@ -73,7 +72,7 @@
           </div>
 
           {{-- fecha de fin --}}
-          <div class="flex flex-col justify-end w-1/6">
+          <div class="flex flex-col justify-end w-48">
             <label for="search_end_at">fecha de preorden hasta</label>
             <input
               type="date"
@@ -83,24 +82,18 @@
               class="w-full text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"/>
           </div>
 
-        </div>
-
-        {{-- limpiar campos de busqueda --}}
-        <div class="flex flex-col self-start h-full">
           <x-a-button
             href="#"
             wire:click="resetSearchInputs()"
             bg_color="neutral-200"
             border_color="neutral-300"
             text_color="neutral-600"
-            >limpiar
+            >limpiar filtros
           </x-a-button>
         </div>
-
       </x-slot:header>
 
       <x-slot:content>
-
         <x-table-base>
           <x-slot:tablehead>
             <tr class="border bg-neutral-100">
@@ -114,10 +107,10 @@
                 proveedor
               </x-table-th>
               <x-table-th class="text-start">
-                estado
+                estado de preorden
               </x-table-th>
               <x-table-th class="text-start">
-                compra registrada?
+                estado de compra
               </x-table-th>
               <x-table-th class="text-start">
                 fecha de preorden
@@ -197,8 +190,8 @@
 
                     <div class="flex gap-1">
                       <x-a-button
-                        wire:navigate
                         href="#"
+                        wire:click="goToPreorder({{ $preorder }})"
                         bg_color="neutral-100"
                         border_color="neutral-200"
                         text_color="neutral-600"
