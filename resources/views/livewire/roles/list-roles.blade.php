@@ -18,18 +18,20 @@
     <x-content-section>
 
       <x-slot:header>
-        <span class="text-sm capitalize">buscar rol:</span>
         {{-- formulario de busqueda --}}
-        <form class="flex gap-1 grow">
-
+        <div class="w-full flex justify-start items-end gap-1">
           {{-- termino de busqueda --}}
-          <input
-            type="text"
-            name="search"
-            wire:model.live="search"
-            wire:click="resetPagination()"
-            placeholder="ingrese un id, o termino de busqueda"
-            class="w-1/4 shrink text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300" />
+          <div class="flex flex-col gap-1 w-1/4">
+            <label>Buscar rol</label>
+            <input
+              type="text"
+              name="search"
+              wire:model.live="search"
+              wire:click="resetPagination()"
+              placeholder="ingrese un id, o termino de busqueda"
+              class="text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+            />
+          </div>
 
           {{-- es editable --}}
           <div class="w-fit flex items-center gap-1 border rounded-sm p-1 mx-1">
@@ -38,7 +40,9 @@
               id="editable"
               type="checkbox"
               wire:model.live="editable"
-              wire:click="resetPagination()"/>
+              wire:click="resetPagination()"
+              class="text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+              />
             <label for="editable">editables</label>
           </div>
 
@@ -49,13 +53,23 @@
               id="internal"
               type="checkbox"
               wire:model.live="internal"
-              wire:click="resetPagination()"/>
+              wire:click="resetPagination()"
+              class="text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+              />
             <label for="internal">internos</label>
           </div>
 
-        </form>
-        <!-- grupo de botones -->
-        <div class="flex"></div>
+          {{-- limpiar filtros --}}
+          <x-a-button
+            href="#"
+            wire:click='limpiar()'
+            bg_color="neutral-200"
+            border_color="neutral-300"
+            text_color="neutral-600"
+            >limpiar filtros
+          </x-a-button>
+
+        </div>
       </x-slot:header>
 
       <x-slot:content>
@@ -143,4 +157,20 @@
     </x-content-section>
 
   </article>
+
+  <script>
+    // escuchar el evento reset-checkbox
+    document.addEventListener('livewire:initialized', () => {
+      Livewire.on('reset-checkbox', () => {
+        // obtener los checkboxes por su id
+        const editableCheckbox = document.getElementById('editable');
+        const internalCheckbox = document.getElementById('internal');
+
+        // establecer checked = false
+        if(editableCheckbox) editableCheckbox.checked = false;
+        if(internalCheckbox) internalCheckbox.checked = false;
+      });
+    });
+  </script>
+
 </div>

@@ -1,18 +1,19 @@
 <div>
   {{-- componente crear usuario interno --}}
   <article class="m-2 border rounded-sm border-neutral-200">
+
     <section class="flex items-center justify-between px-1 py-1 bg-neutral-200">
       <span class="text-sm capitalize">crear un usuario interno</span>
       <div role="grupo-de-botones" class="flex"></div>
     </section>
+
     <section class="flex flex-col pt-2 px-1 text-sm capitalize bg-white">
       {{-- formulario --}}
-      <span class="mb-2 font-bold">formulario</span>
       <form wire:submit="save" class="w-full">
         <div class="flex flex-col md:flex-row gap-2 w-full">
           <!-- este es un grupo de inputs por tema -->
           <fieldset class="flex flex-wrap mb-2 w-full md:w-1/2 border rounded border-neutral-200">
-            <legend>datos del usuario</legend>
+            <legend class="font-semibold">datos del usuario</legend>
             {{-- nombre --}}
             <div class="flex flex-col gap-1 p-2 w-full shrink">
               <span>
@@ -42,26 +43,26 @@
           </fieldset>
           <!-- este es un grupo de inputs por tema -->
           <fieldset class="flex flex-col mb-2 w-full md:w-1/2 border rounded border-neutral-200">
-          <legend>rol del usuario</legend>
-          <div class="flex flex-col gap-1 p-2 grow">
-            <span>
-              <label for="">seleccione un rol</label>
-              <span class="text-red-600">*</span>
-              @error('user_role')
-                <span class="text-red-400 text-xs">{{ $message }}</span>
-              @enderror
-            </span>
-            <div class="flex justify-start items-start flex-wrap gap-1 p-2 min-w-1/3 grow">
-              @forelse ($roles as $role)
-              <div class="border rounded-sm p-1 mx-1">
-                <input wire:model="user_role" type="radio" name="user_role" id="{{ $role->name }}" value="{{ $role->name }}" class="cursor-pointer">
-                <label for="{{ $role->name }}" class="cursor-pointer">{{ $role->name }}</label>
+            <legend class="font-semibold">rol del usuario</legend>
+            <div class="flex flex-col gap-1 p-2 grow">
+              <span>
+                <label for="">seleccione un rol</label>
+                <span class="text-red-600">*</span>
+                @error('user_role')
+                  <span class="text-red-400 text-xs">{{ $message }}</span>
+                @enderror
+              </span>
+              <div class="flex justify-start items-start flex-wrap gap-1 p-2 min-w-1/3 grow">
+                @forelse ($roles as $role)
+                <div class="border rounded-sm p-1 mx-1">
+                  <input wire:model="user_role" type="radio" name="user_role" id="{{ $role->name }}" value="{{ $role->name }}" class="cursor-pointer">
+                  <label for="{{ $role->name }}" class="cursor-pointer">{{ $role->name }}</label>
+                </div>
+                @empty
+                  <span>no hay roles definidos</span>
+                @endforelse
               </div>
-              @empty
-                <span>no hay roles definidos</span>
-              @endforelse
             </div>
-          </div>
           </fieldset>
         </div>
 

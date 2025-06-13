@@ -18,40 +18,48 @@
     <x-content-section>
 
       <x-slot:header>
-        <span class="text-sm capitalize">buscar usuario:</span>
         {{-- formulario de busqueda --}}
-        <form class="grow">
-
+        <div class="w-full flex justify-start gap-1 items-end">
           {{-- termino de busqueda --}}
-          <input
-            type="text"
-            name="search"
-            wire:model.live="search"
-            wire:click="resetPagination()"
-            placeholder="ingrese un id, o termino de busqueda"
-            class="w-1/4 shrink text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300" />
-
+          <div class="flex flex-col gap-1 w-1/4">
+            <label>Buscar usuario</label>
+            <input
+              type="text"
+              name="search"
+              wire:model.live="search"
+              wire:click="resetPagination()"
+              placeholder="ingrese un id, o termino de busqueda"
+              class="text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+            />
+          </div>
           {{-- roles --}}
-          <select
-            wire:model.live="role"
-            wire:click="resetPagination()"
-            name="role"
-            id="role"
-            class="w-1/4 shrink text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300" />
-
-            <option value="" selected>filtrar por rol...</option>
-
-            @forelse ($role_names as $role_name)
-              <option value="{{$role_name}}">{{$role_name}}</option>
-            @empty
-              <option value="">sin opciones ...</option>
-            @endforelse
-
-          </select>
-
-        </form>
-        <!-- grupo de botones -->
-        <div class="flex"></div>
+          <div class="flex flex-col gap-1 w-1/4">
+            <label>Filtrar por rol</label>
+            <select
+              wire:model.live="role"
+              wire:click="resetPagination()"
+              name="role"
+              id="role"
+              class="text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+              >
+              <option value="" selected>seleccione ...</option>
+              @forelse ($role_names as $role_name)
+                <option value="{{$role_name}}">{{$role_name}}</option>
+              @empty
+                <option value="">sin opciones ...</option>
+              @endforelse
+            </select>
+          </div>
+          {{-- limpiar filtros --}}
+          <x-a-button
+            href="#"
+            wire:click='limpiar()'
+            bg_color="neutral-200"
+            border_color="neutral-300"
+            text_color="neutral-600"
+            >limpiar filtros
+          </x-a-button>
+        </div>
       </x-slot:header>
 
       <x-slot:content>
@@ -111,7 +119,7 @@
             </tr>
             @empty
             <tr class="border">
-              <td colspan="6">sin registros!</td>
+              <td colspan="6">¡sin registros!</td>
             </tr>
             @endforelse
           </x-slot:tablebody>

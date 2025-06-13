@@ -33,6 +33,17 @@ class ListRoles extends Component
   }
 
   /**
+   * limpiar filtros
+   * @return void
+   */
+  public function limpiar(): void
+  {
+    $this->reset(['search', 'editable', 'internal']);
+    // evento reiniciar checkboxes
+    $this->dispatch('reset-checkbox');
+  }
+
+  /**
    * * buscar roles
    * busca todos los roles paginados
    * filtra roles cuando los parametros de filtrado existen

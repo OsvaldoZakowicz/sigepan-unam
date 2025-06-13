@@ -37,7 +37,7 @@ class EditUser extends Component
     // un usuario proveedor no puede editarse
     if ($user_service->isSupplierUserWithSupplier($this->user)) {
 
-      session()->flash('operation-info', 'No puede editar un usuario proveedor, debe gestionarlo a traves de la seccion "proveedores"');
+      session()->flash('operation-info', 'No puede editar un usuario proveedor, debe gestionarlo a traves de la seccion proveedores');
       $this->redirectRoute('users-users-index');
     }
 

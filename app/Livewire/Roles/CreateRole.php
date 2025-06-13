@@ -22,17 +22,22 @@ class CreateRole extends Component
   // capturo nombres
   public $role_permissions = [];
 
-  // roles por defecto
+  // permisos por defecto
   public $permissions_default_names = ['panel', 'panel-perfil'];
   public $permissions_default = [];
+
+  // permisos no elegibles
+  public $permissions_excluded = ['presupuestos', 'ordenes'];
 
   //* montar datos
   public function mount()
   {
+    $merged = array_merge($this->permissions_default_names, $this->permissions_excluded);
+
     // permisos que no son por defecto
     $this->permissions = Permission::where('is_internal', true)
-      ->whereNotIn('name', $this->permissions_default_names)
-      ->get();
+        ->whereNotIn('name', $merged)
+        ->get();
 
     // permisos por defecto
     $this->permissions_default = Permission::whereIn('name', $this->permissions_default_names)

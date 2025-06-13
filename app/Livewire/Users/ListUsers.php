@@ -111,6 +111,15 @@ class ListUsers extends Component
   }
 
   /**
+   * limpiar filtros
+   * @return void
+   */
+  public function limpiar(): void
+  {
+    $this->reset(['search', 'role']);
+  }
+
+  /**
    * * buscar usuarios
    * busca todos los usuarios paginados
    * filtra usuarios cuando los parametros de filtrado existen

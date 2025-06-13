@@ -21,6 +21,9 @@ class EditRole extends Component
   public $permissions_default_names = ['panel', 'panel-perfil'];
   public $permissions_default = [];
 
+  // permisos no elegibles
+  public $permissions_excluded = ['presupuestos', 'ordenes'];
+
   public function mount($role_id)
   {
     $this->role = Role::findOrFail($role_id);
@@ -31,8 +34,10 @@ class EditRole extends Component
       $this->redirectRoute('users-roles-index');
     }
 
+    $merged = array_merge($this->permissions_default_names, $this->permissions_excluded);
+
     $this->permissions = Permission::where('is_internal', true)
-      ->whereNotIn('name', $this->permissions_default_names)
+      ->whereNotIn('name', $merged)
       ->get();
 
     $this->permissions_default = Permission::whereIn('name', $this->permissions_default_names)

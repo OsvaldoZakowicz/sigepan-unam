@@ -1,17 +1,18 @@
 <div>
   {{-- componente crear rol --}}
   <article class="m-2 border rounded-sm border-neutral-200">
+
     <section class="flex items-center justify-between px-1 py-1 bg-neutral-200">
       <span class="text-sm capitalize">crear un rol interno</span>
       <div role="grupo-de-botones" class="flex"></div>
     </section>
+
     <section class="flex flex-col pt-2 px-1 text-sm capitalize bg-white">
       {{-- formulario --}}
-      <span class="mb-2 font-bold">formulario</span>
       <form wire:submit="save" class="w-full">
         <!-- este es un grupo de inputs por tema -->
         <fieldset class="flex flex-col mb-2 border rounded border-neutral-200">
-          <legend>datos del rol</legend>
+          <legend class="font-semibold">datos del rol</legend>
           {{-- nombre --}}
           <div class="flex flex-col gap-1 p-2 min-w-1/3 grow">
             <span>
@@ -36,8 +37,8 @@
           </div>
         </fieldset>
          <!-- este es un grupo de inputs por tema -->
-         <fieldset class="flex flex-col mb-2 border rounded border-neutral-200">
-          <legend>permisos del rol</legend>
+        <fieldset class="flex flex-col mb-2 border rounded border-neutral-200">
+          <legend class="font-semibold">permisos del rol</legend>
           <div class="flex flex-col gap-1 p-2 min-w-1/3 grow">
             <span>
               <label for="">seleccione los permisos</label>
@@ -80,7 +81,7 @@
               @endforelse
             </div>
           </div>
-         </fieldset>
+        </fieldset>
 
         <!-- botones del formulario -->
         <div class="flex justify-end">
