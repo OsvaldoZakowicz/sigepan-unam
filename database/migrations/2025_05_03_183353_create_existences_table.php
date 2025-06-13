@@ -26,7 +26,7 @@ return new class extends Migration
         ->constrained('stocks')->restrictOnDelete();
       $table->enum('movement_type', ['compra', 'elaboracion', 'perdida']);
       $table->timestamp('registered_at');
-      $table->decimal('quantity_amount');
+      $table->decimal('quantity_amount', 10, 3);  // permite hasta 3 decimales
       $table->timestamps();
     });
   }

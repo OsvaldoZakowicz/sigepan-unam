@@ -12,21 +12,12 @@ class Purchase extends Model
   use HasFactory;
 
   /**
-   * *status
-   * completada - Recibida en su totalidad
-   * parcial - Recibida parcialmente
-   * cancelada - Anulada antes de recepción
-   * devuelta - Recibida pero devuelta al proveedor
-   */
-
-  /**
    * atributos de una compra
    */
   protected $fillable = [
     'supplier_id',              // id de proveedor
     'purchase_date',            // fecha de compra
     'total_price',              // precio total de la compra
-    'status',                   // estado (por defecto completada), enum
     'purchase_reference_id',    // (nullable) id de preorden de referencia
     'purchase_reference_type',  // (nullable) modelo de preorden de referencia
   ];

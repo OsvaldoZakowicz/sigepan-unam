@@ -33,16 +33,13 @@ class PurchaseService
   {
     // Obtener el proveedor
     $supplier = $preorder->supplier;
-
     // Obtener datos del json order
     $order_data = json_decode($preorder->order, true);
 
     // Fecha de la orden
-    $order_date = $order_data['date'];
-
+    $order_date = $order_data['order_date'];
     // codigo de orden
-    $order_code = $order_data['code'];
-
+    $order_code = $order_data['order_code'];
     // total $ de la orden
     $order_total = $order_data['total'];
 
@@ -104,8 +101,8 @@ class PurchaseService
 
   /**
    * Crear una nueva compra con sus items y existencias
-   * @param array $purchase_data
-   * @param Collection $items
+   * @param array $purchase_data datos de compra
+   * @param Collection $items coleccion de items que se compraran
    * @return Purchase
    */
   public function createPurchase(array $purchase_data, Collection $purchase_items): Purchase
@@ -118,7 +115,6 @@ class PurchaseService
         'supplier_id'             => $purchase_data['supplier']->id,
         'purchase_date'           => $purchase_data['purchase_date'],
         'total_price'             => $purchase_items->sum('subtotal_price'),
-        'status'                  => $purchase_data['status'],
         'purchase_reference_id'   => $purchase_data['purchase_reference_id'] ?? null,
         'purchase_reference_type' => $purchase_data['purchase_reference_type'] ?? null,
       ]);
@@ -129,12 +125,8 @@ class PurchaseService
         // detalle de compra
         $detail = $this->createPurchaseDetail($purchase->id, $item);
 
-        // * NOTA: el helper convert_measure_value() retorna: array{symbol:string, value:float}
-        // symbol: es el indicador del volumen (kg, L, mL, g, ...), y value es el volumen numerico.
-        // total volume fue calculado con el helper.
-
         // existencia por compra
-        $this->createExistence($purchase->id, $detail, $item['total_volume']['value']);
+        $this->createExistence($purchase->id, $detail);
       }
 
       DB::commit();
@@ -149,6 +141,9 @@ class PurchaseService
 
   /**
    * Crear detalle de compra
+   * @param $purchase_id id de compra
+   * @param array $item un item que debe crearse como detalle
+   * @return PurchaseDetail
    */
   private function createPurchaseDetail(int $purchase_id, array $item): PurchaseDetail
   {
@@ -156,7 +151,7 @@ class PurchaseService
       'purchase_id'     => $purchase_id,
       'provision_id'    => $item['item_type'] === 'provision' ? $item['id'] : null,
       'pack_id'         => $item['item_type'] === 'pack' ? $item['id'] : null,
-      'item_count'      => $item['item_count'],
+      'item_count'      => $item['item_count'], // cantidad comprada
       'unit_price'      => $item['unit_price'],
       'subtotal_price'  => $item['subtotal_price']
     ]);
@@ -164,18 +159,26 @@ class PurchaseService
 
   /**
    * Crear registro de existencias
+   * @param int $purchase_id id de compra
+   * @param PurchaseDetail $detail un renglon detalle (suministro o pack)
    */
-  private function createExistence(int $purchase_id, PurchaseDetail $detail, $total_volume): void
+  private function createExistence(int $purchase_id, PurchaseDetail $detail): void
   {
-    // obtenemos el id de
-    $provision_id = $detail->provision_id ?? $detail->pack->provision_id;
+    // obtenemos el id del suministro para el cual aumenta su existencia
+    $provision = $detail->provision_id
+      ? Provision::find($detail->provision_id)
+      : Pack::find($detail->pack_id)->provision;
+
+    // cantidad total comprada = total items * volumen unitario
+    // * las existencias siempre se almacenan con una cantidad float en la unidad (Kg, L, U, M)
+    $quantity_amount = $detail->item_count * $provision->provision_quantity; // 4 * 1.5
 
     Existence::create([
-      'provision_id'    => $provision_id,
+      'provision_id'    => $provision->id,
       'purchase_id'     => $purchase_id,
-      'movement_type'   => 'compra',
+      'movement_type'   => Existence::MOVEMENT_TYPE_COMPRA(),
       'registered_at'   => now(),
-      'quantity_amount' => $total_volume
+      'quantity_amount' => (float) $quantity_amount,
     ]);
   }
 
@@ -192,8 +195,8 @@ class PurchaseService
 
       return [
         'id' => $preorder->id,
-        'order_code' => $order_data['code'],
-        'order_date' => $order_data['date']
+        'order_code' => $order_data['order_code'],
+        'order_date' => $order_data['order_date']
       ];
 
     }

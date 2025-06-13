@@ -270,7 +270,6 @@ class PurchaseSeeder extends Seeder
           'supplier_id' => $proveedor->id,
           'purchase_date' => now(),
           'total_price' => $total_compra,
-          'status' => 'completada'
         ]);
 
         // Crear detalles y existencias
@@ -347,7 +346,6 @@ class PurchaseSeeder extends Seeder
           'supplier_id' => $proveedor->id,
           'purchase_date' => now(),
           'total_price' => $total_compra,
-          'status' => 'completada'
         ]);
 
         // Crear detalles y existencias

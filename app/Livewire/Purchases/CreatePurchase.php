@@ -408,19 +408,13 @@ class CreatePurchase extends Component
       });
 
       if ($this->with_preorder) {
-
         $this->order_data['purchase_date'] = $validated['formdt_purchase_date'];
-        $this->order_data['status']        = 'completada'; //? es necesario un estado?
-
         $purchase_service->createPurchase($this->order_data, $sanitized_items);
       } else {
-
         $new_purchase_data = [
           'supplier'      => Supplier::find($validated['formdt_supplier_id']),
           'purchase_date' => $validated['formdt_purchase_date'],
-          'status'        => 'completada', //? es necesario un estado?
         ];
-
         $purchase_service->createPurchase($new_purchase_data, $sanitized_items);
       }
 

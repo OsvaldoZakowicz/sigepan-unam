@@ -160,29 +160,34 @@ function limitText($text)
 }
 
 /**
- * Convierte una cantidad según la unidad de medida proporcionada
- * @param float $quantity Cantidad a convertir
- * @param Measure $measure Instancia del modelo Measure
+ * Convierte una cantidad segun la unidad de medida proporcionada
+ * @param float $quantity Cantidad a convertir,
+ * (siempre viene desde un suministro o pack como la unidad en unidad 'grande': Kg, L, U, M),
+ * por ejemplo cincuenta gramos de levadura humeda son 0,05 kg y medio kilo de membrillo son 0,05
+ * @param Measure $measure Instancia del modelo Measure (tiene el factor de conversion)
  * @return string Cantidad convertida con su unidad
  */
 function convert_measure(float $quantity, Measure $measure): string
 {
-  // Usar valor absoluto
+  // usar valor absoluto
+  // siempre trabajamos en absolutos
   $absQuantity = abs($quantity);
 
-  // Si es unidad, retornar sin decimales
+  // si es unidad (U), retornar sin decimales
+  // un unidad (1) no tiene factor de conversion, en float 1.00 pasa a ser 1.
   if ($measure->unit_name === 'unidad') {
     return (int)$absQuantity . ' ' . $measure->unit_symbol;
   }
 
-  // Si es una unidad simple o la cantidad es mayor o igual a 1
+  // si el factor de conversion es null (caso de unidad) o la cantidad es mayor o igual a 1
+  // convertimos la cantidad a Kg, L, M
   if (is_null($measure->conversion_factor) || $absQuantity >= 1) {
-    return number_format($absQuantity, 2) . ' ' . $measure->unit_symbol;
+    return (float) number_format($absQuantity, 2) . '' . $measure->unit_symbol;
   }
 
-  // Convertir a la unidad menor
+  // convertir a la unidad menor g, mL, cm
   $convertedQuantity = $absQuantity * $measure->conversion_factor;
-  return number_format($convertedQuantity, 2) . ' ' . $measure->conversion_symbol;
+  return (float) number_format($convertedQuantity, 2) . '' . $measure->conversion_symbol;
 }
 
 /**
@@ -193,10 +198,12 @@ function convert_measure(float $quantity, Measure $measure): string
  */
 function convert_measure_value(float $quantity, Measure $measure): array
 {
-  // Usar valor absoluto
+  // usar valor absoluto
+  // siempre trabajamos en absolutos
   $absQuantity = abs($quantity);
 
-  // Si es unidad, retornar valor entero
+  // si es unidad (U), retornar sin decimales
+  // un unidad (1) no tiene factor de conversion, en float 1.00 pasa a ser 1.o
   if ($measure->unit_name === 'unidad') {
     return [
       'symbol' => $measure->unit_symbol,
@@ -204,18 +211,20 @@ function convert_measure_value(float $quantity, Measure $measure): array
     ];
   }
 
-  // Si es una unidad simple o la cantidad es mayor o igual a 1
+  // si el factor de conversion es null (caso de unidad) o la cantidad es mayor o igual a 1
+  // convertimos la cantidad a Kg, L, M
   if (is_null($measure->conversion_factor) || $absQuantity >= 1) {
     return [
       'symbol' => $measure->unit_symbol,
-      'value' => $absQuantity
+      'value' => (float) number_format($absQuantity, 2)
     ];
   }
 
-  // Convertir a la unidad menor
+  // convertir a la unidad menor g, mL, cm
+  $convertedQuantity = $absQuantity * $measure->conversion_factor;
   return [
     'symbol' => $measure->conversion_symbol,
-    'value' => $absQuantity * $measure->conversion_factor
+    'value' => (float) number_format($convertedQuantity, 2)
   ];
 }
 
