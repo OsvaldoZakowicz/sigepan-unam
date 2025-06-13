@@ -8,6 +8,9 @@
         wire:navigate
         href="{{ route('stocks-products-index') }}"
         class="mx-1"
+        bg_color="neutral-200"
+        border_color="neutral-300"
+        text_color="neutral-600"
         >volver
       </x-a-button>
     </x-title-section>
@@ -174,7 +177,7 @@
                     <span class="">{{ $selected_stock->quantity_left }}</span>
                   </span>
                 </div>
-                <div class="mt-4">
+                <div class="mt-4 max-h-72 overflow-y-auto overflow-x-auto">
                   <x-table-base>
                     <x-slot:tablehead>
                       <tr class="border bg-neutral-100">

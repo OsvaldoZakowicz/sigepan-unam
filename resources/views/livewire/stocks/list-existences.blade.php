@@ -119,7 +119,7 @@
                 </div>
               </div>
               {{-- cuerpo del modal --}}
-              <div class="mt-4">
+              <div class="mt-4 max-h-72 overflow-y-auto overflow-x-auto">
                 <x-table-base>
                   <x-slot:tablehead>
                     <tr class="border bg-neutral-100">
