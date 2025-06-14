@@ -12,8 +12,6 @@
 
       <x-slot:content class="flex-col">
 
-        <span class="mb-1 font-bold">formulario</span>
-
         @if (!$can_edit)
           <span class="mb-1">El suministro esta asociado a proveedores, solo puede editar la descripcion o los packs</span>
         @endif
@@ -139,13 +137,22 @@
               @error('provision_quantity')
                 <span class="text-red-400 text-xs">{{ $message }}</span>
               @enderror
-              <input
-                wire:model="provision_quantity"
-                name="provision_quantity"
-                type="text"
-                @readonly(!$can_edit)
-                class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300 @if (!$can_edit)bg-neutral-100 @endif"
-              />
+              @if ($measure === 'unidad')
+                <input
+                  placeholder="1"
+                  type="text"
+                  readonly
+                  class="p-1 text-sm text-end border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300 bg-neutral-100"
+                />
+              @else
+                <input
+                  wire:model="provision_quantity"
+                  name="provision_quantity"
+                  type="text"
+                  @readonly(!$can_edit)
+                  class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300 @if (!$can_edit)bg-neutral-100 @endif"
+                />
+              @endif
             </div>
 
             {{-- descripcion --}}
@@ -171,7 +178,7 @@
             <div class="flex justify-start items-end p-2 w-full">
 
               {{-- indicar cantidad del pack --}}
-              <div class="flex flex-col gap-1 pr-2 md:w-1/2 lg:w-1/4">
+              <div class="flex flex-col gap-1 pr-2">
                 <label for="pack_units">crear o editar la lista de packs del suministro</label>
                 <div class="flex items-center justify-start gap-1">
                   <select
@@ -184,6 +191,10 @@
                     <option value="8">pack de 8</option>
                     <option value="10">pack de 10</option>
                     <option value="12">pack de 12</option>
+                    <option value="100">pack de 100 (recomendado para insumos)</option>
+                    <option value="250">pack de 250 (recomendado para insumos)</option>
+                    <option value="500">pack de 500 (recomendado para insumos)</option>
+                    <option value="1000">pack de 1000 (recomendado para insumos)</option>
                   </select>
                   <x-a-button
                     href="#"
@@ -198,7 +209,7 @@
 
               {{-- mostrar packs a crear o editar --}}
               <div class="flex flex-col md:w-1/2 lg:grow">
-                <span class="ml-2">lista de packs, use el icono <strong>x</strong> para eliminar o cancelar un pack</span>
+                <span class="ml-2">lista de packs, use el icono <strong>x</strong> para eliminar un pack existente o cancelar la creación de un pack</span>
                 <div class="flex justify-start items-center gap-1 ml-2 p-1 h-8 border border-dashed border-neutral-200 leading-none">
 
                   {{-- packs creados --}}

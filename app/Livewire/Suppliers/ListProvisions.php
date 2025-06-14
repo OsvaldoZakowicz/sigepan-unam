@@ -46,8 +46,6 @@ class ListProvisions extends Component
   */
   public function delete(Provision $provision): void
   {
-    // todo: cuando el suministro se use en recetas, no permitir el borrado
-
     // si el suministro esta en listas de precios, no borrar
     if ($provision->suppliers->count() > 0) {
 
@@ -72,7 +70,57 @@ class ListProvisions extends Component
       return;
     }
 
+    // si el suministro esta asociado a periodos de presupuesto, no borrar
+    if ($provision->periods->count() > 0 || $provision->quotations->count() > 0) {
+      $this->dispatch('toast-event', toast_data: [
+        'event_type'  =>  'info',
+        'title_toast' =>  toastTitle('', true),
+        'descr_toast' =>  'No se puede eliminar el suministro, tiene presupuestos y periodos presupuestarios asociados',
+      ]);
+
+      return;
+    }
+
+    // si el suministro esta asociado a periodos de preorden, no borrar
+    if ($provision->pre_orders->count()) {
+      $this->dispatch('toast-event', toast_data: [
+        'event_type'  =>  'info',
+        'title_toast' =>  toastTitle('', true),
+        'descr_toast' =>  'No se puede eliminar el suministro, tiene preordenes y periodos de preorden asociados',
+      ]);
+
+      return;
+    }
+
+    // si el suministro esta asociado a compras, no borrar
+    if ($provision->purchase_details->count() > 0) {
+      $this->dispatch('toast-event', toast_data: [
+        'event_type'  =>  'info',
+        'title_toast' =>  toastTitle('', true),
+        'descr_toast' =>  'No se puede eliminar el suministro, tiene compras asociadas',
+      ]);
+
+      return;
+    }
+
+    // si el suministro tiene existencias, no borrar
+    if ($provision->existences->count() > 0) {
+      $this->dispatch('toast-event', toast_data: [
+        'event_type'  =>  'info',
+        'title_toast' =>  toastTitle('', true),
+        'descr_toast' =>  'No se puede eliminar el suministro, tiene existencias asociadas',
+      ]);
+
+      return;
+    }
+
     $provision->delete();
+
+    $this->dispatch('toast-event', toast_data: [
+      'event_type'  =>  'info',
+      'title_toast' =>  toastTitle('', true),
+      'descr_toast' =>  'El suministro fue borrado con exito, aparcerá al final de la lista, puede restaurarlo de ser necesario',
+    ]);
 
   }
 

@@ -20,7 +20,7 @@
       <x-slot:header>
 
         {{-- busqueda --}}
-        <div class="flex gap-1 justify-start items-start grow">
+        <div class="w-full flex justify-start items-end gap-1">
 
           {{-- termino de busqueda --}}
           <div class="flex flex-col justify-end w-1/4">
@@ -78,18 +78,16 @@
             </select>
           </div>
 
-        </div>
-
-        {{-- limpiar campos de busqueda --}}
-        <div class="flex flex-col self-start h-full">
+          {{-- limpiar filtros --}}
           <x-a-button
             href="#"
-            wire:click="resetSearchInputs()"
+            wire:click='resetSearchInputs()'
             bg_color="neutral-200"
             border_color="neutral-300"
             text_color="neutral-600"
-            >limpiar
+            >limpiar filtros
           </x-a-button>
+
         </div>
 
       </x-slot:header>
@@ -104,7 +102,7 @@
               <x-table-th class="text-start">marca</x-table-th>
               <x-table-th class="text-start">tipo</x-table-th>
               <x-table-th class="text-end">
-                <span>volumen unitario</span>
+                <span>volumen</span>
                 <x-quest-icon title="kilogramos (kg), litros (lts) o unidades (un)"/>
               </x-table-th>
               <x-table-th class="text-start">
@@ -153,9 +151,9 @@
                 </x-table-td>
                 <x-table-td class="text-start text-neutral-700">
                   @if ($provision->deleted_at === 'borrado')
-                    <span class="font-semibold text-neutral-600" >{{ $provision->deleted_at }}</span>
-                  @else
-                    <span class="font-semibold text-emerald-600">{{ $provision->deleted_at }}</span>
+                    <x-text-tag color="neutral">{{ $provision->deleted_at }}</x-text-tag>
+                    @else
+                    <x-text-tag color="emerald">{{ $provision->deleted_at }}</x-text-tag>
                   @endif
                 </x-table-td>
                 <x-table-td class="text-start">

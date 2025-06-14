@@ -52,26 +52,22 @@
                 <x-table-td>
                   <div class="flex justify-start gap-1">
 
-                    @if ($trademark->provision_trademark_is_editable)
-                      <x-a-button
-                        wire:click="edit({{ $trademark->id }})"
-                        href="#"
-                        bg_color="neutral-100"
-                        border_color="neutral-200"
-                        text_color="neutral-600"
-                        >editar
-                      </x-a-button>
+                    <x-a-button
+                      wire:click="edit({{ $trademark->id }})"
+                      href="#"
+                      bg_color="neutral-100"
+                      border_color="neutral-200"
+                      text_color="neutral-600"
+                      >editar
+                    </x-a-button>
 
-                      <x-btn-button
-                        type="button"
-                        wire:click="delete({{ $trademark->id }})"
-                        wire:confirm="¿Desea borrar el registro?, eliminar una marca hará que no este disponible para asignar a ningún suministro."
-                        color="red"
-                        >eliminar
-                      </x-btn-button>
-                    @else
-                      <span>ninguna</span>
-                    @endif
+                    <x-btn-button
+                      type="button"
+                      wire:click="delete({{ $trademark->id }})"
+                      wire:confirm="¿Desea borrar el registro?, eliminar una marca hará que no este disponible para asignar a ningún suministro."
+                      color="red"
+                      >eliminar
+                    </x-btn-button>
 
                   </div>
                 </x-table-td>

@@ -57,6 +57,11 @@ class CreateProvision extends Component
       $this->measure                    = $category->measure->unit_name;
       $this->provision_type             = $category->provision_type->provision_type_name;
 
+      // Si la medida es 'unidad', asignar 1 a provision_quantity
+      if ($category->measure->unit_name === 'unidad') {
+        $this->provision_quantity = 1;
+      }
+
       // placeholder de la cantidad esperada
       $this->input_quantity_placeholder = 'cantidad en ' . $category->measure->unit_name .
         ($category->measure->conversion_unit ? ' o ' . $category->measure->conversion_unit : '');
@@ -66,6 +71,7 @@ class CreateProvision extends Component
       $this->measure                    = '';
       $this->input_quantity_placeholder = '';
       $this->provision_type             = '';
+      $this->provision_quantity         = null;
 
     }
   }

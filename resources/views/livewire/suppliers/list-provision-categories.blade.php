@@ -51,31 +51,27 @@
                 <x-table-td class="text-end">{{ $category->id }}</x-table-td>
                 <x-table-td class="text-start">{{ $category->provision_category_name }}</x-table-td>
                 <x-table-td class="text-start">{{ $category->provision_type->provision_type_name }}</x-table-td>
-                <x-table-td class="text-start">{{ $category->measure->unit_name }}</x-table-td>
+                <x-table-td class="text-start">{{ $category->measure->unit_name }} ({{ $category->measure->unit_symbol }})</x-table-td>
                 <x-table-td class="text-end">{{ formatDateTime($category->created_at, 'd-m-Y') }}</x-table-td>
                 <x-table-td>
                   <div class="flex justify-start gap-1">
 
-                    @if ($category->provision_category_is_editable)
-                      <x-a-button
-                        wire:click="edit({{ $category->id }})"
-                        href="#"
-                        bg_color="neutral-100"
-                        border_color="neutral-200"
-                        text_color="neutral-600"
-                        >editar
-                      </x-a-button>
+                    <x-a-button
+                      wire:click="edit({{ $category->id }})"
+                      href="#"
+                      bg_color="neutral-100"
+                      border_color="neutral-200"
+                      text_color="neutral-600"
+                      >editar
+                    </x-a-button>
 
-                      <x-btn-button
-                        type="button"
-                        wire:click="delete({{ $category->id }})"
-                        wire:confirm="¿Desea borrar el registro?, eliminar una categoría hará que no este disponible para asignar a ningún suministro."
-                        color="red"
-                        >eliminar
-                      </x-btn-button>
-                    @else
-                      <span>ninguna</span>
-                    @endif
+                    <x-btn-button
+                      type="button"
+                      wire:click="delete({{ $category->id }})"
+                      wire:confirm="¿Desea borrar el registro?, eliminar una categoría hará que no este disponible para asignar a ningún suministro."
+                      color="red"
+                      >eliminar
+                    </x-btn-button>
 
                   </div>
                 </x-table-td>
