@@ -132,7 +132,7 @@
         {{-- modal de detalle de compra --}}
         @if($show_details_modal && $selected_purchase)
           <div class="fixed z-50 inset-0 bg-neutral-400 bg-opacity-40 overflow-y-auto h-full w-full flex items-center justify-center">
-            <div class="bg-white p-5 border rounded-md shadow-lg w-3/4 transform transition-all">
+            <div class="bg-white p-5 border rounded-md shadow-lg w-5/6 transform transition-all">
               <div class="text-start">
                 <h3 class="text-lg leading-6 capitalize font-medium text-neutral-800">
                   Detalle de la compra <span class="uppercase">{{ $selected_purchase->id }}</span>

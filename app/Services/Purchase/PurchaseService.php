@@ -171,7 +171,16 @@ class PurchaseService
 
     // cantidad total comprada = total items * volumen unitario
     // * las existencias siempre se almacenan con una cantidad float en la unidad (Kg, L, U, M)
-    $quantity_amount = $detail->item_count * $provision->provision_quantity; // 4 * 1.5
+    // la cantidad total depende de si se adquirio un suministro individual o un pack.
+    if ($detail->provision_id) {
+      // compra de n suministros individuales
+      $quantity_amount = $detail->item_count * $provision->provision_quantity; // ej: 4 aceites * 1.5 L cada uno
+    } else {
+      // compra de n packs de un suministro
+      $pack = Pack::find($detail->pack_id);
+      $pack_volume = $pack->pack_units * $pack->provision->provision_quantity; // ej: pack de 10 unidades de aceite * 1.5 L cada uno
+      $quantity_amount = $detail->item_count * $pack_volume; // ej: compre 2 packs * (10 * 1.5)
+    }
 
     Existence::create([
       'provision_id'    => $provision->id,
