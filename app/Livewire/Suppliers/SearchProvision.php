@@ -214,6 +214,17 @@ class SearchProvision extends Component
   }
 
   /**
+   * limpiar filtros
+   * @return void
+   */
+  public function limpiar(): void
+  {
+    $this->reset([
+      'search', 'search_tr', 'search_ty','search_pack', 'search_tr_pack', 'search_ty_pack', 'paginas'
+    ]);
+  }
+
+  /**
    * renderizar vista
    * @return View
   */

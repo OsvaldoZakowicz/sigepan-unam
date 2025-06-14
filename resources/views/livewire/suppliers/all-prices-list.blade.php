@@ -23,7 +23,7 @@
       <x-slot:header>
 
         {{-- busqueda --}}
-        <div class="w-full flex justify-start items-center gap-1">
+        <div class="w-full flex justify-start items-end gap-1">
 
           {{-- termino de busqueda --}}
           <div class="flex flex-col w-1/4">
@@ -46,7 +46,7 @@
           </div>
 
           {{-- filtro de marca --}}
-          <div class="flex flex-col w-1/4">
+          <div class="flex flex-col w-56">
             <label for="trademark_filter">filtrar por marca</label>
             <select
               name="trademark_filter"
@@ -67,7 +67,7 @@
           </div>
 
           {{-- filtro de tipo --}}
-          <div class="flex flex-col w-1/4">
+          <div class="flex flex-col w-56">
             <label for="type_filter">filtrar por tipo</label>
             <select
               name="type_filter"
@@ -95,6 +95,16 @@
             </div>
           </div>
 
+          {{-- limpiar filtros --}}
+          <x-a-button
+            href="#"
+            wire:click='limpiar()'
+            bg_color="neutral-200"
+            border_color="neutral-300"
+            text_color="neutral-600"
+            >limpiar filtros
+          </x-a-button>
+
         </div>
 
       </x-slot:header>
@@ -114,10 +124,10 @@
                 <x-table-th class="text-start">tipo</x-table-th>
                 <x-table-th class="text-start">proveedor</x-table-th>
                 <x-table-th class="text-end">
-                  <span>cantidad</span>
+                  <span>volumen</span>
                   <x-quest-icon title="kilogramos (kg), gramos (g), litros (l), mililitros (ml), metro (m), centimetro (cm), unidad (u)"/>
                 </x-table-th>
-                <x-table-th class="text-end">$&nbsp;precio</x-table-th>
+                <x-table-th class="text-end">$precio</x-table-th>
                 <x-table-th class="text-start w-48">acciones</x-table-th>
               </tr>
             </x-slot:tablehead>
@@ -151,7 +161,7 @@
                         {{ convert_measure($pack->pack_quantity, $pack->provision->measure) }}
                       </x-table-td>
                       <x-table-td class="text-end">
-                        $&nbsp;{{ $supplier->pivot->price }}
+                        ${{ toMoneyFormat($supplier->pivot->price) }}
                       </x-table-td>
                       <x-table-td class="text-start">
                         <div class="flex gap-1">
@@ -204,7 +214,7 @@
                         {{ convert_measure($provision->provision_quantity, $provision->measure) }}
                       </x-table-td>
                       <x-table-td class="text-end">
-                        $&nbsp;{{ $supplier->pivot->price }}
+                        ${{ toMoneyFormat($supplier->pivot->price) }}
                       </x-table-td>
                       <x-table-td class="text-start">
                         <div class="flex gap-1">

@@ -12,8 +12,6 @@
 
     <x-slot:content class="flex-col">
 
-      <span class="mb-2 font-bold">formulario</span>
-
       <form wire:submit="save" class="w-full flex flex-col gap-2">
 
         <x-div-toggle

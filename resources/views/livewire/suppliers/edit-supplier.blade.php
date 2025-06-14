@@ -12,8 +12,6 @@
 
       <x-slot:content class="flex-col">
 
-        <span class="mb-2 font-bold">formulario</span>
-
         <form wire:submit="update" class="w-full flex flex-col gap-2">
 
           <x-div-toggle x-data="{ open: false }" title="proveedor" subtitle="Editar los siguientes datos del proveedor y su direccion." class="p-2">

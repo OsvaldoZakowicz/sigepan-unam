@@ -38,47 +38,60 @@ class ListSuppliers extends Component
   */
   public function delete(SupplierService $supplier_service, Supplier $supplier): void
   {
-    try {
-
-      // todo: politicas para borrar un proveedor
-      // no permitir si tiene suministros asociados
-      // no prmitir si participa en pedidos de presupuesto abiertos
-      // no permitir si esta activo
-
-      $supplier_service->deleteSupplier($supplier);
-
+    // Verificar si tiene suministros o packs asociados
+    if ($supplier->provisions()->count() > 0 || $supplier->packs()->count() > 0) {
       $this->dispatch('toast-event', toast_data: [
-        'event_type'  => 'success',
-        'title_toast' => toastTitle(),
-        'descr_toast' => toastSuccessBody('proveedor', 'eliminado')
+        'event_type'  => 'info',
+        'title_toast' => toastTitle('', true),
+        'descr_toast' => 'No se puede eliminar el proveedor porque tiene suministros o packs asociados'
       ]);
 
-    } catch (QueryException $qe) {
-
-      // capturar codigo del error
-      $error_code = $qe->errorInfo[1];
-
-      // error 1451 de clave foranea, restrict on delete
-      if ($error_code == 1451) {
-
-        $this->dispatch('toast-event', toast_data: [
-          'event_type'  =>  'info',
-          'title_toast' =>  toastTitle('', true),
-          'descr_toast' =>  'No se puede eliminar el proveedor, tiene suministros asociados a su lista de precios',
-        ]);
-
-        return;
-
-      }
-
-      // otro error
-      $this->dispatch('toast-event', toast_data: [
-        'event_type'  =>  'error',
-        'title_toast' =>  toastTitle('fallida'),
-        'descr_toast' =>  'Error inesperado: ' . $qe->getMessage() . 'contacte al Administrador',
-      ]);
-
+      return;
     }
+
+    // verificar si esta sociado a compras
+    if ($supplier->purchases()->count() > 0) {
+      $this->dispatch('toast-event', toast_data: [
+        'event_type'  => 'info',
+        'title_toast' => toastTitle('', true),
+        'descr_toast' => 'No se puede eliminar el proveedor porque tiene compras asociadas'
+      ]);
+
+      return;
+    }
+
+    // verificar si esta sociado a periodos presupuestarios
+    // nota periodos abiertos o historicos.
+    if ($supplier->quotations()->count() > 0) {
+      $this->dispatch('toast-event', toast_data: [
+        'event_type'  => 'info',
+        'title_toast' => toastTitle('', true),
+        'descr_toast' => 'No se puede eliminar el proveedor porque tiene presupuestos y periodos presupuestarios asociados'
+      ]);
+
+      return;
+    }
+
+    // verificar si esta sociado a periodos de preordenes
+    // nota periodos abiertos o historicos.
+    if ($supplier->pre_orders()->count() > 0) {
+      $this->dispatch('toast-event', toast_data: [
+        'event_type'  => 'info',
+        'title_toast' => toastTitle('', true),
+        'descr_toast' => 'No se puede eliminar el proveedor porque tiene preordenes y periodos de preorden asociados'
+      ]);
+
+      return;
+    }
+
+    // eliminar proveedor
+    $supplier_service->deleteSupplier($supplier);
+
+    $this->dispatch('toast-event', toast_data: [
+      'event_type'  => 'success',
+      'title_toast' => toastTitle(),
+      'descr_toast' => toastSuccessBody('proveedor', 'eliminado')
+    ]);
   }
 
   /**
@@ -88,8 +101,7 @@ class ListSuppliers extends Component
   {
     return Supplier::when($this->search_input,
         function ($query) {
-          $query->where('id', 'like', '%' . $this->search_input . '%')
-                ->orWhere('company_name', 'like', '%' . $this->search_input . '%')
+          $query->where('company_name', 'like', '%' . $this->search_input . '%')
                 ->orWhere('company_cuit', 'like', '%' . $this->search_input . '%')
                 ->orWhere('phone_number', 'like', '%' . $this->search_input . '%');
         }

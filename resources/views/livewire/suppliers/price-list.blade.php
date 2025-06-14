@@ -9,17 +9,15 @@
         <span class="font-semibold">{{ $supplier->company_name }},&nbsp;</span>
         <span>El proveedor se encuentra:&nbsp;</span>
         @if ($supplier->status_is_active)
-          <span
-            class="font-semibold text-emerald-600"
-            >activo
+          <x-text-tag color="emerald">
+            activo
             <x-quest-icon title="El proveedor esta activo para la panaderia, puede contactarse para presupuestos y ordenes de compras. Puede asignarle suministros y generarle una lista de precios"/>
-          </span>
+          </x-text-tag>
         @else
-          <span
-            class="font-semibold text-neutral-600"
-            >inactivo
+          <x-text-tag color="neutral">
+            inactivo
             <x-quest-icon title="El proveedor no esta activo debido a {{ $supplier->status_description }}"/>
-          </span>
+          </x-text-tag>
         @endif
       </x-slot:title>
       <div class="flex gap-2">
@@ -57,7 +55,7 @@
       <x-slot:header>
 
         {{-- busqueda --}}
-        <div class="w-full flex items-center gap-1">
+        <div class="w-full flex justify-start items-end gap-1">
 
           {{-- termino de busqueda --}}
           <div class="flex flex-col w-1/4">
@@ -129,6 +127,16 @@
             </div>
           </div>
 
+          {{-- limpiar filtos --}}
+          <x-a-button
+            href="#"
+            wire:click='limpiar()'
+            bg_color="neutral-200"
+            border_color="neutral-300"
+            text_color="neutral-600"
+            >limpiar filtros
+          </x-a-button>
+
         </div>
 
       </x-slot:header>
@@ -142,10 +150,10 @@
               <x-table-th class="text-start">marca</x-table-th>
               <x-table-th class="text-start">tipo</x-table-th>
               <x-table-th class="text-end">
-                <span>cantidad</span>
+                <span>volumen</span>
                 <x-quest-icon title="kilogramos (kg), gramos (g), litros (l), mililitros (ml), metro (m), centimetro (cm), unidad (u)"/>
               </x-table-th>
-              <x-table-th class="text-end">$&nbsp;precio</x-table-th>
+              <x-table-th class="text-end">$precio</x-table-th>
               <x-table-th class="text-start w-48">acciones</x-table-th>
             </tr>
           </x-slot:tablehead>
@@ -170,7 +178,7 @@
                     {{ convert_measure($pwp->pack_quantity, $pwp->provision->measure) }}
                   </x-table-td>
                   <x-table-td class="text-end">
-                    $&nbsp;{{ $pwp->pivot->price }}
+                    ${{ toMoneyFormat($pwp->pivot->price) }}
                   </x-table-td>
                   <x-table-td class="text-start">
 
@@ -210,7 +218,7 @@
                     {{ convert_measure($pwp->provision_quantity, $pwp->measure) }}
                   </x-table-td>
                   <x-table-td class="text-end">
-                    $&nbsp;{{ $pwp->pivot->price }}
+                    ${{ toMoneyFormat($pwp->pivot->price) }}
                   </x-table-td>
                   <x-table-td class="text-start">
 
@@ -248,4 +256,17 @@
     </x-content-section>
 
   </article>
+
+  <script>
+    // escuchar el evento reset-checkbox
+    document.addEventListener('livewire:initialized', () => {
+      Livewire.on('reset-checkbox', () => {
+        // obtener los checkboxes por su id
+        const toggleCheckbox = document.getElementById('toggle');
+
+        // establecer checked = false
+        if(toggleCheckbox) toggleCheckbox.checked = false;
+      });
+    });
+  </script>
 </div>

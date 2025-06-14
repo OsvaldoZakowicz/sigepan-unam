@@ -39,7 +39,7 @@
               type="text"
               wire:model.live="search_input"
               name="search"
-              placeholder="ingrese un id, razon social, telefono o CUIT ..."
+              placeholder="ingrese razon social, telefono o CUIT ..."
               class="w-1/4 shrink text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
             />
           </div>
@@ -83,17 +83,15 @@
                 </x-table-td>
                 <x-table-td class="text-start">
                   @if ($supplier->status_is_active)
-                    <span
-                      class="font-semibold text-emerald-600"
-                      >activo
+                    <x-text-tag color="emerald">
+                      activo
                       <x-quest-icon title="El proveedor esta activo para la panaderia, puede contactarse para presupuestos y ordenes de compras. Puede asignarle suministros y generarle una lista de precios"/>
-                    </span>
+                    </x-text-tag>
                   @else
-                    <span
-                      class="font-semibold text-neutral-600"
-                      >inactivo
+                    <x-text-tag color="neutral">
+                      inactivo
                       <x-quest-icon title="El proveedor no esta activo debido a {{ $supplier->status_description }}"/>
-                    </span>
+                    </x-text-tag>
                   @endif
                 </x-table-td>
                 <x-table-td class="text-end">
@@ -108,7 +106,8 @@
                       bg_color="neutral-100"
                       border_color="neutral-200"
                       text_color="neutral-600"
-                      >precios</x-a-button>
+                      >precios
+                    </x-a-button>
 
                     <x-a-button
                       wire:navigate
@@ -116,7 +115,8 @@
                       bg_color="neutral-100"
                       border_color="neutral-200"
                       text_color="neutral-600"
-                      >ver</x-a-button>
+                      >ver
+                    </x-a-button>
 
                     <x-a-button
                       wire:navigate
@@ -124,14 +124,16 @@
                       bg_color="neutral-100"
                       border_color="neutral-200"
                       text_color="neutral-600"
-                      >editar</x-a-button>
+                      >editar
+                    </x-a-button>
 
                     <x-btn-button
                       btn_type="button"
                       color="red"
                       wire:click="delete({{ $supplier->id }})"
-                      wire:confirm="¿desea borrar el registro? esta accion es irreversible, se eliminara el proveedor y sus credenciales de acceso"
-                      >eliminar</x-btn-button>
+                      wire:confirm="¿desea borrar el registro? esta accion es irreversible, se eliminara el proveedor y sus credenciales de acceso. Si no desea trabajar con un proveedor registrado, puede editarlo para desactivarlo."
+                      >eliminar
+                    </x-btn-button>
 
                   </div>
                 </x-table-td>

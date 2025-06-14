@@ -118,6 +118,17 @@ class AllPricesList extends Component
   }
 
   /**
+   * limpiar filtros
+   * @return void
+   */
+  public function limpiar(): void
+  {
+    $this->reset([
+      'search', 'trademark_filter', 'type_filter'
+    ]);
+  }
+
+  /**
    * renderizar vista
    * @return view
   */

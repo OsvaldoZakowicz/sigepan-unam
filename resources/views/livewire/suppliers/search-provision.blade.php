@@ -30,10 +30,10 @@
       <div class="flex flex-col gap-1 w-full">
 
         {{-- busqueda --}}
-        <div class="flex w-full gap-1 bg-neutral-100 p-1 border border-neutral-200">
+        <div class="flex justify-start items-end w-full gap-1 bg-neutral-100 p-1 border border-neutral-200">
 
           {{-- termino de busqueda --}}
-          <div class="flex flex-col w-full justify-end">
+          <div class="flex flex-col w-1/4 justify-end">
             <x-input-label>buscar packs</x-input-label>
             <x-text-input
               wire:model.live="search_pack"
@@ -44,7 +44,7 @@
           </div>
 
           {{-- filtrar por marca --}}
-          <div class="flex flex-col w-full justify-end">
+          <div class="flex flex-col w-56 justify-end">
             <select
               name="search_tr_pack"
               id="search_tr_pack"
@@ -64,7 +64,7 @@
           </div>
 
           {{-- filtrar por tipo --}}
-          <div class="flex flex-col w-full justify-end">
+          <div class="flex flex-col w-56 justify-end">
             <select
               name="search_ty_pack"
               id="search_ty_pack"
@@ -84,7 +84,7 @@
           </div>
 
           {{-- elegir tamaño de paginacion --}}
-          <div class="flex flex-col w-full justify-end">
+          <div class="flex flex-col w-56 justify-end">
             <select
               name="paginas"
               id="paginas"
@@ -99,6 +99,16 @@
             </select>
           </div>
 
+          {{-- limpiar filtros --}}
+          <x-a-button
+            href="#"
+            wire:click='limpiar()'
+            bg_color="neutral-200"
+            border_color="neutral-300"
+            text_color="neutral-600"
+            >limpiar filtros
+          </x-a-button>
+
         </div>
 
         {{-- seleccion del resultado --}}
@@ -112,10 +122,10 @@
                 <x-table-th class="text-start">marca</x-table-th>
                 <x-table-th class="text-start">tipo</x-table-th>
                 <x-table-th class="text-end">
-                  <span>cantidad</span>
+                  <span>volumen</span>
                   <x-quest-icon title="kilogramos (kg), gramos (g), litros (l), mililitros (ml), metro (m), centimetro (cm), unidad (u)"/>
                 </x-table-th>
-                @if ($is_editing) <x-table-th class="text-end w-1/3">$&nbsp;precio</x-table-th> @endif
+                @if ($is_editing) <x-table-th class="text-end w-1/3">$precio</x-table-th> @endif
                 <x-table-th class="text-start w-16">elegir</x-table-th>
               </tr>
             </x-slot:tablehead>
@@ -140,7 +150,7 @@
                   </x-table-td>
                   @if ($is_editing)
                     <x-table-td class="text-end">
-                      <span>$&nbsp;{{ $pack->pivot->price }}</span>
+                      <span>${{ toMoneyFormat($pack->pivot->price) }}</span>
                     </x-table-td>
                   @endif
                   <x-table-td class="text-start">
@@ -180,10 +190,10 @@
       <div class="flex flex-col gap-1 w-full">
 
         {{-- busqueda --}}
-        <div class="flex w-full gap-1 bg-neutral-100 p-1 border border-neutral-200">
+        <div class="flex w-full justify-start items-end gap-1 bg-neutral-100 p-1 border border-neutral-200">
 
           {{-- termino de busqueda --}}
-          <div class="flex flex-col w-full justify-end">
+          <div class="flex flex-col w-1/4 justify-end">
             <x-input-label>buscar suministros</x-input-label>
             <x-text-input
               wire:model.live="search"
@@ -194,7 +204,7 @@
           </div>
 
           {{-- filtrar por marca --}}
-          <div class="flex flex-col w-full justify-end">
+          <div class="flex flex-col w-56 justify-end">
             <select
               name="search_tr"
               id="search_tr"
@@ -214,7 +224,7 @@
           </div>
 
           {{-- filtrar por tipo --}}
-          <div class="flex flex-col w-full justify-end">
+          <div class="flex flex-col w-56 justify-end">
             <select
               name="search_ty"
               id="search_ty"
@@ -234,7 +244,7 @@
           </div>
 
           {{-- elegir tamaño de paginacion --}}
-          <div class="flex flex-col w-full justify-end">
+          <div class="flex flex-col w-56 justify-end">
             <select
               name="paginas"
               id="paginas"
@@ -249,6 +259,16 @@
             </select>
           </div>
 
+          {{-- limpiar filtros --}}
+          <x-a-button
+            href="#"
+            wire:click='limpiar()'
+            bg_color="neutral-200"
+            border_color="neutral-300"
+            text_color="neutral-600"
+            >limpiar filtros
+          </x-a-button>
+
         </div>
 
         {{-- seleccion de resultado --}}
@@ -262,11 +282,11 @@
                 <x-table-th class="text-start">marca</x-table-th>
                 <x-table-th class="text-start">tipo</x-table-th>
                 <x-table-th class="text-end">
-                  <span>cantidad</span>
+                  <span>volumen</span>
                   <x-quest-icon title="kilogramos (kg), gramos (g), litros (l), mililitros (ml), metro (m), centimetro (cm), unidad (u)"/>
                 </x-table-th>
                 @if ($is_editing)
-                  <x-table-th class="text-end w-1/3">$&nbsp;precio</x-table-th>
+                  <x-table-th class="text-end w-1/3">$precio</x-table-th>
                 @endif
                 <x-table-th class="text-start w-16">elegir</x-table-th>
               </tr>
@@ -293,7 +313,7 @@
                   </x-table-td>
                   @if ($is_editing)
                   <x-table-td class="text-end">
-                    $&nbsp;{{ $provision->pivot->price }}
+                    ${{ toMoneyFormat($provision->pivot->price) }}
                   </x-table-td>
                   @endif
                   <x-table-td class="text-start">

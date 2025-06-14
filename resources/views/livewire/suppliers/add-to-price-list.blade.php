@@ -43,7 +43,7 @@
                   <x-table-th class="text-start">marca</x-table-th>
                   <x-table-th class="text-start">tipo</x-table-th>
                   <x-table-th class="text-end">
-                    <span>cantidad</span>
+                    <span>volumen</span>
                     <x-quest-icon title="kilogramos (kg), gramos (g), litros (l), mililitros (ml), metro (m), centimetro (cm), unidad (u)"/>
                   </x-table-th>
                   <x-table-th class="text-end w-1/3">
@@ -80,7 +80,7 @@
                         @error('prices.'.$key.'.price')<span class="text-red-400 text-xs capitalize">{{ $message }}</span>@enderror
                         <div class="flex justify-start items-center">
                           {{-- simbolo de $ --}}
-                          <span>$&nbsp;</span>
+                          <span>$</span>
                           {{-- precio --}}
                           <x-text-input
                             id="prices_{{ $key }}_price"
@@ -123,7 +123,7 @@
                         @error('prices.'.$key.'.price')<span class="text-red-400 text-xs capitalize">{{ $message }}</span>@enderror
                         <div class="flex justify-start items-center">
                           {{-- simbolo de $ --}}
-                          <span>$&nbsp;</span>
+                          <span>$</span>
                           {{-- precio --}}
                           <x-text-input
                             id="prices_{{ $key }}_price"

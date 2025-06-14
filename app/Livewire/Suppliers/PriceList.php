@@ -119,6 +119,17 @@ class PriceList extends Component
   }
 
   /**
+   * limpiar filtros
+   * @return void
+   */
+  public function limpiar(): void
+  {
+    $this->reset(['search', 'trademark_filter', 'type_filter']);
+    // enviar evento para reiniciar checkbox
+    $this->dispatch('reset-checkbox');
+  }
+
+  /**
    * eliminar precio del suministro
    * quita la asociacion suministro con proveedor y el precio,
    * no borra el suministro.

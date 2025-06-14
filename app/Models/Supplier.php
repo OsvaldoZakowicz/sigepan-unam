@@ -70,6 +70,12 @@ class Supplier extends Model implements Auditable
     return $this->hasMany(Quotation::class, 'supplier_id', 'id');
   }
 
+  //* un proveedor esta asociado a muchas preordenes (pre_orders)
+  public function pre_orders(): HasMany
+  {
+    return $this->hasMany(PreOrder::class, 'supplier_id', 'id');
+  }
+
   //* un proveedor tiene asociadas muchas compras
   public function purchases(): HasMany
   {
