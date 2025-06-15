@@ -4,6 +4,7 @@ namespace App\Mail;
 
 use App\Models\Supplier;
 use App\Models\User;
+use App\Models\DatoNegocio;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -15,11 +16,15 @@ class SupplierRegistered extends Mailable
 {
   use Queueable, SerializesModels;
 
+  public array $datos_negocio;
+
   public function __construct(
     public User $user,
     public $password,
     public Supplier $supplier
-  ) {}
+  ) {
+    $this->datos_negocio = DatoNegocio::obtenerTodos();
+  }
 
   /**
    * asunto del correo

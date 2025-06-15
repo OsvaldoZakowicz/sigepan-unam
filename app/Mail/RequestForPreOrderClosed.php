@@ -4,6 +4,7 @@ namespace App\Mail;
 
 use App\Models\PreOrder;
 use App\Models\Supplier;
+use App\Models\DatoNegocio;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -15,13 +16,19 @@ class RequestForPreOrderClosed extends Mailable
 {
   use Queueable, SerializesModels;
 
+  public Supplier $supplier;
+  public PreOrder $preorder;
+  public array $datos_negocio;
+
   /**
    * Create a new message instance.
    */
-  public function __construct(
-    public Supplier $supplier,
-    public PreOrder $preorder
-  ) {}
+  public function __construct(Supplier $supplier, PreOrder $preorder)
+  {
+    $this->supplier = $supplier;
+    $this->preorder = $preorder;
+    $this->datos_negocio = DatoNegocio::obtenerTodos();
+  }
 
   /**
    * Get the message envelope.

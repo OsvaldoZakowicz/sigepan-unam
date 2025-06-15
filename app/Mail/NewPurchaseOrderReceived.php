@@ -4,6 +4,7 @@ namespace App\Mail;
 
 use App\Models\PreOrder;
 use App\Models\Supplier;
+use App\Models\DatoNegocio;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -16,15 +17,21 @@ class NewPurchaseOrderReceived extends Mailable
 {
   use Queueable, SerializesModels;
 
+  public Supplier $supplier;
+  public PreOrder $preorder;
+  public array $datos_negocio;
+
   /**
    * Create a new message instance.
    * @param Supplier $supplier
    * @param PreOrder $preorder
    */
-  public function __construct(
-    public Supplier $supplier,
-    public PreOrder $preorder
-  ) {}
+  public function __construct(Supplier $supplier, PreOrder $preorder)
+  {
+    $this->supplier = $supplier;
+    $this->preorder = $preorder;
+    $this->datos_negocio = DatoNegocio::obtenerTodos();
+  }
 
   /**
    * Get the message envelope.
@@ -39,7 +46,6 @@ class NewPurchaseOrderReceived extends Mailable
 
   /**
    * Get the message content definition.
-   * todo: falta mostrar datos de la orden
    * @return Content
    */
   public function content(): Content
@@ -51,7 +57,6 @@ class NewPurchaseOrderReceived extends Mailable
 
   /**
    * Get the attachments for the message.
-   * todo: adjuntar PDF orden y albaran
    * @return array<int, \Illuminate\Mail\Mailables\Attachment>
    */
   public function attachments(): array

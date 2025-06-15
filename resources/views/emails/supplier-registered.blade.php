@@ -1,7 +1,7 @@
 @extends('emails.email-layout')
 
 @section('header')
-  <h1>¡Bienvenido a Panadería <i>nombre</i>!</h1>
+  <h1>¡Bienvenido a Panadería: <i>{{ $datos_negocio['razon_social'] }}</i>!</h1>
   <p>Ha sido registrado como uno de nuestros proveedores. Ahora podrá recibir solicitudes de presupuestos y ordenes de compra de parte de la panadería.</p>
 @endsection
 
@@ -18,11 +18,10 @@
   <p>¡Gracias por ser parte de nosotros!</p>
   <p>Si tiene alguna duda o pregunta, no dude en contactarnos.</p>
 
-  {{-- seccion de contacto, mostrar telefono e email ficticios --}}
-  <p>Teléfono: <strong>123 456 7890</strong></p>
-  <p>Correo electrónico: <strong>contacto@ejemplo.com</strong></p>
-
-  {{-- todo: opcion para que el proveedor indique que no desea este registro --}}
+  {{-- seccion de contacto --}}
+  <p>Teléfono: <strong>{{ $datos_negocio['telefono'] }}</strong></p>
+  <p>Correo electrónico: <strong>{{ $datos_negocio['email'] }}</strong></p>
+  <p>Dirección: <strong>{{ $datos_negocio['domicilio'] }}</strong></p>
 
   {{-- copyright de SiGePAN, todos los derechos reservados --}}
   <p>&copy; {{ date('Y') }} SiGePAN - Sistema de Gestión de Panaderías. Todos los derechos reservados.</p>

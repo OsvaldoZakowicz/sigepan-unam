@@ -1,8 +1,8 @@
 @extends('emails.email-layout')
 
 @section('header')
-  <h1>Cierre exitoso de el periodo de pre ordenes</h1>
-  <p>El sistema cerró el periodo de pre ordenes <strong>{{ $preorder_period->period_code }}</strong></p>
+  <h1>Cierre exitoso del periodo de pre ordenes</h1>
+  <p>El sistema cerró el periodo de pre ordenes: <strong>{{ $preorder_period->period_code }}</strong></p>
 @endsection
 
 @section('content')

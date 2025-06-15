@@ -4,12 +4,12 @@
 
   @php
     $order = is_string($preorder->order) ? json_decode($preorder->order) : $preorder->order;
-    $code = $order->code ?? '';
-    $date = $order->date ?? '';
+    $code = $order->order_code ?? '';
+    $date = $order->order_date ?? '';
   @endphp
 
   <h1>Nueva orden de compra recibida</h1>
-  <p>La panadería <i>nombre</i> desea comprar en su comercio.</p>
+  <p>La panadería: <i>{{ $datos_negocio['razon_social'] }}</i> desea comprar en su comercio.</p>
   <p><strong>Código de orden:</strong>&nbsp;<span>{{ $code }}</span></p>
   <p><strong>fecha de pedido:</strong>&nbsp;<span>{{ $date }}</span></p>
 @endsection
@@ -25,9 +25,10 @@
   <p>¡Gracias por ser parte de nosotros!, <strong>esperamos su respuesta.</strong></p>
   <p>Si tiene alguna duda o pregunta, no dude en contactarnos:</p>
 
-  {{-- seccion de contacto, mostrar telefono e email ficticios --}}
-  <p>Teléfono: <strong>123 456 7890</strong></p>
-  <p>Correo electrónico: <strong>contacto@ejemplo.com</strong></p>
+  {{-- seccion de contacto --}}
+  <p>Teléfono: <strong>{{ $datos_negocio['telefono'] }}</strong></p>
+  <p>Correo electrónico: <strong>{{ $datos_negocio['email'] }}</strong></p>
+  <p>Dirección: <strong>{{ $datos_negocio['domicilio'] }}</strong></p>
 
   {{-- copyright de SiGePAN, todos los derechos reservados --}}
   <p>&copy; {{ date('Y') }} SiGePAN - Sistema de Gestión de Panaderías. Todos los derechos reservados.</p>
