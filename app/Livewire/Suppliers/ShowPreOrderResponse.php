@@ -8,6 +8,7 @@ use App\Models\Quotation;
 use App\Models\PreOrder;
 use App\Models\Provision;
 use App\Models\Pack;
+use App\Models\DatoNegocio;
 use App\Services\Pdf\PdfService;
 use App\Services\Supplier\PreOrderService;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -24,6 +25,14 @@ class ShowPreOrderResponse extends Component
   public PreOrder $preorder;
   public $preorder_details;
   public ?Quotation $quotation = null;
+
+  // datos de la panaderia
+  public $razon_social = '';
+  public $cuit = '';
+  public $telefono = '';
+  public $correo = '';
+  public $direccion = '';
+  public $inicio_actividades = '';
 
   // estados
   public string $status_pending;
@@ -53,6 +62,13 @@ class ShowPreOrderResponse extends Component
     $this->status_pending = PreOrder::getPendingStatus();
     $this->status_approved = PreOrder::getApprovedStatus();
     $this->status_rejected = PreOrder::getRejectedStatus();
+
+    $this->razon_social = DatoNegocio::obtenerValor('razon_social');
+    $this->cuit = DatoNegocio::obtenerValor('cuit');
+    $this->telefono = DatoNegocio::obtenerValor('telefono');
+    $this->correo = DatoNegocio::obtenerValor('email');
+    $this->direccion = DatoNegocio::obtenerValor('domicilio');
+    $this->inicio_actividades = DatoNegocio::obtenerValor('inicio_actividades');
   }
 
   /**

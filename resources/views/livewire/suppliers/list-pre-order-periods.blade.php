@@ -19,10 +19,8 @@
     <x-content-section>
 
       <x-slot:header class="">
-
         {{-- busqueda --}}
-        <div class="flex gap-1 justify-start items-start grow">
-
+        <div class="w-full flex gap-1 justify-start items-end">
           {{-- termino de busqueda --}}
           <div class="flex flex-col justify-end w-1/4">
             <label for="search">buscar periodo</label>
@@ -36,7 +34,6 @@
               class="w-full text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
             />
           </div>
-
           {{-- fecha de inicio --}}
           <div class="flex flex-col justify-end w-1/6">
             <label for="search_start_at">fecha de inicio desde</label>
@@ -48,7 +45,6 @@
               class="w-full text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
             />
           </div>
-
           {{-- fecha de fin --}}
           <div class="flex flex-col justify-end w-1/6">
             <label for="search_end_at">fecha de fin hasta</label>
@@ -60,21 +56,16 @@
               class="w-full text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
             />
           </div>
-
-        </div>
-
-        {{-- limpiar campos de busqueda --}}
-        <div class="flex flex-col self-start h-full">
+          {{-- limpiar campos de busqueda --}}
           <x-a-button
             href="#"
             wire:click="resetSearchInputs()"
             bg_color="neutral-200"
             border_color="neutral-300"
             text_color="neutral-600"
-            >limpiar
+            >limpiar filtros
           </x-a-button>
         </div>
-
       </x-slot:header>
 
       <x-slot:content>

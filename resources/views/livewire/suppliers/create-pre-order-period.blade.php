@@ -4,9 +4,7 @@
 
     {{-- barra de titulo --}}
     <x-title-section title="crear periodo de preordenes de compra">
-
       @if ($period  !== null)
-
         <x-a-button
           wire:navigate
           href="{{ route('suppliers-budgets-ranking', $period->id) }}"
@@ -15,9 +13,7 @@
           text_color="neutral-600"
           >volver al ranking
         </x-a-button>
-
       @else
-
         <x-a-button
           wire:navigate
           href="{{ route('suppliers-preorders-index') }}"
@@ -26,9 +22,7 @@
           text_color="neutral-600"
           >volver
         </x-a-button>
-
       @endif
-
     </x-title-section>
 
     {{-- cuerpo --}}
@@ -37,8 +31,6 @@
       <x-slot:header class="hidden"></x-slot:header>
 
       <x-slot:content class="flex-col">
-
-        <span class="font-semibold text-neutral-800 capitalize">formulario</span>
 
         @if ($errors->any())
           <span>hay problemas de validacion!</span>
@@ -114,7 +106,7 @@
 
           </x-div-toggle>
 
-          {{-- si no existe priodo presupustario previo, mostrar seccion para creacion manual de pre ordenes --}}
+          {{-- si no existe priodo presupuestario previo, mostrar seccion para creacion manual de pre ordenes --}}
           {{-- permitir buscar y elegir suministros y packs, luego, proveedor a contactar --}}
           @if ($period === null)
             <x-div-toggle x-data="{open: true}" title="suministros y packs a pre ordenar" class="p-2">
@@ -136,7 +128,7 @@
               {{-- tabla dinamica con campos de formulario para cantidad y proveedor --}}
               {{-- lista de suministros elegidos --}}
               <div class="flex flex-col gap-1 w-full">
-                <span class="font-semibold capitalize">lista de suministros y/o packs elegidos para pre ordenar</span>
+                <span>Lista de suministros y/o packs elegidos para pre ordenar</span>
 
                 {{-- errores en la lista --}}
                 <div class="mb-2">
@@ -175,11 +167,11 @@
                           tipo
                         </x-table-th>
                         <x-table-th class="text-end">
-                          <span>cantidad</span>
+                          <span>volumen</span>
                           <x-quest-icon title="kilogramos (kg), gramos (g), litros (l), mililitros (ml), metro (m), centimetro (cm), unidad (u)"/>
                         </x-table-th>
                         <x-table-th class="text-end">
-                          <span>unidades a pre ordenar</span>
+                          <span>cantidad a pre ordenar</span>
                           <span class="text-red-400">*</span>
                           <x-quest-icon title="cantidad de unidades que desea pre ordenar" />
                         </x-table-th>
@@ -329,6 +321,19 @@
                       @endforelse
                     </x-slot:tablebody>
                   </x-table-base>
+
+                  {{-- vaciar lista --}}
+                  <div class="w-full mt-2 flex justify-end items-center">
+                    <x-a-button
+                      href="#"
+                      wire:click="vaciarLista()"
+                      bg_color="neutral-100"
+                      border_color="neutral-200"
+                      text_color="neutral-600"
+                      >vaciar lista
+                    </x-a-button>
+                  </div>
+
                 </div>
               </div>
 

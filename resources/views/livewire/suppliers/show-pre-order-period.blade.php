@@ -146,12 +146,12 @@
                       <span>marca/tipo</span>
                     </x-table-th>
                     <x-table-th class="text-end">
-                      <span>cantidad</span>
+                      <span>volumen</span>
                       <x-quest-icon title="kilogramos (kg), gramos (g), litros (l), mililitros (ml), metro (m), centimetro (cm), unidad (u)"/>
                     </x-table-th>
                     <x-table-th class="text-end">
-                      <span>unidades faltantes</span>
-                      <x-quest-icon title="cantidad de unidades de cada suministro que no pudieron cubrirse en las ordenes de compra finales"/>
+                      <span>cantidad faltante</span>
+                      <x-quest-icon title="cantidad faltante de cada suministro o pack que no pudieron cubrirse en las ordenes de compra finales"/>
                     </x-table-th>
                     <x-table-th class="text-start">
                       <span>proveedor contactado</span>
@@ -188,7 +188,6 @@
                       <x-table-td class="text-start">
                         {{-- puede haber mas de 1 --}}
                         <div x-data="{ open: false }" class="relative">
-
                           {{-- texto con desplegable de lista --}}
                           <button @click="open = !open" class="flex items-center text-blue-700 hover:text-blue-900">
                             @if (count($uncovered_provision['alternative_suppliers']) > 0)
@@ -238,11 +237,31 @@
                       </x-table-td>
                       <x-table-td class="text-start">
                         {{-- puede haber mas de 1 --}}
-                        @forelse ($uncovered_pack['alternative_suppliers'] as $alt_supplier)
-                          <span>{{ $alt_supplier['proveedor'] }}</span>
-                        @empty
-                          <span>ninguno</span>
-                        @endforelse
+                        <div x-data="{ open: false }" class="relative">
+
+                          {{-- texto con desplegable de lista --}}
+                          <button @click="open = !open" class="flex items-center text-blue-700 hover:text-blue-900">
+                            @if (count($uncovered_pack['alternative_suppliers']) > 0)
+                              <span>Ver {{ count($uncovered_pack['alternative_suppliers']) }} proveedores</span>
+                            @else
+                              <span>Ninguno</span>
+                            @endif
+                          </button>
+
+                          {{-- lista desplegable --}}
+                          <ul x-show="open"
+                              @click.away="open = false"
+                              class="absolute z-10 mt-1 w-64 bg-white border border-gray-200 rounded-md shadow-lg">
+                            @forelse ($uncovered_pack['alternative_suppliers'] as $alt_supplier)
+                              <li class="p-2 hover:bg-gray-100">
+                                <span class="block text-sm">{{ $alt_supplier['proveedor'] }}</span>
+                                <span class="block text-xs text-gray-500">Precio unitario: ${{ $alt_supplier['precio_unitario'] }}</span>
+                              </li>
+                            @empty
+                              <li class="p-2 text-gray-500">No hay proveedores alternativos</li>
+                            @endforelse
+                          </ul>
+                        </div>
                       </x-table-td>
                     </tr>
                   @endforeach
@@ -264,6 +283,7 @@
           @endif
         @endif
 
+        {{-- suministros y packs de interes --}}
         @if ($preorder_period->quotation_period_id == null)
 
           {{--
@@ -293,7 +313,7 @@
                     marca/tipo
                   </x-table-th>
                   <x-table-th class="text-end">
-                    <span>cantidad</span>
+                    <span>volumen</span>
                     <x-quest-icon title="kilogramos (kg), gramos (g), litros (l), mililitros (ml), metro (m), centimetro (cm), unidad (u)"/>
                   </x-table-th>
                   <x-table-th class="text-end">
@@ -352,7 +372,7 @@
                     marca/tipo
                   </x-table-th>
                   <x-table-th class="text-end">
-                    <span>cantidad</span>
+                    <span>volumen</span>
                     <x-quest-icon title="kilogramos (kg), gramos (g), litros (l), mililitros (ml), metro (m), centimetro (cm), unidad (u)"/>
                   </x-table-th>
                   <x-table-th class="text-end">
@@ -436,7 +456,7 @@
                     marca/tipo
                   </x-table-th>
                   <x-table-th class="text-end">
-                    <span>cantidad</span>
+                    <span>volumen</span>
                     <x-quest-icon title="kilogramos (kg), gramos (g), litros (l), mililitros (ml), metro (m), centimetro (cm), unidad (u)"/>
                   </x-table-th>
                   <x-table-th class="text-end">
@@ -495,7 +515,7 @@
                     marca/tipo
                   </x-table-th>
                   <x-table-th class="text-end">
-                    <span>cantidad</span>
+                    <span>volumen</span>
                     <x-quest-icon title="kilogramos (kg), gramos (g), litros (l), mililitros (ml), metro (m), centimetro (cm), unidad (u)"/>
                   </x-table-th>
                   <x-table-th class="text-end">

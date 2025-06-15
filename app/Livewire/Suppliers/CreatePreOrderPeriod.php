@@ -320,6 +320,8 @@ class CreatePreOrderPeriod extends Component
         'period_preorders_data'    => ($this->period === null) ? json_encode($period_preorders_data) : null,
       ]);
 
+      // TODO: si la fecha de apertura es el dia actual, abrir periodo.
+
       $this->reset();
 
       session()->flash('operation-success', toastSuccessBody('periodo de pre ordenes', 'creado y programado'));

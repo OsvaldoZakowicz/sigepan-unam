@@ -29,10 +29,10 @@
       <div class="flex flex-col gap-1 w-full">
 
         {{-- busqueda --}}
-        <div class="flex w-full gap-1 bg-neutral-100 p-1 border border-neutral-200">
+        <div class="flex justify-start items-end w-full gap-1 bg-neutral-100 p-1 border border-neutral-200">
 
           {{-- termino de busqueda --}}
-          <div class="flex flex-col w-full justify-end">
+          <div class="flex flex-col w-1/4 justify-end">
             <x-input-label>buscar packs</x-input-label>
             <x-text-input
               wire:model.live="search_pack"
@@ -44,7 +44,7 @@
           </div>
 
           {{-- filtrar por marca --}}
-          <div class="flex flex-col w-full justify-end">
+          <div class="flex flex-col w-56 justify-end">
             <select
               name="search_tr_pack"
               id="search_tr_pack"
@@ -64,7 +64,7 @@
           </div>
 
           {{-- filtrar por tipo --}}
-          <div class="flex flex-col w-full justify-end">
+          <div class="flex flex-col w-56 justify-end">
             <select
               name="search_ty_pack"
               id="search_ty_pack"
@@ -84,7 +84,7 @@
           </div>
 
           {{-- elegir tamaño de paginacion --}}
-          <div class="flex flex-col w-full justify-end">
+          <div class="flex flex-col w-56 justify-end">
             <select
               name="paginas"
               id="paginas"
@@ -97,6 +97,15 @@
               <option value="15">mostrar grupos de 15 resultados</option>
             </select>
           </div>
+
+          <x-a-button
+            href="#"
+            wire:click="limpiar()"
+            bg_color="neutral-200"
+            border_color="neutral-300"
+            text_color="neutral-600"
+            >limpiar filtros
+          </x-a-button>
 
         </div>
 
@@ -119,12 +128,8 @@
                   tipo
                 </x-table-th>
                 <x-table-th class="text-end">
-                  <span>cantidad</span>
-                  <x-quest-icon title="indica si se trata de una unidad (1), o pack de unidades (mas de uno)"/>
-                </x-table-th>
-                <x-table-th class="text-end">
                   <span>volumen</span>
-                  <x-quest-icon title="kilogramos (kg), litros (lts) o unidades (un)"/>
+                  <x-quest-icon title="kilogramos (Kg), gramos (g), litros (L), mililitros (mL), metros (M), centimetros (cm) o unidades (U)"/>
                 </x-table-th>
                 <x-table-th class="text-start w-16">
                   elegir
@@ -146,9 +151,6 @@
                   </x-table-td>
                   <x-table-td class="text-start">
                     {{ $pack->provision->type->provision_type_name }}
-                  </x-table-td>
-                  <x-table-td class="text-end">
-                    pack x {{ $pack->pack_units }}
                   </x-table-td>
                   <x-table-td class="text-end">
                     {{ convert_measure($pack->pack_quantity, $pack->provision->measure) }}
@@ -186,10 +188,10 @@
       <div class="flex flex-col gap-1 w-full">
 
         {{-- busqueda --}}
-        <div class="flex w-full gap-1 bg-neutral-100 p-1 border border-neutral-200">
+        <div class="flex justify-start items-end w-full gap-1 bg-neutral-100 p-1 border border-neutral-200">
 
           {{-- termino de busqueda --}}
-          <div class="flex flex-col w-full justify-end">
+          <div class="flex flex-col w-1/4 justify-end">
             <x-input-label>buscar suministros</x-input-label>
             <x-text-input
               wire:model.live="search"
@@ -201,7 +203,7 @@
           </div>
 
           {{-- filtrar por marca --}}
-          <div class="flex flex-col w-full justify-end">
+          <div class="flex flex-col w-56 justify-end">
             <select
               name="search_tr"
               id="search_tr"
@@ -221,7 +223,7 @@
           </div>
 
           {{-- filtrar por tipo --}}
-          <div class="flex flex-col w-full justify-end">
+          <div class="flex flex-col w-56 justify-end">
             <select
               name="search_ty"
               id="search_ty"
@@ -241,7 +243,7 @@
           </div>
 
           {{-- elegir tamaño de paginacion --}}
-          <div class="flex flex-col w-full justify-end">
+          <div class="flex flex-col w-56 justify-end">
             <select
               name="paginas"
               id="paginas"
@@ -254,6 +256,15 @@
               <option value="15">mostrar grupos de 15 resultados</option>
             </select>
           </div>
+
+          <x-a-button
+            href="#"
+            wire:click="limpiar()"
+            bg_color="neutral-200"
+            border_color="neutral-300"
+            text_color="neutral-600"
+            >limpiar filtros
+          </x-a-button>
 
         </div>
 
@@ -276,12 +287,8 @@
                   tipo
                 </x-table-th>
                 <x-table-th class="text-end">
-                  <span>cantidad</span>
-                  <x-quest-icon title="indica si se trata de una unidad (1), o pack de unidades (mas de uno)"/>
-                </x-table-th>
-                <x-table-th class="text-end">
                   <span>volumen</span>
-                  <x-quest-icon title="kilogramos (kg), litros (lts) o unidades (un)"/>
+                  <x-quest-icon title="kilogramos (Kg), gramos (g), litros (L), mililitros (mL), metros (M), centimetros (cm) o unidades (U)"/>
                 </x-table-th>
                 <x-table-th class="text-start w-16">
                   elegir
@@ -304,9 +311,6 @@
                   </x-table-td>
                   <x-table-td class="text-start">
                     {{ $provision->type->provision_type_name }}
-                  </x-table-td>
-                  <x-table-td class="text-end">
-                    <span>1</span>
                   </x-table-td>
                   <x-table-td class="text-end">
                     {{ convert_measure($provision->provision_quantity, $provision->measure) }}

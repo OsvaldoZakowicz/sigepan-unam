@@ -165,6 +165,17 @@ class SearchProvisionPeriod extends Component
     $this->resetPage();
   }
 
+  /**
+   * limpiar filtros de busqueda
+   * @return void
+   */
+  public function limpiar(): void
+  {
+    $this->reset([
+      'search', 'search_tr', 'search_ty', 'paginas', 'search_pack', 'search_tr_pack', 'search_ty_pack'
+    ]);
+  }
+
   #[On('refresh-search')]
   public function render()
   {

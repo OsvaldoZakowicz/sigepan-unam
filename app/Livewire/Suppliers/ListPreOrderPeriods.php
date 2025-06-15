@@ -78,6 +78,8 @@ class ListPreOrderPeriods extends Component
     $this->resetPagination();
   }
 
+  // TODO: Permitir el borrado de un periodo si no esta abierto.
+
   /**
    * renderizar vista
    * @return View
