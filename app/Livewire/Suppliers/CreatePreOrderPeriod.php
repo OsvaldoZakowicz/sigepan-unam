@@ -12,6 +12,9 @@ use App\Models\Supplier;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Bus;
+use App\Jobs\OpenPreOrderPeriodJob;
+use App\Jobs\NotifySuppliersRequestForPreOrderReceivedJob;
 use Illuminate\View\View;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -310,7 +313,7 @@ class CreatePreOrderPeriod extends Component
         });
       }
 
-      PreOrderPeriod::create([
+      $preorder_period = PreOrderPeriod::create([
         'quotation_period_id'      => $validated['quotation_period_id'],
         'period_code'              => $validated['period_code'],
         'period_start_at'          => $validated['period_start_at'],
@@ -320,7 +323,13 @@ class CreatePreOrderPeriod extends Component
         'period_preorders_data'    => ($this->period === null) ? json_encode($period_preorders_data) : null,
       ]);
 
-      // TODO: si la fecha de apertura es el dia actual, abrir periodo.
+      //$preorder_period->period_start_at formato string 'Y-m-d'
+      if (Carbon::parse($preorder_period->period_start_at)->startOfDay()->eq(Carbon::now()->startOfDay())) {
+        Bus::chain([
+          OpenPreOrderPeriodJob::dispatch($preorder_period),
+          NotifySuppliersRequestForPreOrderReceivedJob::dispatch($preorder_period),
+        ]);
+      }
 
       $this->reset();
 

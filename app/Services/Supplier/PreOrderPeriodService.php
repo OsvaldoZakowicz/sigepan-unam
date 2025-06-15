@@ -660,10 +660,8 @@ class PreOrderPeriodService
    */
   public function getUncoveredItems(PreOrderPeriod $preorder_period)
   {
-    // obtener todas las pre ordenes completadas para el periodo
-    $completed_preorders = $preorder_period->pre_orders()
-      ->where('is_completed', true)
-      ->get();
+    // obtener todas las pre ordenes para el periodo
+    $completed_preorders = $preorder_period->pre_orders()->get();
 
     // inicializar colecciones para packs y suministros
     $uncovered_provisions = collect();

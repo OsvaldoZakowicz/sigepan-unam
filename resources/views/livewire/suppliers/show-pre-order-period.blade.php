@@ -60,7 +60,7 @@
             @endswitch
           </span>
           <span>
-            <span class="font-semibold">Apertura:</span>&nbsp;
+            <span class="font-semibold">Inicio:</span>&nbsp;
             {{ formatDateTime($preorder_period->period_start_at, 'd-m-Y') }}
           </span>
           <span>
@@ -92,7 +92,7 @@
               bg_color="red-600"
               border_color="red-600"
               text_color="neutral-100"
-              wire:confirm="¿Cerrar este período?, los proveedores con pre ordenes sin responder quedarán fuera del periodo."
+              wire:confirm="¿Cerrar este período?, los proveedores con pre ordenes en estado sin responder quedarán fuera del periodo."
               >cerrar ahora
             </x-a-button>
 

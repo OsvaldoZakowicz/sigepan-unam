@@ -79,6 +79,53 @@ class ListPreOrderPeriods extends Component
   }
 
   // TODO: Permitir el borrado de un periodo si no esta abierto.
+  /**
+   * borrar un periodo de pre ordenes
+   * * unicamente si no ha abierto aun.
+   * @param int $id id del periodo a borrar.
+   * @return void
+   */
+  public function delete(int $id): void
+  {
+    $programado_status_code = 0;
+    $abierto_status_code = 1;
+    $cerrado_status_code = 2;
+
+    $period = PreOrderPeriod::findOrFail($id);
+
+    if($period->status->status_code === $programado_status_code) {
+
+      // * borrar
+      $period->delete();
+
+      $this->dispatch('toast-event', toast_data: [
+        'event_type'  => 'info',
+        'title_toast' => toastTitle('', true),
+        'descr_toast' => 'Periodo de pre ordenes eliminado correctamente.',
+      ]);
+
+      return;
+    }
+
+    if ($period->status->status_code === $abierto_status_code) {
+
+      $this->dispatch('toast-event', toast_data: [
+        'event_type'  => 'info',
+        'title_toast' => toastTitle('', true),
+        'descr_toast' => 'No es posible eliminar el periodo de pre ordenes, se encuentra actualmente abierto.',
+      ]);
+    }
+
+    if ($period->status->status_code === $cerrado_status_code) {
+
+      $this->dispatch('toast-event', toast_data: [
+        'event_type'  => 'info',
+        'title_toast' => toastTitle('', true),
+        'descr_toast' => 'No es posible eliminar el periodo de pre ordenes, ya fue cerrado y procesado.',
+      ]);
+    }
+
+  }
 
   /**
    * renderizar vista

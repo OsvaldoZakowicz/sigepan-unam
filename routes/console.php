@@ -52,7 +52,7 @@ Artisan::command('budget-periods:open', function (QuotationPeriodService $quotat
     }
   }
 })->purpose('abrir periodos de solicitud de presupuestos')
-  ->everyMinute();
+  ->dailyAt('08:00');
 
 /**
  * command: cerrar periodos de peticion de presupuesto.
@@ -73,7 +73,7 @@ Artisan::command('budget-periods:close', function (QuotationPeriodService $quota
     }
   }
 })->purpose('cerrar periodos de solicitud de presupuestos')
-  ->everyTwoMinutes();
+  ->dailyAt('19:00');
 
 /**
  * command: abrir periodos de pre orden.
@@ -94,7 +94,7 @@ Artisan::command('preorder-periods:open', function (PreOrderPeriodService $preor
     }
   }
 })->purpose('abrir periodos de solicitud de pre ordenes')
-  ->everyMinute();
+  ->dailyAt('08:00');
 
 /**
  * command: cerrar periodos de pre orden
@@ -135,4 +135,4 @@ Artisan::command('preorder-periods:close', function (PreOrderPeriodService $preo
     }
   }
 })->purpose('cerrar periodos de solicitud de pre orden')
-  ->everyTwoMinutes();
+  ->dailyAt('19:00');

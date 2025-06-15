@@ -141,6 +141,13 @@
                       text_color="neutral-600"
                       >ver
                     </x-a-button>
+                    <x-btn-button
+                      btn_type="button"
+                      color="red"
+                      wire:click="delete({{ $period->id }})"
+                      wire:confirm="¿Desea borrar el registro? esta accion es irreversible, solo puede borrar periodos en estado programado"
+                      >eliminar
+                    </x-btn-button>
                   </div>
                 </x-table-td>
               </tr>
