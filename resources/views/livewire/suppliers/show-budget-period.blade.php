@@ -85,9 +85,10 @@
 
         {{-- aviso segun respuesta de proveedores --}}
         @if ($period_status === $closed and $count_quotations !== 0)
-        <div class="flex items-center justify-between w-full p-2 border rounded-md bg-emerald-100 border-emerald-500">
+        <div class="flex items-center justify-between w-full p-1 border rounded-sm bg-emerald-100 border-emerald-300">
 
-          <span>
+          <span class="text-emerald-800">
+            <span class="font-semibold">¡Éxito!</span>
             <span>Se ha calculado una comparativa de precios por suministros para cada proveedor</span>
             <strong>usando los presupuestos respondidos</strong>
           </span>
@@ -97,12 +98,11 @@
           </x-a-button>
 
         </div>
-
         @elseif ($period_status === $closed and $count_quotations === 0)
+        <div class="flex items-center justify-between w-full p-1 bg-yellow-100 border border-yellow-500 rounded-sm">
 
-        <div class="flex items-center justify-between w-full p-2 bg-red-100 border border-red-500 rounded-md">
-
-          <span>
+          <span class="text-yellow-800">
+            <span class="font-semibold">¡Aviso!</span>
             <span>¡No se han recibido presupuestos de los proveedores!</span>
             <span>¿Re abrir periodo?</span>
           </span>
@@ -112,7 +112,6 @@
           </x-a-button>
 
         </div>
-
         @endif
 
         {{-- suministros --}}

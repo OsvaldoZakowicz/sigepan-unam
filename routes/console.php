@@ -11,6 +11,7 @@ use App\Jobs\OpenQuotationPeriodJob;
 use App\Jobs\SendEmailJob;
 use App\Mail\CantClosePreOrderPeriod;
 use App\Mail\ClosePreOrderPeriod;
+use App\Mail\CloseQuotationPeriod;
 use App\Services\Supplier\QuotationPeriodService;
 use App\Services\Supplier\PreOrderPeriodService;
 use App\Models\User;
@@ -63,13 +64,22 @@ Artisan::command('budget-periods:close', function (QuotationPeriodService $quota
 
   $periods_to_close = $quotation_period_service->getQuotationPeriodsToClose();
 
+  $gerentes_to_notify = User::role('gerente')->get();
+
   if (count($periods_to_close) != 0) {
+
     // cada periodo debe cerrarse y procesarse
     foreach ($periods_to_close as $period) {
+
       Bus::chain([
         CloseQuotationPeriodJob::dispatch($period),
         NotifySuppliersRequestForQuotationClosedJob::dispatch($period),
       ]);
+
+      // notificar del cierre a gerentes
+      foreach ($gerentes_to_notify as $gerente) {
+        SendEmailJob::dispatch($gerente->email, new CloseQuotationPeriod($period));
+      }
     }
   }
 })->purpose('cerrar periodos de solicitud de presupuestos')
@@ -117,7 +127,6 @@ Artisan::command('preorder-periods:close', function (PreOrderPeriodService $preo
         foreach ($gerentes_to_notify as $gerente) {
           SendEmailJob::dispatch($gerente->email, new CantClosePreOrderPeriod($preorder_period));
         }
-
       } else {
 
         // cerrar periodo
@@ -131,7 +140,6 @@ Artisan::command('preorder-periods:close', function (PreOrderPeriodService $preo
           SendEmailJob::dispatch($gerente->email, new ClosePreOrderPeriod($this->preorder_period));
         }
       }
-
     }
   }
 })->purpose('cerrar periodos de solicitud de pre orden')

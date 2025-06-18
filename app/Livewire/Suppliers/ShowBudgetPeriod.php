@@ -2,17 +2,20 @@
 
 namespace App\Livewire\Suppliers;
 
-use App\Jobs\CloseQuotationPeriodJob;
-use App\Jobs\NotifySuppliersRequestForQuotationClosedJob;
-use App\Jobs\NotifySuppliersRequestForQuotationReceivedJob;
+use App\Models\User;
+use Livewire\Component;
+use Illuminate\View\View;
+use App\Jobs\SendEmailJob;
+use Livewire\WithPagination;
+use Illuminate\Support\Carbon;
+use App\Mail\CloseQuotationPeriod;
+use Illuminate\Support\Facades\Bus;
 use App\Jobs\OpenQuotationPeriodJob;
+use App\Jobs\CloseQuotationPeriodJob;
 use App\Models\RequestForQuotationPeriod;
 use App\Services\Supplier\QuotationPeriodService;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Bus;
-use Illuminate\View\View;
-use Livewire\Component;
-use Livewire\WithPagination;
+use App\Jobs\NotifySuppliersRequestForQuotationClosedJob;
+use App\Jobs\NotifySuppliersRequestForQuotationReceivedJob;
 
 /**
  * mostrar un periodo presupuestario
@@ -89,6 +92,11 @@ class ShowBudgetPeriod extends Component
       CloseQuotationPeriodJob::dispatch($this->period),
       NotifySuppliersRequestForQuotationClosedJob::dispatch($this->period),
     ]);
+
+    $gerentes_to_notify = User::role('gerente')->get();
+    foreach ($gerentes_to_notify as $gerente) {
+      SendEmailJob::dispatch($gerente->email, new CloseQuotationPeriod($this->period));
+    };
   }
 
   /**

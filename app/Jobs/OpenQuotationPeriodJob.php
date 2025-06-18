@@ -34,10 +34,10 @@ class OpenQuotationPeriodJob implements ShouldQueue
     $this->period->period_status_id = $quotation_period_service->getStatusOpen();
     $this->period->save();
 
-    // * obtener todos los proveedores
+    // obtener todos los proveedores
     // con los suministros y/o que pueden proveer, que interesan al periodo
 
-    // Obtenemos las provisiones del período con sus cantidades
+    // obtenemos las provisiones del período con sus cantidades
     $period_provisions = $this->period->provisions()
       ->select('provisions.id')
       ->withPivot('quantity')
@@ -50,7 +50,7 @@ class OpenQuotationPeriodJob implements ShouldQueue
       })
       ->toArray();
 
-    // Obtenemos los packs del período con sus cantidades
+    // obtenemos los packs del período con sus cantidades
     $period_packs = $this->period->packs()
       ->select('packs.id')
       ->withPivot('quantity')
@@ -63,7 +63,7 @@ class OpenQuotationPeriodJob implements ShouldQueue
       })
       ->toArray();
 
-    // Consulta principal para obtener los proveedores con sus provisiones y packs
+    // consulta principal para obtener los proveedores con sus provisiones y packs
     $all_suppliers = Supplier::where('status_is_active', true)
       ->whereHas('provisions', function ($query) use ($period_provisions) {
         $query->whereIn('provisions.id', array_keys($period_provisions));
@@ -80,20 +80,20 @@ class OpenQuotationPeriodJob implements ShouldQueue
       ->map(function ($supplier) use ($period_provisions, $period_packs) {
         return [
           'supplier_id' => $supplier->id,
-          'provisions'  => $supplier->provisions->map(function ($provision) use ($period_provisions){
-              return [
-                'id'       => $provision->id,
-                'name'     => $provision->provision_name,
-                'quantity' => $period_provisions[$provision->id]['quantity'],
-              ];
-            })->values(),
+          'provisions'  => $supplier->provisions->map(function ($provision) use ($period_provisions) {
+            return [
+              'id'       => $provision->id,
+              'name'     => $provision->provision_name,
+              'quantity' => $period_provisions[$provision->id]['quantity'],
+            ];
+          })->values(),
           'packs' => $supplier->packs->map(function ($pack) use ($period_packs) {
-              return [
-                'id'       => $pack->id,
-                'name'     => $pack->pack_name,
-                'quantity' => $period_packs[$pack->id]['quantity'],
-              ];
-            })->values()
+            return [
+              'id'       => $pack->id,
+              'name'     => $pack->pack_name,
+              'quantity' => $period_packs[$pack->id]['quantity'],
+            ];
+          })->values()
         ];
       })
       ->values()
@@ -114,22 +114,24 @@ class OpenQuotationPeriodJob implements ShouldQueue
       // por cada suministro solicitado al proveedor
       foreach ($supplier['provisions'] as $provision) {
         // crear un "renglon" del presupuesto
+        // por defecto permanece sin stock y precios en 0
         $quotation->provisions()->attach($provision['id'], [
           'has_stock'   => false,
           'quantity'    => $provision['quantity'],
-          'unit_price'  => null,
-          'total_price' => null,
+          'unit_price'  => 0,
+          'total_price' => 0,
         ]);
       }
 
       // por cada pack solicitado al proveedor
       foreach ($supplier['packs'] as $pack) {
         // crear un "renglon" del presupuesto
+        // por defecto permanece sin stock y precios en 0
         $quotation->packs()->attach($pack['id'], [
           'has_stock'   => false,
           'quantity'    => $pack['quantity'],
-          'unit_price'  => null,
-          'total_price' => null,
+          'unit_price'  => 0,
+          'total_price' => 0,
         ]);
       }
     }
