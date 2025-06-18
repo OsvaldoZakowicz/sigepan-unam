@@ -7,7 +7,8 @@ use App\Models\Supplier;
 use App\Models\User;
 
 /**
- * todo: vista de resumen, estadisticas
+ * camponente que ancapsula a todos los
+ * sub componentes del panel.
  */
 class DashboardResume extends Component
 {

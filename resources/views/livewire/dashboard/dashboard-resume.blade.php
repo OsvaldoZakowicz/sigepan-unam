@@ -1,15 +1,25 @@
 <div class="w-full">
   {{-- card container --}}
-  <main class="w-full flex gap-4 items-start justify-start flex-wrap my-2 mx-8">
-
+  <main class="grid grid-cols-1 gap-8 p-8 sm:grid-cols-2">
     {{-- cards de informacion, visibles segun rol --}}
+    {{-- Los componentes se posicionarán automáticamente en la cuadrícula --}}
 
-    {{-- datos del negocio --}}
-    @livewire('dashboard.show-negocio')
+    <div class="w-full">
+      @livewire('dashboard.show-quotation-period-status')
+    </div>
 
-    {{-- datos de tienda --}}
-    @livewire('dashboard.show-tienda')
+    <div class="w-full">
+      @livewire('dashboard.show-pre-order-period-status')
+    </div>
 
+
+    <div class="w-full">
+      @livewire('dashboard.show-negocio')
+    </div>
+
+    <div class="w-full">
+      @livewire('dashboard.show-tienda')
+    </div>
 
   </main>
 </div>
