@@ -9,6 +9,7 @@ use App\Jobs\NotifySuppliersRequestForQuotationReceivedJob;
 use App\Jobs\OpenPreOrderPeriodJob;
 use App\Jobs\OpenQuotationPeriodJob;
 use App\Jobs\SendEmailJob;
+use App\Jobs\UpdateSuppliersPricesJob;
 use App\Mail\CantClosePreOrderPeriod;
 use App\Mail\ClosePreOrderPeriod;
 use App\Mail\CloseQuotationPeriod;
@@ -73,6 +74,7 @@ Artisan::command('budget-periods:close', function (QuotationPeriodService $quota
 
       Bus::chain([
         CloseQuotationPeriodJob::dispatch($period),
+        UpdateSuppliersPricesJob::dispatch($period),
         NotifySuppliersRequestForQuotationClosedJob::dispatch($period),
       ]);
 

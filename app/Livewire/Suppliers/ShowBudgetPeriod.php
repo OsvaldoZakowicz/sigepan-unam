@@ -16,6 +16,7 @@ use App\Models\RequestForQuotationPeriod;
 use App\Services\Supplier\QuotationPeriodService;
 use App\Jobs\NotifySuppliersRequestForQuotationClosedJob;
 use App\Jobs\NotifySuppliersRequestForQuotationReceivedJob;
+use App\Jobs\UpdateSuppliersPricesJob;
 
 /**
  * mostrar un periodo presupuestario
@@ -90,6 +91,7 @@ class ShowBudgetPeriod extends Component
 
     Bus::chain([
       CloseQuotationPeriodJob::dispatch($this->period),
+      UpdateSuppliersPricesJob::dispatch($this->period),
       NotifySuppliersRequestForQuotationClosedJob::dispatch($this->period),
     ]);
 

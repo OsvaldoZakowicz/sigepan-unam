@@ -24,8 +24,6 @@ class ShowBudgetRanking extends Component
   public function mount(QuotationPeriodService $qps, int $id)
   {
     $this->period = RequestForQuotationPeriod::findOrFail($id);
-
-    // todo: es necesario usar paginacion
     $this->quotations_ranking = $qps->comparePricesBetweenQuotations($this->period->id);
   }
 
@@ -46,7 +44,7 @@ class ShowBudgetRanking extends Component
 
     $this->dispatch('toast-event', toast_data: [
       'event_type'  =>  'info',
-      'title_toast' =>  toastTitle('',true),
+      'title_toast' =>  toastTitle('', true),
       'descr_toast' =>  'Este ranking de presupuestos ya tiene un periodo de pre ordenes creado.',
     ]);
 

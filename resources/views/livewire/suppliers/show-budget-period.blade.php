@@ -72,7 +72,7 @@
           @elseif ($period->period_status_id === $opened)
           <x-a-button href="#" wire:click="closePeriod()" bg_color="red-600" border_color="red-600"
             text_color="neutral-100"
-            wire:confirm="¿Cerrar este período?, los proveedores con presupuesto sin responder quedarán fuera del periodo.">
+            wire:confirm="¿Cerrar este período?, los proveedores con presupuesto sin responder quedarán fuera del periodo. Los presupuestos con respuestas se usaran en la actualizacion de precios para cada proveedor">
             cerrar ahora
           </x-a-button>
           @endif
@@ -89,7 +89,8 @@
 
           <span class="text-emerald-800">
             <span class="font-semibold">¡Éxito!</span>
-            <span>Se ha calculado una comparativa de precios por suministros para cada proveedor</span>
+            <span>Se ha calculado una comparativa de precios y se han actualizado los precios por suministros para cada
+              proveedor</span>
             <strong>usando los presupuestos respondidos</strong>
           </span>
 
