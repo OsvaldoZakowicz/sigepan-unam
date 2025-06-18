@@ -56,8 +56,8 @@
             @endif
 
             {{-- boton --}}
-            <x-a-button href="#" wire:navigate bg_color="neutral-100" border_color="neutral-200"
-              text_color="neutral-600">ver</x-a-button>
+            <x-a-button href="{{ route('suppliers-budgets-periods-show', $quotation_period->id) }}" wire:navigate
+              bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600">ver</x-a-button>
 
           </div>
         </div>
