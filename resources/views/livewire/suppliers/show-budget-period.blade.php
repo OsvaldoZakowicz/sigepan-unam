@@ -7,13 +7,8 @@
     {{-- barra de titulo --}}
     <x-title-section title="ver periodo presupuestario: {{ $period->period_code }}">
 
-      <x-a-button
-        wire:navigate
-        href="{{ route('suppliers-budgets-periods-index') }}"
-        bg_color="neutral-100"
-        border_color="neutral-200"
-        text_color="neutral-600"
-        >volver
+      <x-a-button wire:navigate href="{{ route('suppliers-budgets-periods-index') }}" bg_color="neutral-100"
+        border_color="neutral-200" text_color="neutral-600">volver
       </x-a-button>
 
     </x-title-section>
@@ -24,40 +19,34 @@
       <x-slot:header class="">
 
         {{-- titulo de encabezado --}}
-        <div class="w-full flex justify-start items-center gap-2">
+        <div class="flex items-center justify-start w-full gap-2">
           <span>
             <span class="font-semibold">Estado actual:</span>&nbsp;
             {{-- estado del periodo --}}
             @switch($period->status->status_code)
 
-              @case(0)
-                {{-- programado --}}
-                <x-text-tag
-                  title="{{ $period->status->status_short_description }}"
-                  color="neutral"
-                  class="cursor-pointer"
-                  >{{ $period->status->status_name }}
-                </x-text-tag>
-                @break
+            @case(0)
+            {{-- programado --}}
+            <x-text-tag title="{{ $period->status->status_short_description }}" color="neutral" class="cursor-pointer">
+              {{ $period->status->status_name }}
+              <x-quest-icon title="{{ $period->status->status_short_description }}" />
+            </x-text-tag>
+            @break
 
-              @case(1)
-                {{-- abierto --}}
-                <x-text-tag
-                  title="{{ $period->status->status_short_description }}"
-                  color="emerald"
-                  class="cursor-pointer"
-                  >{{ $period->status->status_name }}
-                </x-text-tag>
-                @break
+            @case(1)
+            {{-- abierto --}}
+            <x-text-tag title="{{ $period->status->status_short_description }}" color="emerald" class="cursor-pointer">
+              {{ $period->status->status_name }}
+              <x-quest-icon title="{{ $period->status->status_short_description }}" />
+            </x-text-tag>
+            @break
 
-              @default
-                {{-- cerrado --}}
-                <x-text-tag
-                  title="{{ $period->status->status_short_description }}"
-                  color="red"
-                  class="cursor-pointer"
-                  >{{ $period->status->status_name }}
-                </x-text-tag>
+            @default
+            {{-- cerrado --}}
+            <x-text-tag title="{{ $period->status->status_short_description }}" color="red" class="cursor-pointer">{{
+              $period->status->status_name }}
+              <x-quest-icon title="{{ $period->status->status_short_description }}" />
+            </x-text-tag>
 
             @endswitch
           </span>
@@ -72,28 +61,20 @@
         </div>
 
         {{-- botones con acciones --}}
-        <div class="w-2/3 flex justify-end items-center gap-2">
+        <div class="flex items-center justify-end w-2/3 gap-2">
 
           @if ($period->period_status_id === $scheduled)
-            <x-a-button
-              href="#"
-              wire:click="openPeriod()"
-              bg_color="emerald-600"
-              border_color="emerald-600"
-              text_color="neutral-100"
-              wire:confirm="¿Abrir este período?, se enviarán pedidos de presupuesto a los proveedores activos de los suministros de interés"
-              >abrir ahora
-            </x-a-button>
+          <x-a-button href="#" wire:click="openPeriod()" bg_color="emerald-600" border_color="emerald-600"
+            text_color="neutral-100"
+            wire:confirm="¿Abrir este período?, se enviarán pedidos de presupuesto a los proveedores activos de los suministros de interés">
+            abrir ahora
+          </x-a-button>
           @elseif ($period->period_status_id === $opened)
-            <x-a-button
-              href="#"
-              wire:click="closePeriod()"
-              bg_color="red-600"
-              border_color="red-600"
-              text_color="neutral-100"
-              wire:confirm="¿Cerrar este período?, los proveedores con presupuesto sin responder quedarán fuera del periodo."
-              >cerrar ahora
-            </x-a-button>
+          <x-a-button href="#" wire:click="closePeriod()" bg_color="red-600" border_color="red-600"
+            text_color="neutral-100"
+            wire:confirm="¿Cerrar este período?, los proveedores con presupuesto sin responder quedarán fuera del periodo.">
+            cerrar ahora
+          </x-a-button>
           @endif
 
         </div>
@@ -104,44 +85,33 @@
 
         {{-- aviso segun respuesta de proveedores --}}
         @if ($period_status === $closed and $count_quotations !== 0)
-          <div class="w-full flex justify-between items-center p-2 bg-emerald-100 border border-emerald-500 rounded-md">
+        <div class="flex items-center justify-between w-full p-2 border rounded-md bg-emerald-100 border-emerald-500">
 
-            <span>
-              <span>Se ha calculado una comparativa de precios por suministros para cada proveedor</span>
-              <strong>usando los presupuestos respondidos</strong>
-            </span>
+          <span>
+            <span>Se ha calculado una comparativa de precios por suministros para cada proveedor</span>
+            <strong>usando los presupuestos respondidos</strong>
+          </span>
 
-            <x-a-button
-              href="{{ route('suppliers-budgets-ranking', $period->id) }}"
-              wire:navigate
-              bg_color="emerald-600"
-              border_color="emerald-600"
-              text_color="neutral-100"
-              >ver
-            </x-a-button>
+          <x-a-button href="{{ route('suppliers-budgets-ranking', $period->id) }}" wire:navigate bg_color="emerald-600"
+            border_color="emerald-600" text_color="neutral-100">ver
+          </x-a-button>
 
-          </div>
+        </div>
 
         @elseif ($period_status === $closed and $count_quotations === 0)
 
-          <div class="w-full flex justify-between items-center p-2 bg-red-100 border border-red-500 rounded-md">
+        <div class="flex items-center justify-between w-full p-2 bg-red-100 border border-red-500 rounded-md">
 
-            <span>
-              <span>¡No se han recibido presupuestos de los proveedores!</span>
-              <span>¿Re abrir periodo?</span>
-            </span>
+          <span>
+            <span>¡No se han recibido presupuestos de los proveedores!</span>
+            <span>¿Re abrir periodo?</span>
+          </span>
 
-            <x-a-button
-              wire:navigate
-              href="{{ route('suppliers-budgets-periods-edit', $period->id) }}"
-              wire:click=""
-              bg_color="neutral-100"
-              border_color="neutral-200"
-              text_color="neutral-600"
-              >configurar y reabrir
-            </x-a-button>
+          <x-a-button wire:navigate href="{{ route('suppliers-budgets-periods-edit', $period->id) }}" wire:click=""
+            bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600">configurar y reabrir
+          </x-a-button>
 
-          </div>
+        </div>
 
         @endif
 
@@ -157,47 +127,54 @@
           <x-table-base>
             <x-slot:tablehead>
               <tr class="border bg-neutral-100">
-                <x-table-th class="text-end w-12">id</x-table-th>
-                <x-table-th class="text-start w-56">nombre</x-table-th>
-                <x-table-th class="text-start">marca</x-table-th>
+                <x-table-th class="w-12 text-end">
+                  id
+                </x-table-th>
+                <x-table-th class="text-start">
+                  nombre
+                </x-table-th>
+                <x-table-th class="text-start">
+                  marca/tipo
+                </x-table-th>
                 <x-table-th class="text-end">
                   <span>volumen</span>
-                  <x-quest-icon title="kilogramos (kg), litros (lts) o unidades (un)"/>
+                  <x-quest-icon
+                    title="kilogramos (Kg), gramos (g), litros (L), mililitros (mL), metros (M), centimetros (cm) o unidades (U)" />
                 </x-table-th>
                 <x-table-th class="text-end">
                   <span>cantidad a presupuestar</span>
-                  <x-quest-icon title="cantidad de unidades de cada pack o de cada suministro que desea presupuestar"/>
+                  <x-quest-icon title="cantidad de unidades de cada pack o de cada suministro que desea presupuestar" />
                 </x-table-th>
               </tr>
             </x-slot:tablehead>
             <x-slot:tablebody>
               @forelse ($period_provisions as $provision)
-                <tr wire:key="{{ $provision->id }}" class="border">
-                  <x-table-td class="text-end">
-                    {{ $provision->id }}
-                  </x-table-td>
-                  <x-table-td class="text-start">
-                    {{ $provision->provision_name }}
-                  </x-table-td>
-                  <x-table-td class="text-start">
-                    {{ $provision->trademark->provision_trademark_name }}
-                  </x-table-td>
-                  <x-table-td class="text-end">
-                    {{ $provision->provision_quantity }}&nbsp;{{ $provision->measure->measure_abrv }}
-                  </x-table-td>
-                  <x-table-td class="text-end">
-                    {{ $provision->pivot->quantity }}
-                  </x-table-td>
-                </tr>
+              <tr wire:key="{{ $provision->id }}" class="border">
+                <x-table-td class="text-end">
+                  {{ $provision->id }}
+                </x-table-td>
+                <x-table-td class="text-start">
+                  {{ $provision->provision_name }}
+                </x-table-td>
+                <x-table-td class="text-start">
+                  {{ $provision->trademark->provision_trademark_name }}/{{ $provision->type->provision_type_name }}
+                </x-table-td>
+                <x-table-td class="text-end">
+                  {{ convert_measure($provision->provision_quantity, $provision->measure) }}
+                </x-table-td>
+                <x-table-td class="text-end">
+                  {{ $provision->pivot->quantity }}
+                </x-table-td>
+              </tr>
               @empty
-                <tr class="border">
-                  <td colspan="5">¡sin registros!</td>
-                </tr>
+              <tr class="border">
+                <td colspan="5">¡sin registros!</td>
+              </tr>
               @endforelse
             </x-slot:tablebody>
           </x-table-base>
           {{-- paginacion --}}
-          <div class="w-full flex justify-end items-center gap-1 mt-1">
+          <div class="flex items-center justify-end w-full gap-1 mt-1">
             {{ $period_provisions->links() }}
           </div>
         </x-div-toggle>
@@ -214,47 +191,55 @@
           <x-table-base>
             <x-slot:tablehead>
               <tr class="border bg-neutral-100">
-                <x-table-th class="text-end w-12">id</x-table-th>
-                <x-table-th class="text-start w-56">nombre</x-table-th>
-                <x-table-th class="text-start">marca</x-table-th>
+                <x-table-th class="w-12 text-end">
+                  id
+                </x-table-th>
+                <x-table-th class="text-start">
+                  nombre
+                </x-table-th>
+                <x-table-th class="text-start">
+                  marca
+                </x-table-th>
                 <x-table-th class="text-end">
                   <span>volumen</span>
-                  <x-quest-icon title="kilogramos (kg), litros (lts) o unidades (un)"/>
+                  <x-quest-icon
+                    title="kilogramos (Kg), gramos (g), litros (L), mililitros (mL), metros (M), centimetros (cm) o unidades (U)" />
                 </x-table-th>
                 <x-table-th class="text-end">
                   <span>cantidad a presupuestar</span>
-                  <x-quest-icon title="cantidad de unidades de cada pack o de cada suministro que desea presupuestar"/>
+                  <x-quest-icon title="cantidad de unidades de cada pack o de cada suministro que desea presupuestar" />
                 </x-table-th>
               </tr>
             </x-slot:tablehead>
             <x-slot:tablebody>
               @forelse ($period_packs as $pack)
-                <tr wire:key="{{ $pack->id }}" class="border">
-                  <x-table-td class="text-end">
-                    {{ $pack->id }}
-                  </x-table-td>
-                  <x-table-td class="text-start">
-                    {{ $pack->pack_name }}
-                  </x-table-td>
-                  <x-table-td class="text-start">
-                    {{ $pack->provision->trademark->provision_trademark_name }}
-                  </x-table-td>
-                  <x-table-td class="text-end">
-                    {{ $pack->pack_quantity }}&nbsp;{{ $pack->provision->measure->measure_abrv }}
-                  </x-table-td>
-                  <x-table-td class="text-end">
-                    {{ $pack->pivot->quantity }}
-                  </x-table-td>
-                </tr>
+              <tr wire:key="{{ $pack->id }}" class="border">
+                <x-table-td class="text-end">
+                  {{ $pack->id }}
+                </x-table-td>
+                <x-table-td class="text-start">
+                  {{ $pack->pack_name }}
+                </x-table-td>
+                <x-table-td class="text-start">
+                  {{ $pack->provision->trademark->provision_trademark_name }}/{{
+                  $pack->provision->type->provision_type_name }}
+                </x-table-td>
+                <x-table-td class="text-end">
+                  {{ convert_measure($pack->pack_quantity, $pack->provision->measure) }}
+                </x-table-td>
+                <x-table-td class="text-end">
+                  {{ $pack->pivot->quantity }}
+                </x-table-td>
+              </tr>
               @empty
-                <tr class="border">
-                  <td colspan="5">¡sin registros!</td>
-                </tr>
+              <tr class="border">
+                <td colspan="5">¡sin registros!</td>
+              </tr>
               @endforelse
             </x-slot:tablebody>
           </x-table-base>
           {{-- paginacion --}}
-          <div class="w-full flex justify-end items-center gap-1 mt-1">
+          <div class="flex items-center justify-end w-full gap-1 mt-1">
             {{ $period_packs->links() }}
           </div>
         </x-div-toggle>
@@ -271,77 +256,81 @@
           <x-table-base>
             <x-slot:tablehead>
               <tr class="border bg-neutral-100">
-                <x-table-th class="text-end w-12">id</x-table-th>
-                <x-table-th class="text-start">presupuesto</x-table-th>
-                <x-table-th class="text-start">proveedor</x-table-th>
-                <x-table-th class="text-start">estado</x-table-th>
+                <x-table-th class="w-12 text-end">
+                  id
+                </x-table-th>
+                <x-table-th class="text-start">
+                  presupuesto
+                </x-table-th>
+                <x-table-th class="text-start">
+                  proveedor
+                </x-table-th>
+                <x-table-th class="text-start">
+                  estado
+                </x-table-th>
                 <x-table-th class="text-end">
                   <span>última respuesta</span>
-                  <x-quest-icon title="última vez que el proveedor modificó los precios de este presupuesto"/>
+                  <x-quest-icon title="última vez que el proveedor modificó los precios de este presupuesto" />
                 </x-table-th>
-                <x-table-th class="text-start w-48">acciones</x-table-th>
+                <x-table-th class="text-start">
+                  presupuesto
+                  <x-quest-icon title="PDF disponible una vez que el presupuesto es respondido" />
+                </x-table-th>
+                <x-table-th class="w-48 text-start">
+                  acciones
+                </x-table-th>
               </tr>
             </x-slot:tablehead>
             <x-slot:tablebody>
               @forelse ($period_quotations as $quotation)
-                {{-- fila proveedor --}}
-                <tr wire:key="{{ $quotation->id }}" class="border">
-                  <x-table-td class="text-end">
-                    {{ $quotation->id }}
-                  </x-table-td>
-                  <x-table-td class="text-start">
-                    {{ $quotation->quotation_code }}
-                  </x-table-td>
-                  <x-table-td class="text-start">
-                    {{ $quotation->supplier->company_name }},&nbsp;CUIT:&nbsp;{{ $quotation->supplier->company_cuit }}
-                  </x-table-td>
-                  <x-table-td class="text-start">
-                    {{-- estado del presupuesto --}}
-                    @if ($quotation->is_completed)
-                      <x-text-tag
-                        title="el proveedor ha respondido"
-                        color="emerald"
-                        class="cursor-pointer"
-                        >respondido
-                      </x-text-tag>
-                    @else
-                      <x-text-tag
-                        title="el proveedor no ha respondido"
-                        color="neutral"
-                        class="cursor-pointer"
-                        >sin responder
-                      </x-text-tag>
-                    @endif
-                  </x-table-td>
-                  <x-table-td class="text-end">
-                    @if ($quotation->is_completed)
-                      {{ formatDateTime($quotation->updated_at, 'd-m-Y') }}
-                    @else
-                      <span class="font-semibold text-red-400">-</span>
-                    @endif
-                  </x-table-td>
-                  <x-table-td>
-
-                    <x-a-button
-                      wire:navigate
-                      href="{{ route('suppliers-budgets-response', $quotation->id) }}"
-                      bg_color="neutral-100"
-                      border_color="neutral-200"
-                      text_color="neutral-600"
-                      >ver
-                    </x-a-button>
-
-                  </x-table-td>
-                </tr>
+              {{-- fila proveedor --}}
+              <tr wire:key="{{ $quotation->id }}" class="border">
+                <x-table-td class="text-end">
+                  {{ $quotation->id }}
+                </x-table-td>
+                <x-table-td class="text-start">
+                  {{ $quotation->quotation_code }}
+                </x-table-td>
+                <x-table-td class="text-start">
+                  {{ $quotation->supplier->company_name }}
+                </x-table-td>
+                <x-table-td class="text-start">
+                  {{-- estado del presupuesto --}}
+                  @if ($quotation->is_completed)
+                  <x-text-tag title="el proveedor ha respondido" color="emerald" class="cursor-pointer">respondido
+                    <x-quest-icon title="el proveedor ha respondido a este presupuesto" />
+                  </x-text-tag>
+                  @else
+                  <x-text-tag title="el proveedor no ha respondido" color="neutral" class="cursor-pointer">sin responder
+                    <x-quest-icon title="el proveedor aún no responde a este presupuesto" />
+                  </x-text-tag>
+                  @endif
+                </x-table-td>
+                <x-table-td class="text-end">
+                  @if ($quotation->is_completed)
+                  {{ formatDateTime($quotation->updated_at, 'd-m-Y H:i') }} hs.
+                  @else
+                  <span class="font-semibold text-neutral-400">-</span>
+                  @endif
+                </x-table-td>
+                <x-table-td class="text-start">
+                  -
+                </x-table-td>
+                <x-table-td>
+                  <x-a-button wire:navigate href="{{ route('suppliers-budgets-response', $quotation->id) }}"
+                    bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600">ver presupuesto
+                  </x-a-button>
+                </x-table-td>
+              </tr>
               @empty
-                <tr class="border">
-                  <td colspan="2">¡sin registros hasta que el período comience!</td>
-                </tr>
+              <tr class="border">
+                <td colspan="2">¡sin registros hasta que el período comience!</td>
+              </tr>
               @endforelse
             </x-slot:tablebody>
           </x-table-base>
           {{-- paginacion --}}
-          <div class="w-full flex justify-end items-center gap-1 mt-1">
+          <div class="flex items-center justify-end w-full gap-1 mt-1">
             {{ $period_quotations->links() }}
           </div>
         </x-div-toggle>
@@ -349,7 +338,6 @@
       </x-slot:content>
 
       <x-slot:footer class="my-2">
-        <div></div>
       </x-slot:footer>
 
     </x-content-section>

@@ -39,7 +39,7 @@ class ShowBudgetPeriod extends Component
    * boot de constantes
    * @param $qps quotation period service
    * @return void
-  */
+   */
   public function boot(QuotationPeriodService $qps): void
   {
     // ids de estados
@@ -53,7 +53,7 @@ class ShowBudgetPeriod extends Component
    * @param int $id id de un periodo de peticion de presupuestos.
    * @param QuotationPeriodService $quotation_period_service servicio.
    * @return void
-  */
+   */
   public function mount(QuotationPeriodService $qps, int $id): void
   {
     $this->period = RequestForQuotationPeriod::findOrFail($id);
@@ -64,7 +64,7 @@ class ShowBudgetPeriod extends Component
   /**
    * abrir el periodo.
    * @return void
-  */
+   */
   public function openPeriod(): void
   {
     $this->period->period_start_at = Carbon::now()->format('Y-m-d');
@@ -79,7 +79,7 @@ class ShowBudgetPeriod extends Component
   /**
    * cerrar el periodo.
    * @return void
-  */
+   */
   public function closePeriod(): void
   {
     $this->period->period_end_at = Carbon::now()->format('Y-m-d');
@@ -92,9 +92,14 @@ class ShowBudgetPeriod extends Component
   }
 
   /**
+   * obtener pdf de un presupuesto
+   * TODO
+   */
+
+  /**
    * renderizar vista
    * @return View
-  */
+   */
   public function render(): View
   {
     // suministros y packs de interes para el periodo

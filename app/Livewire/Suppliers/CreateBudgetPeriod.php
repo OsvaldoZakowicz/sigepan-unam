@@ -66,7 +66,7 @@ class CreateBudgetPeriod extends Component
       $this->dispatch('toast-event', toast_data: [
         'event_type' => 'info',
         'title_toast' => toastTitle('', true),
-        'descr_toast' => 'este suministro ya fue elegido'
+        'descr_toast' => 'este suministro ya está en la lista.'
       ]);
 
       return;
@@ -78,7 +78,6 @@ class CreateBudgetPeriod extends Component
       'item_object'   => $provision,
       'item_quantity' => "1",
     ]);
-
   }
 
   /**
@@ -94,7 +93,7 @@ class CreateBudgetPeriod extends Component
       $this->dispatch('toast-event', toast_data: [
         'event_type' => 'info',
         'title_toast' => toastTitle('', true),
-        'descr_toast' => 'este pack ya fue elegido'
+        'descr_toast' => 'este pack ya está en la lista.'
       ]);
 
       return;
@@ -112,7 +111,7 @@ class CreateBudgetPeriod extends Component
    * quitar suministro o pack de la lista
    * @param int $index
    * @return void
-  */
+   */
   public function removeItemFromList(int $index): void
   {
     $this->provisions_and_packs->forget($index);
@@ -121,7 +120,7 @@ class CreateBudgetPeriod extends Component
   /**
    * vaciar lista completa
    * @return void
-  */
+   */
   public function removeAllItemsFromList(): void
   {
     $this->provisions_and_packs = collect([]);
@@ -144,7 +143,8 @@ class CreateBudgetPeriod extends Component
         'provisions_and_packs.*.item_type'     => ['nullable'], // necesario en el request
         'provisions_and_packs.*.item_id'       => ['nullable'], // necesario en el request
         'provisions_and_packs.*.item_quantity' => ['required', 'numeric', 'min:1', 'max:99'],
-      ],[
+      ],
+      [
         'period_start_at.required'        =>  'La :attribute es obligatoria',
         'period_start_at.after_or_equal'  =>  'La :attribute debe ser a partir de hoy como mínimo',
         'period_end_at.required'          =>  'La :attribute es obligatoria',
@@ -154,7 +154,8 @@ class CreateBudgetPeriod extends Component
         'provisions_and_packs.*.item_quantity.required' => 'La :attribute es obligatoria',
         'provisions_and_packs.*.item_quantity.min'      => 'La :attribute debe ser minimo 1',
         'provisions_and_packs.*.item_quantity.max'      => 'La :attribute debe ser maximo 99',
-      ], [
+      ],
+      [
         'period_start_at'           =>  'fecha de inicio',
         'period_end_at'             =>  'fecha de cierre',
         'period_short_description'  =>  'descripción corta',
@@ -189,7 +190,6 @@ class CreateBudgetPeriod extends Component
         if ($item['item_type'] === 'pack') {
           $period->packs()->attach($item['item_object']->id, ['quantity' => $item['item_quantity']]);
         }
-
       });
 
 
@@ -197,12 +197,10 @@ class CreateBudgetPeriod extends Component
 
       session()->flash('operation-success', toastSuccessBody('periodo de solicitud', 'creado y programado'));
       $this->redirectRoute('suppliers-budgets-periods-index');
-
     } catch (\Exception $e) {
 
       session()->flash('operation-error', 'error: ' . $e->getMessage() . ', contacte al Administrador');
       $this->redirectRoute('suppliers-budgets-periods-index');
-
     }
   }
 
