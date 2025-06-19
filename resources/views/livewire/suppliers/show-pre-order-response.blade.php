@@ -8,18 +8,13 @@
       <x-slot:title>
         <span class="text-xl md:text-base lg:text-sm text-neutral-800">ver pre orden,&nbsp;</span>
         <span class="text-xl md:text-base lg:text-sm text-neutral-800">código:&nbsp;</span>
-        <span class="font-semibold uppercase text-sm">{{ $preorder->pre_order_code }}.</span>
+        <span class="text-sm font-semibold uppercase">{{ $preorder->pre_order_code }}.</span>
         <span class="text-xl md:text-base lg:text-sm text-neutral-800">fecha de la pre orden:&nbsp;</span>
         <span class="font-semibold">{{ formatDateTime($preorder->updated_at, 'd-m-Y H:i:s') }} (último cambio).</span>
       </x-slot:title>
 
-      <x-a-button
-        wire:navigate
-        href="{{ route('suppliers-preorders-show', $preorder->pre_order_period->id) }}"
-        bg_color="neutral-100"
-        border_color="neutral-200"
-        text_color="neutral-600"
-        >volver al periodo
+      <x-a-button wire:navigate href="{{ route('suppliers-preorders-show', $preorder->pre_order_period->id) }}"
+        bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600">volver al periodo
       </x-a-button>
 
     </x-title-section>
@@ -29,92 +24,71 @@
 
       <x-slot:header>
         {{-- estado, evaluacion y presupuesto de referencia --}}
-        <div class="flex gap-2 justify-start items-center">
+        <div class="flex items-center justify-start gap-2">
 
           {{-- estado de pre orden --}}
           @if ($preorder->is_completed)
-            <x-text-tag
-              color="emerald"
-              class="cursor-pointer"
-              >respondido
-              <x-quest-icon title="el proveedor ha respondido"/>
-            </x-text-tag>
+          <x-text-tag color="emerald" class="cursor-pointer">respondido
+            <x-quest-icon title="el proveedor ha respondido" />
+          </x-text-tag>
           @else
-            <x-text-tag
-              color="neutral"
-              class="cursor-pointer"
-              >sin responder
-              <x-quest-icon title="el proveedor no ha respondido"/>
-            </x-text-tag>
+          <x-text-tag color="neutral" class="cursor-pointer">sin responder
+            <x-quest-icon title="el proveedor no ha respondido" />
+          </x-text-tag>
           @endif
 
           {{-- evaluacion pendiente --}}
           @if ($preorder->status === $status_pending)
-            <x-text-tag
-              color="neutral"
-              class="cursor-pointer"
-              >{{ $preorder->status }}
-              <x-quest-icon title="esta pre orden esta aún en tramite de aprobación"/>
-            </x-text-tag>
+          <x-text-tag color="neutral" class="cursor-pointer">{{ $preorder->status }}
+            <x-quest-icon title="esta pre orden esta aún en tramite de aprobación" />
+          </x-text-tag>
           @endif
 
           {{-- evaluacion aprobado --}}
           @if ($preorder->status === $status_approved)
-            <x-text-tag
-              color="emerald"
-              class="cursor-pointer"
-              >{{ $preorder->status }}
-              <x-quest-icon title="tanto proveedor como la panaderia estan de acuerdo con esta pre orden de compra"/>
-            </x-text-tag>
+          <x-text-tag color="emerald" class="cursor-pointer">{{ $preorder->status }}
+            <x-quest-icon title="tanto proveedor como la panaderia estan de acuerdo con esta pre orden de compra" />
+          </x-text-tag>
           @endif
 
           {{-- evaluacion rechazado --}}
           @if ($preorder->status === $status_rejected)
-            <x-text-tag
-              color="red"
-              class="cursor-pointer"
-              >{{ $preorder->status }}
-              <x-quest-icon title="una de las partes rechazó esta pre orden de compra"/>
-            </x-text-tag>
+          <x-text-tag color="red" class="cursor-pointer">{{ $preorder->status }}
+            <x-quest-icon title="una de las partes rechazó esta pre orden de compra" />
+          </x-text-tag>
           @endif
 
           {{-- si la pre orden se basa en un presupuesto previo --}}
           @if ($preorder->quotation_reference !== null)
 
-            <x-text-tag
-              color="neutral"
-              class="cursor-pointer"
-              >referencia: <span class="uppercase text-xs font-semibold">{{ $preorder->quotation_reference }}</span>
-            </x-text-tag>
+          <x-text-tag color="neutral" class="cursor-pointer">referencia: <span
+              class="text-xs font-semibold uppercase">{{ $preorder->quotation_reference }}</span>
+          </x-text-tag>
 
-            <x-a-button
-              wire:navigate
-              href="{{ route('suppliers-budgets-response', $quotation->id) }}"
-              bg_color="neutral-100"
-              border_color="neutral-200"
-              text_color="neutral-600"
-              >ver presupuesto previo
-            </x-a-button>
+          <x-a-button wire:navigate href="{{ route('suppliers-budgets-response', $quotation->id) }}"
+            bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600">ver presupuesto previo
+          </x-a-button>
 
           @endif
 
         </div>
         {{-- detalle de fecha sobre el presupuesto de referencia --}}
         @if ($preorder->quotation_reference !== null)
-          <div class="mt-2 ">
-            <span class="py-2 lowercase">esta pre orden se creó a partir del presupuesto obtenido el:&nbsp;</span>
-            <span class="py-2 lowercase">{{ $quotation->updated_at->format('d-m-Y H:i:s') }}</span>
-          </div>
+        <div class="mt-2 ">
+          <span class="py-2 lowercase">esta pre orden se creó a partir del presupuesto obtenido el:&nbsp;</span>
+          <span class="py-2 lowercase">{{ $quotation->updated_at->format('d-m-Y H:i:s') }}</span>
+        </div>
         @endif
       </x-slot:header>
 
-      <x-slot:content class="flex-col overflow-y-auto overflow-x-auto">
+      <x-slot:content class="flex-col overflow-x-auto overflow-y-auto">
         {{-- una pre orden --}}
         <section>
           {{-- encabezado --}}
-          <header class="flex gap-8 w-full p-2 border border-neutral-200 rounded-md">
+          <header class="flex w-full gap-8 p-2 border rounded-md border-neutral-200">
             {{-- panaderia --}}
             <div class="flex flex-col gap-1">
+              <span class="font-semibold uppercase text-neutral-500">de:</span>
               <span>
                 <span class="font-semibold">Panadería:</span>
                 <span>{{ $razon_social }}</span>
@@ -142,6 +116,7 @@
             </div>
             {{-- proveedor --}}
             <div class="flex flex-col gap-1">
+              <span class="font-semibold uppercase text-neutral-500">para:</span>
               <span>
                 <span class="font-semibold">Proveedor:</span>
                 <span>{{ $preorder->supplier->company_name }}</span>
@@ -165,8 +140,8 @@
             </div>
           </header>
           {{-- contenido --}}
-          <x-div-toggle x-data="{ open: true }" class="mt-2 p-2" title="suministros y packs de esta pre orden">
-            <div class="w-full max-h-72 overflow-x-auto overflow-y-auto">
+          <x-div-toggle x-data="{ open: true }" class="p-2 mt-2" title="suministros y packs de esta pre orden">
+            <div class="w-full overflow-x-auto overflow-y-auto max-h-72">
               <x-table-base>
                 <x-slot:tablehead>
                   <tr class="border bg-neutral-100">
@@ -195,172 +170,172 @@
                 </x-slot:tablehead>
                 <x-slot:tablebody>
                   @foreach($items as $key => $item)
-                    @if ($item['item_type'] === $item_provision)
-                      {{-- suministros --}}
-                      <tr class="border">
-                        <x-table-td class="text-end">
-                          {{ $key+1 }}
-                        </x-table-td>
-                        <x-table-td class="text-start">
-                          {{ $item['item_object']->provision_name }}
-                        </x-table-td>
-                        <x-table-td class="text-start">
-                          <span>
-                            <span>{{ $item['item_object']->trademark->provision_trademark_name }}/{{ $item['item_object']->type->provision_type_name }}</span>
-                            <span class="lowercase"> de {{ convert_measure($item['item_object']->provision_quantity, $item['item_object']->measure) }}</span>
-                          </span>
-                        </x-table-td>
-                        <x-table-td class="text-start">
-                          @if ($preorder->is_completed)
-                            {{ ($item['item_has_stock']) ? 'si' : 'no' }}
-                          @else
-                            <x-text-tag
-                              color="neutral"
-                              class="cursor-pointer"
-                              >sin respuesta
-                              <x-quest-icon title="el proveedor no ha respondido"/>
-                            </x-text-tag>
-                          @endif
-                        </x-table-td>
-                        <x-table-td class="text-end">
-                          @if(!$item['item_has_stock'])
-                            <del class="text-neutral-400">{{ $item['item_quantity'] }}</del>
-                            <span>cantidad alternativa:&nbsp;{{ $item['item_alternative_quantity'] }}</span>
-                          @else
-                            <span>{{ $item['item_quantity'] }}</span>
-                          @endif
-                        </x-table-td>
-                        <x-table-td class="text-end">
-                          <span>${{ toMoneyFormat($item['item_unit_price']) }}</span>
-                        </x-table-td>
-                        <x-table-td class="text-end">
-                          @if(!$item['item_has_stock'])
-                            <del class="text-neutral-400">${{ number_format($item['item_total_price'], 2) }}</del>
-                            <span>${{ toMoneyFormat($item['item_alternative_quantity'] * $item['item_unit_price']) }}</span>
-                          @else
-                            <span>${{ toMoneyFormat($item['item_total_price']) }}</span>
-                          @endif
-                        </x-table-td>
-                      </tr>
-                    @else
-                      {{-- packs --}}
-                      <tr class="border">
-                        <x-table-td class="text-end">
-                          {{ $key+1 }}
-                        </x-table-td>
-                        <x-table-td class="text-start">
-                          {{ $item['item_object']->pack_name }}
-                        </x-table-td>
-                        <x-table-td class="text-start">
-                          <span>
-                            <span>{{ $item['item_object']->provision->trademark->provision_trademark_name }}/{{ $item['item_object']->provision->type->provision_type_name }}</span>
-                            <span class="lowercase"> de {{ convert_measure($item['item_object']->pack_quantity, $item['item_object']->provision->measure) }}</span>
-                          </span>
-                        </x-table-td>
-                        <x-table-td class="text-start">
-                          @if ($preorder->is_completed)
-                            {{ ($item['item_has_stock']) ? 'si' : 'no' }}
-                          @else
-                            <x-text-tag
-                              color="neutral"
-                              class="cursor-pointer"
-                              >sin respuesta
-                              <x-quest-icon title="el proveedor no ha respondido"/>
-                            </x-text-tag>
-                          @endif
-                        </x-table-td>
-                        <x-table-td class="text-end">
-                          @if(!$item['item_has_stock'])
-                            <del class="text-neutral-400">{{ $item['item_quantity'] }}</del>
-                            <span>cantidad alternativa:&nbsp;{{ $item['item_alternative_quantity'] }}</span>
-                          @else
-                            <span>{{ $item['item_quantity'] }}</span>
-                          @endif
-                        </x-table-td>
-                        <x-table-td class="text-end">
-                          <span>${{ toMoneyFormat($item['item_unit_price']) }}</span>
-                        </x-table-td>
-                        <x-table-td class="text-end">
-                          @if(!$item['item_has_stock'])
-                            <del class="text-neutral-400">${{ number_format($item['item_total_price'], 2) }}</del>
-                            <span>${{ toMoneyFormat($item['item_alternative_quantity'] * $item['item_unit_price']) }}</span>
-                          @else
-                            <span>${{ toMoneyFormat($item['item_total_price']) }}</span>
-                          @endif
-                        </x-table-td>
-                      </tr>
-                    @endif
-                    @if ($loop->last)
-                      <tr class="border">
-                        <x-table-td colspan="6" class="text-end font-semibold capitalize">Total:</x-table-td>
-                        <x-table-td class="text-end">
-                          @if (number_format($total_price, 2) === number_format($alternative_total_price, 2))
-                            {{-- no hay cambios --}}
-                            <span class="font-semibold">${{ toMoneyFormat($total_price) }}</span>
-                          @else
-                            <del class="text--400">$ {{ toMoneyFormat($total_price) }}</del>
-                            <span class="font-semibold">${{ toMoneyFormat($alternative_total_price) }}</span>
-                          @endif
-                        </x-table-td>
-                      </tr>
-                    @endif
+                  @if ($item['item_type'] === $item_provision)
+                  {{-- suministros --}}
+                  <tr class="border">
+                    <x-table-td class="text-end">
+                      {{ $key+1 }}
+                    </x-table-td>
+                    <x-table-td class="text-start">
+                      {{ $item['item_object']->provision_name }}
+                    </x-table-td>
+                    <x-table-td class="text-start">
+                      <span>
+                        <span>{{ $item['item_object']->trademark->provision_trademark_name }}/{{
+                          $item['item_object']->type->provision_type_name }}</span>
+                        <span class="lowercase"> de {{ convert_measure($item['item_object']->provision_quantity,
+                          $item['item_object']->measure) }}</span>
+                      </span>
+                    </x-table-td>
+                    <x-table-td class="text-start">
+                      @if ($preorder->is_completed)
+                      {{ ($item['item_has_stock']) ? 'si' : 'no' }}
+                      @else
+                      <x-text-tag color="neutral" class="cursor-pointer">sin respuesta
+                        <x-quest-icon title="el proveedor no ha respondido" />
+                      </x-text-tag>
+                      @endif
+                    </x-table-td>
+                    <x-table-td class="text-end">
+                      @if(!$item['item_has_stock'])
+                      <del class="text-neutral-400">{{ $item['item_quantity'] }}</del>
+                      <span>cantidad alternativa:&nbsp;{{ $item['item_alternative_quantity'] }}</span>
+                      @else
+                      <span>{{ $item['item_quantity'] }}</span>
+                      @endif
+                    </x-table-td>
+                    <x-table-td class="text-end">
+                      <span>${{ toMoneyFormat($item['item_unit_price']) }}</span>
+                    </x-table-td>
+                    <x-table-td class="text-end">
+                      @if(!$item['item_has_stock'])
+                      <del class="text-neutral-400">${{ number_format($item['item_total_price'], 2) }}</del>
+                      <span>${{ toMoneyFormat($item['item_alternative_quantity'] * $item['item_unit_price']) }}</span>
+                      @else
+                      <span>${{ toMoneyFormat($item['item_total_price']) }}</span>
+                      @endif
+                    </x-table-td>
+                  </tr>
+                  @else
+                  {{-- packs --}}
+                  <tr class="border">
+                    <x-table-td class="text-end">
+                      {{ $key+1 }}
+                    </x-table-td>
+                    <x-table-td class="text-start">
+                      {{ $item['item_object']->pack_name }}
+                    </x-table-td>
+                    <x-table-td class="text-start">
+                      <span>
+                        <span>{{ $item['item_object']->provision->trademark->provision_trademark_name }}/{{
+                          $item['item_object']->provision->type->provision_type_name }}</span>
+                        <span class="lowercase"> de {{ convert_measure($item['item_object']->pack_quantity,
+                          $item['item_object']->provision->measure) }}</span>
+                      </span>
+                    </x-table-td>
+                    <x-table-td class="text-start">
+                      @if ($preorder->is_completed)
+                      {{ ($item['item_has_stock']) ? 'si' : 'no' }}
+                      @else
+                      <x-text-tag color="neutral" class="cursor-pointer">sin respuesta
+                        <x-quest-icon title="el proveedor no ha respondido" />
+                      </x-text-tag>
+                      @endif
+                    </x-table-td>
+                    <x-table-td class="text-end">
+                      @if(!$item['item_has_stock'])
+                      <del class="text-neutral-400">{{ $item['item_quantity'] }}</del>
+                      <span>cantidad alternativa:&nbsp;{{ $item['item_alternative_quantity'] }}</span>
+                      @else
+                      <span>{{ $item['item_quantity'] }}</span>
+                      @endif
+                    </x-table-td>
+                    <x-table-td class="text-end">
+                      <span>${{ toMoneyFormat($item['item_unit_price']) }}</span>
+                    </x-table-td>
+                    <x-table-td class="text-end">
+                      @if(!$item['item_has_stock'])
+                      <del class="text-neutral-400">${{ number_format($item['item_total_price'], 2) }}</del>
+                      <span>${{ toMoneyFormat($item['item_alternative_quantity'] * $item['item_unit_price']) }}</span>
+                      @else
+                      <span>${{ toMoneyFormat($item['item_total_price']) }}</span>
+                      @endif
+                    </x-table-td>
+                  </tr>
+                  @endif
+                  @if ($loop->last)
+                  <tr class="border">
+                    <x-table-td colspan="6" class="font-semibold capitalize text-end">Total:</x-table-td>
+                    <x-table-td class="text-end">
+                      @if (number_format($total_price, 2) === number_format($alternative_total_price, 2))
+                      {{-- no hay cambios --}}
+                      <span class="font-semibold">${{ toMoneyFormat($total_price) }}</span>
+                      @else
+                      <del class="text--400">$ {{ toMoneyFormat($total_price) }}</del>
+                      <span class="font-semibold">${{ toMoneyFormat($alternative_total_price) }}</span>
+                      @endif
+                    </x-table-td>
+                  </tr>
+                  @endif
                   @endforeach
                 </x-slot:tablebody>
               </x-table-base>
             </div>
           </x-div-toggle>
           {{-- anexo --}}
-          <x-div-toggle x-data="{ open: true }" class="mt-2 p-2" title="anexo">
+          <x-div-toggle x-data="{ open: true }" class="p-2 mt-2" title="anexo">
             {{-- detalle de envio, fecha, y medio de pago informado por el proveedor --}}
             <div class="flex flex-col gap-2">
               @if ($preorder->is_completed && $preorder->is_approved_by_supplier)
-                <div class="flex flex-col gap-2">
-                  {{-- mensaje de aprobacion del proveedor --}}
-                  <div class="flex flex-col">
-                    @if ($preorder->is_approved_by_supplier)
-                      <span>El proveedor <x-text-tag color="emerald">aceptó</x-text-tag> cumplir con la pre orden según el stock y el presente anexo declarado</span>
-                    @endif
-                  </div>
-                  {{-- retiro o envio, fecha y método de pago en una línea --}}
-                  <div class="flex flex-wrap gap-2 w-full">
-                    @if (!empty($preorder_details))
-                      {{-- retiro o envio --}}
-                      <div class="flex items-center">
-                        <span class="font-medium text-sm text-neutral-700">Tipo de entrega:</span>
-                        <span class="ml-2 text-sm">
-                          {{ implode(', ', $preorder_details['delivery_type']) }}
-                        </span>
-                      </div>
-                      {{-- fecha de envio o retiro --}}
-                      <div class="flex items-center">
-                        <span class="font-medium text-sm text-neutral-700">Fecha tentativa de entrega o retiro a partir de:</span>
-                        <span class="ml-2 text-sm">
-                          {{ formatDateTime($preorder_details['delivery_date'], 'd-m-Y') }}
-                        </span>
-                      </div>
-                      {{-- metodo de pago --}}
-                      <div class="flex items-center">
-                        <span class="font-medium text-sm text-neutral-700">Métodos de pago aceptados:</span>
-                        <span class="ml-2 text-sm">
-                          {{ implode(', ', $preorder_details['payment_method']) }}
-                        </span>
-                      </div>
-                    @endif
-                  </div>
-                  {{-- comentarios --}}
-                  @if(!empty($preorder_details))
-                    <div class="w-full">
-                      <span class="font-medium text-sm text-neutral-700">Comentarios:</span>
-                      <p class="mt-1 text-sm text-neutral-700">
-                        {{ $preorder_details['short_description'] ?? 'ninguno' }}
-                      </p>
-                    </div>
+              <div class="flex flex-col gap-2">
+                {{-- mensaje de aprobacion del proveedor --}}
+                <div class="flex flex-col">
+                  @if ($preorder->is_approved_by_supplier)
+                  <span>El proveedor <x-text-tag color="emerald">aceptó</x-text-tag> cumplir con la pre orden según el
+                    stock y el presente anexo declarado</span>
                   @endif
                 </div>
-              @else
-                <div>
-                  <span>sin respuesta</span>
+                {{-- retiro o envio, fecha y método de pago en una línea --}}
+                <div class="flex flex-wrap w-full gap-2">
+                  @if (!empty($preorder_details))
+                  {{-- retiro o envio --}}
+                  <div class="flex items-center">
+                    <span class="text-sm font-medium text-neutral-700">Tipo de entrega:</span>
+                    <span class="ml-2 text-sm">
+                      {{ implode(', ', $preorder_details['delivery_type']) }}
+                    </span>
+                  </div>
+                  {{-- fecha de envio o retiro --}}
+                  <div class="flex items-center">
+                    <span class="text-sm font-medium text-neutral-700">Fecha tentativa de entrega o retiro a partir
+                      de:</span>
+                    <span class="ml-2 text-sm">
+                      {{ formatDateTime($preorder_details['delivery_date'], 'd-m-Y') }}
+                    </span>
+                  </div>
+                  {{-- metodo de pago --}}
+                  <div class="flex items-center">
+                    <span class="text-sm font-medium text-neutral-700">Métodos de pago aceptados:</span>
+                    <span class="ml-2 text-sm">
+                      {{ implode(', ', $preorder_details['payment_method']) }}
+                    </span>
+                  </div>
+                  @endif
                 </div>
+                {{-- comentarios --}}
+                @if(!empty($preorder_details))
+                <div class="w-full">
+                  <span class="text-sm font-medium text-neutral-700">Comentarios:</span>
+                  <p class="mt-1 text-sm text-neutral-700">
+                    {{ $preorder_details['short_description'] ?? 'ninguno' }}
+                  </p>
+                </div>
+                @endif
+              </div>
+              @else
+              <div>
+                <span>sin respuesta</span>
+              </div>
               @endif
             </div>
           </x-div-toggle>
@@ -369,34 +344,27 @@
       </x-slot:content>
 
       <x-slot:footer class="my-2">
-        <div class="flex w-full justify-end gap-2 mt-2">
+        <div class="flex justify-end w-full gap-2 mt-2">
           @if ($preorder->is_completed && $preorder->is_approved_by_supplier)
-            @if (!$preorder->is_approved_by_buyer && $preorder->status === $status_pending)
-              <x-a-button
-                wire:navigate
-                href="#"
-                bg_color="red-600"
-                border_color="red-600"
-                wire:click="rejectPreOrder()"
-                wire:confirm="¿rechazar esta pre orden? el proveedor no podrá responder la pre orden una vez la rechace, al finalizar el periodo los suministros y packs de esta pre orden se indicarán como faltates a cubrir."
-                >rechazar
-              </x-a-button>
-              <x-btn-button
-                type="button"
-                wire:click="approveAndMakeOrder()"
-                wire:confirm="¿aprobar esta pre orden?, al aprobar la pre orden indica que está de acuerdo con el stock que puede cumplir el proveedor y con los parámetros del anexo. Se emitirá una orden de compra final para todos los suministros y packs de la lista con stock, la orden de compra definitiva se enviará por email al proveedor"
-                >aprobar y ordenar compra
-              </x-btn-button>
-            @elseif ($preorder->is_approved_by_buyer && $preorder->status === $status_approved)
-              <p>Esta pre orden fue aceptada, y se envió al proveedor una orden de compra definitiva.</p>
-            @else
-              <p>Esta pre orden fue rechazada.</p>
-            @endif
+          @if (!$preorder->is_approved_by_buyer && $preorder->status === $status_pending)
+          <x-a-button wire:navigate href="#" bg_color="red-600" border_color="red-600" wire:click="rejectPreOrder()"
+            wire:confirm="¿rechazar esta pre orden? el proveedor no podrá responder la pre orden una vez la rechace, al finalizar el periodo los suministros y packs de esta pre orden se indicarán como faltates a cubrir.">
+            rechazar
+          </x-a-button>
+          <x-btn-button type="button" wire:click="approveAndMakeOrder()"
+            wire:confirm="¿aprobar esta pre orden?, al aprobar la pre orden indica que está de acuerdo con el stock que puede cumplir el proveedor y con los parámetros del anexo. Se emitirá una orden de compra final para todos los suministros y packs de la lista con stock, la orden de compra definitiva se enviará por email al proveedor">
+            aprobar y ordenar compra
+          </x-btn-button>
+          @elseif ($preorder->is_approved_by_buyer && $preorder->status === $status_approved)
+          <p>Esta pre orden fue aceptada, y se envió al proveedor una orden de compra definitiva.</p>
+          @else
+          <p>Esta pre orden fue rechazada.</p>
+          @endif
           @endif
         </div>
       </x-slot:footer>
 
     </x-content-section>
 
-</article>
+  </article>
 </div>

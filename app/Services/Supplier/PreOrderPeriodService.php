@@ -66,6 +66,17 @@ class PreOrderPeriodService
   }
 
   /**
+   * contar la cantidad de pre ordenes respondidas
+   * @param PreOrderPeriod $period
+   * @return int conteo
+   */
+  public function countPreordersFromPeriod(PreOrderPeriod $period): int
+  {
+    return $period->pre_orders->where('is_completed', true)
+      ->count();
+  }
+
+  /**
    * obtener periodos de peticion de preordenes que
    * deben abrirse a la fecha actual, o una fecha anterior,
    * siempre que el estado sea programado.
