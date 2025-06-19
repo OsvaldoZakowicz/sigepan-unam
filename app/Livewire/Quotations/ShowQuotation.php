@@ -2,15 +2,24 @@
 
 namespace App\Livewire\Quotations;
 
-use Illuminate\Support\Collection;
+use App\Models\Pack;
+use Livewire\Component;
 use App\Models\Provision;
 use App\Models\Quotation;
-use App\Models\Pack;
 use Illuminate\View\View;
-use Livewire\Component;
+use App\Models\DatoNegocio;
+use Illuminate\Support\Collection;
 
 class ShowQuotation extends Component
 {
+  // datos de la panaderia
+  public $razon_social = '';
+  public $cuit = '';
+  public $telefono = '';
+  public $correo = '';
+  public $direccion = '';
+  public $inicio_actividades = '';
+
   // presupuesto
   public $quotation;
   public $provisions;
@@ -18,19 +27,33 @@ class ShowQuotation extends Component
 
   // inputs para suministros, y packs
   public Collection $rows;
+  public $total = 0;
+
+  /**
+   * boot de datos constantes
+   * @return void
+   */
+  public function boot(): void
+  {
+    $this->razon_social = DatoNegocio::obtenerValor('razon_social');
+    $this->cuit = DatoNegocio::obtenerValor('cuit');
+    $this->telefono = DatoNegocio::obtenerValor('telefono');
+    $this->correo = DatoNegocio::obtenerValor('email');
+    $this->direccion = DatoNegocio::obtenerValor('domicilio');
+    $this->inicio_actividades = DatoNegocio::obtenerValor('inicio_actividades');
+  }
 
   /**
    * inicializar datos
    * @param int $id id del presupuesto a responder
    * @return void
-  */
+   */
   public function mount($id)
   {
     $this->quotation = Quotation::findOrFail($id);
     $this->provisions = $this->quotation->provisions;
     $this->packs = $this->quotation->packs;
 
-    // creo un array con un key llamado 'inputs' y un value = []
     $this->fill([
       'rows' => collect([]),
     ]);
@@ -46,13 +69,15 @@ class ShowQuotation extends Component
         $this->addRow($pack);
       }
     }
+
+    $this->calculateTotal();
   }
 
   /**
    * agregar un suministro al array de inputs
    * @param Provision | Pack $item es un suministro o pack
    * @return void
-  */
+   */
   public function addRow(Provision|Pack $item): void
   {
     $type = ($item instanceof Provision) ? 'suministro' : 'pack';
@@ -66,6 +91,17 @@ class ShowQuotation extends Component
       'item_unit_price'  => $item->pivot->unit_price,
       'item_total_price' => $item->pivot->total_price,
     ]);
+  }
+
+  /**
+   * calcular total del presupuesto.
+   * @return void
+   */
+  public function calculateTotal(): void
+  {
+    $this->total = $this->rows->reduce(function ($acc, $input) {
+      return $acc + (float) $input['item_total_price'];
+    }, 0);
   }
 
   /**

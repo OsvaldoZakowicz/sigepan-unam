@@ -114,192 +114,193 @@
             </div>
             @endif
   
-            <x-table-base>
-              <x-slot:tablehead>
-                <tr class="border bg-neutral-100">
-                  <x-table-th class="text-end">
-                    #
-                  </x-table-th>
-                  <x-table-th class="text-start">
-                    suministro/pack
-                  </x-table-th>
-                  <x-table-th class="text-start">
-                    marca/volumen
-                    <x-quest-icon title="kilogramos (K), gramos (g), litros (L), mililitros (mL), metros (M), centimetros (cm), unidades (U)" />
-                  </x-table-th>
-                  <x-table-th class="text-end">
-                    presupuestar
-                    <x-quest-icon title="cantidad que la panaderia desea presupuestar" />
-                  </x-table-th>
-                  <x-table-th class="text-end">
-                    tiene stock?
-                    <x-quest-icon title="¿actualmente tiene en stock la cantidad solicitada?" />
-                  </x-table-th>
-                  <x-table-th class="text-end">
-                    $precio unitario
-                    <x-quest-icon title="precio unitario de un suministro o pack, ejemplo: 1230.20 (mil doscientos treinta con veinte)" />
-                    <span class="text-red-400">*</span>
-                  </x-table-th>
-                  <x-table-th class="text-end">
-                    $subtotal
-                    <x-quest-icon
-                      title="precio subtotal del suministro o pack para la cantidad presupuestada, ejemplo: 1230.20 (mil doscientos treinta con veinte)" />
-                    <span class="text-red-400">*</span>
-                  </x-table-th>
-                </tr>
-              </x-slot:tablehead>
-              <x-slot:tablebody>
-                @forelse ($inputs as $key => $input)
-                <tr class="border">
-                  <x-table-td class="text-end">
-                    {{ $key + 1 }}
-                  </x-table-td>
-                  @if ($input['item_type'] === 'suministro')
-                    {{-- mostrar suministro --}}
-                    <x-table-td class="text-start">
-                      {{ $input['item_object']->provision_name }}
-                    </x-table-td>
-                    <x-table-td class="text-start">
-                      {{ $input['item_object']->trademark->provision_trademark_name }}
-                      {{ convert_measure($input['item_object']->provision_quantity, $input['item_object']->measure) }}
-                    </x-table-td>
+            <div class="overflow-x-auto overflow-y-auto max-h-72">
+              <x-table-base>
+                <x-slot:tablehead>
+                  <tr class="border bg-neutral-100">
+                    <x-table-th class="text-end">
+                      #
+                    </x-table-th>
+                    <x-table-th class="text-start">
+                      suministro/pack
+                    </x-table-th>
+                    <x-table-th class="text-start">
+                      marca/volumen
+                      <x-quest-icon title="kilogramos (K), gramos (g), litros (L), mililitros (mL), metros (M), centimetros (cm), unidades (U)" />
+                    </x-table-th>
+                    <x-table-th class="text-end">
+                      presupuestar
+                      <x-quest-icon title="cantidad que la panaderia desea presupuestar" />
+                    </x-table-th>
+                    <x-table-th class="text-end">
+                      tiene stock?
+                      <x-quest-icon title="¿actualmente tiene en stock la cantidad solicitada?" />
+                    </x-table-th>
+                    <x-table-th class="text-end">
+                      $precio unitario
+                      <x-quest-icon title="precio unitario de un suministro o pack, ejemplo: 1230.20 (mil doscientos treinta con veinte)" />
+                      <span class="text-red-400">*</span>
+                    </x-table-th>
+                    <x-table-th class="text-end">
+                      $subtotal
+                      <x-quest-icon
+                        title="precio subtotal del suministro o pack para la cantidad presupuestada, ejemplo: 1230.20 (mil doscientos treinta con veinte)" />
+                      <span class="text-red-400">*</span>
+                    </x-table-th>
+                  </tr>
+                </x-slot:tablehead>
+                <x-slot:tablebody>
+                  @forelse ($inputs as $key => $input)
+                  <tr class="border">
                     <x-table-td class="text-end">
-                      {{ $input['item_quantity'] }}
+                      {{ $key + 1 }}
                     </x-table-td>
-                    {{-- stock --}}
-                    <x-table-td class="text-end">
-                      <div class="flex items-center justify-end w-full gap-1">
-                        <input
-                          type="checkbox"
-                          id="input_{{ $key }}_item_has_stock"
-                          wire:model.live="inputs.{{ $key }}.item_has_stock"
-                          @checked(true)
-                          class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
-                        />
-                        @if ($inputs[$key]['item_has_stock'])
-                          <span>si</span>
-                        @else
-                          <span>no</span>
-                        @endif
-                      </div>
-                    </x-table-td>
-                    {{-- precio unitario --}}
-                    <x-table-td class="text-end">
-                      <div class="flex flex-col w-full gap-1">
-                        <div class="flex items-center justify-start w-full gap-1">
-                          <span>$&nbsp;</span>
+                    @if ($input['item_type'] === 'suministro')
+                      {{-- mostrar suministro --}}
+                      <x-table-td class="text-start">
+                        {{ $input['item_object']->provision_name }}
+                      </x-table-td>
+                      <x-table-td class="text-start">
+                        {{ $input['item_object']->trademark->provision_trademark_name }}
+                        {{ convert_measure($input['item_object']->provision_quantity, $input['item_object']->measure) }}
+                      </x-table-td>
+                      <x-table-td class="text-end">
+                        {{ $input['item_quantity'] }}
+                      </x-table-td>
+                      {{-- stock --}}
+                      <x-table-td class="text-end">
+                        <div class="flex items-center justify-end w-full gap-1">
                           <input
-                            type="text"
-                            id="input_{{ $key }}_item_unit_price"
-                            wire:model.live="inputs.{{ $key }}.item_unit_price"
-                            wire:change="calculateSubtotal({{ $key }}, $event.target.value)"
-                            pattern="[0-9.,]*"
-                            class="p-1 w-32 text-sm text-right border grow border-neutral-200 @error('inputs.' . $key . '.item_unit_price') border-red-200 @enderror focus:outline-none focus:ring focus:ring-neutral-300"
-                            placeholder="precio unitario"
-                            autocomplete="off"
+                            type="checkbox"
+                            id="input_{{ $key }}_item_has_stock"
+                            wire:model.live="inputs.{{ $key }}.item_has_stock"
+                            @checked(true)
+                            class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
                           />
+                          @if ($inputs[$key]['item_has_stock'])
+                            <span>si</span>
+                          @else
+                            <span>no</span>
+                          @endif
                         </div>
-                      </div>
-                    </x-table-td>
-                    {{-- precio subtotal --}}
-                    <x-table-td class="text-end">
-                      <div class="flex flex-col w-full gap-1">
-                        <div class="flex items-center justify-start w-full gap-1">
-                          <span>$&nbsp;</span>
+                      </x-table-td>
+                      {{-- precio unitario --}}
+                      <x-table-td class="text-end">
+                        <div class="flex flex-col w-full gap-1">
+                          <div class="flex items-center justify-start w-full gap-1">
+                            <span>$&nbsp;</span>
+                            <input
+                              type="text"
+                              id="input_{{ $key }}_item_unit_price"
+                              wire:model.live="inputs.{{ $key }}.item_unit_price"
+                              wire:change="calculateSubtotal({{ $key }}, $event.target.value)"
+                              pattern="[0-9.,]*"
+                              class="p-1 w-32 text-sm text-right border grow border-neutral-200 @error('inputs.' . $key . '.item_unit_price') border-red-200 @enderror focus:outline-none focus:ring focus:ring-neutral-300"
+                              placeholder="precio unitario"
+                              autocomplete="off"
+                            />
+                          </div>
+                        </div>
+                      </x-table-td>
+                      {{-- precio subtotal --}}
+                      <x-table-td class="text-end">
+                        <div class="flex flex-col w-full gap-1">
+                          <div class="flex items-center justify-start w-full gap-1">
+                            <span>$&nbsp;</span>
+                            <input
+                              type="text"
+                              id="input_{{ $key }}_item_total_price"
+                              wire:model.live="inputs.{{ $key }}.item_total_price"
+                              wire:change="formatSubtotal({{ $key }}, $event.target.value)"
+                              pattern="[0-9.,]*"
+                              class="p-1 w-32 text-sm text-right border grow border-neutral-200 @error('inputs.' . $key . '.item_total_price') border-red-200 @enderror focus:outline-none focus:ring focus:ring-neutral-300"
+                              placeholder="precio total"
+                              autocomplete="off"
+                            />
+                          </div>
+                        </div>
+                      </x-table-td>
+                    @else
+                      {{-- mostrar pack --}}
+                      <x-table-td class="text-start">
+                        {{ $input['item_object']->pack_name }}
+                      </x-table-td>
+                      <x-table-td class="text-start">
+                        {{ $input['item_object']->provision->trademark->provision_trademark_name }}
+                        {{ convert_measure($input['item_object']->pack_quantity, $input['item_object']->provision->measure) }}
+                      </x-table-td>
+                      <x-table-td class="text-start">
+                        {{ $input['item_quantity'] }}
+                      </x-table-td>
+                      {{-- stock --}}
+                      <x-table-td class="text-end">
+                        <div class="flex items-center justify-end w-full gap-1">
                           <input
-                            type="text"
-                            id="input_{{ $key }}_item_total_price"
-                            wire:model.live="inputs.{{ $key }}.item_total_price"
-                            wire:change="formatSubtotal({{ $key }}, $event.target.value)"
-                            pattern="[0-9.,]*"
-                            class="p-1 w-32 text-sm text-right border grow border-neutral-200 @error('inputs.' . $key . '.item_total_price') border-red-200 @enderror focus:outline-none focus:ring focus:ring-neutral-300"
-                            placeholder="precio total"
-                            autocomplete="off"
+                            type="checkbox"
+                            id="input_{{ $key }}_item_has_stock"
+                            @checked(true)
+                            wire:model.defer="inputs.{{ $key }}.item_has_stock"
+                            class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
                           />
+                          @if ($inputs[$key]['item_has_stock'])
+                            <span>si</span>
+                          @else
+                            <span>no</span>
+                          @endif
                         </div>
-                      </div>
-                    </x-table-td>
-                  @else
-                    {{-- mostrar pack --}}
-                    <x-table-td class="text-start">
-                      {{ $input['item_object']->pack_name }}
-                    </x-table-td>
-                    <x-table-td class="text-start">
-                      {{ $input['item_object']->provision->trademark->provision_trademark_name }}
-                      {{ convert_measure($input['item_object']->pack_quantity, $input['item_object']->provision->measure) }}
-                    </x-table-td>
-                    <x-table-td class="text-start">
-                      {{ $input['item_quantity'] }}
-                    </x-table-td>
-                    {{-- stock --}}
-                    <x-table-td class="text-end">
-                      <div class="flex items-center justify-end w-full gap-1">
-                        <input
-                          type="checkbox"
-                          id="input_{{ $key }}_item_has_stock"
-                          @checked(true)
-                          wire:model.defer="inputs.{{ $key }}.item_has_stock"
-                          class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
-                        />
-                        @if ($inputs[$key]['item_has_stock'])
-                          <span>si</span>
-                        @else
-                          <span>no</span>
-                        @endif
-                      </div>
-                    </x-table-td>
-                    {{-- precio unitario --}}
-                    <x-table-td class="text-end">
-                      <div class="flex flex-col w-full gap-1">
-                        <div class="flex items-center justify-start w-full gap-1">
-                          <span>$&nbsp;</span>
-                          <input
-                            type="text"
-                            id="input_{{ $key }}_item_unit_price"
-                            wire:model.live="inputs.{{ $key }}.item_unit_price"
-                            wire:change="calculateSubtotal({{ $key }}, $event.target.value)"
-                            pattern="[0-9.,]*"
-                            class="p-1 w-32 text-sm text-right border grow border-neutral-200 @error('inputs.' . $key . '.item_unit_price') border-red-200 @enderror focus:outline-none focus:ring focus:ring-neutral-300"
-                            placeholder="precio unitario"
-                            autocomplete="off"
-                          />
+                      </x-table-td>
+                      {{-- precio unitario --}}
+                      <x-table-td class="text-end">
+                        <div class="flex flex-col w-full gap-1">
+                          <div class="flex items-center justify-start w-full gap-1">
+                            <span>$&nbsp;</span>
+                            <input
+                              type="text"
+                              id="input_{{ $key }}_item_unit_price"
+                              wire:model.live="inputs.{{ $key }}.item_unit_price"
+                              wire:change="calculateSubtotal({{ $key }}, $event.target.value)"
+                              pattern="[0-9.,]*"
+                              class="p-1 w-32 text-sm text-right border grow border-neutral-200 @error('inputs.' . $key . '.item_unit_price') border-red-200 @enderror focus:outline-none focus:ring focus:ring-neutral-300"
+                              placeholder="precio unitario"
+                              autocomplete="off"
+                            />
+                          </div>
                         </div>
-                      </div>
-                    </x-table-td>
-                    {{-- precio subtotal --}}
-                    <x-table-td class="text-end">
-                      <div class="flex flex-col w-full gap-1">
-                        <div class="flex items-center justify-start w-full gap-1">
-                          <span>$&nbsp;</span>
-                          <input
-                            type="text"
-                            id="input_{{ $key }}_item_total_price"
-                            wire:model.defer="inputs.{{ $key }}.item_total_price"
-                            wire:change="formatSubtotal({{ $key }}, $event.target.value)"
-                            pattern="[0-9.,]*"
-                            class="p-1 w-32 text-sm text-right border grow border-neutral-200 @error('inputs.' . $key . '.item_total_price') border-red-200 @enderror focus:outline-none focus:ring focus:ring-neutral-300"
-                            placeholder="precio total"
-                            autocomplete="off"
-                          />
+                      </x-table-td>
+                      {{-- precio subtotal --}}
+                      <x-table-td class="text-end">
+                        <div class="flex flex-col w-full gap-1">
+                          <div class="flex items-center justify-start w-full gap-1">
+                            <span>$&nbsp;</span>
+                            <input
+                              type="text"
+                              id="input_{{ $key }}_item_total_price"
+                              wire:model.defer="inputs.{{ $key }}.item_total_price"
+                              wire:change="formatSubtotal({{ $key }}, $event.target.value)"
+                              pattern="[0-9.,]*"
+                              class="p-1 w-32 text-sm text-right border grow border-neutral-200 @error('inputs.' . $key . '.item_total_price') border-red-200 @enderror focus:outline-none focus:ring focus:ring-neutral-300"
+                              placeholder="precio total"
+                              autocomplete="off"
+                            />
+                          </div>
                         </div>
-                      </div>
-                    </x-table-td>
-                  @endif
-                  @if ($loop->last)
-                    <tr class="border">
-                      <x-table-td colspan="6" class="font-semibold capitalize text-end">total</x-table-td>
-                      <x-table-td class="font-semibold text-end">${{ toMoneyFormat($total) }}</x-table-td>
-                    </tr>
-                  @endif 
-                </tr>
-                @empty
-                <tr class="border">
-                  <td colspan="6">sin registros!</td>
-                </tr>
-                @endforelse
-              </x-slot:tablebody>
-            </x-table-base>
-  
+                      </x-table-td>
+                    @endif
+                    @if ($loop->last)
+                      <tr class="border">
+                        <x-table-td colspan="6" class="font-semibold capitalize text-end">total</x-table-td>
+                        <x-table-td class="font-semibold text-end">${{ toMoneyFormat($total) }}</x-table-td>
+                      </tr>
+                    @endif 
+                  </tr>
+                  @empty
+                  <tr class="border">
+                    <td colspan="6">sin registros!</td>
+                  </tr>
+                  @endforelse
+                </x-slot:tablebody>
+              </x-table-base>
+            </div>
   
           </x-div-toggle>
         </section>
