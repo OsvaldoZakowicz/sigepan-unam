@@ -117,7 +117,7 @@
             </div>
             @endif
   
-            <x-table-base class="hidden lg:table">
+            <x-table-base>
               <x-slot:tablehead>
                 <tr class="border bg-neutral-100">
                   <x-table-th class="text-end">
@@ -174,12 +174,17 @@
                       {{-- stock --}}
                       <x-table-td class="text-end">
                         <div class="flex items-center justify-end w-full gap-1">
-                          @error('inputs.{{ $key }}.item_has_stock')
-                          <span class="text-xs text-red-400">{{ $message }}</span>
-                          @enderror
-                          <input type="checkbox" id="input_{{ $key }}_item_has_stock" @checked(true)
+                          <input
+                            type="checkbox" id="input_{{ $key }}_item_has_stock"
+                            @checked(true)
                             wire:model.defer="inputs.{{ $key }}.item_has_stock"
-                            class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300" />
+                            class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                          />
+                          @if ($inputs[$key]['item_has_stock'])
+                            <span>si</span>
+                          @else
+                            <span>no</span>
+                          @endif
                         </div>
                       </x-table-td>
                       {{-- precio unitario --}}
@@ -223,12 +228,17 @@
                       {{-- stock --}}
                       <x-table-td class="text-end">
                         <div class="flex items-center justify-end w-full gap-1">
-                          @error('inputs.{{ $key }}.item_has_stock')
-                          <span class="text-xs text-red-400">{{ $message }}</span>
-                          @enderror
-                          <input type="checkbox" id="input_{{ $key }}_item_has_stock" @checked(true)
+                          <input
+                            type="checkbox" id="input_{{ $key }}_item_has_stock"
+                            @checked(true)
                             wire:model.defer="inputs.{{ $key }}.item_has_stock"
-                            class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300" />
+                            class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                          />
+                          @if ($inputs[$key]['item_has_stock'])
+                            <span>si</span>
+                          @else
+                            <span>no</span>
+                          @endif
                         </div>
                       </x-table-td>
                       {{-- precio unitario --}}
@@ -283,7 +293,7 @@
           <x-a-button wire:navigate href="{{ route('quotations-quotations-index') }}" bg_color="neutral-600"
             border_color="neutral-600">cancelar
           </x-a-button>
-          <x-btn-button type="button" wire:click="submit">completar
+          <x-btn-button type="button" wire:click="submit">responder
           </x-btn-button>
         </div>
       </x-slot:footer>

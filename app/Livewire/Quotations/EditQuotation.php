@@ -2,16 +2,25 @@
 
 namespace App\Livewire\Quotations;
 
-use Illuminate\Support\Collection;
-use Illuminate\Support\Arr;
-use App\Models\Quotation;
-use App\Models\Provision;
 use App\Models\Pack;
-use Illuminate\View\View;
 use Livewire\Component;
+use App\Models\Provision;
+use App\Models\Quotation;
+use Illuminate\View\View;
+use App\Models\DatoNegocio;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 
 class EditQuotation extends Component
 {
+  // datos de la panaderia
+  public $razon_social = '';
+  public $cuit = '';
+  public $telefono = '';
+  public $correo = '';
+  public $direccion = '';
+  public $inicio_actividades = '';
+
   // presupuesto
   public $quotation;
   public $provisions;
@@ -19,12 +28,27 @@ class EditQuotation extends Component
 
   // inputs para suministros, y packs
   public Collection $inputs;
+  public $total = 0;
+
+  /**
+   * boot de datos constantes
+   * @return void
+   */
+  public function boot(): void
+  {
+    $this->razon_social = DatoNegocio::obtenerValor('razon_social');
+    $this->cuit = DatoNegocio::obtenerValor('cuit');
+    $this->telefono = DatoNegocio::obtenerValor('telefono');
+    $this->correo = DatoNegocio::obtenerValor('email');
+    $this->direccion = DatoNegocio::obtenerValor('domicilio');
+    $this->inicio_actividades = DatoNegocio::obtenerValor('inicio_actividades');
+  }
 
   /**
    * inicializar datos
    * @param int $id id del presupuesto a responder
    * @return void
-  */
+   */
   public function mount($id)
   {
     $this->quotation = Quotation::findOrFail($id);
@@ -59,7 +83,7 @@ class EditQuotation extends Component
    * agregar un suministro al array de inputs
    * @param Provision | Pack $item es un suministro o pack
    * @return void
-  */
+   */
   public function addInput(Provision|Pack $item): void
   {
     $type = ($item instanceof Provision) ? 'suministro' : 'pack';
@@ -68,39 +92,135 @@ class EditQuotation extends Component
       'item_type'     => $type,
       'item_id'       => $item->id,
       'item_object'   => $item,
-      'item_quantity' => $item->pivot->quantity,
-      'item_has_stock'   => $item->pivot->has_stock,
-      'item_unit_price'  => $item->pivot->unit_price,
-      'item_total_price' => $item->pivot->total_price,
+      'item_quantity' => (int) $item->pivot->quantity,
+      'item_has_stock'   => (bool) $item->pivot->has_stock,
+      'item_unit_price'  => (float) $item->pivot->unit_price,
+      'item_total_price' => (float) $item->pivot->total_price,
     ]);
+  }
+
+  /**
+   * al ingresar un precio unitario con formato float valido
+   * calcular el subtotal como unitario * cantidad.
+   * @param int $key clave donde ocurre el cambio
+   * @param $value valor de cambio
+   * @return void 
+   */
+  public function calculateSubtotal(int $key, $value): void
+  {
+    $item = $this->inputs->get($key);
+
+    if (!is_numeric($value) || (float) $value <= 0) {
+      $item['item_unit_price'] = 0.00;
+      $item['item_total_price'] = 0.00;
+    } else {
+      $item['item_unit_price'] = (float) $value;
+      $item['item_total_price'] = (float) $item['item_unit_price'] * $item['item_quantity'];
+    }
+
+    $this->inputs->put($key, $item);
+    $this->calculateTotal();
+  }
+
+  /**
+   * formato de subtotal y calculo de total
+   * cuando el subtotal cambie
+   * @param int $key clave donde ocurre el cambio
+   * @param $value valor de cambio
+   * @return void 
+   */
+  public function formatSubtotal(int $key, $value): void
+  {
+    if (!is_numeric($value) || (float) $value <= 0) {
+
+      // formato invalido, recalcular original
+      $item = $this->inputs->get($key);
+      $item['item_total_price'] = (float) $item['item_unit_price'] * $item['item_quantity'];
+    } else {
+
+      // obtener el item y asignar valor
+      $item = $this->inputs->get($key);
+      $item['item_total_price'] = (float) $value;
+    }
+
+    // actualizar item en la coleccion
+    $this->inputs->put($key, $item);
+
+    // recalcular el total
+    $this->calculateTotal();
+  }
+
+  /**
+   * calcular total del presupuesto cada vez que
+   * algun subtotal se actualice.
+   * @return void
+   */
+  public function calculateTotal(): void
+  {
+    $this->total = $this->inputs->reduce(function ($acc, $input) {
+      return $acc + (float) $input['item_total_price'];
+    }, 0);
   }
 
   /**
    * guardar presupuesto
    * se trata de la respuesta con el precio para cada input suministro generado y montado.
    * @return void
-  */
+   */
   public function submit(): void
   {
-    // aplico las reglas y mensajes de validacion
-    $validated = $this->validate([
-      'inputs.*.item_has_stock'   => 'nullable',
-      'inputs.*.item_unit_price'  => ['required_if_accepted:inputs.*.item_has_stock', 'numeric', 'regex:/^\d{1,6}(\.\d{1,2})?$/'],
-      'inputs.*.item_total_price' => ['required_if_accepted:inputs.*.item_has_stock', 'numeric', 'regex:/^\d{1,6}(\.\d{1,2})?$/'],
-      'inputs.*.item_id'          => 'nullable',
-      'inputs.*.item_type'        => 'nullable',
-    ], [
-      'inputs.*.item_unit_price.required'              => 'El :attribute es requerido',
-      'inputs.*.item_total_price.required'             => 'El :attribute es requerido',
-      'inputs.*.item_unit_price.numeric'               => 'El :attribute es debe ser un número',
-      'inputs.*.item_total_price.regex'                => 'El :attribute puede ser hasta $999999.99',
-      'inputs.*.item_unit_price.required_if_accepted'  => 'El :attribute es obligatorio si marco que tiene stock',
-      'inputs.*.item_total_price.required_if_accepted' => 'El :attribute es obligatorio si marco que tiene stock'
-    ], [
-      'inputs.*.item_has_stock'   => 'stock',
-      'inputs.*.item_unit_price'  => 'precio unitario',
+
+    // convertir Collection a array para la validacion
+    $inputsArray = $this->inputs->toArray();
+
+    $rules = [];
+    $messages = [
+      'inputs.*.item_unit_price.required' => 'El :attribute es obligatorio si marco que tiene stock',
+      'inputs.*.item_total_price.required' => 'El :attribute es obligatorio si marco que tiene stock',
+      'inputs.*.item_unit_price.numeric' => 'El :attribute debe ser un número en formato moneda, ejemplo: 1230.34',
+      'inputs.*.item_total_price.numeric' => 'El :attribute debe ser un número en formato moneda, ejemplo: 1230.34',
+      'inputs.*.item_unit_price.regex' => 'El :attribute puede ser hasta $999999.99',
+      'inputs.*.item_total_price.regex' => 'El :attribute puede ser hasta $999999.99',
+      'inputs.*.item_unit_price.min' => 'El :attribute debe ser mayor a cero',
+      'inputs.*.item_total_price.min' => 'El :attribute debe ser mayor a cero'
+    ];
+
+    $attributes = [
+      'inputs.*.item_has_stock' => 'stock',
+      'inputs.*.item_unit_price' => 'precio unitario',
       'inputs.*.item_total_price' => 'precio total',
-    ]);
+    ];
+
+    // validación dinamica para cada input
+    foreach ($inputsArray as $index => $input) {
+
+      $hasStock = $input['item_has_stock'] === true;
+
+      $rules["inputs.{$index}.item_has_stock"] = 'boolean';
+      $rules["inputs.{$index}.item_id"] = 'nullable';
+      $rules["inputs.{$index}.item_type"] = 'nullable';
+
+      if ($hasStock) {
+        $rules["inputs.{$index}.item_unit_price"] = [
+          'required',
+          'numeric',
+          'min:0.1',
+          'regex:/^\d{1,6}(\.\d{1,2})?$/'
+        ];
+        $rules["inputs.{$index}.item_total_price"] = [
+          'required',
+          'numeric',
+          'min:0.1',
+          'regex:/^\d{1,6}(\.\d{1,2})?$/'
+        ];
+      } else {
+        $rules["inputs.{$index}.item_unit_price"] = ['nullable'];
+        $rules["inputs.{$index}.item_total_price"] = ['nullable'];
+      }
+    }
+
+    // ejecutar la validación
+    $validated = $this->validate($rules, $messages, $attributes);
 
     try {
 
@@ -123,24 +243,24 @@ class EditQuotation extends Component
         if ($input['item_type'] === 'suministro') {
 
           $this->quotation->provisions()->updateExistingPivot(
-            $input['item_id'], [
+            $input['item_id'],
+            [
               'has_stock'   => $input['item_has_stock'],
               'unit_price'  => $input['item_unit_price'],
               'total_price' => $input['item_total_price'],
             ]
           );
-
         } else {
           // packs
           $this->quotation->packs()->updateExistingPivot(
-            $input['item_id'], [
+            $input['item_id'],
+            [
               'has_stock'   => $input['item_has_stock'],
               'unit_price'  => $input['item_unit_price'],
               'total_price' => $input['item_total_price'],
             ]
-            );
+          );
         }
-
       }
 
       // marcar presupuesto como completado
@@ -151,20 +271,17 @@ class EditQuotation extends Component
 
       session()->flash('operation-success', toastSuccessBody('presupuesto', 'modificado y enviado'));
       $this->redirectRoute('quotations-quotations-index');
-
     } catch (\Exception $e) {
 
       session()->flash('operation-error', 'error: ' . $e->getMessage() . ', contacte al Administrador');
       $this->redirectRoute('quotations-quotations-index');
-
     }
-
   }
 
   /**
    * renderizar vista
    * @return View
-  */
+   */
   public function render(): View
   {
     return view('livewire.quotations.edit-quotation');

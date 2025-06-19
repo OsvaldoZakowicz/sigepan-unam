@@ -9,6 +9,7 @@ use App\Models\Quotation;
 use Illuminate\View\View;
 use App\Models\DatoNegocio;
 use Illuminate\Support\Arr;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Collection;
 
 class RespondQuotation extends Component
@@ -171,27 +172,57 @@ class RespondQuotation extends Component
    */
   public function submit(): void
   {
-    // aplico las reglas y mensajes de validacion
-    $validated = $this->validate([
-      'inputs.*.item_has_stock'   => 'nullable',
-      'inputs.*.item_unit_price'  => ['required_if_accepted:inputs.*.item_has_stock', 'numeric', 'min:0.1', 'regex:/^\d{1,6}(\.\d{1,2})?$/'],
-      'inputs.*.item_total_price' => ['required_if_accepted:inputs.*.item_has_stock', 'numeric', 'min:0.1', 'regex:/^\d{1,6}(\.\d{1,2})?$/'],
-      'inputs.*.item_id'          => 'nullable',
-      'inputs.*.item_type'        => 'nullable',
-    ], [
-      'inputs.*.item_unit_price.required'              => 'El :attribute es requerido',
-      'inputs.*.item_total_price.required'             => 'El :attribute es requerido',
-      'inputs.*.item_unit_price.numeric'               => 'El :attribute debe ser un número en formato moneda, ejemplo: 1230.34',
-      'inputs.*.item_total_price.regex'                => 'El :attribute puede ser hasta $999999.99',
-      'inputs.*.item_unit_price.required_if_accepted'  => 'El :attribute es obligatorio si marco que tiene stock',
-      'inputs.*.item_total_price.required_if_accepted' => 'El :attribute es obligatorio si marco que tiene stock',
-      'inputs.*.item_unit_price.min'  => 'El :attribute debe ser mayor a cero, si marco que tiene stock',
-      'inputs.*.item_total_price.min' => 'El :attribute debe ser mayor a cero, si marco que tiene stock'
-    ], [
-      'inputs.*.item_has_stock'   => 'stock',
-      'inputs.*.item_unit_price'  => 'precio unitario',
+    // convertir Collection a array para la validación
+    $inputsArray = $this->inputs->toArray();
+
+    $rules = [];
+    $messages = [
+      'inputs.*.item_unit_price.required' => 'El :attribute es obligatorio si marco que tiene stock',
+      'inputs.*.item_total_price.required' => 'El :attribute es obligatorio si marco que tiene stock',
+      'inputs.*.item_unit_price.numeric' => 'El :attribute debe ser un número en formato moneda, ejemplo: 1230.34',
+      'inputs.*.item_total_price.numeric' => 'El :attribute debe ser un número en formato moneda, ejemplo: 1230.34',
+      'inputs.*.item_unit_price.regex' => 'El :attribute puede ser hasta $999999.99',
+      'inputs.*.item_total_price.regex' => 'El :attribute puede ser hasta $999999.99',
+      'inputs.*.item_unit_price.min' => 'El :attribute debe ser mayor a cero',
+      'inputs.*.item_total_price.min' => 'El :attribute debe ser mayor a cero'
+    ];
+
+    $attributes = [
+      'inputs.*.item_has_stock' => 'stock',
+      'inputs.*.item_unit_price' => 'precio unitario',
       'inputs.*.item_total_price' => 'precio total',
-    ]);
+    ];
+
+    // validación dinamica para cada input
+    foreach ($inputsArray as $index => $input) {
+
+      $hasStock = $input['item_has_stock'] === true;
+
+      $rules["inputs.{$index}.item_has_stock"] = 'boolean';
+      $rules["inputs.{$index}.item_id"] = 'nullable';
+      $rules["inputs.{$index}.item_type"] = 'nullable';
+
+      if ($hasStock) {
+        $rules["inputs.{$index}.item_unit_price"] = [
+          'required',
+          'numeric',
+          'min:0.1',
+          'regex:/^\d{1,6}(\.\d{1,2})?$/'
+        ];
+        $rules["inputs.{$index}.item_total_price"] = [
+          'required',
+          'numeric',
+          'min:0.1',
+          'regex:/^\d{1,6}(\.\d{1,2})?$/'
+        ];
+      } else {
+        $rules["inputs.{$index}.item_unit_price"] = ['nullable'];
+        $rules["inputs.{$index}.item_total_price"] = ['nullable'];
+      }
+    }
+
+    // ejecutar la validación
+    $validated = $this->validate($rules, $messages, $attributes);
 
     try {
 
@@ -209,7 +240,6 @@ class RespondQuotation extends Component
 
       // por cada input, obtener el suministro y actualizar el precio para el presupuesto
       foreach ($inputs as $input) {
-
         // suministros
         if ($input['item_type'] === 'suministro') {
 
