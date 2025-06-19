@@ -37,6 +37,11 @@ class CompleteProfile extends Component
     $this->user = Auth::user();
     $this->genders = Gender::all();
 
+    $user = User::find($this->user->id);
+    if ($user->hasRole('proveedor')) {
+      return redirect()->route('profile');
+    }
+
     //* si tiene perfil completo, montar datos
     // si profile() no tiene registro, retorna null, evalua como false
     // false indica que no tiene perfil completo.
@@ -61,7 +66,6 @@ class CompleteProfile extends Component
       $this->city         = $this->user_address->city;
       $this->postal_code  = $this->user_address->postal_code;
     }
-
   }
 
   public function save()
@@ -73,17 +77,17 @@ class CompleteProfile extends Component
 
       //validaciones para actualizar
       $this->validate([
-        'first_name' =>   ['required','max:50','string'],
-        'last_name' =>    ['required','max:50','string'],
-        'dni' =>          ['required',Rule::unique('profiles','dni')->ignore($this->user_profile->id),'min:8','numeric'],
+        'first_name' =>   ['required', 'max:50', 'string'],
+        'last_name' =>    ['required', 'max:50', 'string'],
+        'dni' =>          ['required', Rule::unique('profiles', 'dni')->ignore($this->user_profile->id), 'min:8', 'numeric'],
         'birthdate' =>    ['required'],
-        'phone_number' => ['required',Rule::unique('profiles','phone_number')->ignore($this->user_profile->id),'min:10'],
+        'phone_number' => ['required', Rule::unique('profiles', 'phone_number')->ignore($this->user_profile->id), 'min:10'],
         'user_gender_update'  => ['required'],
-        'street' => ['required','max:45'],
-        'number' => ['nullable','max:8'],
-        'city' =>   ['required','max:45'],
-        'postal_code' => ['required','min:4'],
-      ],[],[
+        'street' => ['required', 'max:45'],
+        'number' => ['nullable', 'max:8'],
+        'city' =>   ['required', 'max:45'],
+        'postal_code' => ['required', 'min:4'],
+      ], [], [
         'first_name'    => 'nombres',
         'last_name'     => 'apellidos',
         'dni'           => 'dni',
@@ -113,24 +117,23 @@ class CompleteProfile extends Component
       $this->user_profile->phone_number = $this->phone_number;
       $this->user_profile->gender_id    = $this->user_gender_update; //id nuevo si cambia de genero
       $this->user_profile->save();
-
     } else {
 
       /* dd(['user_gender_save' => $this->user_gender]); */
 
       //validaciones
       $this->validate([
-        'first_name' =>   ['required','max:50','string'],
-        'last_name' =>    ['required','max:50','string'],
-        'dni' =>          ['required','unique:profiles','min:8','numeric'],
+        'first_name' =>   ['required', 'max:50', 'string'],
+        'last_name' =>    ['required', 'max:50', 'string'],
+        'dni' =>          ['required', 'unique:profiles', 'min:8', 'numeric'],
         'birthdate' =>    ['required'],
-        'phone_number' => ['required','unique:profiles','min:10'],
+        'phone_number' => ['required', 'unique:profiles', 'min:10'],
         'user_gender' => ['required'],
-        'street' => ['required','max:45'],
-        'number' => ['nullable','max:8'],
-        'city' =>   ['required','max:45'],
-        'postal_code' => ['required','min:4'],
-      ],[],[
+        'street' => ['required', 'max:45'],
+        'number' => ['nullable', 'max:8'],
+        'city' =>   ['required', 'max:45'],
+        'postal_code' => ['required', 'min:4'],
+      ], [], [
         'first_name'    => 'nombres',
         'last_name'     => 'apellidos',
         'dni'           => 'dni',
@@ -164,7 +167,6 @@ class CompleteProfile extends Component
         'address_id' => $new_address->id, // direccion creada
         'user_id' => $this->user->id
       ]);
-
     }
 
     $this->redirectRoute('profile');
@@ -172,6 +174,6 @@ class CompleteProfile extends Component
 
   public function render()
   {
-      return view('livewire.users.complete-profile');
+    return view('livewire.users.complete-profile');
   }
 }
