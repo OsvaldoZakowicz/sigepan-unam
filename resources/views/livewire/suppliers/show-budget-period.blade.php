@@ -274,7 +274,7 @@
                 </x-table-th>
                 <x-table-th class="text-start">
                   presupuesto
-                  <x-quest-icon title="PDF disponible una vez que el presupuesto es respondido" />
+                  <x-quest-icon title="PDF disponible una vez que el presupuesto es respondido y el periodo ha cerrado" />
                 </x-table-th>
                 <x-table-th class="w-48 text-start">
                   acciones
@@ -314,7 +314,18 @@
                   @endif
                 </x-table-td>
                 <x-table-td class="text-start">
-                  -
+                  @if ($quotation->is_completed && $this->hasSomeStock($quotation->id) && $quotation->period->period_status_id == $closed)
+                    <x-a-button
+                      wire:click="openPdf({{ $quotation->id }})"
+                      href="#"
+                      bg_color="neutral-100"
+                      border_color="neutral-200"
+                      text_color="neutral-600"
+                      >descargar PDF
+                    </x-a-button>
+                  @else
+                    <span>sin stock</span>
+                  @endif
                 </x-table-td>
                 <x-table-td>
                   <x-a-button wire:navigate href="{{ route('suppliers-budgets-response', $quotation->id) }}"
@@ -343,4 +354,16 @@
     </x-content-section>
 
   </article>
+
+  {{-- manejar eventos --}}
+  <script>
+
+    /* evento: abrir pdf en nueva pestaña para visualizar */
+    document.addEventListener('livewire:initialized', () => {
+      Livewire.on('openPdfInNewTab', ({ url }) => {
+        window.open(url, '_blank');
+      });
+    });
+
+  </script>
 </div>

@@ -246,8 +246,11 @@ Route::middleware(['auth', 'verified', 'can:proveedores'])->group(function () {
 
   //*---------------------------- PDFs
 
-  Route::get('preorders/pdf/show/{id}', [PDFController::class, 'open_pdf_order'])
+  Route::get('preorders-supplier/pdf/show/{id}', [PDFController::class, 'open_pdf_order'])
     ->name('open-pdf-order');
+
+  Route::get('quotations-supplier/pdf/stream/{id}', [PDFController::class, 'stream_pdf_quotation'])
+    ->name('open-pdf-quotation-supplier');
 });
 
 //* seccion de presupuestos (quotations) y preordenes para proveedores
@@ -275,6 +278,9 @@ Route::middleware(['auth', 'verified', 'can:presupuestos'])->group(function () {
 
   Route::get('preorders/pdf/download/{id}', [PDFController::class, 'download_pdf_order'])
     ->name('download-pdf-order');
+
+  Route::get('quotations/pdf/stream/{id}', [PDFController::class, 'stream_pdf_quotation'])
+    ->name('open-pdf-quotation');
 });
 
 //* modulo de stock

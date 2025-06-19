@@ -9,6 +9,7 @@ use App\Models\Quotation;
 use Illuminate\View\View;
 use App\Models\DatoNegocio;
 use Illuminate\Support\Collection;
+use App\Services\Supplier\QuotationPeriodService;
 
 class ShowQuotation extends Component
 {
@@ -24,6 +25,9 @@ class ShowQuotation extends Component
   public $quotation;
   public $provisions;
   public $packs;
+
+  // periodo
+  public $period_is_closed = false;
 
   // inputs para suministros, y packs
   public Collection $rows;
@@ -71,6 +75,11 @@ class ShowQuotation extends Component
     }
 
     $this->calculateTotal();
+
+    $qps = new QuotationPeriodService();
+    if ($this->quotation->period->period_status_id == $qps->getStatusClosed()) {
+      $this->period_is_closed = true;
+    }
   }
 
   /**
@@ -102,6 +111,33 @@ class ShowQuotation extends Component
     $this->total = $this->rows->reduce(function ($acc, $input) {
       return $acc + (float) $input['item_total_price'];
     }, 0);
+  }
+
+  /**
+   * abrir pdf de presupuesto
+   */
+  public function openPdf(): void
+  {
+    if (!$this->hasSomeStock()) {
+      return;
+    }
+
+    // generar URL para ver el pdf
+    $pdfUrl = route('open-pdf-quotation', ['id' => $this->quotation->id]);
+    // disparar evento para abrir el PDF en nueva pestaña
+    $this->dispatch('openPdfInNewTab', url: $pdfUrl);
+  }
+
+  /**
+   * comprobar si el presupuesto tiene al menos un item en stock
+   * @return bool
+   */
+  public function hasSomeStock(): bool
+  {
+    $cant_provisions = $this->quotation->provisions()->where('has_stock', true)->count();
+    $cant_packs = $this->quotation->packs()->where('has_stock', true)->count();
+
+    return (($cant_provisions + $cant_packs) > 0) ? true : false;
   }
 
   /**

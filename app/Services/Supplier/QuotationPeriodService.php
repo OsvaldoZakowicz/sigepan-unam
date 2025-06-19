@@ -2,8 +2,9 @@
 
 namespace App\Services\Supplier;
 
-use App\Models\PeriodStatus;
 use App\Models\Quotation;
+use App\Models\DatoNegocio;
+use App\Models\PeriodStatus;
 use App\Models\RequestForQuotationPeriod;
 
 class QuotationPeriodService
@@ -336,5 +337,85 @@ class QuotationPeriodService
     }
 
     return ['provisions' => $compare_provision_prices, 'packs' => $compare_pack_prices];
+  }
+
+  /**
+   * generar datos para PDF de presupuesto
+   * @param Quotation $quotation presupuesto
+   * @return array
+   */
+  public function generateQuotationPDFData(Quotation $quotation): array
+  {
+    // datos del negocio panaderia
+    $issuer_name = DatoNegocio::obtenerValor('razon_social');
+    $issuer_cuit = DatoNegocio::obtenerValor('cuit');
+    $issuer_email = DatoNegocio::obtenerValor('email');
+    $issuer_phone = DatoNegocio::obtenerValor('telefono');
+    $issuer_start = DatoNegocio::obtenerValor('inicio_actividades');
+    $issuer_address = DatoNegocio::obtenerValor('domicilio');
+
+    $quotation_data = [
+      'quotation_code' => $quotation->quotation_code,
+      'quotation_date' => $quotation->updated_at->format('d-m-Y'),
+      'issuer_name' => $issuer_name,
+      'issuer_cuit' => $issuer_cuit,
+      'issuer_email' => $issuer_email,
+      'issuer_phone' => $issuer_phone,
+      'issuer_start' => $issuer_start,
+      'issuer_address' => $issuer_address,
+      'provider_name' => $quotation->supplier->company_name,
+      'provider_cuit' => $quotation->supplier->company_cuit,
+      'provider_email' => $quotation->supplier->user->email,
+      'provider_phone' => $quotation->supplier->phone_number,
+      'provider_address' => $quotation->supplier->full_address,
+    ];
+
+    // obtener provisions con stock y precio válido
+    $items_provision = $quotation->provisions
+      ->filter(fn($provision) => $provision->pivot->has_stock && $provision->pivot->unit_price >= 0)
+      ->map(function ($provision) {
+        $description = $provision->trademark->provision_trademark_name . '/' .
+          convert_measure($provision->provision_quantity, $provision->measure);
+
+        return [
+          'item_id' => 'provision_' . $provision->id, // prefijo para evitar duplicados
+          'item_type' => 'provision',
+          'item_name' => $provision->provision_name,
+          'item_desc' => $description,
+          'item_quantity' => $provision->pivot->quantity,
+          'item_unit_price' => $provision->pivot->unit_price,
+          'item_total_price' => $provision->pivot->total_price,
+        ];
+      })
+      ->values(); // re-indexar numericamente
+
+    // obtener packs con stock y precio válido
+    $items_pack = $quotation->packs
+      ->filter(fn($pack) => $pack->pivot->has_stock && $pack->pivot->unit_price >= 0)
+      ->map(function ($pack) {
+        $description = $pack->provision->trademark->provision_trademark_name . '/' .
+          convert_measure($pack->pack_quantity, $pack->provision->measure);
+
+        return [
+          'item_id' => 'pack_' . $pack->id, // prefijo para evitar duplicados
+          'item_type' => 'pack',
+          'item_name' => $pack->pack_name,
+          'item_desc' => $description,
+          'item_quantity' => $pack->pivot->quantity,
+          'item_unit_price' => $pack->pivot->unit_price,
+          'item_total_price' => $pack->pivot->total_price,
+        ];
+      })
+      ->values(); // re-indexar numericamente
+
+    // combinar ambos arrays de forma segura
+    $all_items = $items_provision->concat($items_pack);
+
+    $quotation_data['items'] = $all_items->toArray();
+
+    // calcular el total usando Collection
+    $quotation_data['total'] = $all_items->sum('item_total_price');
+
+    return $quotation_data;
   }
 }

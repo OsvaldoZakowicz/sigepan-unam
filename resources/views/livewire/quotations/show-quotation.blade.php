@@ -29,6 +29,16 @@
             <x-quest-icon title="el proveedor aún no responde a este presupuesto" />
           </x-text-tag>
           @endif
+          @if ($quotation->is_completed && $this->hasSomeStock() && $period_is_closed)
+            <x-a-button
+              wire:click="openPdf()"
+              href="#"
+              bg_color="neutral-100"
+              border_color="neutral-200"
+              text_color="neutral-600"
+              >descargar PDF
+            </x-a-button>
+          @endif
         </div>
       </x-slot:header>
 
@@ -215,4 +225,16 @@
     </x-content-section>
 
   </article>
+
+  {{-- manejar eventos --}}
+  <script>
+
+    /* evento: abrir pdf en nueva pestaña para visualizar */
+    document.addEventListener('livewire:initialized', () => {
+      Livewire.on('openPdfInNewTab', ({ url }) => {
+        window.open(url, '_blank');
+      });
+    });
+
+  </script>
 </div>

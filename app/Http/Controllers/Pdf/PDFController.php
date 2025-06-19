@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Pdf;
 
 use App\Http\Controllers\Controller;
 use App\Models\PreOrder;
+use App\Models\Quotation;
 use App\Models\Sale;
 use App\Services\Sale\SaleService;
+use App\Services\Supplier\QuotationPeriodService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
@@ -80,6 +82,30 @@ class PDFController extends Controller
     // nombre
     $codigo = $sale_data['header']['id'] . str_replace([' ', ':', '-'], '', $sale_data['header']['fecha']);
     $pdf_name = 'comprobante_venta' . $codigo . '.pdf';
+
+    // stream a una pestaña del navegador
+    return $pdf->stream($pdf_name);
+  }
+
+  /**
+   * vista de un pdf de presupuesto completado
+   * contactado desde 'open-pdf-quotation-supplier' (modulo proveedores, para gerencia)
+   * contactado desde 'open-pdf-quotation' (apartado de presupuestos para proveedor)
+   * @param int $id id de presupuesto
+   * @return \Illuminate\Http\Response
+   */
+  public function stream_pdf_quotation(int $id)
+  {
+    $quotation = Quotation::findOrFail($id);
+    $qps = new QuotationPeriodService();
+    $quotation_data = $qps->generateQuotationPDFData($quotation);
+
+    $pdf = Pdf::loadView('pdf.quotations.quotation', ['quotation_data' => $quotation_data])
+      ->setPaper('a4')
+      ->setOption('encoding', 'UTF-8');
+
+    $codigo = $quotation->quotation_code;
+    $pdf_name = $codigo . '.pdf';
 
     // stream a una pestaña del navegador
     return $pdf->stream($pdf_name);

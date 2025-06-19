@@ -4,6 +4,7 @@ namespace App\Livewire\Suppliers;
 
 use App\Models\User;
 use Livewire\Component;
+use App\Models\Quotation;
 use Illuminate\View\View;
 use App\Jobs\SendEmailJob;
 use Livewire\WithPagination;
@@ -12,11 +13,11 @@ use App\Mail\CloseQuotationPeriod;
 use Illuminate\Support\Facades\Bus;
 use App\Jobs\OpenQuotationPeriodJob;
 use App\Jobs\CloseQuotationPeriodJob;
+use App\Jobs\UpdateSuppliersPricesJob;
 use App\Models\RequestForQuotationPeriod;
 use App\Services\Supplier\QuotationPeriodService;
 use App\Jobs\NotifySuppliersRequestForQuotationClosedJob;
 use App\Jobs\NotifySuppliersRequestForQuotationReceivedJob;
-use App\Jobs\UpdateSuppliersPricesJob;
 
 /**
  * mostrar un periodo presupuestario
@@ -102,9 +103,33 @@ class ShowBudgetPeriod extends Component
   }
 
   /**
-   * obtener pdf de un presupuesto
-   * TODO
+   * abrir pdf de presupuesto
+   * @param int $id de presupuesto
    */
+  public function openPdf(int $id): void
+  {
+    if (!$this->hasSomeStock($id)) {
+      return;
+    }
+
+    // generar URL para ver el pdf
+    $pdfUrl = route('open-pdf-quotation-supplier', ['id' => $id]);
+    // disparar evento para abrir el PDF en nueva pestaña
+    $this->dispatch('openPdfInNewTab', url: $pdfUrl);
+  }
+
+  /**
+   * comprobar si el presupuesto tiene al menos un item en stock
+   * @return bool
+   */
+  public function hasSomeStock(int $id): bool
+  {
+    $quotation = Quotation::find($id);
+    $cant_provisions = $quotation->provisions()->where('has_stock', true)->count();
+    $cant_packs = $quotation->packs()->where('has_stock', true)->count();
+
+    return (($cant_provisions + $cant_packs) > 0) ? true : false;
+  }
 
   /**
    * renderizar vista
