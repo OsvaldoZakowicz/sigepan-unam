@@ -17,19 +17,28 @@
           <div class="flex items-center justify-between w-full">
 
             {{-- datos --}}
-            <div class="inline-flex items-center justify-between gap-2">
-              <span class="text-xs font-semibold uppercase">{{ $period->period_code }}</span>
+            <div class="inline-flex items-center">
+              <div class="flex flex-col">
+                <span class="text-xs font-semibold uppercase">{{ $period->period_code }}</span>
+                @if ($period->status->status_code == '0')
+                <span class="text-sm text-gray-500">inicio:&nbsp;{{
+                  \Carbon\Carbon::parse($period->period_start_at)->format('d-m-Y') }}</span>
+                @else
+                <span class="text-sm text-gray-500">cierre:&nbsp;{{
+                  \Carbon\Carbon::parse($period->period_end_at)->format('d-m-Y') }}</span>
+                @endif
+              </div>
+            </div>
+
+            {{-- estado --}}
+            <div class="">
               @if ($period->status->status_code == '0')
-              <span class="text-sm text-gray-500">inicio:&nbsp;{{
-                \Carbon\Carbon::parse($period->period_start_at)->format('d-m-Y') }}</span>
               {{-- estado programado --}}
               <x-text-tag color="neutral">
                 {{ $period->status->status_name }}
                 <x-quest-icon title="periodo programado para iniciarse." />
               </x-text-tag>
               @else
-              <span class="text-sm text-gray-500">cierre:&nbsp;{{
-                \Carbon\Carbon::parse($period->period_end_at)->format('d-m-Y') }}</span>
               {{-- estado abierto --}}
               <x-text-tag color="emerald">
                 {{ $period->status->status_name }}

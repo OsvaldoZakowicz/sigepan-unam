@@ -96,7 +96,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 // * modulo de estadisticas
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified', 'can:estadisticas'])->group(function () {
 
   Route::get('stats', [StatsController::class, 'stats_index'])
     ->name('stats-stats-index');

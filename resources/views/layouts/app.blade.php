@@ -24,16 +24,16 @@
   <div class="relative min-h-screen bg-gray-100">
 
     {{-- grupo de navegacion, encabezado y notificaciones --}}
-    <div class="fixed z-50 top-0 left-0 right-0">
+    <div class="fixed top-0 left-0 right-0 z-50">
 
       {{-- navegacion de livewire --}}
       <livewire:layout.navigation />
 
       {{-- header de seccion --}}
       @if (isset($header))
-        <header class="w-full px-8 h-10 sm:px-6 lg:px-8 flex justify-start items-center bg-white shadow">
-          {{ $header }}
-        </header>
+      <header class="flex items-center justify-start w-full h-10 px-8 bg-white shadow sm:px-6 lg:px-8">
+        {{ $header }}
+      </header>
       @endif
 
       {{-- notificaciones toast, llamadas 'toast-event' --}}
@@ -67,21 +67,18 @@
         }
       }">
         {{-- visualizacion y posicion del toast --}}
-        <div x-show="showToast"
-              x-transition
-              class="absolute z-50 top-32 left-2 lg:inset-x-1/3">
-            <div
-              :class="'relative flex gap-3 p-4 rounded-lg border max-w-lg' + ' ' + getToastClasses()">
-              <div class="mt-0.5">
-                <span x-text="toastIcon" class="text-xl"></span>
-              </div>
-
-              <div class="flex flex-col gap-1">
-                <h3 x-text="toastData?.title_toast" class="text-sm font-medium text-neutral-800"></h3>
-                <p x-text="toastData?.descr_toast" class="text-sm text-neutral-600"></p>
-                <span x-on:click="showToast = false" class="absolute top-2 right-2 cursor-pointer">&#10005;</span>
-              </div>
+        <div x-show="showToast" x-transition class="absolute z-50 top-32 left-2 lg:inset-x-1/3">
+          <div :class="'relative flex gap-3 p-4 rounded-lg border max-w-lg' + ' ' + getToastClasses()">
+            <div class="mt-0.5">
+              <span x-text="toastIcon" class="text-xl"></span>
             </div>
+
+            <div class="flex flex-col gap-1">
+              <h3 x-text="toastData?.title_toast" class="text-sm font-medium text-neutral-800"></h3>
+              <p x-text="toastData?.descr_toast" class="text-sm text-neutral-600"></p>
+              <span x-on:click="showToast = false" class="absolute cursor-pointer top-2 right-2">&#10005;</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -89,17 +86,17 @@
       <div>
         {{-- mensaje toast exito, recibido por session --}}
         @if (session('operation-success'))
-          <x-session-toast type="success" msg="{{ session('operation-success') }}" />
+        <x-session-toast type="success" msg="{{ session('operation-success') }}" />
         @endif
 
         {{-- mensaje toast info, recibido por sesion --}}
         @if (session('operation-info'))
-          <x-session-toast type="info" msg="{{ session('operation-info') }}" />
+        <x-session-toast type="info" msg="{{ session('operation-info') }}" />
         @endif
 
         {{-- mensaje toast error, recibido por sesion --}}
         @if (session('operation-error'))
-          <x-session-toast type="error" msg="{{ session('operation-error') }}" />
+        <x-session-toast type="error" msg="{{ session('operation-error') }}" />
         @endif
       </div>
 
@@ -107,7 +104,7 @@
     </div>
 
     {{-- contendio de seccion --}}
-    <main class="w-full mb-2 flex flex-col items-center text-neutral-700 pt-28">
+    <main class="flex flex-col items-center w-full text-neutral-700 pt-28">
       {{ $slot }}
     </main>
   </div>
