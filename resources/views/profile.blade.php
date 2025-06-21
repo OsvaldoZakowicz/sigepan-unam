@@ -1,30 +1,30 @@
 <x-app-layout>
   {{-- perfil de usuario --}}
   <x-slot name="header">
-    <div class="w-full flex gap-10 h-10 justify-start items-center text-sm font-medium capitalize text-neutral-700">
+    <div class="flex items-center justify-start w-full h-10 gap-10 text-sm font-medium capitalize text-neutral-700">
       <span>mi perfil</span>
     </div>
   </x-slot>
 
   <div class="m-2 md:m-4 lg:m-8">
-    <div class="flex items-start gap-8 flex-wrap">
+    <div class="flex flex-wrap items-start gap-8">
 
-      <div class="w-full bg-white shadow rounded-sm">
+      <div class="w-full bg-white rounded-sm shadow">
         @livewire('users.show-profile')
       </div>
 
-      <div class="flex flex-wrap items-start lg:flex-nowrap gap-8 w-full">
-        <div class="sm:w-full grow md:w-1/2 bg-white shadow rounded-sm">
+      <div class="flex flex-wrap items-start w-full gap-8 lg:flex-nowrap">
+        <div class="bg-white rounded-sm shadow sm:w-full grow md:w-1/2">
           <livewire:profile.update-profile-information-form />
         </div>
 
-        <div class="sm:w-full grow md:w-1/2 bg-white shadow rounded-sm">
+        <div class="bg-white rounded-sm shadow sm:w-full grow md:w-1/2">
           <livewire:profile.update-password-form />
         </div>
 
-        <div class="lg:w-1/3 bg-red-200 border border-red-400 shadow rounded-sm">
+        {{-- <div class="bg-red-200 border border-red-400 rounded-sm shadow lg:w-1/3">
           <livewire:profile.delete-user-form />
-        </div>
+        </div> --}}
       </div>
 
     </div>

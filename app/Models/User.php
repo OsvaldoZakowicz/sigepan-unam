@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use OwenIt\Auditing\Contracts\Auditable;
 use App\Models\Supplier;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable implements MustVerifyEmail, Auditable
 {
@@ -28,6 +29,8 @@ class User extends Authenticatable implements MustVerifyEmail, Auditable
   /** paquete de auditoria
    */
   use \OwenIt\Auditing\Auditable;
+
+  use SoftDeletes;
 
   /**
    * * excluir de auditoria
@@ -69,7 +72,32 @@ class User extends Authenticatable implements MustVerifyEmail, Auditable
     return [
       'email_verified_at' => 'datetime',
       'password' => 'hashed',
+      'deleted_at' => 'datetime',
     ];
+  }
+
+  /**
+   * Scope para obtener solo usuarios activos (no eliminados)
+   */
+  public function scopeActive($query)
+  {
+    return $query->whereNull('deleted_at');
+  }
+
+  /**
+   * Verificar si el usuario está eliminado (soft deleted)
+   */
+  public function isDeleted(): bool
+  {
+    return !is_null($this->deleted_at);
+  }
+
+  /**
+   * Verificar si el usuario puede ser restaurado
+   */
+  public function canBeRestored(): bool
+  {
+    return $this->trashed();
   }
 
   //* un usuario tiene cero a un perfil asociado

@@ -1,31 +1,31 @@
 @extends('welcome')
 
 @section('view_content')
-  <div class="mt-20 pt-5 bg-gradient-to-r from-orange-100 via-amber-200 to-orange-900 pb-14">
+  <div class="pt-5 mt-20 bg-gradient-to-r from-orange-100 via-amber-200 to-orange-900 pb-14">
     {{-- * vista de perfil de cliente, layout. --}}
-    <div class="bg-white rounded-lg flex justify-between gap-8 items-start w-full max-w-7xl mx-auto p-6">
+    <div class="flex items-start justify-between w-full gap-8 p-6 mx-auto bg-white rounded-lg max-w-7xl">
       <div class="m-2 md:m-4 lg:m-8">
-        <div class="flex items-start gap-8 flex-wrap">
+        <div class="flex flex-wrap items-start gap-8">
 
           <p class="text-lg font-semibold text-neutral-800">Mi Perfil:</p>
 
-          <div class="w-full bg-white shadow rounded-sm">
+          <div class="w-full bg-white rounded-sm shadow">
             {{-- componente para mostrar cuadro del perfil del cliente --}}
             @livewire('users.show-profile-client')
           </div>
 
           <p class="font-semibold text-neutral-800">Configuraciones rápidas:</p>
 
-          <div class="flex flex-wrap items-start lg:flex-nowrap gap-8 w-full">
-            <div class="sm:w-full grow md:w-1/2 bg-white shadow rounded-sm">
+          <div class="flex flex-wrap items-start w-full gap-8 lg:flex-nowrap">
+            <div class="bg-white rounded-sm shadow sm:w-full grow md:w-1/2">
               <livewire:profile.update-profile-information-form />
             </div>
 
-            <div class="sm:w-full grow md:w-1/2 bg-white shadow rounded-sm">
+            <div class="bg-white rounded-sm shadow sm:w-full grow md:w-1/2">
               <livewire:profile.update-password-form />
             </div>
 
-            <div class="lg:w-1/3 bg-red-200 border border-red-400 shadow rounded-sm">
+            <div class="bg-red-100 border border-red-400 rounded-sm shadow lg:w-1/3">
               <livewire:profile.delete-user-form />
             </div>
           </div>
