@@ -51,4 +51,13 @@
       </tbody>
     </table>
   </section>
+  {{-- grafico --}}
+  <div class="contenedor">
+    <p class="renglon">
+      <span class="meta">Grafico de Ventas por Producto y Fecha</span>
+    </p>
+    <div>
+      <img src="{{ $chart_image_url }}" alt="Gráfico de Ventas" width="100%" height="400px">
+    </div>
+  </div>
 @endsection

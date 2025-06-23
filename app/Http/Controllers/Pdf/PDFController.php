@@ -7,6 +7,7 @@ use App\Models\PreOrder;
 use App\Models\Product;
 use App\Models\Quotation;
 use App\Models\Sale;
+use App\Services\Charts\ChartService;
 use App\Services\Sale\SaleService;
 use App\Services\Stats\StatsSalesService;
 use App\Services\Supplier\QuotationPeriodService;
@@ -130,41 +131,38 @@ class PDFController extends Controller
     $sales = $sss->searchSales($start_date, $end_date, $product);
     $processed_sales = $sss->processSalesForTable($sales);
     $sales_flatten = $sss->flattenSalesData($processed_sales);
+    $chart_data = $sss->prepareChartData($processed_sales);
 
     // otros datos
     $fecha_emision = now()->format('d-m-Y H:i');
-
-    $start = ($start_date === '')
-      ? '-'
-      : Carbon::createFromFormat('Y-m-d', $start_date)->format('d-m-Y');
-
-    $end = ($end_date === '')
-      ? '-'
-      : Carbon::createFromFormat('Y-m-d', $end_date)->format('d-m-Y');
-
-    $product_name = (is_numeric($product))
-      ? Product::find((int)$product)->product_name
-      : 'todos';
-
-    $parametros = [
-      'desde' => $start,
-      'hasta' => $end,
-      'producto' => $product_name,
-    ];
+    $start = ($start_date === '') ? '-' : Carbon::createFromFormat('Y-m-d', $start_date)->format('d-m-Y');
+    $end = ($end_date === '') ? '-' : Carbon::createFromFormat('Y-m-d', $end_date)->format('d-m-Y');
+    $product_name = (is_numeric($product)) ? Product::find((int)$product)->product_name : 'todos';
+    $parametros = ['desde' => $start, 'hasta' => $end, 'producto' => $product_name];
 
     $total_ventas = $sales_flatten->reduce(function ($acc, $sale) {
       return $acc + $sale['total'];
     }, 0);
 
+    // imagen del chart
+    $chart_service = new ChartService();
+    $chart_image_url = $chart_service->generateChartUrl($chart_data, 750, 350);
+
     // crear pdf
     $pdf = Pdf::loadView('pdf.sales.stat-sale', [
       'fecha' => $fecha_emision,
       'parametros' => $parametros,
+      'chart_image_url' => $chart_image_url,
       'sales' => $sales_flatten,
       'total' => $total_ventas,
     ])
       ->setPaper('a4')
-      ->setOption('encoding', 'UTF-8');
+      ->setOption([
+        'encoding' => 'UTF-8',
+        'isHtml5ParserEnabled' => true,
+        'isRemoteEnabled' => true,
+        'tempDir' => storage_path('app/temp')
+      ]);
 
     $codigo = 'estadistica_ventas_' . str_replace([' ', ':', '-'], [''], $fecha_emision);
     $pdf_name = $codigo . '.pdf';
