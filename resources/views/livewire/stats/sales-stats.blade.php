@@ -60,6 +60,18 @@
 
       <x-slot:content>
         <div class="flex flex-col w-full gap-4">
+          {{-- acciones extra --}}
+          <div class="flex items-center justify-end w-full gap-2 p-2 border rounded-sm border-e-neutral-200">
+            <x-a-button
+              wire:click="openPdfStat()"
+              bg_color="neutral-200"
+              border_color="neutral-300"
+              text_color="neutral-600"
+              class="cursor-pointer"
+              >descargar PDF
+              <x-svg-pdf-paper/>
+            </x-a-button>
+          </div>
           {{-- contenedor del grafico --}}
           <div class="flex items-center justify-start">
             {{-- grafico --}}
@@ -323,6 +335,13 @@
           labels: [],
           datasets: []
         });
+      });
+
+      /* evento: abrir pdf en nueva pestaña para visualizar */
+      document.addEventListener('livewire:initialized', () => {
+          Livewire.on('openPdfInNewTab', ({ url }) => {
+            window.open(url, '_blank');
+          });
       });
 
     </script>

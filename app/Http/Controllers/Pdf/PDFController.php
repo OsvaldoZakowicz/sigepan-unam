@@ -4,10 +4,13 @@ namespace App\Http\Controllers\Pdf;
 
 use App\Http\Controllers\Controller;
 use App\Models\PreOrder;
+use App\Models\Product;
 use App\Models\Quotation;
 use App\Models\Sale;
 use App\Services\Sale\SaleService;
+use App\Services\Stats\StatsSalesService;
 use App\Services\Supplier\QuotationPeriodService;
+use Illuminate\Support\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
@@ -105,6 +108,65 @@ class PDFController extends Controller
       ->setOption('encoding', 'UTF-8');
 
     $codigo = $quotation->quotation_code;
+    $pdf_name = $codigo . '.pdf';
+
+    // stream a una pestaña del navegador
+    return $pdf->stream($pdf_name);
+  }
+
+  /**
+   * vista de un pdf de estadistica de ventas
+   * @param Request $request datos de filtrado
+   * @return \Illuminate\Http\Response
+   */
+  public function stream_pdf_sale_stat(Request $request)
+  {
+    $start_date = $request->query('start_date') ?? ''; //"Y-m-d"
+    $end_date   = $request->query('end_date') ?? '';  //"Y-m-d"
+    $product    = $request->query('product') ?? '';   //"id" de producto
+
+    // servicios para construir query y hacer consulta de ventas
+    $sss = new StatsSalesService();
+    $sales = $sss->searchSales($start_date, $end_date, $product);
+    $processed_sales = $sss->processSalesForTable($sales);
+    $sales_flatten = $sss->flattenSalesData($processed_sales);
+
+    // otros datos
+    $fecha_emision = now()->format('d-m-Y H:i');
+
+    $start = ($start_date === '')
+      ? '-'
+      : Carbon::createFromFormat('Y-m-d', $start_date)->format('d-m-Y');
+
+    $end = ($end_date === '')
+      ? '-'
+      : Carbon::createFromFormat('Y-m-d', $end_date)->format('d-m-Y');
+
+    $product_name = (is_numeric($product))
+      ? Product::find((int)$product)->product_name
+      : 'todos';
+
+    $parametros = [
+      'desde' => $start,
+      'hasta' => $end,
+      'producto' => $product_name,
+    ];
+
+    $total_ventas = $sales_flatten->reduce(function ($acc, $sale) {
+      return $acc + $sale['total'];
+    }, 0);
+
+    // crear pdf
+    $pdf = Pdf::loadView('pdf.sales.stat-sale', [
+      'fecha' => $fecha_emision,
+      'parametros' => $parametros,
+      'sales' => $sales_flatten,
+      'total' => $total_ventas,
+    ])
+      ->setPaper('a4')
+      ->setOption('encoding', 'UTF-8');
+
+    $codigo = 'estadistica_ventas_' . str_replace([' ', ':', '-'], [''], $fecha_emision);
     $pdf_name = $codigo . '.pdf';
 
     // stream a una pestaña del navegador

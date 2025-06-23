@@ -100,6 +100,11 @@ Route::middleware(['auth', 'verified', 'can:estadisticas'])->group(function () {
 
   Route::get('stats', [StatsController::class, 'stats_index'])
     ->name('stats-stats-index');
+
+  //* ---------------------------------------------------- pdfs
+
+  Route::get('stats/salestat', [PDFController::class, 'stream_pdf_sale_stat'])
+    ->name('open-pdf-stat');
 });
 
 //* modulo de usuarios
