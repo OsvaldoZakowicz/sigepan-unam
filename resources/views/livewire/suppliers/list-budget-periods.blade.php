@@ -74,6 +74,7 @@
               </x-table-th>
               <x-table-th class="w-48 text-start">
                 acciones
+                <x-quest-icon title="puede editar o borrar un periodo siempre que su estado sea el de programado"/>
               </x-table-th>
             </tr>
           </x-slot:tablehead>
@@ -126,10 +127,29 @@
               </x-table-td>
               <x-table-td>
                 <div class="flex justify-start gap-1">
-
-                  <x-a-button wire:navigate href="{{ route('suppliers-budgets-periods-show', $period->id) }}"
-                    bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600">ver</x-a-button>
-
+                  <x-a-button
+                    wire:navigate
+                    href="{{ route('suppliers-budgets-periods-show', $period->id) }}" bg_color="neutral-100"
+                    border_color="neutral-200"
+                    text_color="neutral-600">ver
+                  </x-a-button>
+                  
+                  @if ($period->status->status_code === 0)
+                    <x-a-button
+                      wire:navigate
+                      href="{{ route('suppliers-budgets-periods-edit', $period->id) }}" bg_color="neutral-100"
+                      border_color="neutral-200"
+                      text_color="neutral-600">editar
+                    </x-a-button>
+                    <x-a-button
+                      wire:click='deletePeriod({{ $period->id }})'
+                      wire:confirm='¿Desa borrar el registro?, esta accion es irreversible.'
+                      href="#"
+                      bg_color="red-600"
+                      border_color="red-600"
+                      text_color="neutral-100">eliminar
+                    </x-a-button>
+                  @endif
                 </div>
               </x-table-td>
             </tr>

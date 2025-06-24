@@ -129,78 +129,83 @@
                 <x-slot:tablebody>
                   @forelse ($provisions_and_packs as $key => $item )
                   <tr wire:key="{{ $key }}" class="border">
-
                     @if ($item['item_type'] === 'suministro')
-                    {{-- suministro --}}
-                    <x-table-td class="w-12 text-end">
-                      {{ $item['item_object']->id }}
-                    </x-table-td>
-                    <x-table-td class="text-start">
-                      {{ $item['item_object']->provision_name }}
-                    </x-table-td>
-                    <x-table-td class="text-start">
-                      {{ $item['item_object']->trademark->provision_trademark_name }}
-                    </x-table-td>
-                    <x-table-td class="text-start">
-                      {{ $item['item_object']->type->provision_type_name }}
-                    </x-table-td>
-                    <x-table-td class="text-end">
-                      {{ convert_measure($item['item_object']->provision_quantity, $item['item_object']->measure) }}
-                    </x-table-td>
-                    <x-table-td class="w-56 text-end">
-                      {{-- cantidad --}}
-                      @error('provisions_and_packs.'.$key.'.item_quantity')
-                      <span class="text-xs text-red-400">{{ $message }}</span>
-                      @enderror
-                      <input type="number" id="provisions_and_packs_{{ $key }}_item_quantity" min="1" max="99"
-                        wire:model.defer="provisions_and_packs.{{ $key }}.item_quantity" placeholder="cantidad"
-                        class="w-full p-1 text-sm text-right border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300" />
-                    </x-table-td>
-                    <x-table-td class="text-start">
-                      {{-- quitar --}}
-                      <div class="inline-flex items-center justify-start w-full gap-1">
-                        <span wire:click="removeItemFromList({{ $key }})" title="quitar de la lista"
-                          class="p-1 font-bold leading-none text-center bg-red-100 border border-red-200 rounded-sm cursor-pointer">&times;
-                        </span>
-                      </div>
-                    </x-table-td>
+                      {{-- suministro --}}
+                      <x-table-td class="w-12 text-end">
+                        {{ $item['item_object']->id }}
+                      </x-table-td>
+                      <x-table-td class="text-start">
+                        {{ $item['item_object']->provision_name }}
+                      </x-table-td>
+                      <x-table-td class="text-start">
+                        {{ $item['item_object']->trademark->provision_trademark_name }}
+                      </x-table-td>
+                      <x-table-td class="text-start">
+                        {{ $item['item_object']->type->provision_type_name }}
+                      </x-table-td>
+                      <x-table-td class="text-end">
+                        {{ convert_measure($item['item_object']->provision_quantity, $item['item_object']->measure) }}
+                      </x-table-td>
+                      <x-table-td class="w-56 text-end">
+                        {{-- cantidad --}}
+                        @error('provisions_and_packs.'.$key.'.item_quantity')
+                          <span class="text-xs text-red-400">{{ $message }}</span>
+                        @enderror
+                        <input
+                          type="number"
+                          id="provisions_and_packs_{{ $key }}_item_quantity"
+                          min="1"
+                          max="99"
+                          wire:model.defer="provisions_and_packs.{{ $key }}.item_quantity" placeholder="cantidad"
+                          class="w-full p-1 text-sm text-right border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                        />
+                      </x-table-td>
+                      <x-table-td class="text-start">
+                        {{-- quitar --}}
+                        <div class="inline-flex items-center justify-start w-full gap-1">
+                          <span
+                            wire:click="removeItemFromList({{ $key }})"
+                            title="quitar de la lista"
+                            class="p-1 font-bold leading-none text-center bg-red-100 border border-red-200 rounded-sm cursor-pointer">&times;
+                          </span>
+                        </div>
+                      </x-table-td>
                     @else
-                    {{-- pack --}}
-                    <x-table-td class="w-12 text-end">
-                      {{ $item['item_object']->id }}
-                    </x-table-td>
-                    <x-table-td class="text-start">
-                      {{ $item['item_object']->pack_name }}
-                    </x-table-td>
-                    <x-table-td class="text-start">
-                      {{ $item['item_object']->provision->trademark->provision_trademark_name }}
-                    </x-table-td>
-                    <x-table-td class="text-start">
-                      {{ $item['item_object']->provision->type->provision_type_name }}
-                    </x-table-td>
-                    <x-table-td class="text-end">
-                      {{ convert_measure($item['item_object']->pack_quantity, $item['item_object']->provision->measure)
-                      }}
-                    </x-table-td>
-                    <x-table-td class="w-56 text-end">
-                      {{-- cantidad --}}
-                      @error('provisions_and_packs.'.$key.'.item_quantity')
-                      <span class="text-xs text-red-400">{{ $message }}</span>
-                      @enderror
-                      <input type="number" id="provisions_and_packs_{{ $key }}_item_quantity" min="1" max="99"
-                        wire:model.defer="provisions_and_packs.{{ $key }}.item_quantity" placeholder="cantidad"
-                        class="w-full p-1 text-sm text-right border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300" />
-                    </x-table-td>
-                    <x-table-td class="text-start">
-                      {{-- quitar --}}
-                      <div class="inline-flex items-center justify-start w-full gap-1">
-                        <span wire:click="removeItemFromList({{ $key }})" title="quitar de la lista"
-                          class="p-1 font-bold leading-none text-center bg-red-100 border border-red-200 rounded-sm cursor-pointer">&times;
-                        </span>
-                      </div>
-                    </x-table-td>
+                      {{-- pack --}}
+                      <x-table-td class="w-12 text-end">
+                        {{ $item['item_object']->id }}
+                      </x-table-td>
+                      <x-table-td class="text-start">
+                        {{ $item['item_object']->pack_name }}
+                      </x-table-td>
+                      <x-table-td class="text-start">
+                        {{ $item['item_object']->provision->trademark->provision_trademark_name }}
+                      </x-table-td>
+                      <x-table-td class="text-start">
+                        {{ $item['item_object']->provision->type->provision_type_name }}
+                      </x-table-td>
+                      <x-table-td class="text-end">
+                        {{ convert_measure($item['item_object']->pack_quantity, $item['item_object']->provision->measure)
+                        }}
+                      </x-table-td>
+                      <x-table-td class="w-56 text-end">
+                        {{-- cantidad --}}
+                        @error('provisions_and_packs.'.$key.'.item_quantity')
+                        <span class="text-xs text-red-400">{{ $message }}</span>
+                        @enderror
+                        <input type="number" id="provisions_and_packs_{{ $key }}_item_quantity" min="1" max="99"
+                          wire:model.defer="provisions_and_packs.{{ $key }}.item_quantity" placeholder="cantidad"
+                          class="w-full p-1 text-sm text-right border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300" />
+                      </x-table-td>
+                      <x-table-td class="text-start">
+                        {{-- quitar --}}
+                        <div class="inline-flex items-center justify-start w-full gap-1">
+                          <span wire:click="removeItemFromList({{ $key }})" title="quitar de la lista"
+                            class="p-1 font-bold leading-none text-center bg-red-100 border border-red-200 rounded-sm cursor-pointer">&times;
+                          </span>
+                        </div>
+                      </x-table-td>
                     @endif
-
                   </tr>
                   @empty
                   <tr class="border">

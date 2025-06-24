@@ -15,14 +15,20 @@ return new class extends Migration
       $table->id();
 
       // fk periodo de peticion de suministros
-      // no puedo borrar un periodo asociado a packs
+      // puedo borrar un periodo asociado a packs
       $table->unsignedBigInteger('period_id');
-      $table->foreign('period_id')->references('id')->on('request_for_quotation_periods')->restrictOnDelete();
+      $table->foreign('period_id')
+        ->references('id')
+        ->on('request_for_quotation_periods')
+        ->cascadeOnDelete();
 
       //fk packs
       // no puedo borrar un pack asociado a un periodo
       $table->unsignedBigInteger('pack_id');
-      $table->foreign('pack_id')->references('id')->on('packs')->restrictOnDelete();
+      $table->foreign('pack_id')
+        ->references('id')
+        ->on('packs')
+        ->restrictOnDelete();
 
       // cantidad a presupuestar
       $table->smallInteger('quantity', false, true);
