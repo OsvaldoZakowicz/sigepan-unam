@@ -32,19 +32,19 @@ class UpdateSuppliersPricesJob implements ShouldQueue
     foreach ($quotations as $quotation) {
       // suministros
       foreach ($quotation->provisions as $quotation_provision) {
-        if ((float) $quotation_provision->pivot->unit_price !== 0) {
+        if ((float)$quotation_provision->pivot->unit_price > 0 && $quotation_provision->pivot->has_stock) {
           $quotation->supplier->provisions()->updateExistingPivot(
             $quotation_provision->id,
-            ['price' => (float) $quotation_provision->pivot->unit_price]
+            ['price' => $quotation_provision->pivot->unit_price]
           );
         }
       }
       // packs
       foreach ($quotation->packs as $quotation_pack) {
-        if ((float) $quotation_pack->unit_price !== 0) {
+        if ((float)$quotation_pack->pivot->unit_price > 0 && $quotation_pack->pivot->has_stock) {
           $quotation->supplier->packs()->updateExistingPivot(
             $quotation_pack->id,
-            ['price' => (float) $quotation_pack->pivot->unit_price]
+            ['price' => $quotation_pack->pivot->unit_price]
           );
         }
       }

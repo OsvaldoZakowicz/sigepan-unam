@@ -2,16 +2,20 @@
 
 namespace App\Livewire\Suppliers;
 
+use App\Models\Pack;
 use Livewire\Component;
 use App\Models\Provision;
-use App\Models\Pack;
-use App\Models\RequestForQuotationPeriod;
-use App\Services\Supplier\QuotationPeriodService;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 use Illuminate\View\View;
+use Illuminate\Support\Arr;
 use Livewire\Attributes\On;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Bus;
+use App\Jobs\OpenQuotationPeriodJob;
+use App\Models\RequestForQuotationPeriod;
+use App\Livewire\Suppliers\SearchProvisionPeriod;
+use App\Services\Supplier\QuotationPeriodService;
+use App\Jobs\NotifySuppliersRequestForQuotationReceivedJob;
 
 class CreateBudgetPeriod extends Component
 {
@@ -184,14 +188,27 @@ class CreateBudgetPeriod extends Component
       $this->provisions_and_packs->each(function ($item) use ($period) {
 
         if ($item['item_type'] === 'suministro') {
-          $period->provisions()->attach($item['item_object']->id, ['quantity' => $item['item_quantity']]);
+          $period->provisions()->attach(
+            $item['item_object']->id,
+            ['quantity' => $item['item_quantity']]
+          );
         }
 
         if ($item['item_type'] === 'pack') {
-          $period->packs()->attach($item['item_object']->id, ['quantity' => $item['item_quantity']]);
+          $period->packs()->attach(
+            $item['item_object']->id,
+            ['quantity' => $item['item_quantity']]
+          );
         }
       });
 
+      //$period->period_start_at formato string 'Y-m-d'
+      if (Carbon::parse($period->period_start_at)->startOfDay()->eq(Carbon::now()->startOfDay())) {
+        Bus::chain([
+          OpenQuotationPeriodJob::dispatch($period),
+          NotifySuppliersRequestForQuotationReceivedJob::dispatch($period),
+        ]);
+      }
 
       $this->reset();
 

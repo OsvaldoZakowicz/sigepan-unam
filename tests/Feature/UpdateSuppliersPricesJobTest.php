@@ -230,24 +230,25 @@ class UpdateSuppliersPricesJobTest extends TestCase
     ]);
 
     $quotation->provisions()->attach($provision->id, [
-      'unit_price' => 150,
-      'has_stock' => true,
+      'has_stock' => 1,
       'quantity' => 1,
+      'unit_price' => 150,
       'total_price' => 150,
     ]);
 
     $quotation->packs()->attach($pack->id, [
-      'unit_price' => 250,
-      'has_stock' => true,
+      'has_stock' => 1,
       'quantity' => 1,
+      'unit_price' => 0, // cero
       'total_price' => 250,
     ]);
 
     // ejecutar el job
     (new UpdateSuppliersPricesJob($period))->handle();
 
-    // verificar que el precio del supplier se actualizo
+    // verificar que el precio de suministro del supplier se actualizo
     $this->assertEquals(150, $supplier->provisions()->find($provision->id)->pivot->price);
-    $this->assertEquals(250, $supplier->packs()->find($pack->id)->pivot->price);
+    // verificar que el precio de pack del supplier NO se actualizo
+    $this->assertEquals(200, $supplier->packs()->find($pack->id)->pivot->price);
   }
 }

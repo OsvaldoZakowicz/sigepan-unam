@@ -86,32 +86,22 @@
         {{-- aviso segun respuesta de proveedores --}}
         @if ($period_status === $closed and $count_quotations !== 0)
         <div class="flex items-center justify-between w-full p-1 border rounded-sm bg-emerald-100 border-emerald-300">
-
           <span class="text-emerald-800">
             <span class="font-semibold">¡Éxito!</span>
             <span>Se ha calculado una comparativa de precios y se han actualizado los precios por suministros para cada
               proveedor</span>
             <strong>usando los presupuestos respondidos</strong>
           </span>
-
           <x-a-button href="{{ route('suppliers-budgets-ranking', $period->id) }}" wire:navigate bg_color="emerald-600"
             border_color="emerald-600" text_color="neutral-100">ver
           </x-a-button>
-
         </div>
         @elseif ($period_status === $closed and $count_quotations === 0)
         <div class="flex items-center justify-between w-full p-1 bg-yellow-100 border border-yellow-500 rounded-sm">
-
           <span class="text-yellow-800">
             <span class="font-semibold">¡Aviso!</span>
             <span>¡No se han recibido presupuestos de los proveedores!</span>
-            <span>¿Re abrir periodo?</span>
           </span>
-
-          <x-a-button wire:navigate href="{{ route('suppliers-budgets-periods-edit', $period->id) }}" wire:click=""
-            bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600">configurar y reabrir
-          </x-a-button>
-
         </div>
         @endif
 
@@ -273,7 +263,7 @@
                   <x-quest-icon title="última vez que el proveedor modificó los precios de este presupuesto" />
                 </x-table-th>
                 <x-table-th class="text-start">
-                  presupuesto
+                  presupuesto final
                   <x-quest-icon title="PDF disponible una vez que el presupuesto es respondido y el periodo ha cerrado" />
                 </x-table-th>
                 <x-table-th class="w-48 text-start">
@@ -308,23 +298,31 @@
                 </x-table-td>
                 <x-table-td class="text-end">
                   @if ($quotation->is_completed)
-                  {{ formatDateTime($quotation->updated_at, 'd-m-Y H:i') }} hs.
+                    {{ formatDateTime($quotation->updated_at, 'd-m-Y H:i') }} hs.
                   @else
-                  <span class="font-semibold text-neutral-400">-</span>
+                    <span class="font-semibold text-neutral-400">-</span>
                   @endif
                 </x-table-td>
                 <x-table-td class="text-start">
-                  @if ($quotation->is_completed && $this->hasSomeStock($quotation->id) && $quotation->period->period_status_id == $closed)
-                    <x-a-button
-                      wire:click="openPdf({{ $quotation->id }})"
-                      href="#"
-                      bg_color="neutral-100"
-                      border_color="neutral-200"
-                      text_color="neutral-600"
-                      >descargar PDF
-                    </x-a-button>
+                  @if ($quotation->is_completed)
+                    @if ($quotation->period->period_status_id == $closed)
+                      @if ($this->hasSomeStock($quotation->id))
+                        <x-a-button
+                          wire:click="openPdf({{ $quotation->id }})"
+                          href="#"
+                          bg_color="neutral-100"
+                          border_color="neutral-200"
+                          text_color="neutral-600"
+                          >descargar PDF
+                        </x-a-button>
+                      @else
+                        <span>sin stock</span>
+                      @endif
+                    @else
+                      <span>no disponible</span>
+                    @endif
                   @else
-                    <span>sin stock</span>
+                    <span>sin respuesta</span>
                   @endif
                 </x-table-td>
                 <x-table-td>

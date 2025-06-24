@@ -229,7 +229,7 @@
                         {{ $input['item_object']->provision->trademark->provision_trademark_name }}
                         {{ convert_measure($input['item_object']->pack_quantity, $input['item_object']->provision->measure) }}
                       </x-table-td>
-                      <x-table-td class="text-start">
+                      <x-table-td class="text-end">
                         {{ $input['item_quantity'] }}
                       </x-table-td>
                       {{-- stock --}}
