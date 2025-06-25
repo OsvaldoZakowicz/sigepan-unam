@@ -36,7 +36,7 @@ class PriceList extends Component
   /**
    * boot de datos
    * @return void
-  */
+   */
   public function boot(): void
   {
     $this->trademarks = ProvisionTrademark::orderBy('id', 'desc')->get();
@@ -47,10 +47,10 @@ class PriceList extends Component
    * montar datos del componente
    * @param int $id id de un proveedor.
    * @return void
-  */
+   */
   public function mount(int $id): void
   {
-    $this->supplier = Supplier::findOrFail($id);
+    $this->supplier = Supplier::withTrashed()->findOrFail($id);
     $this->toggle = false;
   }
 
@@ -58,7 +58,7 @@ class PriceList extends Component
    * cambiar busqueda
    * alternar entre busqueda de suministros individuales o packs
    * @return void
-  */
+   */
   public function toggleSearch(): void
   {
     $this->toggle = !$this->toggle;
@@ -67,7 +67,7 @@ class PriceList extends Component
   /**
    * buscar suministos del proveedor
    * @return mixed
-  */
+   */
   public function searchSupplierProvisions()
   {
     return $this->supplier->provisions()
@@ -87,7 +87,7 @@ class PriceList extends Component
   /**
    * buscar packs del proveedor
    * @return mixed
-  */
+   */
   public function searchSupplierPacks()
   {
     return $this->supplier->packs()
@@ -112,7 +112,7 @@ class PriceList extends Component
   /**
    * reiniciar la paginacion para buscar
    * @return void.
-  */
+   */
   public function resetPagination()
   {
     $this->resetPage();
@@ -135,7 +135,7 @@ class PriceList extends Component
    * no borra el suministro.
    * @param int $id del suministro
    * @return void
-  */
+   */
   public function deleteProvision(int $id): void
   {
     try {
@@ -148,7 +148,6 @@ class PriceList extends Component
         'title_toast' =>  toastTitle('exitosa'),
         'descr_toast' =>  toastSuccessBody('precio del suministro', 'eliminado'),
       ]);
-
     } catch (\Exception $e) {
 
       $this->dispatch('toast-event', toast_data: [
@@ -156,7 +155,6 @@ class PriceList extends Component
         'title_toast' =>  toastTitle('fallida'),
         'descr_toast' =>  'error: ' . $e->getMessage() . ' contacte al Administrador',
       ]);
-
     }
   }
 
@@ -166,7 +164,7 @@ class PriceList extends Component
    * no borra el pack.
    * @param int $id del pack
    * @return void
-  */
+   */
   public function deletePack(int $id): void
   {
     try {
@@ -179,7 +177,6 @@ class PriceList extends Component
         'title_toast' =>  toastTitle('exitosa'),
         'descr_toast' =>  toastSuccessBody('precio del pack', 'eliminado'),
       ]);
-
     } catch (\Exception $e) {
 
       $this->dispatch('toast-event', toast_data: [
@@ -187,14 +184,13 @@ class PriceList extends Component
         'title_toast' =>  toastTitle('fallida'),
         'descr_toast' =>  'error: ' . $e->getMessage() . ' contacte al Administrador',
       ]);
-
     }
   }
 
   /**
    * renderizar vista
    * @return View
-  */
+   */
   public function render(): View
   {
     $provisions_with_price = $this->searchSupplierProvisions();

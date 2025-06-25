@@ -15,9 +15,11 @@ class ListUsers extends Component
 
   // variable necesaria para la busqueda
   protected $EXTERNAL_ROLE;
+  protected $RESTRICTED_ROLE;
 
   #[Url]
   public $search = '';
+
   #[Url]
   public $role = '';
 
@@ -28,8 +30,8 @@ class ListUsers extends Component
   public function mount(UserService $user_service)
   {
     // recuperar roles para el filtrado en la busqueda
-    $this->role_names = Role::whereNotIn('name', [$user_service->getExternalRole()])
-      ->pluck('name');
+    $roles_filter = [$user_service->getExternalRole(), $user_service->getRestrictedRole()];
+    $this->role_names = Role::whereNotIn('name', $roles_filter)->pluck('name');
   }
 
   //* eliminar un usuario
@@ -47,36 +49,8 @@ class ListUsers extends Component
       return; // detener borrado
     }
 
-    // un usuario proveedor no puede eliminarse si tiene un proveedor asociado
-    if ($user_service->isSupplierUserWithSupplier($user)) {
-
-      $this->dispatch('toast-event', toast_data: [
-        'event_type'  => 'info',
-        'title_toast' => toastTitle('', true),
-        'descr_toast' => 'No puede eliminar el usuario proveedor: ' . $user->name . ', esta asociado a un proveedor existente'
-      ]);
-
-      return; // detener borrado
-    }
-
-    // un usuario cliente no puede eliminarse
-    // en caso de que por alguna razon se listen clientes
-    if ($user_service->isClientUser($user)) {
-
-      $this->dispatch('toast-event', toast_data: [
-        'event_type'  => 'info',
-        'title_toast' => toastTitle('', true),
-        'descr_toast' => 'No puede eliminar el usuario cliente: ' . $user->name . ', no es un usuario gestionable'
-      ]);
-
-      return; // detener borrado;
-    }
-
     //* eliminar usuario
     try {
-
-      // capturo el rol, en caso de que el borrado falle
-      $user_role = $user->getRolenames()->first();
 
       $user_service->deleteInternalUser($user);
 
@@ -85,18 +59,35 @@ class ListUsers extends Component
         'title_toast' => toastTitle(),
         'descr_toast' => toastSuccessBody('usuario', 'eliminado')
       ]);
-
     } catch (\Exception $e) {
-
-      // devolver rol al usuario
-      $user->assignRole($user_role);
 
       $this->dispatch('toast-event', toast_data: [
         'event_type'  => 'error',
         'title_toast' => toastTitle('fallida'),
         'descr_toast' => 'error: ' . $e->getMessage() . ' Contacte con el Administrador'
       ]);
+    }
+  }
 
+  //* restaurar usuario
+  public function restore(UserService $user_service, $id)
+  {
+    try {
+
+      $user_service->restoreInternalUser($id);
+
+      $this->dispatch('toast-event', toast_data: [
+        'event_type'  => 'success',
+        'title_toast' => toastTitle(),
+        'descr_toast' => toastSuccessBody('usuario', 'restaurado')
+      ]);
+    } catch (\Exception $e) {
+
+      $this->dispatch('toast-event', toast_data: [
+        'event_type'  => 'error',
+        'title_toast' => toastTitle('fallida'),
+        'descr_toast' => 'error: ' . $e->getMessage() . ' Contacte con el Administrador'
+      ]);
     }
   }
 
@@ -126,24 +117,27 @@ class ListUsers extends Component
    */
   public function searchUsers()
   {
-    return User::when($this->search, function ($query) {
-            $query->where('id', 'like', '%'.$this->search.'%')
-                  ->orWhere('name', 'like', '%'.$this->search.'%')
-                  ->orWhere('email', 'like', '%'.$this->search.'%');
-          })
-          ->when($this->role, function ($query) {
-            $query->role($this->role);
-          }, function ($query) {
-            $query->withoutRole($this->EXTERNAL_ROLE);
-          })
-          ->orderBy('id', 'desc')
-          ->paginate(10);
+    return User::withTrashed()
+      ->when($this->search, function ($query) {
+        $query->where('id', 'like', '%' . $this->search . '%')
+          ->orWhere('name', 'like', '%' . $this->search . '%')
+          ->orWhere('email', 'like', '%' . $this->search . '%');
+      })
+      ->when($this->role, function ($query) {
+        $query->role($this->role);
+      }, function ($query) {
+        $query->withoutRole([$this->EXTERNAL_ROLE, $this->RESTRICTED_ROLE]);
+      })
+      ->orderBy('deleted_at')
+      ->orderBy('id', 'desc')
+      ->paginate(10);
   }
 
   public function render(UserService $user_service)
   {
     // rol externo, necesario por que condiciona la busqueda
     $this->EXTERNAL_ROLE = $user_service->getExternalRole();
+    $this->RESTRICTED_ROLE = $user_service->getRestrictedRole();
 
     $users = $this->searchUsers();
 

@@ -2,17 +2,17 @@
 
 namespace App\Models;
 
+use App\Models\Profile;
+use App\Models\Supplier;
+use Illuminate\Notifications\Notifiable;
+use OwenIt\Auditing\Contracts\Auditable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles; // paquete de roles y permisos
-use App\Models\Profile;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use OwenIt\Auditing\Contracts\Auditable;
-use App\Models\Supplier;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable implements MustVerifyEmail, Auditable
 {

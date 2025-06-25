@@ -40,7 +40,7 @@
               wire:model.live="search_input"
               name="search"
               placeholder="ingrese razon social, telefono o CUIT ..."
-              class="w-1/4 shrink text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+              class="w-1/4 p-1 text-sm border shrink border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
             />
           </div>
 
@@ -53,7 +53,7 @@
         <x-table-base>
           <x-slot:tablehead>
             <tr class="border bg-neutral-100">
-              <x-table-th class="text-end w-12">id</x-table-th>
+              <x-table-th class="w-12 text-end">id</x-table-th>
               <x-table-th class="text-start">razón social</x-table-th>
               <x-table-th class="text-end">cuit</x-table-th>
               <x-table-th class="text-end">teléfono</x-table-th>
@@ -118,22 +118,36 @@
                       >ver
                     </x-a-button>
 
-                    <x-a-button
-                      wire:navigate
-                      href="{{ route('suppliers-suppliers-edit', $supplier->id) }}"
-                      bg_color="neutral-100"
-                      border_color="neutral-200"
-                      text_color="neutral-600"
-                      >editar
-                    </x-a-button>
+                    @if ($supplier->deleted_at !== null)
+                      <x-a-button
+                        href="#"
+                        bg_color="neutral-100"
+                        border_color="neutral-200"
+                        text_color="neutral-600"
+                        wire:click="restore({{ $supplier->id }})"
+                        wire:confirm="¿desea restaurar el proveedor?"
+                        >restaurar
+                      </x-a-button>
+                    @else
+                      <x-a-button
+                        wire:navigate
+                        href="{{ route('suppliers-suppliers-edit', $supplier->id) }}"
+                        bg_color="neutral-100"
+                        border_color="neutral-200"
+                        text_color="neutral-600"
+                        >editar
+                      </x-a-button>
 
-                    <x-btn-button
-                      btn_type="button"
-                      color="red"
-                      wire:click="delete({{ $supplier->id }})"
-                      wire:confirm="¿desea borrar el registro? esta accion es irreversible, se eliminara el proveedor y sus credenciales de acceso. Si no desea trabajar con un proveedor registrado, puede editarlo para desactivarlo."
-                      >eliminar
-                    </x-btn-button>
+                      <x-btn-button
+                        btn_type="button"
+                        color="red"
+                        wire:click="delete({{ $supplier->id }})"
+                        wire:confirm="¿desea borrar el proveedor?. Si no desea trabajar con un proveedor registrado, puede editarlo para desactivarlo. Los provedores eliminados no serán contactados para presupuestos y pre orenes de compra"
+                        >eliminar
+                      </x-btn-button>
+                    @endif
+
+
 
                   </div>
                 </x-table-td>

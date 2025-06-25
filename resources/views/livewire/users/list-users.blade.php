@@ -19,9 +19,9 @@
 
       <x-slot:header>
         {{-- formulario de busqueda --}}
-        <div class="w-full flex justify-start gap-1 items-end">
+        <div class="flex items-end justify-start w-full gap-1">
           {{-- termino de busqueda --}}
-          <div class="flex flex-col gap-1 w-1/4">
+          <div class="flex flex-col w-1/4 gap-1">
             <label>Buscar usuario</label>
             <input
               type="text"
@@ -29,18 +29,18 @@
               wire:model.live="search"
               wire:click="resetPagination()"
               placeholder="ingrese un id, o termino de busqueda"
-              class="text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+              class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
             />
           </div>
           {{-- roles --}}
-          <div class="flex flex-col gap-1 w-1/4">
+          <div class="flex flex-col w-1/4 gap-1">
             <label>Filtrar por rol</label>
             <select
               wire:model.live="role"
               wire:click="resetPagination()"
               name="role"
               id="role"
-              class="text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+              class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
               >
               <option value="" selected>seleccione ...</option>
               @forelse ($role_names as $role_name)
@@ -67,12 +67,12 @@
         <x-table-base>
           <x-slot:tablehead>
             <tr class="border bg-neutral-100">
-              <x-table-th class="text-end w-12">id</x-table-th>
+              <x-table-th class="w-12 text-end">id</x-table-th>
               <x-table-th class="text-start">nombre de usuario</x-table-th>
               <x-table-th class="text-start">correo</x-table-th>
               <x-table-th class="text-start">rol</x-table-th>
               <x-table-th class="text-end">fecha de creación</x-table-th>
-              <x-table-th class="text-start w-48">acciones</x-table-th>
+              <x-table-th class="w-48 text-start">acciones</x-table-th>
             </tr>
           </x-slot:tablehead>
           <x-slot:tablebody>
@@ -88,32 +88,44 @@
                   {{ $user->email }}
                 </x-table-td>
                 <x-table-td class="text-start">
-                  {{ $user->getRoleNames()->first() }}
+                  @if ($user->getRoleNames()->first() !== null)
+                    {{ $user->getRoleNames()->first() }}
+                  @else
+                    sin rol
+                  @endif
                 </x-table-td>
                 <x-table-td class="text-end">
                   {{ formatDateTime($user->created_at, 'd-m-Y') }}
                 </x-table-td>
                 <x-table-td class="text-start">
-                  <div class="w-full inline-flex gap-1 justify-start items-center">
-
-                    <x-a-button
-                      wire:navigate
-                      href="{{ route('users-users-edit', $user->id) }}"
-                      bg_color="neutral-100"
-                      border_color="neutral-200"
-                      text_color="neutral-600"
-                      >editar
-                    </x-a-button>
-
-                    <x-btn-button
-                      type="button"
-                      wire:navigate
-                      wire:click="delete({{$user->id}})"
-                      wire:confirm="¿Desea borrar el registro?"
-                      color="red"
-                      >eliminar
-                    </x-btn-button>
-
+                  <div class="inline-flex items-center justify-start w-full gap-1">
+                    @if ($user->deleted_at === null)
+                      <x-a-button
+                        wire:navigate
+                        href="{{ route('users-users-edit', $user->id) }}"
+                        bg_color="neutral-100"
+                        border_color="neutral-200"
+                        text_color="neutral-600"
+                        >editar
+                      </x-a-button>
+                      <x-btn-button
+                        type="button"
+                        wire:navigate
+                        wire:click="delete({{$user->id}})"
+                        wire:confirm="¿Desea borrar el registro?"
+                        color="red"
+                        >eliminar
+                      </x-btn-button>
+                    @else
+                      <x-a-button
+                        href="#"
+                        wire:click='restore({{ $user->id }})'
+                        bg_color="neutral-100"
+                        border_color="neutral-200"
+                        text_color="neutral-600"
+                        >restaurar
+                      </x-a-button>
+                    @endif
                   </div>
                 </x-table-td>
             </tr>

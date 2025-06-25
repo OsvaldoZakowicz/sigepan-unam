@@ -5,8 +5,9 @@ namespace App\Services\Supplier;
 use App\Models\User;
 use App\Models\Address;
 use App\Models\Supplier;
-use App\Models\ProvisionTrademark;
 use App\Models\ProvisionType;
+use InvalidArgumentException;
+use App\Models\ProvisionTrademark;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -41,7 +42,7 @@ class SupplierService
    * @param Array $supplier_data
    * @return Supplier $supplier
    */
-  public function createSupplier(User $supplier_user, Array $supplier_data): Supplier
+  public function createSupplier(User $supplier_user, array $supplier_data): Supplier
   {
     $supplier_address = Address::create([
       'street'      => $supplier_data['company_street'],
@@ -75,7 +76,7 @@ class SupplierService
    * @param Array $supplier_data
    * @return Supplier $supplier actualizado
    */
-  public function editSupplier(User $supplier_user, Supplier $supplier, Array $supplier_data): Supplier
+  public function editSupplier(User $supplier_user, Supplier $supplier, array $supplier_data): Supplier
   {
     // direccion
     $address = $supplier->address;
@@ -104,27 +105,51 @@ class SupplierService
 
 
   /**
-   * servicio: eliminar provedor
-   * NOTA: elimina el usuario y direccion asociados
+   * Eliminar proveedor
+   * NOTA: elimina el usuario y dirección asociados
    * @param Supplier $supplier
    * @return void
    */
   public function deleteSupplier(Supplier $supplier): void
   {
-    $supplier_user = $supplier->user;
-    $supplier_address = $supplier->address;
+    DB::transaction(function () use ($supplier) {
+      // 1. primero eliminar supplier (tiene las FK)
+      $supplier->status_is_active = false;
+      $supplier->status_description = 'Proveedor inactivo';
+      $supplier->save();
+      $supplier->delete();
 
-    $supplier->delete();
+      // 2. luego eliminar las entidades referenciadas
+      $supplier->user?->delete();
+      $supplier->address?->delete();
+    });
+  }
 
-    if ($supplier_user) {
-      $supplier_user->delete();
+  /**
+   * Restaurar proveedor
+   * NOTA: restaura el usuario y dirección asociados
+   * @param Supplier $supplier_id
+   * @return void
+   */
+  public function restoreSupplier(int $supplier_id): void
+  {
+    $supplier = Supplier::withTrashed()->findOrFail($supplier_id);
+
+    if (!$supplier->trashed()) {
+      throw new InvalidArgumentException('El proveedor no está eliminado');
     }
 
-    if ($supplier_address) {
-      $supplier_address->delete();
-    }
+    DB::transaction(function () use ($supplier) {
+      // restaurar dependencias usando los IDs directamente
+      User::withTrashed()->where('id', $supplier->user_id)->restore();
+      Address::withTrashed()->where('id', $supplier->address_id)->restore();
 
-    return;
+      $supplier->restore();
+      $supplier = $supplier->refresh();
+      $supplier->status_is_active = true;
+      $supplier->status_description = 'Proveedor activo';
+      $supplier->save();
+    });
   }
 
   /**
@@ -145,5 +170,4 @@ class SupplierService
   {
     return ProvisionType::all();
   }
-
 }

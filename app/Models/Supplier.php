@@ -2,20 +2,28 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use OwenIt\Auditing\Contracts\Auditable;
 use App\Models\User;
 use App\Models\Address;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Model;
+use OwenIt\Auditing\Contracts\Auditable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Supplier extends Model implements Auditable
 {
   use HasFactory;
   // paquete de auditoria
   use \OwenIt\Auditing\Auditable;
+
+  use SoftDeletes;
+
+  /**
+   * NOTAS:
+   * - Proveedor no tiene acceso al formulario para completar perfil.
+   */
 
   protected $fillable = [
     'company_name',

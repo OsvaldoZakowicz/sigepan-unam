@@ -24,7 +24,7 @@ class ListSuppliers extends Component
    * montar datos
    * @param SupplierService $supplier_service servicio para proveedores.
    * @return void.
-  */
+   */
   public function mount(SupplierService $supplier_service): void
   {
     $this->iva_conditions = $supplier_service->getSuppilerIvaConditions();
@@ -35,7 +35,7 @@ class ListSuppliers extends Component
    * @param SupplierService $supplier_service servicio para proveedores.
    * @param Supplier $supplier proveedor
    * @return void
-  */
+   */
   public function delete(SupplierService $supplier_service, Supplier $supplier): void
   {
     // Verificar si tiene suministros o packs asociados
@@ -85,34 +85,73 @@ class ListSuppliers extends Component
     }
 
     // eliminar proveedor
-    $supplier_service->deleteSupplier($supplier);
+    try {
+      $supplier_service->deleteSupplier($supplier);
 
-    $this->dispatch('toast-event', toast_data: [
-      'event_type'  => 'success',
-      'title_toast' => toastTitle(),
-      'descr_toast' => toastSuccessBody('proveedor', 'eliminado')
-    ]);
+      $this->dispatch('toast-event', toast_data: [
+        'event_type'  => 'success',
+        'title_toast' => toastTitle(),
+        'descr_toast' => toastSuccessBody('proveedor', 'eliminado')
+      ]);
+    } catch (\Exception $e) {
+
+      $this->dispatch('toast-event', toast_data: [
+        'event_type'  => 'error',
+        'title_toast' => toastTitle('fallida'),
+        'descr_toast' => 'Error: ' . $e->getMessage() . ', contacte al Administrador.'
+      ]);
+    }
+  }
+
+  /**
+   * restaurar un proveedor
+   * @param SupplierService $supplier_service servicio para proveedores.
+   * @param int $id supplier
+   * @return void
+   */
+  public function restore(SupplierService $supplier_service, $id): void
+  {
+    try {
+      $supplier_service->restoreSupplier($id);
+
+      $this->dispatch('toast-event', toast_data: [
+        'event_type'  => 'success',
+        'title_toast' => toastTitle(),
+        'descr_toast' => toastSuccessBody('proveedor', 'restaurado')
+      ]);
+    } catch (\Exception $e) {
+
+      $this->dispatch('toast-event', toast_data: [
+        'event_type'  => 'error',
+        'title_toast' => toastTitle('fallida'),
+        'descr_toast' => 'Error: ' . $e->getMessage() . ', contacte al Administrador.'
+      ]);
+    }
   }
 
   /**
    * buscar proveedores
-  */
+   */
   public function searchSuppliers()
   {
-    return Supplier::when($this->search_input,
+    return Supplier::withTrashed()
+      ->when(
+        $this->search_input,
         function ($query) {
           $query->where('company_name', 'like', '%' . $this->search_input . '%')
-                ->orWhere('company_cuit', 'like', '%' . $this->search_input . '%')
-                ->orWhere('phone_number', 'like', '%' . $this->search_input . '%');
+            ->orWhere('company_cuit', 'like', '%' . $this->search_input . '%')
+            ->orWhere('phone_number', 'like', '%' . $this->search_input . '%');
         }
-      )->orderBy('id', 'desc')
+      )
+      ->orderBy('deleted_at')
+      ->orderBy('id', 'desc')
       ->paginate('10');
   }
 
   /**
    * renderizar vista
    * @return view
-  */
+   */
   public function render(): View
   {
     $suppliers = $this->searchSuppliers();

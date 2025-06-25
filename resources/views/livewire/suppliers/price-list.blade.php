@@ -31,20 +31,22 @@
           >volver a proveedores
         </x-a-button>
 
-        <x-a-button
-          wire:navigate
-          href="{{ route('suppliers-suppliers-price-edit', $supplier->id) }}"
-          bg_color="neutral-100"
-          border_color="neutral-300"
-          text_color="neutral-600"
-          >editar precios
-        </x-a-button>
+        @if ($supplier->deleted_at === null)
+          <x-a-button
+            wire:navigate
+            href="{{ route('suppliers-suppliers-price-edit', $supplier->id) }}"
+            bg_color="neutral-100"
+            border_color="neutral-300"
+            text_color="neutral-600"
+            >editar precios
+          </x-a-button>
 
-        <x-a-button
-          wire:navigate
-          href="{{ route('suppliers-suppliers-price-create', $supplier->id) }}"
-          >agregar precios
-        </x-a-button>
+          <x-a-button
+            wire:navigate
+            href="{{ route('suppliers-suppliers-price-create', $supplier->id) }}"
+            >agregar precios
+          </x-a-button>
+        @endif
 
       </div>
     </x-title-section>
@@ -55,7 +57,7 @@
       <x-slot:header>
 
         {{-- busqueda --}}
-        <div class="w-full flex justify-start items-end gap-1">
+        <div class="flex items-end justify-start w-full gap-1">
 
           {{-- termino de busqueda --}}
           <div class="flex flex-col w-1/4">
@@ -73,7 +75,7 @@
               wire:model.live="search"
               wire:click="resetPagination"
               placeholder="ingrese un id, o termino de busqueda"
-              class="text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+              class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
             />
           </div>
 
@@ -85,7 +87,7 @@
               id="trademark_filter"
               wire:model.live="trademark_filter"
               wire:click="resetPagination"
-              class="text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
+              class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
 
               <option value="">seleccione una marca ...</option>
 
@@ -106,7 +108,7 @@
               id="type_filter"
               wire:model.live="type_filter"
               wire:click="resetPagination"
-              class="text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
+              class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
 
               <option value="">seleccione un tipo ...</option>
 
@@ -121,7 +123,7 @@
 
           {{-- cambiar a lista de precios de packs --}}
           <div class="self-end justify-self-end">
-            <div class="inline-flex items-center gap-1 p-1 border border-neutral-200 bg-neutral-100 rounded-md cursor-pointer">
+            <div class="inline-flex items-center gap-1 p-1 border rounded-md cursor-pointer border-neutral-200 bg-neutral-100">
               <label for="toggle">precios de packs</label>
               <input type="checkbox" wire:click="toggleSearch" name="toggle" id="toggle" class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
             </div>
@@ -141,11 +143,11 @@
 
       </x-slot:header>
 
-      <x-slot:content class="w-full flex-col">
+      <x-slot:content class="flex-col w-full">
         <x-table-base>
           <x-slot:tablehead>
             <tr class="border bg-neutral-100">
-              <x-table-th class="text-end w-12">id</x-table-th>
+              <x-table-th class="w-12 text-end">id</x-table-th>
               <x-table-th class="text-start">nombre</x-table-th>
               <x-table-th class="text-start">marca</x-table-th>
               <x-table-th class="text-start">tipo</x-table-th>
@@ -154,7 +156,7 @@
                 <x-quest-icon title="kilogramos (kg), gramos (g), litros (l), mililitros (ml), metro (m), centimetro (cm), unidad (u)"/>
               </x-table-th>
               <x-table-th class="text-end">$precio</x-table-th>
-              <x-table-th class="text-start w-48">acciones</x-table-th>
+              <x-table-th class="w-48 text-start">acciones</x-table-th>
             </tr>
           </x-slot:tablehead>
           <x-slot:tablebody>

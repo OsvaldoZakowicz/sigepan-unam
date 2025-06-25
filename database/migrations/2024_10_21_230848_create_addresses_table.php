@@ -18,6 +18,7 @@ return new class extends Migration
       $table->string('postal_code', 4);
       $table->string('city', 90);
       $table->timestamps();
+      $table->softDeletes();
     });
   }
 

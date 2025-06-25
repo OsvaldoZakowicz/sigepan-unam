@@ -2,18 +2,21 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use App\Models\Profile;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use OwenIt\Auditing\Contracts\Auditable;
 use App\Models\Supplier;
+use Illuminate\Database\Eloquent\Model;
+use OwenIt\Auditing\Contracts\Auditable;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Address extends Model implements Auditable
 {
   use HasFactory;
   // paquete de auditoria
   use \OwenIt\Auditing\Auditable;
+
+  use SoftDeletes;
 
   protected $fillable = [
     'street',
@@ -36,5 +39,4 @@ class Address extends Model implements Auditable
   {
     return $this->hasOne(Supplier::class);
   }
-
 }

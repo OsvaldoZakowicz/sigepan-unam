@@ -2,19 +2,22 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use OwenIt\Auditing\Contracts\Auditable;
 use App\Models\User;
 use App\Models\Gender;
 use App\Models\Address;
+use Illuminate\Database\Eloquent\Model;
+use OwenIt\Auditing\Contracts\Auditable;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Profile extends Model implements Auditable
 {
   use HasFactory;
   // paquete de auditoria
   use \OwenIt\Auditing\Auditable;
+
+  use SoftDeletes;
 
   protected $fillable = [
     'first_name',
@@ -48,5 +51,4 @@ class Profile extends Model implements Auditable
   {
     return $this->belongsTo(Address::class);
   }
-
 }

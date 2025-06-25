@@ -3,6 +3,8 @@
 namespace App\Services\User;
 
 use App\Models\User;
+use App\Models\Address;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 class UserService
@@ -35,7 +37,7 @@ class UserService
    * NOTA: el array debe recibir pares key => value validados
    * NOTA: el nombre de las 'key' depende de la implementacion de los nombres en inputs
    */
-  public function createInternalUser(Array $internal_user_data): User
+  public function createInternalUser(array $internal_user_data): User
   {
     $user = User::create([
       'name' => $internal_user_data['user_name'],
@@ -90,27 +92,51 @@ class UserService
   }
 
   /**
-   * * servicio: borrar un usuario interno
-   * NOTA: si el borrado falla, el usuario existira sin roles
-   * controlar esto en un try catch.
+   * borrar usuario interno
+   * @param User $user
+   * @return void
    */
-  public function deleteInternalUser(User $user)
+  public function deleteInternalUser(User $user): void
   {
-    //* se quitan sus roles
-    // para ello sincronizo con array vacio
-    $user->syncRoles([]);
+    DB::transaction(function () use ($user) {
+      // Quitar roles y permisos
+      $user->syncRoles([]);
+      $user->syncPermissions([]);
 
-    //* se quitan sus permisos directos, si tuviere
-    // para ello sincronizo con un array vacio
-    $user->syncPermissions([]);
+      // Orden: Profile primero (tiene las FK), luego las referenciadas
+      $user->profile?->delete();
+      $user->profile?->address?->delete();
+      $user->delete();
+    });
+  }
 
-    return $user->delete();
+  /**
+   * restaurar usuario interno
+   * @param int $id
+   * @return void
+   */
+  public function restoreInternalUser(int $id): void
+  {
+    $user = User::withTrashed()->findOrFail($id);
+
+    DB::transaction(function () use ($user) {
+      // Cargar profile con withTrashed para acceder a datos soft deleted
+      $profile = $user->profile()->withTrashed()->first();
+
+      // Orden: Primero las referenciadas, luego las que tienen FK
+      if ($profile && $profile->address_id) {
+        Address::withTrashed()->find($profile->address_id)?->restore();
+      }
+
+      $user->restore();
+      $profile?->restore();
+    });
   }
 
   /**
    * * servicio: editar usuario interno
    */
-  public function editInternalUser(User $user, Array $internal_user_data): User
+  public function editInternalUser(User $user, array $internal_user_data): User
   {
     $user->name = $internal_user_data['user_name'];
     $user->email = $internal_user_data['user_email'];
@@ -124,7 +150,7 @@ class UserService
   /**
    * * servicio: editar usuario interno y solo cambiar el rol
    */
-  public function editRoleInternalUser(User $user, Array $internal_user_data): User
+  public function editRoleInternalUser(User $user, array $internal_user_data): User
   {
     $user->syncRoles($internal_user_data['user_role']);
 
