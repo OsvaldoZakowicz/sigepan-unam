@@ -17,6 +17,7 @@ use App\Http\Controllers\Stats\StatsController;
 //* layout publico
 // retorna la vista tienda publica
 Route::get('store', [StoreController::class, 'store_index'])
+  ->middleware('restrict.non.clients')
   ->name('store-store-index');
 
 //* modulo de clientes
