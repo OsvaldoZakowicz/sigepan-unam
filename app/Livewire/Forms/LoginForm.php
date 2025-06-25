@@ -37,16 +37,31 @@ class LoginForm extends Form
 
     $this->ensureIsNotRateLimited();
 
-    // Primero verificar si existe un usuario eliminado con este email
+    // primero verificar si existe un usuario eliminado con este email
     $deletedUser = $this->userAccountService->canRestoreUser($this->email);
 
     if ($deletedUser && Hash::check($this->password, $deletedUser->password)) {
-      // Usuario eliminado con credenciales correctas
-      return [
-        'type' => 'deleted_user',
-        'user' => $deletedUser,
-        'message' => 'Tu cuenta fue eliminada. ¿Deseas recuperarla?'
-      ];
+
+      // segundo: debe ser cliente
+      $isClient = $this->userAccountService->isClient($deletedUser->id);
+
+      if ($isClient) {
+
+        // usuario cliente eliminado con credenciales correctas
+        return [
+          'type' => 'deleted_user',
+          'user' => $deletedUser,
+          'message' => 'Tu cuenta fue eliminada. ¿Deseas recuperarla?'
+        ];
+      } else {
+
+        // usuario eliminado
+        return [
+          'type' => 'deleted_user_alt',
+          'user' => $deletedUser,
+          'message' => 'Tu cuenta fue eliminada por un administrador.'
+        ];
+      }
     }
 
     if (!Auth::attempt($this->only(['email', 'password']), $this->remember)) {

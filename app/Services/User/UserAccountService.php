@@ -3,6 +3,7 @@
 namespace App\Services\User;
 
 use App\Models\User;
+use App\Models\Address;
 use App\Models\Profile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -52,8 +53,17 @@ class UserAccountService
 
     return DB::transaction(function () use ($user) {
       try {
-        // restaurar el usuario
+        
+        // Cargar profile con withTrashed para acceder a datos soft deleted
+        $profile = $user->profile()->withTrashed()->first();
+
+        // Orden: Primero las referenciadas, luego las que tienen FK
+        if ($profile && $profile->address_id) {
+          Address::withTrashed()->find($profile->address_id)?->restore();
+        }
+
         $user->restore();
+        $profile?->restore();
 
         Log::info("Usuario restaurado exitosamente", ['user_id' => $user->id]);
 
@@ -77,5 +87,17 @@ class UserAccountService
       ->where('email', $email)
       ->whereNotNull('deleted_at')
       ->first();
+  }
+
+  /**
+   * verificar si el usuario a restaurar tiene rol cliente
+   */
+  public function isClient(int $id): bool
+  {
+    $user = User::withTrashed()->find($id);
+
+    return $user->roles()
+      ->where('name', 'cliente')
+      ->exists();
   }
 }

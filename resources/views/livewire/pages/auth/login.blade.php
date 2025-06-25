@@ -8,9 +8,11 @@ use Livewire\Volt\Component;
 new #[Layout('layouts.guest')] class extends Component {
     
   public LoginForm $form;
+  
   public bool $showRestorePrompt = false;
+  public bool $showInfoPrompt = false;
   public $deletedUser = null;
-  public string $restoreMessage = '';
+  public string $message = '';
 
   /**
    * Handle an incoming authentication request.
@@ -26,7 +28,15 @@ new #[Layout('layouts.guest')] class extends Component {
         // mostrar prompt de recuperación
         $this->showRestorePrompt = true;
         $this->deletedUser = $result['user'];
-        $this->restoreMessage = $result['message'];
+        $this->message = $result['message'];
+        return;
+      }
+
+      if ($result['type'] === 'deleted_user_alt') {
+        // mostrar prompt de recuperación
+        $this->showInfoPrompt = true;
+        $this->deletedUser = $result['user'];
+        $this->message = $result['message'];
         return;
       }
 
@@ -71,12 +81,25 @@ new #[Layout('layouts.guest')] class extends Component {
   {
     $this->showRestorePrompt = false;
     $this->deletedUser = null;
-    $this->restoreMessage = '';
+    $this->message = '';
     
     // limpiar el formulario
     $this->form->reset();
   }
 
+  /** 
+   * cerrar prompt de informacion 
+  */
+  public function closePrompt(): void
+  {
+    $this->showInfoPrompt = false;
+    $this->deletedUser = null;
+    $this->message = '';
+    
+    // limpiar el formulario
+    $this->form->reset();
+  }
+  
   /**
    * Manejar login exitoso
    */
@@ -86,10 +109,12 @@ new #[Layout('layouts.guest')] class extends Component {
 
     if (auth()->user()->hasRole('cliente')) {
       // clientes van a la tienda
-      $this->redirectIntended(default: route('store-store-index', absolute: false), navigate: true);
+      $this->redirectIntended(
+        default: route('store-store-index', absolute: false), navigate: true);
     } else {
       // otros roles van al panel
-      $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
+      $this->redirectIntended(
+        default: route('dashboard', absolute: false), navigate: true);
     }
   }
 
@@ -106,7 +131,7 @@ new #[Layout('layouts.guest')] class extends Component {
       </div>
     @endif
 
-    @if(!$showRestorePrompt)
+    @if(!$showRestorePrompt && !$showInfoPrompt)
       <!-- Formulario de Login Normal -->
       <form wire:submit="login" class="rounded-sm">
         <!-- Email Address -->
@@ -153,22 +178,16 @@ new #[Layout('layouts.guest')] class extends Component {
           </button>
         </div>
       </form>
-    @else
+    @elseif ($showRestorePrompt)
       <!-- Prompt de Recuperación de Cuenta -->
       <div class="p-4 border border-yellow-200 rounded-md bg-yellow-50">
         <div class="flex">
-          <div class="flex-shrink-0">
-            <svg class="w-5 h-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-            </svg>
-          </div>
           <div class="ml-3">
             <h3 class="text-sm font-medium text-yellow-800">
               Cuenta Eliminada Encontrada
             </h3>
             <div class="mt-2 text-sm text-yellow-700">
-              <p>{{ $restoreMessage }}</p>
-              <p class="mt-1">Nota: Deberás completar tu perfil nuevamente.</p>
+              <p>{{ $message }}</p>
             </div>
               
             <x-input-error :messages="$errors->get('restore')" class="mt-2" />
@@ -182,6 +201,28 @@ new #[Layout('layouts.guest')] class extends Component {
               <button wire:click="cancelRestore" type="button"
                 class="box-border flex items-center justify-center h-6 p-1 my-1 text-xs text-center uppercase border border-solid rounded w-fit border-neutral-600 bg-neutral-600 text-neutral-100">
                 Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    @else
+      {{-- prompt info --}}
+      <div class="p-4 border border-blue-200 rounded-md bg-blue-50">
+        <div class="flex">
+          <div class="ml-3">
+            <h3 class="text-sm font-medium text-blue-800">
+              Cuenta Eliminada Encontrada
+            </h3>
+            <div class="mt-2 text-sm text-blue-700">
+              <p>{{ $message }}</p>
+              <p>Si esto es un error, contáctanos.</p>
+              <span>{{ \App\Models\DatoNegocio::obtenerValor('email') ?? '' }}</span>
+            </div>
+            <div class="flex gap-3 mt-4">
+              <button wire:click="closePrompt" type="button"
+                class="box-border flex items-center justify-center h-6 p-1 my-1 text-xs text-center uppercase border border-solid rounded w-fit border-neutral-600 bg-neutral-600 text-neutral-100">
+                aceptar
               </button>
             </div>
           </div>
