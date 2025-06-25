@@ -16,6 +16,7 @@ class ListUsers extends Component
   // variable necesaria para la busqueda
   protected $EXTERNAL_ROLE;
   protected $RESTRICTED_ROLE;
+  protected $ADMIN_ROLE = 'administrador';
 
   #[Url]
   public $search = '';
@@ -30,7 +31,11 @@ class ListUsers extends Component
   public function mount(UserService $user_service)
   {
     // recuperar roles para el filtrado en la busqueda
-    $roles_filter = [$user_service->getExternalRole(), $user_service->getRestrictedRole()];
+    $roles_filter = [
+      $user_service->getExternalRole(),
+      $user_service->getRestrictedRole(),
+      $this->ADMIN_ROLE,
+    ];
     $this->role_names = Role::whereNotIn('name', $roles_filter)->pluck('name');
   }
 
@@ -126,7 +131,7 @@ class ListUsers extends Component
       ->when($this->role, function ($query) {
         $query->role($this->role);
       }, function ($query) {
-        $query->withoutRole([$this->EXTERNAL_ROLE, $this->RESTRICTED_ROLE]);
+        $query->withoutRole([$this->EXTERNAL_ROLE, $this->RESTRICTED_ROLE, $this->ADMIN_ROLE]);
       })
       ->orderBy('deleted_at')
       ->orderBy('id', 'desc')

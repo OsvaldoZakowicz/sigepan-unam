@@ -3,8 +3,10 @@
 namespace App\Livewire\Users;
 
 use Livewire\Component;
-use Spatie\Permission\Models\Role;
+use App\Jobs\SendEmailJob;
 use App\Services\User\UserService;
+use Spatie\Permission\Models\Role;
+use App\Mail\InternalUserRegistered;
 
 class CreateUser extends Component
 {
@@ -41,24 +43,24 @@ class CreateUser extends Component
 
     try {
 
-      $validated += ['user_password' => randomPassword()];
-      $user_service->createInternalUser($validated);
+      $random_password = randomPassword();
+      $validated += ['user_password' => $random_password];
+      $user = $user_service->createInternalUser($validated);
 
-      //todo: si la creacion es correcta:
-      // - enviar acceso via email al nuevo usuario
+      SendEmailJob::dispatch(
+        $user->email,
+        new InternalUserRegistered($user, $random_password)
+      );
 
       $this->reset();
 
       session()->flash('operation-success', toastSuccessBody('usuario', 'creado'));
       $this->redirectRoute('users-users-index');
-
     } catch (\Exception $e) {
 
       session()->flash('operation-error', 'error: ' . $e->getMessage() . ', contacte con el Administrador');
       $this->redirectRoute('users-users-index');
-
     }
-
   }
 
   public function render()
