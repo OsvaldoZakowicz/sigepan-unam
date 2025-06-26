@@ -73,13 +73,28 @@
         <x-table-base>
           <x-slot:tablehead>
             <tr class="border bg-neutral-100">
-              <x-table-th class="w-12 text-end">id</x-table-th>
-              <x-table-th class="text-start">codigo de periodo</x-table-th>
-              <x-table-th class="text-end">fecha de inicio</x-table-th>
-              <x-table-th class="text-end">fecha de cierre</x-table-th>
-              <x-table-th class="text-start">estado</x-table-th>
-              <x-table-th class="text-end">fecha de creación</x-table-th>
-              <x-table-th class="w-48 text-start">acciones</x-table-th>
+              <x-table-th class="w-12 text-end">
+                id
+              </x-table-th>
+              <x-table-th class="text-start">
+                codigo de periodo
+              </x-table-th>
+              <x-table-th class="text-end">
+                fecha de inicio
+              </x-table-th>
+              <x-table-th class="text-end">
+                fecha de cierre
+              </x-table-th>
+              <x-table-th class="text-start">
+                estado
+              </x-table-th>
+              <x-table-th class="text-end">
+                fecha de creación
+              </x-table-th>
+              <x-table-th class="w-48 text-start">
+                acciones
+                <x-quest-icon title="puede editar o eliminar un periodo siempre que su estado sea el de programado."/>
+              </x-table-th>
             </tr>
           </x-slot:tablehead>
           <x-slot:tablebody>
@@ -141,13 +156,15 @@
                       text_color="neutral-600"
                       >ver
                     </x-a-button>
-                    <x-btn-button
-                      btn_type="button"
-                      color="red"
-                      wire:click="delete({{ $period->id }})"
-                      wire:confirm="¿Desea borrar el registro? esta accion es irreversible, solo puede borrar periodos en estado programado"
-                      >eliminar
-                    </x-btn-button>
+                    @if ($period->period_status_id === $scheduled_status_id)
+                      <x-btn-button
+                        btn_type="button"
+                        color="red"
+                        wire:click="delete({{ $period->id }})"
+                        wire:confirm="¿Desea borrar el registro? esta accion es irreversible, solo puede borrar periodos en estado programado."
+                        >eliminar
+                      </x-btn-button>
+                    @endif
                   </div>
                 </x-table-td>
               </tr>
