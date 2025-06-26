@@ -326,8 +326,8 @@ class CreatePreOrderPeriod extends Component
       //$preorder_period->period_start_at formato string 'Y-m-d'
       if (Carbon::parse($preorder_period->period_start_at)->startOfDay()->eq(Carbon::now()->startOfDay())) {
         Bus::chain([
-          OpenPreOrderPeriodJob::dispatch($preorder_period),
-          NotifySuppliersRequestForPreOrderReceivedJob::dispatch($preorder_period),
+          OpenPreOrderPeriodJob::dispatch($preorder_period->id),
+          NotifySuppliersRequestForPreOrderReceivedJob::dispatch($preorder_period->id),
         ]);
       }
 

@@ -100,8 +100,8 @@ Artisan::command('preorder-periods:open', function (PreOrderPeriodService $preor
     // cada periodo debe abrirse y procesarse
     foreach ($periods_to_open as $preorder_period) {
       Bus::chain([
-        OpenPreOrderPeriodJob::dispatch($preorder_period),
-        NotifySuppliersRequestForPreOrderReceivedJob::dispatch($preorder_period),
+        OpenPreOrderPeriodJob::dispatch($preorder_period->id),
+        NotifySuppliersRequestForPreOrderReceivedJob::dispatch($preorder_period->idate),
       ]);
     }
   }
@@ -133,8 +133,8 @@ Artisan::command('preorder-periods:close', function (PreOrderPeriodService $preo
 
         // cerrar periodo
         Bus::chain([
-          ClosePreOrderPeriodJob::dispatch($preorder_period),
-          NotifySuppliersRequestForPreOrderClosedJob::dispatch($preorder_period),
+          ClosePreOrderPeriodJob::dispatch($preorder_period->id),
+          NotifySuppliersRequestForPreOrderClosedJob::dispatch($preorder_period->id),
         ]);
 
         // notificar del cierre a gerentes

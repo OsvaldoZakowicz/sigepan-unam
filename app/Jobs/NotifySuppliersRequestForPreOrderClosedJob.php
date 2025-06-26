@@ -16,16 +16,22 @@ class NotifySuppliersRequestForPreOrderClosedJob implements ShouldQueue
 
   /**
    * Create a new job instance.
-   * @param PreOrderPeriod $preorder_period
+   * @param int $period_id
    */
-  public function __construct(public PreOrderPeriod $preorder_period) {}
+  public function __construct(public int $period_id) {}
 
   /**
    * Execute the job.
    */
   public function handle(): void
   {
-    $suppliers_to_notify = $this->preorder_period->pre_orders->map(
+    $preorder_period = PreOrderPeriod::find($this->period_id);
+
+    if (!$preorder_period) {
+      return;
+    }
+
+    $suppliers_to_notify = $preorder_period->pre_orders->map(
       function ($pre_order) {
         return [
           'supplier' => $pre_order->supplier,

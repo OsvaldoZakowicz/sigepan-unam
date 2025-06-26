@@ -121,8 +121,8 @@ class ShowPreOrderPeriod extends Component
     $this->preorder_period->save();
 
     Bus::chain([
-      OpenPreOrderPeriodJob::dispatch($this->preorder_period),
-      NotifySuppliersRequestForPreOrderReceivedJob::dispatch($this->preorder_period),
+      OpenPreOrderPeriodJob::dispatch($this->preorder_period->id),
+      NotifySuppliersRequestForPreOrderReceivedJob::dispatch($this->preorder_period->id),
     ]);
   }
 
@@ -149,8 +149,8 @@ class ShowPreOrderPeriod extends Component
     $this->preorder_period->save();
 
     Bus::chain([
-      ClosePreOrderPeriodJob::dispatch($this->preorder_period),
-      NotifySuppliersRequestForPreOrderClosedJob::dispatch($this->preorder_period),
+      ClosePreOrderPeriodJob::dispatch($this->preorder_period->id),
+      NotifySuppliersRequestForPreOrderClosedJob::dispatch($this->preorder_period->id),
     ]);
 
     // notificar del cierre a gerentes

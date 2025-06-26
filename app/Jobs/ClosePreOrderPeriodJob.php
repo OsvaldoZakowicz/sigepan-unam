@@ -17,21 +17,27 @@ class ClosePreOrderPeriodJob implements ShouldQueue
 
   /**
    * Create a new job instance.
-   * @param PreOrderPeriod $period periodo de peticion de pre ordenes
+   * @param int $period_id
    */
-  public function __construct(public PreOrderPeriod $period) {}
+  public function __construct(public int $period_id) {}
 
   /**
    * Execute the job.
    */
   public function handle(PreOrderPeriodService $preorder_period_service): void
   {
+    $preorder_period = PreOrderPeriod::find($this->period_id);
+
+    if (!$preorder_period) {
+      return;
+    }
+
     // el periodo se cierra
-    $this->period->period_status_id = $preorder_period_service->getStatusClosed();
-    $this->period->save();
+    $preorder_period->period_status_id = $preorder_period_service->getStatusClosed();
+    $preorder_period->save();
 
     // las pre ordenes no completadas (es decir, no respondidas) se rechazan
-    $preorders_to_reject = $preorder_period_service->getPreOrdersToReject($this->period);
+    $preorders_to_reject = $preorder_period_service->getPreOrdersToReject($preorder_period);
 
     foreach ($preorders_to_reject as $preorder) {
       $preorder->status = PreOrder::getRejectedStatus();

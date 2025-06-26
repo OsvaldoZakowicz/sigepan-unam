@@ -389,8 +389,8 @@ class EditPreOrderPeriod extends Component
         ->startOfDay()->eq(Carbon::now()->startOfDay())
       ) {
         Bus::chain([
-          OpenPreOrderPeriodJob::dispatch($this->preorder_period),
-          NotifySuppliersRequestForPreOrderReceivedJob::dispatch($this->preorder_period),
+          OpenPreOrderPeriodJob::dispatch($this->preorder_period->id),
+          NotifySuppliersRequestForPreOrderReceivedJob::dispatch($this->preorder_period->id),
         ]);
       }
 
