@@ -205,8 +205,8 @@ class CreateBudgetPeriod extends Component
       //$period->period_start_at formato string 'Y-m-d'
       if (Carbon::parse($period->period_start_at)->startOfDay()->eq(Carbon::now()->startOfDay())) {
         Bus::chain([
-          OpenQuotationPeriodJob::dispatch($period),
-          NotifySuppliersRequestForQuotationReceivedJob::dispatch($period),
+          OpenQuotationPeriodJob::dispatch($period->id),
+          NotifySuppliersRequestForQuotationReceivedJob::dispatch($period->id),
         ]);
       }
 

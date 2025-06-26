@@ -76,8 +76,8 @@ class ShowBudgetPeriod extends Component
     $this->period->save();
 
     Bus::chain([
-      OpenQuotationPeriodJob::dispatch($this->period),
-      NotifySuppliersRequestForQuotationReceivedJob::dispatch($this->period),
+      OpenQuotationPeriodJob::dispatch($this->period->id),
+      NotifySuppliersRequestForQuotationReceivedJob::dispatch($this->period->id),
     ]);
   }
 
@@ -91,9 +91,9 @@ class ShowBudgetPeriod extends Component
     $this->period->save();
 
     Bus::chain([
-      CloseQuotationPeriodJob::dispatch($this->period),
-      UpdateSuppliersPricesJob::dispatch($this->period),
-      NotifySuppliersRequestForQuotationClosedJob::dispatch($this->period),
+      CloseQuotationPeriodJob::dispatch($this->period->id),
+      UpdateSuppliersPricesJob::dispatch($this->period->id),
+      NotifySuppliersRequestForQuotationClosedJob::dispatch($this->period->id),
     ]);
 
     $gerentes_to_notify = User::role('gerente')->get();

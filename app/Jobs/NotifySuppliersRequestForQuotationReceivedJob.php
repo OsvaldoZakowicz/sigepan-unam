@@ -14,24 +14,24 @@ class NotifySuppliersRequestForQuotationReceivedJob implements ShouldQueue
 {
   use Queueable;
 
-  // periodo presupuestario
-  protected RequestForQuotationPeriod $period;
-
   /**
    * Create a new job instance.
-   * @param RequestFromQuotationPriod $period periodo presupuestario
+   * @param int $period_id
    */
-  public function __construct(RequestForQuotationPeriod $period)
-  {
-    $this->period = $period;
-  }
+  public function __construct(public int $period_id) {}
 
   /**
    * Execute the job.
    */
   public function handle(): void
   {
-    $suppliers_to_notify = $this->period->quotations->map(function ($quotation) {
+    $quotation_period = RequestForQuotationPeriod::find($this->period_id);
+
+    if (!$quotation_period) {
+      return;
+    }
+
+    $suppliers_to_notify = $quotation_period->quotations->map(function ($quotation) {
       return [
         'supplier' => $quotation->supplier,
         'quotation' => $quotation

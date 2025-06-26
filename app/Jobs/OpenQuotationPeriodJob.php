@@ -18,10 +18,10 @@ class OpenQuotationPeriodJob implements ShouldQueue
 
   /**
    * crear la instancia del trabajo
-   * @param RequestForQuotationPeriod $period periodo de peticion de presupuestos
+   * @param int $period_id
    * @return void
    */
-  public function __construct(public RequestForQuotationPeriod $period) {}
+  public function __construct(public int $period_id) {}
 
   /**
    * ejecutar el trabajo.
@@ -30,15 +30,21 @@ class OpenQuotationPeriodJob implements ShouldQueue
    */
   public function handle(QuotationPeriodService $quotation_period_service): void
   {
+    $quotation_period = RequestForQuotationPeriod::find($this->period_id);
+
+    if (!$quotation_period) {
+      return;
+    }
+
     // estado: abierto
-    $this->period->period_status_id = $quotation_period_service->getStatusOpen();
-    $this->period->save();
+    $quotation_period->period_status_id = $quotation_period_service->getStatusOpen();
+    $quotation_period->save();
 
     // obtener todos los proveedores
     // con los suministros y/o que pueden proveer, que interesan al periodo
 
     // obtenemos las provisiones del período con sus cantidades
-    $period_provisions = $this->period->provisions()
+    $period_provisions = $quotation_period->provisions()
       ->select('provisions.id')
       ->withPivot('quantity')
       ->get()
@@ -51,7 +57,7 @@ class OpenQuotationPeriodJob implements ShouldQueue
       ->toArray();
 
     // obtenemos los packs del período con sus cantidades
-    $period_packs = $this->period->packs()
+    $period_packs = $quotation_period->packs()
       ->select('packs.id')
       ->withPivot('quantity')
       ->get()
@@ -107,7 +113,7 @@ class OpenQuotationPeriodJob implements ShouldQueue
       $quotation = Quotation::create([
         'quotation_code' => $quotation_period_service->generateUniqueQuotationCode(),
         'is_completed'   => false,
-        'period_id'      => $this->period->id,
+        'period_id'      => $quotation_period->id,
         'supplier_id'    => $supplier['supplier_id'],
       ]);
 

@@ -11,8 +11,11 @@ use Livewire\Attributes\On;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Bus;
+use App\Jobs\OpenQuotationPeriodJob;
 use App\Models\RequestForQuotationPeriod;
 use App\Services\Supplier\QuotationPeriodService;
+use App\Jobs\NotifySuppliersRequestForQuotationReceivedJob;
 
 class EditBudgetPeriod extends Component
 {
@@ -164,10 +167,9 @@ class EditBudgetPeriod extends Component
 
   /**
    * guardar periodo de solicitud
-   * @param QuotationPeriodService $quotation_period_service
    * @return void
    */
-  public function save(QuotationPeriodService $qps): void
+  public function save(): void
   {
     // validar parametros del formulario
     $validated = $this->validate(
@@ -210,6 +212,14 @@ class EditBudgetPeriod extends Component
         $this->period->save();
 
         $this->syncProvisionsAndPacks();
+
+        //$period->period_start_at formato string 'Y-m-d'
+        if (Carbon::parse($this->period->period_start_at)->startOfDay()->eq(Carbon::now()->startOfDay())) {
+          Bus::chain([
+            OpenQuotationPeriodJob::dispatch($this->period->id),
+            NotifySuppliersRequestForQuotationReceivedJob::dispatch($this->period->id),
+          ]);
+        }
       });
 
       $this->reset();

@@ -16,15 +16,21 @@ class UpdateSuppliersPricesJob implements ShouldQueue
   /**
    * Create a new job instance.
    */
-  public function __construct(public RequestForQuotationPeriod $period) {}
+  public function __construct(public int $period_id) {}
 
   /**
    * Execute the job.
    */
   public function handle(): void
   {
+    $quotation_period = RequestForQuotationPeriod::find($this->period_id);
+
+    if (!$quotation_period) {
+      return;
+    }
+
     // presupuestos respondidos
-    $quotations = $this->period->quotations()
+    $quotations = $quotation_period->quotations()
       ->with(['provisions', 'packs', 'supplier'])
       ->where('is_completed', true)->get();
 

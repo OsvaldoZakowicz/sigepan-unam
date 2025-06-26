@@ -17,15 +17,21 @@ class CloseQuotationPeriodJob implements ShouldQueue
   /**
    * Create a new job instance.
    */
-  public function __construct(public RequestForQuotationPeriod $period) {}
+  public function __construct(public int $period_id) {}
 
   /**
    * Execute the job.
    */
   public function handle(QuotationPeriodService $quotation_period_service): void
   {
+    $quotation_period = RequestForQuotationPeriod::find($this->period_id);
+
+    if (!$quotation_period) {
+      return;
+    }
+
     // estado: cerrado
-    $this->period->period_status_id = $quotation_period_service->getStatusClosed();
-    $this->period->save();
+    $quotation_period->period_status_id = $quotation_period_service->getStatusClosed();
+    $quotation_period->save();
   }
 }

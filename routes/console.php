@@ -48,8 +48,8 @@ Artisan::command('budget-periods:open', function (QuotationPeriodService $quotat
     // cada periodo debe abrirse y procesarse
     foreach ($periods_to_open as $period) {
       Bus::chain([
-        OpenQuotationPeriodJob::dispatch($period),
-        NotifySuppliersRequestForQuotationReceivedJob::dispatch($period)
+        OpenQuotationPeriodJob::dispatch($period->id),
+        NotifySuppliersRequestForQuotationReceivedJob::dispatch($period->id)
       ]);
     }
   }
@@ -73,9 +73,9 @@ Artisan::command('budget-periods:close', function (QuotationPeriodService $quota
     foreach ($periods_to_close as $period) {
 
       Bus::chain([
-        CloseQuotationPeriodJob::dispatch($period),
-        UpdateSuppliersPricesJob::dispatch($period),
-        NotifySuppliersRequestForQuotationClosedJob::dispatch($period),
+        CloseQuotationPeriodJob::dispatch($period->id),
+        UpdateSuppliersPricesJob::dispatch($period->id),
+        NotifySuppliersRequestForQuotationClosedJob::dispatch($period->id),
       ]);
 
       // notificar del cierre a gerentes
