@@ -10,7 +10,7 @@
         wire:navigate
         href="{{ route('suppliers-preorders-create') }}"
         class="mx-1"
-        >crear nuevo período
+        >crear período
       </x-a-button>
 
     </x-title-section>
@@ -20,7 +20,7 @@
 
       <x-slot:header class="">
         {{-- busqueda --}}
-        <div class="w-full flex gap-1 justify-start items-end">
+        <div class="flex items-end justify-start w-full gap-1">
           {{-- termino de busqueda --}}
           <div class="flex flex-col justify-end w-1/4">
             <label for="search">buscar periodo</label>
@@ -31,7 +31,7 @@
               wire:model.live="search"
               wire:click="resetPagination()"
               placeholder="ingrese un id o codigo de período ..."
-              class="w-full text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+              class="w-full p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
             />
           </div>
           {{-- fecha de inicio --}}
@@ -42,7 +42,7 @@
               name="search_start_at"
               id="search_start_at"
               wire:model.live="search_start_at"
-              class="w-full text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+              class="w-full p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
             />
           </div>
           {{-- fecha de fin --}}
@@ -53,7 +53,7 @@
               name="search_end_at"
               id="search_end_at"
               wire:model.live="search_end_at"
-              class="w-full text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+              class="w-full p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
             />
           </div>
           {{-- limpiar campos de busqueda --}}
@@ -73,13 +73,13 @@
         <x-table-base>
           <x-slot:tablehead>
             <tr class="border bg-neutral-100">
-              <x-table-th class="text-end w-12">id</x-table-th>
+              <x-table-th class="w-12 text-end">id</x-table-th>
               <x-table-th class="text-start">codigo de periodo</x-table-th>
               <x-table-th class="text-end">fecha de inicio</x-table-th>
               <x-table-th class="text-end">fecha de cierre</x-table-th>
               <x-table-th class="text-start">estado</x-table-th>
               <x-table-th class="text-end">fecha de creación</x-table-th>
-              <x-table-th class="text-start w-48">acciones</x-table-th>
+              <x-table-th class="w-48 text-start">acciones</x-table-th>
             </tr>
           </x-slot:tablehead>
           <x-slot:tablebody>

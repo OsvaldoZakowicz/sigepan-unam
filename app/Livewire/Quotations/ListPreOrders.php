@@ -11,6 +11,10 @@ use Livewire\WithPagination;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 
+/**
+ * LISTA DE PREORDENES PARA UN PROVEEDOR
+ * SECCION DE UN PROVEEDOR
+ */
 class ListPreOrders extends Component
 {
   use WithPagination;
@@ -36,15 +40,15 @@ class ListPreOrders extends Component
   public int $status_open;
   public int $status_closed;
 
-   // estados de la pre orden
-   public string $status_pending;
-   public string $status_approved;
-   public string $status_rejected;
+  // estados de la pre orden
+  public string $status_pending;
+  public string $status_approved;
+  public string $status_rejected;
 
   /**
    * boot de datos
    * @return void
-  */
+   */
   public function boot(PreOrderPeriodService $pps): void
   {
     // cada supplier tiene un usuario, y esta en sesion (Auth::user())
@@ -62,7 +66,7 @@ class ListPreOrders extends Component
    * reiniciar pagina para reestablecer la paginacion al
    * buscar periodos.
    * @return void
-  */
+   */
   public function resetPagination(): void
   {
     $this->resetPage();
@@ -72,7 +76,7 @@ class ListPreOrders extends Component
    * limpiar terminos de busqueda de los inputs
    * esto tambien reiniciara la paginacion.
    * @return void
-  */
+   */
   public function resetSearchInputs(): void
   {
     $this->reset(['search_word', 'period_status', 'preorder_status', 'period_start_at', 'period_end_at']);
@@ -82,17 +86,17 @@ class ListPreOrders extends Component
   /**
    * buscar preordenes
    * @return mixed
-  */
+   */
   public function searchPreorders()
   {
-    // cada quotation tiene un supplier (proveedor) y un period
-    // obtener la lista de quotations que tiene el proveedor en sesion
+    // cada preorder tiene un supplier (proveedor) y un period
+    // obtener la lista de preorders que tiene el proveedor en sesion
     $preorders = PreOrder::with(['supplier', 'pre_order_period'])
       ->where('supplier_id', $this->supplier->id)
       ->when($this->search_word, function ($query) {
         $query->where(function ($sub_query) {
           $sub_query->where('id', $this->search_word)
-                    ->orWhere('pre_order_code', 'like', '%' . $this->search_word .'%');
+            ->orWhere('pre_order_code', 'like', '%' . $this->search_word . '%');
         });
       })
       ->when(isset($this->preorder_status) && $this->preorder_status !== '', function ($query) {
@@ -106,7 +110,7 @@ class ListPreOrders extends Component
       ->when($this->period_start_at && $this->period_end_at, function ($query) {
         $query->whereHas('pre_order_period', function ($sub_query) {
           $sub_query->where('period_start_at', '>=', $this->period_start_at)
-                    ->where('period_end_at', '<=', $this->period_end_at);
+            ->where('period_end_at', '<=', $this->period_end_at);
         });
       })
       ->when($this->period_start_at && !$this->period_end_at, function ($query) {

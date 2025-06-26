@@ -93,9 +93,7 @@
             </x-slot:title>
   
             <x-slot:subtitle>
-              <span class="my-2 text-xl md:text-base lg:text-sm">complete los siguientes precios y
-                disponibilidad para
-                cada producto:</span>
+              <span class="my-2 text-xl md:text-base lg:text-sm">complete los siguientes precios y disponibilidad para cada producto:</span>
             </x-slot:subtitle>
   
             <x-slot:messages>

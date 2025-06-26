@@ -280,6 +280,9 @@ Route::middleware(['auth', 'verified', 'can:presupuestos'])->group(function () {
   Route::get('preorders/respond/{id}', [QuotationController::class, 'preorders_respond'])
     ->name('quotations-preorders-respond');
 
+  Route::get('preorders/show/{id}', [QuotationController::class, 'preorders_show'])
+    ->name('quotations-preorders-show');
+
   //*---------------------------- PDFs
 
   Route::get('preorders/pdf/download/{id}', [PDFController::class, 'download_pdf_order'])

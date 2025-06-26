@@ -2,15 +2,16 @@
 
 namespace App\Livewire\Quotations;
 
+use App\Models\Pack;
+use Livewire\Component;
 use App\Models\PreOrder;
 use App\Models\Provision;
-use App\Models\Pack;
 use App\Models\Quotation;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
-use Livewire\Component;
+use App\Models\DatoNegocio;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * * UN PROVEEDOR RESPONDE A LA PRE ORDEN
@@ -21,6 +22,14 @@ class RespondPreOrder extends Component
   // labels dedicadas
   protected string $PROVISION = 'provision';
   protected string $PACK = 'pack';
+
+  // datos de la panaderia
+  public $razon_social = '';
+  public $cuit = '';
+  public $telefono = '';
+  public $correo = '';
+  public $direccion = '';
+  public $inicio_actividades = '';
 
   // controla si se trata o no del modo edicion
   public bool $is_editing = false;
@@ -65,6 +74,13 @@ class RespondPreOrder extends Component
     // preparacion de labels
     $this->item_provision = $this->PROVISION;
     $this->item_pack      = $this->PACK;
+
+    $this->razon_social = DatoNegocio::obtenerValor('razon_social');
+    $this->cuit = DatoNegocio::obtenerValor('cuit');
+    $this->telefono = DatoNegocio::obtenerValor('telefono');
+    $this->correo = DatoNegocio::obtenerValor('email');
+    $this->direccion = DatoNegocio::obtenerValor('domicilio');
+    $this->inicio_actividades = DatoNegocio::obtenerValor('inicio_actividades');
   }
 
   /**

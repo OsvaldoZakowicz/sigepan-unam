@@ -13,8 +13,11 @@
         <span class="font-semibold">{{ formatDateTime($preorder->updated_at, 'd-m-Y H:i:s') }} (último cambio).</span>
       </x-slot:title>
 
-      <x-a-button wire:navigate href="{{ route('suppliers-preorders-show', $preorder->pre_order_period->id) }}"
-        bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600">volver al periodo
+      <x-a-button
+        wire:navigate
+        href="{{ route('quotations-preorders-index') }}"
+        bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600"
+        >volver
       </x-a-button>
 
     </x-title-section>
@@ -29,11 +32,11 @@
           {{-- estado de pre orden --}}
           @if ($preorder->is_completed)
           <x-text-tag color="emerald" class="cursor-pointer">respondido
-            <x-quest-icon title="el proveedor ha respondido" />
+            <x-quest-icon title="ha respondido" />
           </x-text-tag>
           @else
           <x-text-tag color="neutral" class="cursor-pointer">sin responder
-            <x-quest-icon title="el proveedor no ha respondido" />
+            <x-quest-icon title="no ha respondido" />
           </x-text-tag>
           @endif
 
@@ -47,7 +50,7 @@
           {{-- evaluacion aprobado --}}
           @if ($preorder->status === $status_approved)
           <x-text-tag color="emerald" class="cursor-pointer">{{ $preorder->status }}
-            <x-quest-icon title="tanto proveedor como la panaderia estan de acuerdo con esta pre orden de compra" />
+            <x-quest-icon title="la panaderia esta de acuerdo con esta pre orden de compra" />
           </x-text-tag>
           @endif
 
@@ -70,7 +73,6 @@
           </x-a-button>
 
           @endif
-
         </div>
       </x-slot:header>
 
@@ -284,7 +286,7 @@
                 {{-- mensaje de aprobacion del proveedor --}}
                 <div class="flex flex-col">
                   @if ($preorder->is_approved_by_supplier)
-                  <span>El proveedor <x-text-tag color="emerald">aceptó</x-text-tag> cumplir con la pre orden según el
+                  <span>Usted <x-text-tag color="emerald">aceptó</x-text-tag> cumplir con la pre orden según el
                     stock y el presente anexo declarado</span>
                   @endif
                 </div>
@@ -337,24 +339,6 @@
       </x-slot:content>
 
       <x-slot:footer class="my-2">
-        <div class="flex justify-end w-full gap-2 mt-2">
-          @if ($preorder->is_completed && $preorder->is_approved_by_supplier)
-          @if (!$preorder->is_approved_by_buyer && $preorder->status === $status_pending)
-          <x-a-button wire:navigate href="#" bg_color="red-600" border_color="red-600" wire:click="rejectPreOrder()"
-            wire:confirm="¿rechazar esta pre orden? el proveedor no podrá responder la pre orden una vez la rechace, al finalizar el periodo los suministros y packs de esta pre orden se indicarán como faltates a cubrir.">
-            rechazar
-          </x-a-button>
-          <x-btn-button type="button" wire:click="approveAndMakeOrder()"
-            wire:confirm="¿aprobar esta pre orden?, al aprobar la pre orden indica que está de acuerdo con el stock que puede cumplir el proveedor y con los parámetros del anexo. Se emitirá una orden de compra final para todos los suministros y packs de la lista con stock, la orden de compra definitiva se enviará por email al proveedor">
-            aprobar y ordenar compra
-          </x-btn-button>
-          @elseif ($preorder->is_approved_by_buyer && $preorder->status === $status_approved)
-          <p>Esta pre orden fue aceptada, y se envió al proveedor una orden de compra definitiva.</p>
-          @else
-          <p>Esta pre orden fue rechazada.</p>
-          @endif
-          @endif
-        </div>
       </x-slot:footer>
 
     </x-content-section>
