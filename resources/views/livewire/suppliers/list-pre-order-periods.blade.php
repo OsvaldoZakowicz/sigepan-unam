@@ -157,6 +157,14 @@
                       >ver
                     </x-a-button>
                     @if ($period->period_status_id === $scheduled_status_id)
+                      <x-a-button
+                        wire:navigate
+                        href="{{ route('suppliers-preorders-edit', $period->id) }}"
+                        bg_color="neutral-100"
+                        border_color="neutral-200"
+                        text_color="neutral-600"
+                        >editar
+                      </x-a-button>
                       <x-btn-button
                         btn_type="button"
                         color="red"

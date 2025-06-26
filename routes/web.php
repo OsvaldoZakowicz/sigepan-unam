@@ -242,6 +242,10 @@ Route::middleware(['auth', 'verified', 'can:proveedores'])->group(function () {
   Route::get('suppliers/preorders/create/{id?}', [SupplierController::class, 'preorder_create'])
     ->name('suppliers-preorders-create');
 
+  // NOTA: editar periodo de pre ordenes (solo los creados manualmente)
+  Route::get('suppliers/preorders/edit/{id}', [SupplierController::class, 'preorder_edit'])
+    ->name('suppliers-preorders-edit');
+
   // NOTA: ver periodo de pre ordenes
   Route::get('suppliers/preorders/show/{id}', [SupplierController::class, 'preorder_show'])
     ->name('suppliers-preorders-show');

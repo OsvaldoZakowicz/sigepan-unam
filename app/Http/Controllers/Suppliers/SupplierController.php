@@ -159,6 +159,12 @@ class SupplierController extends Controller
     return view('suppliers.preorders-create', ['id' => $id]);
   }
 
+  //* editar periodo de preorden de compra
+  public function preorder_edit($id): View
+  {
+    return view('suppliers.preorders-edit', ['id' => $id]);
+  }
+
   //* ver periodo de preorden de compra
   public function preorder_show($id): View
   {
