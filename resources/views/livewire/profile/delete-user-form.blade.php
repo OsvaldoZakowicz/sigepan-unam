@@ -21,15 +21,26 @@ new class extends Component
     $user = Auth::user();
     
     try {
-      // Usar el servicio para eliminar la cuenta
+      
       $userAccountService = app(UserAccountService::class);
+
+      // verificar si puede eliminar la cuenta.
+      if ($userAccountService->canDeleteAccount($user)) {
+        
+        $this->addError(
+          'password',
+          'No se pudo eliminar la cuenta. Tienes ordenes pendientes de pago o entrega.'
+        );
+
+        return;
+      }
       
       if ($userAccountService->deleteUserAccount($user)) {
         
-        // Establecer mensaje de éxito en la sesión
+        // establecer mensaje de éxito en la sesión
         session()->flash('account_deleted_success', [
           'title' => 'Cuenta eliminada exitosamente',
-          'message' => 'Tu cuenta ha sido eliminada. Podrás recuperarla iniciando sesión nuevamente con tu email y contraseña.',
+          'message' => 'Tu cuenta ha sido eliminada. Podrás recuperarla iniciando sesión nuevamente.',
           'type' => 'success'
         ]);
         
@@ -40,12 +51,20 @@ new class extends Component
         $this->redirect('/login', navigate: true);
         
         return;
+        
       } else {
-        $this->addError('password', 'No se pudo eliminar la cuenta. Intenta nuevamente.');
+        $this->addError(
+          'password',
+          'No se pudo eliminar la cuenta. Intenta nuevamente.'
+        );
       }
         
     } catch (\Exception $e) {
-      $this->addError('password', 'Error al eliminar la cuenta: ' . $e->getMessage());
+      
+      $this->addError(
+        'password',
+        'Error al eliminar la cuenta: ' . $e->getMessage()
+      );
     }
   }
 
@@ -75,40 +94,40 @@ new class extends Component
 
   <!-- Modal de Confirmación de Eliminación -->
   <x-modal name="confirm-user-deletion" :show="$errors->isNotEmpty()" focusable>
-      <form wire:submit="deleteUser" class="p-6">
-          <h2 class="text-lg font-medium text-neutral-900">
-              {{ __('Are you sure you want to delete your account?') }}
-          </h2>
-          
-          <p class="mt-1 text-sm text-neutral-600">
-              Tu cuenta será eliminada, pero podrás recuperarla iniciando sesión nuevamente con tu email y contraseña. 
-              Ingresa tu contraseña para confirmar.
-          </p>
+    {{-- al detectar submit (por el boton), el form ejecuta la funcion deleteUser --}}
+    <form wire:submit="deleteUser" class="p-6">
+      <h2 class="text-lg font-medium text-neutral-900">
+        {{ __('Are you sure you want to delete your account?') }}
+      </h2>
+      
+      <p class="mt-1 text-sm text-neutral-600">
+        Tu cuenta será eliminada, pero podrás recuperarla iniciando sesión nuevamente con tu email y contraseña. Ingresa tu contraseña para confirmar.
+      </p>
 
-          <div class="mt-6">
-              <x-input-label for="password" value="{{ __('Password') }}" class="sr-only" />
-              <x-text-input
-                  wire:model="password"
-                  id="password"
-                  name="password"
-                  type="password"
-                  class="block w-3/4 mt-1"
-                  placeholder="{{ __('Password') }}"
-              />
-              <x-input-error :messages="$errors->get('password')" class="mt-2" />
-          </div>
+      <div class="mt-6">
+        <x-input-label for="password" value="{{ __('Password') }}" class="sr-only" />
+        <x-text-input
+          wire:model="password"
+          id="password"
+          name="password"
+          type="password"
+          class="block w-3/4 mt-1"
+          placeholder="{{ __('Password') }}"
+        />
+        <x-input-error :messages="$errors->get('password')" class="mt-2" />
+      </div>
 
-          <div class="flex justify-end gap-4 mt-6">
-              <button x-on:click="$dispatch('close')" type="button" 
-                  class="box-border flex items-center justify-center h-6 p-1 text-xs text-center uppercase border border-solid rounded w-fit border-neutral-600 bg-neutral-600 text-neutral-100">
-                  cancelar
-              </button>
-              
-              <button type="submit" 
-                  class="box-border flex items-center justify-center h-6 p-1 text-xs text-center uppercase bg-red-600 border border-red-600 border-solid rounded w-fit text-neutral-100">
-                  borrar cuenta
-              </button>
-          </div>
-      </form>
+      <div class="flex justify-end gap-4 mt-6">
+        <button x-on:click="$dispatch('close')" type="button" 
+          class="box-border flex items-center justify-center h-6 p-1 text-xs text-center uppercase border border-solid rounded w-fit border-neutral-600 bg-neutral-600 text-neutral-100">
+          cancelar
+        </button>
+        
+        <button type="submit" 
+          class="box-border flex items-center justify-center h-6 p-1 text-xs text-center uppercase bg-red-600 border border-red-600 border-solid rounded w-fit text-neutral-100">
+          borrar cuenta
+        </button>
+      </div>
+    </form>
   </x-modal>
 </section>

@@ -3,8 +3,10 @@
 namespace App\Services\User;
 
 use App\Models\User;
+use App\Models\Order;
 use App\Models\Address;
 use App\Models\Profile;
+use App\Models\OrderStatus;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -13,20 +15,20 @@ class UserAccountService
   /**
    * Eliminar cuenta de usuario
    * - Usuario: soft delete
-   * - Perfil: eliminación completa
+   * - Perfil: soft delete
    */
   public function deleteUserAccount(User $user): bool
   {
     return DB::transaction(function () use ($user) {
       try {
-        // 1. eliminar completamente el perfil (hard delete)
+        // 1. eliminar perfil
         if ($user->profile) {
           $address = $user->profile->address;
           $user->profile->delete();
           $address->delete();
         }
 
-        // 2. Soft delete del usuario
+        // 2. eliminar usuario
         $user->delete();
 
         Log::info("Usuario eliminado exitosamente", ['user_id' => $user->id]);
@@ -53,11 +55,11 @@ class UserAccountService
 
     return DB::transaction(function () use ($user) {
       try {
-        
-        // Cargar profile con withTrashed para acceder a datos soft deleted
+
+        // cargar profile con withTrashed para acceder a datos soft deleted
         $profile = $user->profile()->withTrashed()->first();
 
-        // Orden: Primero las referenciadas, luego las que tienen FK
+        // orden: Primero las referenciadas, luego las que tienen FK
         if ($profile && $profile->address_id) {
           Address::withTrashed()->find($profile->address_id)?->restore();
         }
@@ -99,5 +101,30 @@ class UserAccountService
     return $user->roles()
       ->where('name', 'cliente')
       ->exists();
+  }
+
+  /**
+   * verificar si el usuario en sesion no tiene
+   * ordenes pendientes de pago, o de entrega.
+   * @param User $user
+   * @return bool
+   */
+  public function canDeleteAccount(User $user): bool
+  {
+    // id de estado de entrega de orden "pendiente"
+    $order_status_pendiente_id = OrderStatus::ORDER_STATUS_PENDIENTE();
+
+    // estado de pago "pendiente"
+    $order_payment_status_pendiente = Order::ORDER_PAYMENT_STATUS_PENDIENTE();
+
+    $count_status_pending = $user->orders()
+      ->where('order_status_id', $order_status_pendiente_id)
+      ->count();
+
+    $count_payment_pending = $user->orders()
+      ->where('payment_status', $order_payment_status_pendiente)
+      ->count();
+
+    return ($count_status_pending > 0 || $count_payment_pending > 0) ? true : false;
   }
 }
