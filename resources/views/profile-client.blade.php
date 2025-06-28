@@ -3,7 +3,7 @@
 @section('view_content')
   <div class="pt-5 mt-20 bg-gradient-to-r from-orange-100 via-amber-200 to-orange-900 pb-14">
     {{-- * vista de perfil de cliente, layout. --}}
-    <div class="flex items-start justify-between w-full gap-8 p-6 mx-auto bg-white rounded-lg max-w-7xl">
+    <div class="flex items-start justify-between w-full max-w-5xl gap-8 p-6 mx-auto bg-white rounded-lg">
       <div class="m-2 md:m-4 lg:m-8">
         <div class="flex flex-wrap items-start gap-8">
 
