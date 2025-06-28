@@ -96,7 +96,6 @@ class SaleService
 
       DB::commit();
       return $sale;
-
     } catch (\Exception $e) {
 
       DB::rollBack();
@@ -167,7 +166,6 @@ class SaleService
 
       DB::commit();
       return $sale;
-
     } catch (\Exception $e) {
 
       DB::rollBack();
@@ -199,7 +197,7 @@ class SaleService
     $sale_detail = [];
     foreach ($sale->products as $key => $product) {
       array_push($sale_detail, [
-        'nro' => $key+1,
+        'nro' => $key + 1,
         'producto' => $product->product_name,
         'detalle'  => $product->pivot->details,
         'cantidad' => $product->pivot->sale_quantity,

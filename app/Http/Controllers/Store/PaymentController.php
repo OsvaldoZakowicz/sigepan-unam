@@ -37,7 +37,6 @@ class PaymentController extends Controller
       $sale = $sale_service->createOnlineSale($request->external_reference, $request);
 
       return view('store.payment-success');
-
     } catch (\Exception $e) {
 
       Log::error('Error general al crear la venta web:', [
@@ -49,7 +48,6 @@ class PaymentController extends Controller
 
       return view('store.payment-success');
     }
-
   }
 
   /**
