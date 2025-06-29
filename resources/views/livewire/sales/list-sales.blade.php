@@ -20,10 +20,10 @@
       <x-slot:header class="">
 
         {{-- busqueda --}}
-        <div class="flex gap-1 justify-start items-start grow">
+        <div class="flex items-end justify-start gap-1">
 
           {{-- termino de busqueda --}}
-          <div class="flex flex-col justify-end w-1/4">
+          <div class="flex flex-col justify-end w-56">
             <label for="">buscar venta</label>
             <input
               type="text"
@@ -31,12 +31,12 @@
               wire:model.live="search_sale"
               wire:click="resetPagination()"
               placeholder="ingrese un id de venta, o cliente"
-              class="text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+              class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
             />
           </div>
 
           {{-- fecha de venta desde --}}
-          <div class="flex flex-col justify-end w-1/6">
+          <div class="flex flex-col justify-end w-56">
             <label for="search_start_at">fecha de venta desde</label>
             <input
               type="date"
@@ -44,11 +44,11 @@
               id="search_start_at"
               wire:model.live="search_start_at"
               wire:click="resetPagination()"
-              class="w-full text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"/>
+              class="w-full p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"/>
           </div>
 
           {{-- fecha de venta hasta --}}
-          <div class="flex flex-col justify-end w-1/6">
+          <div class="flex flex-col justify-end w-56">
             <label for="search_end_at">fecha de venta hasta</label>
             <input
               type="date"
@@ -56,20 +56,17 @@
               id="search_end_at"
               wire:model.live="search_end_at"
               wire:click="resetPagination()"
-              class="w-full text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"/>
+              class="w-full p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"/>
           </div>
 
-        </div>
-
-        {{-- limpiar campos de busqueda --}}
-        <div class="flex flex-col self-start h-full">
+          {{-- limpiar campos de busqueda --}}
           <x-a-button
             href="#"
             wire:click="resetSearchInputs()"
             bg_color="neutral-200"
             border_color="neutral-300"
             text_color="neutral-600"
-            >limpiar
+            >limpiar filtros
           </x-a-button>
         </div>
 
@@ -81,7 +78,7 @@
         <x-table-base>
           <x-slot:tablehead>
             <tr class="border bg-neutral-100">
-              <x-table-th class="text-end w-12">
+              <x-table-th class="w-12 text-end">
                 id
               </x-table-th>
               <x-table-th class="text-start">
@@ -106,7 +103,7 @@
               <x-table-th class="text-end">
                 fecha de venta
               </x-table-th>
-              <x-table-th class="text-start w-48">
+              <x-table-th class="w-48 text-start">
                 acciones
               </x-table-th>
             </tr>
@@ -125,7 +122,7 @@
                   {{ $sale->payment_type }}
                 </x-table-td>
                 <x-table-td class="text-start">
-                  @if ($sale->user()->exists())
+                  @if ($sale->user)
                     <span class="capitalize">{{ $sale->user->name }}</span>
                   @else
                     <span class="text-neutral-400">{{ $sale->client_type }}</span>
@@ -150,7 +147,7 @@
                   @endif
                 </x-table-td>
                 <x-table-td class="text-end">
-                  {{ $sale->created_at->format('d-m-Y H:i') }} hs.
+                  {{ $sale->sold_on->format('d-m-Y H:i') }} hs.
                 </x-table-td>
                 <x-table-td class="text-start">
                   <div class="flex gap-1">
@@ -188,12 +185,12 @@
 
         {{-- modal de registro de ventas --}}
         @if ($show_new_sale_modal)
-          <div class="fixed z-50 inset-0 bg-neutral-400 bg-opacity-40 overflow-y-auto h-full w-full flex items-center justify-center">
-            <div class="bg-white p-5 border rounded-md shadow-lg w-5/6 transform transition-all">
+          <div class="fixed inset-0 z-50 flex items-center justify-center w-full h-full overflow-y-auto bg-neutral-400 bg-opacity-40">
+            <div class="w-5/6 p-5 transition-all transform bg-white border rounded-md shadow-lg">
               <div class="text-start">
 
                 {{-- titulo del modal --}}
-                <h3 class="text-lg leading-6 capitalize font-medium text-neutral-800">
+                <h3 class="text-lg font-medium leading-6 capitalize text-neutral-800">
                   Nueva venta
                 </h3>
 
@@ -202,9 +199,9 @@
                   x-data="{ open: false }"
                   title="cliente"
                   subtitle="añada un cliente a esta venta"
-                  class="mt-2 p-2"
+                  class="p-2 mt-2"
                   >
-                  <div class="flex gap-1 justify-start items-start grow mb-1">
+                  <div class="flex items-start justify-start gap-1 mb-1 grow">
                     {{-- busqueda de usuarios cliente --}}
                     <div x-data="{
                       open: false,
@@ -220,7 +217,7 @@
                           @click.outside="open = false"
                           wire:model.live="user_search"
                           placeholder="Buscar por nombre o email"
-                          class="text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                          class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
                         >
                       </div>
 
@@ -228,8 +225,8 @@
                       <div
                         x-show="open"
                         x-transition
-                        class="absolute z-50 w-full mt-1 bg-white border border-neutral-200 rounded-sm shadow-lg">
-                        <ul class="max-h-60 overflow-auto py-1">
+                        class="absolute z-50 w-full mt-1 bg-white border rounded-sm shadow-lg border-neutral-200">
+                        <ul class="py-1 overflow-auto max-h-60">
                           @forelse($users as $user)
                             <li
                               wire:key="{{ $user->id }}"
@@ -257,10 +254,10 @@
                   x-data="{ open: false }"
                   title="buscar productos"
                   subtitle="busque productos para agregarlos a la lista de ventas"
-                  class="mt-1 p-2"
+                  class="p-2 mt-1"
                   >
                   {{-- busqueda --}}
-                  <div class="flex gap-1 justify-start items-start grow mb-1">
+                  <div class="flex items-start justify-start gap-1 mb-1 grow">
                     <div class="flex flex-col justify-end w-1/3">
                       <input
                         type="text"
@@ -268,7 +265,7 @@
                         wire:model.live="search_product"
                         wire:click="resetPagination()"
                         placeholder="ingrese un id, o nombre de producto"
-                        class="text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                        class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
                       />
                     </div>
                   </div>
@@ -276,7 +273,7 @@
                   <x-table-base>
                     <x-slot:tablehead>
                       <tr class="border bg-neutral-100">
-                        <x-table-th class="text-end w-12">
+                        <x-table-th class="w-12 text-end">
                           id
                         </x-table-th>
                         <x-table-th class="text-start">
@@ -290,7 +287,7 @@
                           cantidad disponible
                           <x-quest-icon title="en unidades" />
                         </x-table-th>
-                        <x-table-th class="text-end w-12">
+                        <x-table-th class="w-12 text-end">
                           elegir
                         </x-table-th>
                       </tr>
@@ -305,7 +302,7 @@
                             {{ $product->product_name }}
                           </x-table-td>
                           <x-table-td class="text-start">
-                            <div class="w-full flex gap-1">
+                            <div class="flex w-full gap-1">
                               {{-- precio por defecto --}}
                               <span class="font-semibold">
                                 <span class="text-sm">{{ $product->defaultPrice()->description }}&nbsp;({{ $product->defaultPrice()->quantity }} unidad/es)</span>
@@ -322,8 +319,8 @@
                                 {{-- lista desplegable --}}
                                 <ul x-show="open"
                                   @click.away="open = false"
-                                  class="absolute z-10 mt-1 p-1 w-96 bg-white border border-gray-200 rounded-sm shadow-lg">
-                                  <li class="p-1 w-full text-start capitalize font-semibold border-b">lista de precios:</li>
+                                  class="absolute z-10 p-1 mt-1 bg-white border border-gray-200 rounded-sm shadow-lg w-96">
+                                  <li class="w-full p-1 font-semibold capitalize border-b text-start">lista de precios:</li>
                                   @forelse ($product->prices as $price)
                                     <li class="p-1 w-full flex justify-between hover:bg-gray-100 @if ($price->is_default) font-semibold @endif">
                                       <span class="text-sm">{{ $price->description }}&nbsp;({{ $price->quantity }} unidad/es)</span>
@@ -339,13 +336,13 @@
                           <x-table-td class="text-end">
                             {{ $product->getTotalStockAttribute() }}
                           </x-table-td>
-                          <x-table-td class="text-end w-12">
+                          <x-table-td class="w-12 text-end">
                             {{-- agregar a la lista --}}
-                            <div class="w-full inline-flex gap-1 justify-start items-center">
+                            <div class="inline-flex items-center justify-start w-full gap-1">
                               <span
                                 wire:click="addProductForSale({{ $product }})"
                                 title="elegir y agregar a la lista"
-                                class="font-bold leading-none text-center p-1 cursor-pointer bg-neutral-100 border border-neutral-200 rounded-sm"
+                                class="p-1 font-bold leading-none text-center border rounded-sm cursor-pointer bg-neutral-100 border-neutral-200"
                                 >&plus;
                               </span>
                             </div>
@@ -371,20 +368,20 @@
                   <div class="mb-1">
                     {{-- Error general de products_for_sale --}}
                     @error('products_for_sale')
-                      <span class="block text-red-400 text-sm mb-1">{{ $message }}</span>
+                      <span class="block mb-1 text-sm text-red-400">{{ $message }}</span>
                     @enderror
 
                     {{-- Errores de cantidades por producto --}}
                     @foreach($products_for_sale as $index => $product)
                       @error("products_for_sale.{$index}.sale_quantity")
-                        <span class="block text-red-400 text-sm mb-1">{{ $message }}</span>
+                        <span class="block mb-1 text-sm text-red-400">{{ $message }}</span>
                       @enderror
                     @endforeach
 
                     {{-- Otros errores relacionados a products_for_sale --}}
                     @foreach($errors->all() as $error)
                       @if(str_contains($error, 'products_for_sale'))
-                        <span class="block text-red-400 text-sm mb-1">{{ $error }}</span>
+                        <span class="block mb-1 text-sm text-red-400">{{ $error }}</span>
                       @endif
                     @endforeach
 
@@ -395,13 +392,13 @@
                         show = true;
                         message = 'El producto ya está en la lista de venta';
                         setTimeout(() => show = false, 3000)"
-                      ><span x-show="show" x-transition class="block text-blue-400 text-sm mb-1" x-text="message"></span>
+                      ><span x-show="show" x-transition class="block mb-1 text-sm text-blue-400" x-text="message"></span>
                     </div>
                   </div>
                   <x-table-base>
                     <x-slot:tablehead>
                       <tr class="border bg-neutral-100">
-                        <x-table-th class="text-end w-12">
+                        <x-table-th class="w-12 text-end">
                           Id
                         </x-table-th>
                         <x-table-th class="text-start">
@@ -421,7 +418,7 @@
                         <x-table-th class="text-end">
                           $Subtotal
                         </x-table-th>
-                        <x-table-th class="text-start w-12">
+                        <x-table-th class="w-12 text-start">
                           quitar
                         </x-table-th>
                       </tr>
@@ -437,12 +434,12 @@
                           </x-table-td>
                           <x-table-td class="text-start">
                             {{-- select precios o combos --}}
-                            <div class="flex justify-end items-center">
+                            <div class="flex items-center justify-end">
                               {{-- En la sección de precios de la tabla --}}
                               <select
                                 wire:model="products_for_sale.{{ $key }}.selected_price_id"
                                 wire:change="updateSelectedPrice({{ $key }}, $event.target.value)"
-                                class="p-1 w-full text-sm text-start border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                                class="w-full p-1 text-sm border text-start border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
                                 >
                                 @foreach ($pfs['product']->prices as $price)
                                   <option value="{{ $price->id }}">
@@ -452,16 +449,16 @@
                               </select>
                             </div>
                           </x-table-td>
-                          <x-table-td class="text-end w-56">
+                          <x-table-td class="w-56 text-end">
                             {{-- input cantidad a vender --}}
-                            <div class="flex justify-end items-center">
+                            <div class="flex items-center justify-end">
                               <input
                                 id="products_for_sale_{{ $key }}_sale_quantity"
                                 wire:model.live="products_for_sale.{{ $key }}.sale_quantity"
                                 type="number"
                                 min="1"
                                 max="{{ $pfs['product']->getTotalStockAttribute() }}"
-                                class="p-1 w-full text-sm text-right border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                                class="w-full p-1 text-sm text-right border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
                               />
                             </div>
                           </x-table-td>
@@ -473,11 +470,11 @@
                           </x-table-td>
                           <x-table-td class="text-start">
                             {{-- quitar de la lista --}}
-                            <div class="w-full inline-flex gap-1 justify-start items-center">
+                            <div class="inline-flex items-center justify-start w-full gap-1">
                               <span
                                 wire:click="removeProductForSale({{ $key }})"
                                 title="elegir y agregar a la lista"
-                                class="font-bold leading-none text-center p-1 cursor-pointer bg-red-100 border border-red-200 rounded-sm"
+                                class="p-1 font-bold leading-none text-center bg-red-100 border border-red-200 rounded-sm cursor-pointer"
                                 >&times;
                               </span>
                             </div>
@@ -520,11 +517,11 @@
 
         {{-- modal de ver venta --}}
         @if ($show_sale_modal && $selected_sale)
-          <div class="fixed z-50 inset-0 bg-neutral-400 bg-opacity-40 overflow-y-auto h-full w-full flex items-center justify-center">
-            <div class="bg-white p-5 border rounded-md shadow-lg w-3/4 transform transition-all">
+          <div class="fixed inset-0 z-50 flex items-center justify-center w-full h-full overflow-y-auto bg-neutral-400 bg-opacity-40">
+            <div class="w-3/4 p-5 transition-all transform bg-white border rounded-md shadow-lg">
               <div class="w-full text-start">
                 {{-- encabezado --}}
-                <header class="border border-neutral-100 p-1 mb-2">
+                <header class="p-1 mb-2 border border-neutral-100">
                   <h3 class="text-lg font-semibold">Comprobante de venta</h3>
                   <small class="text-xs uppercase">documento no valido como factura</small>
                   <div class="flex flex-col gap-1">
@@ -540,14 +537,27 @@
                       <span class="font-semibold">Establecimiento:</span>
                       {{-- todo: info panaderia --}}
                     </span>
-                    <span>
-                      <span class="font-semibold">Cliente:</span>
-                      @if ($selected_sale->user()->exists())
-                        {{ $selected_sale->user->name . ' - ' . $selected_sale->user->email }}
-                      @else
-                        {{ $selected_sale->client_type }}
-                      @endif
-                    </span>
+                    <div class="flex flex-col items-start justify-start gap-1 mb-2">
+                      <span>
+                        <span class="font-semibold">Cliente:&nbsp;</span>
+                        <span class="capitalize">usuario:&nbsp;{{ $details_user['username'] }}, </span>
+                        <span class="capitalize">nombre completo:&nbsp;{{ $details_user['full_name'] }}</span>
+                        <span> - DNI: {{ $details_user['dni'] }} </span>
+                      </span>
+                      <span>
+                        <span class="font-semibold">Contacto:&nbsp;</span>
+                        <span>Tel:  {{ $details_user['contact'] }} </span>
+                        <span>Email: {{ $details_user['email'] }} </span>
+                      </span>
+                      <span>
+                        <span class="font-semibold">Dirección:&nbsp;</span>
+                        <span>{{ $details_user['full_address'] }}</span>
+                      </span>
+                      <span>
+                        <span class="font-semibold">cuenta del usuario: </span>
+                        <span>{{ $details_user['account_status'] }}</span>
+                      </span>
+                    </div>
                     <span>
                       <span class="font-semibold">Forma de pago:</span>
                       {{ $selected_sale->payment_type }}
@@ -555,11 +565,11 @@
                   </div>
                 </header>
                 {{-- cuerpo con detalle y total --}}
-                <section class="w-full max-h-56 overflow-y-auto overflow-x-auto mb-1">
+                <section class="w-full mb-1 overflow-x-auto overflow-y-auto max-h-56">
                   <x-table-base>
                     <x-slot:tablehead>
                       <tr class="border bg-neutral-100">
-                        <x-table-th class="text-end w-12">
+                        <x-table-th class="w-12 text-end">
                           #
                         </x-table-th>
                         <x-table-th class="text-start">
@@ -582,7 +592,7 @@
                     <x-slot:tablebody>
                       @foreach ($selected_sale->products as $key => $product_sale)
                       <tr class="border" wire:key="{{ $key }}">
-                        <x-table-td class="text-end w-12">
+                        <x-table-td class="w-12 text-end">
                           {{ $key+1 }}
                         </x-table-td>
                         <x-table-td class="text-start">
@@ -603,15 +613,15 @@
                       </tr>
                       @endforeach
                       <tr class="border">
-                        <x-table-td class="text-end font-semibold capitalize" colspan="5">$total:</x-table-td>
-                        <x-table-td class="text-end font-semibold">${{ number_format($selected_sale->total_price, 2) }}</x-table-td>
+                        <x-table-td class="font-semibold capitalize text-end" colspan="5">$total:</x-table-td>
+                        <x-table-td class="font-semibold text-end">${{ number_format($selected_sale->total_price, 2) }}</x-table-td>
                       </tr>
                     </x-slot:tablebody>
                   </x-table-base>
                 </section>
                 {{-- pie con datos extra --}}
-                <footer class="w-full border border-neutral-100 p-1 mb-2">
-                  <div class="w-full flex justify-end">
+                <footer class="w-full p-1 mb-2 border border-neutral-100">
+                  <div class="flex justify-end w-full">
                     <x-a-button
                       href="#"
                       wire:click="closeShowSaleModal()"
@@ -632,9 +642,9 @@
           <div class="fixed inset-0 z-50 overflow-y-auto">
             <div class="flex items-center justify-center min-h-screen px-4">
               <div class="fixed inset-0 bg-neutral-950 opacity-40"></div> {{-- fondo negro --}}
-              <div class="relative bg-white rounded-lg w-full max-w-2xl p-6">
-                <div class="flex justify-between items-center mb-4">
-                  <h2 class="text-xl text-neutral-700 font-semibold">detalles del pago:</h2>
+              <div class="relative w-full max-w-2xl p-6 bg-white rounded-lg">
+                <div class="flex items-center justify-between mb-4">
+                  <h2 class="text-xl font-semibold text-neutral-700">detalles del pago:</h2>
                   <x-a-button
                     href="#"
                     wire:click="closePayment()"
@@ -653,7 +663,7 @@
                   {{-- si se trata de comprobante de mercado pago --}}
                   @if (count($sale_payment_data['mp']) !== 0)
                     <div class="space-y-4">
-                      <div class="flex flex-col justify-start items-start gap-1">
+                      <div class="flex flex-col items-start justify-start gap-1">
                         <span>
                           <span class="font-semibold">Orden:&nbsp;</span>
                           <span class="text-sm uppercase">{{ $selected_sale_payment->order->order_code }}</span>

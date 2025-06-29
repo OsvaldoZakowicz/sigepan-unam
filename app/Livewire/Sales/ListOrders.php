@@ -43,6 +43,7 @@ class ListOrders extends Component
   // modal de detalle
   public bool $show_details_modal = false;
   public $details_order = null;
+  public $details_user = null;
 
   // modal de comprobante de pago
   public bool $show_payment_modal = false;
@@ -79,16 +80,71 @@ class ListOrders extends Component
   }
 
   /**
-   * mostrar modal de detalles
+   * Mostrar modal de detalles
    * @param int $id
    * @return void
    */
   public function showDetails(int $id): void
   {
-    $this->details_order = Order::with(
-      ['products' => function ($query) {
+    $this->details_order = Order::with([
+      'products' => function ($query) {
         $query->withTrashed();
-      }, 'sale', 'user'])->findOrFail($id);
+      },
+      'sale',
+      'user' => function ($query) {
+        $query->withTrashed()
+          ->with([
+            'profile' => function ($q) {
+              $q->withTrashed()
+                ->with([
+                  'address' => function ($q) {
+                    $q->withTrashed();
+                  }
+                ]);
+            }
+          ]);
+      }
+    ])
+      ->findOrFail($id);
+
+
+    if ($this->details_order->user) {
+      $usr = $this->details_order->user;
+      $username = $usr->name;
+      $email = $usr->email;
+    } else {
+      $username = '-';
+      $email = '-';
+    }
+
+    if ($this->details_order->user->profile) {
+      $pr = $this->details_order->user->profile;
+      $fullname = $pr->first_name . ', ' . $pr->last_name;
+      $dni = $pr->dni;
+      $contact = $pr->phone_number;
+    } else {
+      $fullname = '-';
+      $contact = '-';
+      $dni = '-';
+    }
+
+    if ($this->details_order->user->profile->address) {
+      $adr = $this->details_order->user->profile->address;
+      $full_address = $adr->street . ', numero ' . $adr->number . ', ciudad: '
+        . $adr->city . ', CP' . $adr->postal_code;
+    } else {
+      $full_address = '-';
+    }
+
+    $this->details_user = [
+      'username'        =>  $username,
+      'email'           =>  $email,
+      'full_name'       =>  $fullname,
+      'contact'         =>  $contact,
+      'dni'             =>  $dni,
+      'full_address'    =>  $full_address,
+      'account_status'  =>  $this->details_order->user->trashed() ? 'cuenta borrada' : 'usuario activo'
+    ];
 
     $this->show_details_modal = true;
   }
@@ -227,7 +283,6 @@ class ListOrders extends Component
           'title_toast' =>  toastTitle('exitosa'),
           'descr_toast' =>  'El pedido fue entregado.'
         ]);
-
       } else {
 
         // cerrar modal
@@ -253,22 +308,28 @@ class ListOrders extends Component
   }
 
   /**
-   * buscar mis pedidos
+   * Buscar mis pedidos
    * @return mixed
    */
   public function searchOrders()
   {
-    $orders = Order::with([
+    return Order::with([
       'products' => function ($query) {
         $query->withTrashed();
       },
-      'status', 'sale', 'user'])
+      'status',
+      'sale',
+      'user' => function ($query) {
+        $query->withTrashed();
+      }
+    ])
       ->when($this->search_order, function ($query) {
         $query->where('order_code', 'like', '%' . $this->search_order . '%')
-              ->orWhereHas('user', function ($q) {
-                $q->where('name', 'like', '%' . $this->search_order . '%')
-                  ->orWhere('email', 'like', '%' . $this->search_order . '%');
-              });
+          ->orWhereHas('user', function ($q) {
+            $q->withTrashed()
+              ->where('name', 'like', '%' . $this->search_order . '%')
+              ->orWhere('email', 'like', '%' . $this->search_order . '%');
+          });
       })
       ->when($this->search_payment_status, function ($query) {
         $query->where('payment_status', $this->search_payment_status);
@@ -279,8 +340,10 @@ class ListOrders extends Component
       ->when(
         $this->search_start_at && $this->search_end_at,
         function ($query) {
-          $query->where('ordered_at', '>=', $this->search_start_at . ' 00:00:00')
-            ->where('ordered_at', '<=', $this->search_end_at . ' 23:59:59');
+          $query->whereBetween('ordered_at', [
+            $this->search_start_at . ' 00:00:00',
+            $this->search_end_at . ' 23:59:59'
+          ]);
         }
       )
       ->when(
@@ -297,8 +360,6 @@ class ListOrders extends Component
       )
       ->orderBy('created_at', 'desc')
       ->paginate(10);
-
-    return $orders;
   }
 
   /**

@@ -1,4 +1,4 @@
-<div wire:poll>
+<div>
   {{-- componente listar pedidos --}}
   <article class="m-2 border rounded-sm border-neutral-200">
 
@@ -12,22 +12,22 @@
       <x-slot:header class="">
 
         {{-- busqueda --}}
-        <div class="flex gap-1 justify-start items-start grow">
+        <div class="flex items-end justify-start gap-1">
 
           {{-- termino de busqueda --}}
-          <div class="flex flex-col justify-end w-1/6">
+          <div class="flex flex-col justify-end w-48">
             <label for="">buscar pedido</label>
             <input
-            type="text"
-            id="search_order"
-            wire:model.live="search_order"
-            class="w-full text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
-            placeholder="Buscar por codigo de orden o cliente"
-          />
+              type="text"
+              id="search_order"
+              wire:model.live="search_order"
+              class="w-full p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+              placeholder="Buscar por codigo de orden o cliente"
+            />
           </div>
 
           {{-- fecha de pedido desde --}}
-          <div class="flex flex-col justify-end w-1/6">
+          <div class="flex flex-col justify-end w-48">
             <label for="search_start_at">fecha de pedido desde</label>
             <input
               type="date"
@@ -35,11 +35,12 @@
               id="search_start_at"
               wire:model.live="search_start_at"
               wire:click="resetPagination()"
-              class="w-full text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"/>
+              class="w-full p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+            />
           </div>
 
           {{-- fecha de pedido hasta --}}
-          <div class="flex flex-col justify-end w-1/6">
+          <div class="flex flex-col justify-end w-48">
             <label for="search_end_at">fecha de pedido hasta</label>
             <input
               type="date"
@@ -47,16 +48,17 @@
               id="search_end_at"
               wire:model.live="search_end_at"
               wire:click="resetPagination()"
-              class="w-full text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"/>
+              class="w-full p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+            />
           </div>
 
           {{-- estado del pago --}}
-          <div class="flex flex-col justify-end w-1/6">
+          <div class="flex flex-col justify-end w-48">
             <label for="search_payment_status">Filtrar por estado de pago</label>
             <select
               id="search_payment_status"
               wire:model.live="search_payment_status"
-              class="w-full text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+              class="w-full p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
             >
               <option value="">Todos</option>
               <option value="{{ $order_payment_status_pendiente }}">Pendiente</option>
@@ -66,12 +68,12 @@
           </div>
 
           {{-- estado del pedido --}}
-          <div class="flex flex-col justify-end w-1/6">
+          <div class="flex flex-col justify-end w-48">
             <label for="search_order_status">Filtrar por estado de pedido</label>
             <select
               id="search_order_status"
               wire:model.live="search_order_status"
-              class="w-full text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+              class="w-full p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
             >
               <option value="">Todos</option>
               <option value="{{ $order_status_pendiente }}">Pendiente</option>
@@ -80,17 +82,14 @@
             </select>
           </div>
 
-        </div>
-
-        {{-- limpiar campos de busqueda --}}
-        <div class="flex flex-col self-start h-full">
+          {{-- limpiar campos de busqueda --}}
           <x-a-button
             href="#"
             wire:click="resetSearchInputs()"
             bg_color="neutral-200"
             border_color="neutral-300"
             text_color="neutral-600"
-            >limpiar
+            >limpiar filtros
           </x-a-button>
         </div>
 
@@ -99,136 +98,138 @@
       <x-slot:content>
 
         {{-- tabla de pedidos recibidos --}}
-        <x-table-base>
-          <x-slot:tablehead>
-            <tr class="border bg-neutral-100">
-              <x-table-th class="text-end w-12">
-                id
-              </x-table-th>
-              <x-table-th class="text-start">
-                codigo de pedido
-              </x-table-th>
-              <x-table-th class="text-start">
-                cliente
-                <x-quest-icon title="nombre del cliente que ordenó el pedido" />
-              </x-table-th>
-              <x-table-th class="text-start">
-                estado del pago
-                <x-quest-icon title="indica si el cliente registró o no un pago, o si cancelo el pago al cancelar el pedido" />
-              </x-table-th>
-              <x-table-th class="text-end">
-                $total
-              </x-table-th>
-              <x-table-th class="text-start">
-                fecha de pedido
-              </x-table-th>
-              <x-table-th class="text-start">
-                estado del pedido
-                <x-quest-icon title="indica en que estado esta la entrega de los productos pedidos" />
-              </x-table-th>
-              <x-table-th class="text-start">
-                acciones
-                <x-quest-icon title="puede ver el detalle del pedido, marcar la entrega del producto, cancelar un pedido por falta de pago y ver el comprobante de pago" />
-              </x-table-th>
-            </tr>
-          </x-slot:tablehead>
-          <x-slot:tablebody>
-            @forelse ($orders as $order)
-              <tr class="border" wire:key="{{ $order->id }}">
-                <x-table-td class="text-end">
-                  {{ $order->id }}
-                </x-table-td>
-                <x-table-td class="text-start">
-                  <span class="text-xs uppercase">{{ $order->order_code }}</span>
-                </x-table-td>
-                <x-table-td class="text-start">
-                  {{ $order->user->name }}
-                </x-table-td>
-                <x-table-td class="text-start">
-                  @if ($order->payment_status === $order_payment_status_pendiente)
-                    <x-text-tag color="orange">{{ $order->payment_status }}</x-text-tag>
-                  @elseif ($order->payment_status === $order_payment_status_aprobado)
-                    <x-text-tag color="emerald">{{ $order->payment_status }}</x-text-tag>
-                  @else
-                    <x-text-tag color="red">{{ $order->payment_status }}</x-text-tag>
-                  @endif
-                </x-table-td>
-                <x-table-td class="text-end">
-                  ${{ number_format($order->total_price, 2) }}
-                </x-table-td>
-                <x-table-td class="text-start">
-                  {{ $order->ordered_at->format('d-m-Y H:i') }} hs.
-                </x-table-td>
-                <x-table-td class="text-start">
-                  @if ($order->status->id === $order_status_pendiente)
-                    <x-text-tag color="orange">pedido&nbsp;{{ $order->status->status }}</x-text-tag>
-                  @elseif ($order->status->id === $order_status_entregado)
-                    <x-text-tag color="emerald">pedido&nbsp;{{ $order->status->status }}</x-text-tag>
-                  @else
-                    <x-text-tag color="red">pedido&nbsp;{{ $order->status->status}}</x-text-tag>
-                  @endif
-                </x-table-td>
-                <x-table-td class="text-start">
-                  <div class="flex gap-1">
-                    <x-a-button
-                      href="#"
-                      wire:click="showDetails({{ $order->id }})"
-                      bg_color="neutral-100"
-                      border_color="neutral-200"
-                      text_color="neutral-600"
-                      >ver
-                    </x-a-button>
-                    @if ($order->status->id === $order_status_pendiente && $order->payment_status === $order_payment_status_aprobado)
+        <div class="w-full" wire:poll>
+          <x-table-base>
+            <x-slot:tablehead>
+              <tr class="border bg-neutral-100">
+                <x-table-th class="w-12 text-end">
+                  id
+                </x-table-th>
+                <x-table-th class="text-start">
+                  codigo de pedido
+                </x-table-th>
+                <x-table-th class="text-start">
+                  cliente
+                  <x-quest-icon title="nombre del cliente que ordenó el pedido" />
+                </x-table-th>
+                <x-table-th class="text-start">
+                  estado del pago
+                  <x-quest-icon title="indica si el cliente registró o no un pago, o si cancelo el pago al cancelar el pedido" />
+                </x-table-th>
+                <x-table-th class="text-end">
+                  $total
+                </x-table-th>
+                <x-table-th class="text-start">
+                  fecha de pedido
+                </x-table-th>
+                <x-table-th class="text-start">
+                  estado del pedido
+                  <x-quest-icon title="indica en que estado esta la entrega de los productos pedidos" />
+                </x-table-th>
+                <x-table-th class="text-start">
+                  acciones
+                  <x-quest-icon title="puede ver el detalle del pedido, marcar la entrega del producto, cancelar un pedido por falta de pago y ver el comprobante de pago" />
+                </x-table-th>
+              </tr>
+            </x-slot:tablehead>
+            <x-slot:tablebody>
+              @forelse ($orders as $order)
+                <tr class="border" wire:key="{{ $order->id }}">
+                  <x-table-td class="text-end">
+                    {{ $order->id }}
+                  </x-table-td>
+                  <x-table-td class="text-start">
+                    <span class="text-xs uppercase">{{ $order->order_code }}</span>
+                  </x-table-td>
+                  <x-table-td class="text-start">
+                    {{ $order->user->name }}
+                  </x-table-td>
+                  <x-table-td class="text-start">
+                    @if ($order->payment_status === $order_payment_status_pendiente)
+                      <x-text-tag color="orange">{{ $order->payment_status }}</x-text-tag>
+                    @elseif ($order->payment_status === $order_payment_status_aprobado)
+                      <x-text-tag color="emerald">{{ $order->payment_status }}</x-text-tag>
+                    @else
+                      <x-text-tag color="red">{{ $order->payment_status }}</x-text-tag>
+                    @endif
+                  </x-table-td>
+                  <x-table-td class="text-end">
+                    ${{ number_format($order->total_price, 2) }}
+                  </x-table-td>
+                  <x-table-td class="text-start">
+                    {{ $order->ordered_at->format('d-m-Y H:i') }} hs.
+                  </x-table-td>
+                  <x-table-td class="text-start">
+                    @if ($order->status->id === $order_status_pendiente)
+                      <x-text-tag color="orange">pedido&nbsp;{{ $order->status->status }}</x-text-tag>
+                    @elseif ($order->status->id === $order_status_entregado)
+                      <x-text-tag color="emerald">pedido&nbsp;{{ $order->status->status }}</x-text-tag>
+                    @else
+                      <x-text-tag color="red">pedido&nbsp;{{ $order->status->status}}</x-text-tag>
+                    @endif
+                  </x-table-td>
+                  <x-table-td class="text-start">
+                    <div class="flex gap-1">
                       <x-a-button
                         href="#"
-                        wire:click="showEntregarOrderModal({{ $order->id }})"
+                        wire:click="showDetails({{ $order->id }})"
                         bg_color="neutral-100"
                         border_color="neutral-200"
                         text_color="neutral-600"
-                        >marcar entrega
+                        >ver
                       </x-a-button>
-                    @endif
-                    @if ($order->sale()->exists())
-                      <x-a-button
-                        href="#"
-                        wire:click="showPayment({{ $order->id }})"
-                        bg_color="neutral-100"
-                        border_color="neutral-200"
-                        text_color="neutral-600"
-                        >comprobante
-                      </x-a-button>
-                    @endif
-                    @if ($order->payment_status === $order_payment_status_pendiente && $order->status->id === $order_status_pendiente)
-                      <x-a-button
-                        href="#"
-                        wire:click="showCancelOrderModal({{ $order->id }})"
-                        bg_color="red-600"
-                        border_color="red-600"
-                        text_color="neutral-100"
-                        >cancelar pedido
-                      </x-a-button>
-                    @endif
-                  </div>
-                </x-table-td>
-              </tr>
-            @empty
-              <tr class="border">
-                <x-table-td colspan="7">
-                  <span>¡sin pedidos registrados!</span>
-                </x-table-td>
-              </tr>
-            @endforelse
-          </x-slot:tablebody>
-        </x-table-base>
+                      @if ($order->status->id === $order_status_pendiente && $order->payment_status === $order_payment_status_aprobado)
+                        <x-a-button
+                          href="#"
+                          wire:click="showEntregarOrderModal({{ $order->id }})"
+                          bg_color="neutral-100"
+                          border_color="neutral-200"
+                          text_color="neutral-600"
+                          >marcar entrega
+                        </x-a-button>
+                      @endif
+                      @if ($order->sale()->exists())
+                        <x-a-button
+                          href="#"
+                          wire:click="showPayment({{ $order->id }})"
+                          bg_color="neutral-100"
+                          border_color="neutral-200"
+                          text_color="neutral-600"
+                          >comprobante
+                        </x-a-button>
+                      @endif
+                      @if ($order->payment_status === $order_payment_status_pendiente && $order->status->id === $order_status_pendiente)
+                        <x-a-button
+                          href="#"
+                          wire:click="showCancelOrderModal({{ $order->id }})"
+                          bg_color="red-600"
+                          border_color="red-600"
+                          text_color="neutral-100"
+                          >cancelar pedido
+                        </x-a-button>
+                      @endif
+                    </div>
+                  </x-table-td>
+                </tr>
+              @empty
+                <tr class="border">
+                  <x-table-td colspan="7">
+                    <span>¡sin pedidos registrados!</span>
+                  </x-table-td>
+                </tr>
+              @endforelse
+            </x-slot:tablebody>
+          </x-table-base>
+        </div>
 
         {{-- modal: detalles del pedido, productos --}}
         @if ($show_details_modal && $details_order)
           <div class="fixed inset-0 z-50 overflow-y-auto">
             <div class="flex items-center justify-center min-h-screen px-4">
               <div class="fixed inset-0 bg-neutral-950 opacity-40"></div>
-              <div class="relative bg-white rounded-lg w-full max-w-2xl p-6">
-                <div class="flex justify-between items-center mb-4">
-                  <h2 class="text-xl text-neutral-700 font-semibold">Detalles del pedido</h2>
+              <div class="relative w-full max-w-2xl p-6 bg-white rounded-lg">
+                <div class="flex items-center justify-between mb-4">
+                  <h2 class="text-xl font-semibold text-neutral-700">Detalles del pedido</h2>
                   <x-a-button
                     href="#"
                     wire:click="closeDetails()"
@@ -239,39 +240,40 @@
                   </x-a-button>
                 </div>
                 {{-- cliente --}}
-                <div class="flex flex-col justify-start items-start mb-2 gap-1">
-                  @if ($details_order->user->profile()->exists())
-                    <span>
-                      <span class="font-semibold">Cliente:&nbsp;</span>
-                      <span class="capitalize">{{ $details_order->user->name }} - </span>
-                      <span>{{ $details_order->user->profile->dni ? 'DNI: ' . $details_order->user->profile->dni : ''  }}</span>
-                    </span>
-                    <span>
-                      <span class="font-semibold">Contacto:&nbsp;</span>
-                      <span>{{ $details_order->user->profile->phone_number ? 'Tel: ' . $details_order->user->profile->phone_number : '' }} - </span>
-                      <span>{{ 'Email: ' . $details_order->user->email}}</span>
-                    </span>
-                  @else
-                    <span>
-                      <span class="font-semibold">Cliente:&nbsp;</span>
-                      <span class="capitalize">{{ $details_order->user->name }} - </span>
-                      <span>{{ 'Email: ' . $details_order->user->email }}</span>
-                    </span>
-                  @endif
+                <div class="flex flex-col items-start justify-start gap-1 mb-2">
+                  <span>
+                    <span class="font-semibold">Cliente:&nbsp;</span>
+                    <span class="capitalize">usuario:&nbsp;{{ $details_user['username'] }}, </span>
+                    <span class="capitalize">nombre completo:&nbsp;{{ $details_user['full_name'] }}</span>
+                    <span> - DNI: {{ $details_user['dni'] }} </span>
+                  </span>
+                  <span>
+                    <span class="font-semibold">Contacto:&nbsp;</span>
+                    <span>Tel:  {{ $details_user['contact'] }} </span>
+                    <span>Email: {{ $details_user['email'] }} </span>
+                  </span>
+                  <span>
+                    <span class="font-semibold">Dirección:&nbsp;</span>
+                    <span>{{ $details_user['full_address'] }}</span>
+                  </span>
+                  <span>
+                    <span class="font-semibold">cuenta del usuario: </span>
+                    <span>{{ $details_user['account_status'] }}</span>
+                  </span>
                 </div>
                 {{-- pedido --}}
                 <div class="space-y-4">
                   @if ($details_order && $details_order->products)
                     @foreach ($details_order->products as $product)
-                      <div wire:key="{{ $loop->index }}" class="flex flex-col items-center justify-between border-b pb-2">
+                      <div wire:key="{{ $loop->index }}" class="flex flex-col items-center justify-between pb-2 border-b">
                         {{-- producto --}}
-                        <div class="w-full flex justify-between items-center">
+                        <div class="flex items-center justify-between w-full">
                           {{-- imagen y precio unitario --}}
                           <div class="flex items-center gap-2">
                             <img
                               src="{{ Storage::url($product->product_image_path) }}"
                               alt="{{ $product->product_name }}"
-                              class="w-16 h-16 object-cover rounded"
+                              class="object-cover w-16 h-16 rounded"
                             />
                             <div>
                               <h3 class="font-semibold">{{ $product->product_name }}</h3>
@@ -292,7 +294,7 @@
                       </div>
                     @endforeach
                     {{-- total --}}
-                    <div class="flex justify-end items-center w-full p-6">
+                    <div class="flex items-center justify-end w-full p-6">
                       <span class="text-xl font-bold">Total:&nbsp;${{ number_format($details_order->total_price, 2) }}</span>
                     </div>
                   @endif
@@ -307,9 +309,9 @@
           <div class="fixed inset-0 z-50 overflow-y-auto">
             <div class="flex items-center justify-center min-h-screen px-4">
               <div class="fixed inset-0 bg-neutral-950 opacity-40"></div> {{-- fondo negro --}}
-              <div class="relative bg-white rounded-lg w-full max-w-2xl p-6">
-                <div class="flex justify-between items-center mb-4">
-                  <h2 class="text-xl text-neutral-700 font-semibold">detalles del pago:</h2>
+              <div class="relative w-full max-w-2xl p-6 bg-white rounded-lg">
+                <div class="flex items-center justify-between mb-4">
+                  <h2 class="text-xl font-semibold text-neutral-700">detalles del pago:</h2>
                   <x-a-button
                     href="#"
                     wire:click="closePayment()"
@@ -328,7 +330,7 @@
                   {{-- si se trata de comprobante de mercado pago --}}
                   @if (count($sale_payment_data['mp']) !== 0)
                     <div class="space-y-4">
-                      <div class="flex flex-col justify-start items-start gap-1">
+                      <div class="flex flex-col items-start justify-start gap-1">
                         <span>
                           <span class="font-semibold">Orden:&nbsp;</span>
                           <span class="text-sm uppercase">{{ $payment_order->order_code }}</span>
@@ -367,12 +369,12 @@
           <div class="fixed inset-0 z-50 overflow-y-auto">
             <div class="flex items-center justify-center min-h-screen px-4">
               <div class="fixed inset-0 bg-neutral-950 opacity-40"></div> {{-- fondo negro --}}
-              <div class="relative bg-white rounded-lg w-full max-w-md p-6">
-                <div class="mb-4 pb-2 space-y-2 border-b border-neutral-200">
-                  <span class="font-semibold text-neutral-800 text-2xl">¿Cancelar el pedido?</span>
+              <div class="relative w-full max-w-md p-6 bg-white rounded-lg">
+                <div class="pb-2 mb-4 space-y-2 border-b border-neutral-200">
+                  <span class="text-2xl font-semibold text-neutral-800">¿Cancelar el pedido?</span>
                   <p class="">Por favor confirme si desea cancelar el pedido. Esta accion es irreversible!</p>
                 </div>
-                <div class="flex justify-between items-center">
+                <div class="flex items-center justify-between">
                   {{-- cancelar --}}
                   <x-a-button
                     href="#"
@@ -402,12 +404,12 @@
           <div class="fixed inset-0 z-50 overflow-y-auto">
             <div class="flex items-center justify-center min-h-screen px-4">
               <div class="fixed inset-0 bg-neutral-950 opacity-40"></div> {{-- fondo negro --}}
-              <div class="relative bg-white rounded-lg w-full max-w-md p-6">
-                <div class="mb-4 pb-2 space-y-2 border-b border-neutral-200">
-                  <span class="font-semibold text-neutral-800 text-2xl">¿Entregar el pedido?</span>
+              <div class="relative w-full max-w-md p-6 bg-white rounded-lg">
+                <div class="pb-2 mb-4 space-y-2 border-b border-neutral-200">
+                  <span class="text-2xl font-semibold text-neutral-800">¿Entregar el pedido?</span>
                   <p class="">Por favor confirme si desea marcar la entrega de los productos del pedido. Solo puede entregar los productos cuando el pedido tiene el pago aprobado. Esta accion es irreversible!</p>
                 </div>
-                <div class="flex justify-between items-center">
+                <div class="flex items-center justify-between">
                   {{-- cancelar --}}
                   <x-a-button
                     href="#"

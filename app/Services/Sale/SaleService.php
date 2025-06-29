@@ -181,9 +181,57 @@ class SaleService
    */
   public function generateSaleData(Sale $sale): array
   {
-    $client = ($sale->user()->exists())
-      ? $sale->user->name . ' - ' . $sale->user->email
-      : $sale->client_type;
+    $sale->load(['user' => function ($query) {
+      $query->withTrashed()
+        ->with([
+          'profile' => function ($q) {
+            $q->withTrashed()
+              ->with([
+                'address' => function ($q) {
+                  $q->withTrashed();
+                }
+              ]);
+          }
+        ]);
+    }])->first();
+
+    if ($sale->user) {
+      $usr = $sale->user;
+      $username = $usr->name;
+      $email = $usr->email;
+    } else {
+      $username = '-';
+      $email = '-';
+    }
+
+    if ($sale->user->profile) {
+      $pr = $sale->user->profile;
+      $fullname = $pr->first_name . ', ' . $pr->last_name;
+      $dni = $pr->dni;
+      $contact = $pr->phone_number;
+    } else {
+      $fullname = '-';
+      $contact = '-';
+      $dni = '-';
+    }
+
+    if ($sale->user->profile->address) {
+      $adr = $sale->user->profile->address;
+      $full_address = $adr->street . ', numero ' . $adr->number . ', ciudad: '
+        . $adr->city . ', CP' . $adr->postal_code;
+    } else {
+      $full_address = '-';
+    }
+
+    $client = [
+      'username'        =>  $username,
+      'email'           =>  $email,
+      'full_name'       =>  $fullname,
+      'contact'         =>  $contact,
+      'dni'             =>  $dni,
+      'full_address'    =>  $full_address,
+      'account_status'  =>  $sale->user->trashed() ? 'cuenta borrada' : 'usuario activo'
+    ];
 
     $sale_data = [
       'id'              => $sale->id,

@@ -50,6 +50,7 @@ class ListSales extends Component
   // * modal ver venta
   public bool $show_sale_modal = false;
   public $selected_sale = null;
+  public $details_user = null;
 
   // * modal comprobante de venta (o pago)
   public bool $show_payment_modal = false;
@@ -278,8 +279,66 @@ class ListSales extends Component
    */
   public function openShowSaleModal(Sale $sale): void
   {
+    $selected_sale = Sale::with([
+      'products' => function ($query) {
+        $query->withTrashed();
+      },
+      'user' => function ($query) {
+        $query->withTrashed()
+          ->with([
+            'profile' => function ($q) {
+              $q->withTrashed()
+                ->with([
+                  'address' => function ($q) {
+                    $q->withTrashed();
+                  }
+                ]);
+            }
+          ]);
+      }
+    ])->findOrFail($sale->id);
+
+    $this->selected_sale = $selected_sale;
+
+    if ($this->selected_sale->user) {
+      $usr = $this->selected_sale->user;
+      $username = $usr->name;
+      $email = $usr->email;
+    } else {
+      $username = '-';
+      $email = '-';
+    }
+
+    if ($this->selected_sale->user->profile) {
+      $pr = $this->selected_sale->user->profile;
+      $fullname = $pr->first_name . ', ' . $pr->last_name;
+      $dni = $pr->dni;
+      $contact = $pr->phone_number;
+    } else {
+      $fullname = '-';
+      $contact = '-';
+      $dni = '-';
+    }
+
+    if ($this->selected_sale->user->profile->address) {
+      $adr = $this->selected_sale->user->profile->address;
+      $full_address = $adr->street . ', numero ' . $adr->number . ', ciudad: '
+        . $adr->city . ', CP' . $adr->postal_code;
+    } else {
+      $full_address = '-';
+    }
+
+    $this->details_user = [
+      'username'        =>  $username,
+      'email'           =>  $email,
+      'full_name'       =>  $fullname,
+      'contact'         =>  $contact,
+      'dni'             =>  $dni,
+      'full_address'    =>  $full_address,
+      'account_status'  =>  $this->selected_sale->user->trashed() ? 'cuenta borrada' : 'usuario activo'
+    ];
+
     $this->show_sale_modal = true;
-    $this->selected_sale = $sale;
   }
 
   /**
@@ -293,28 +352,33 @@ class ListSales extends Component
   }
 
   /**
-   * buscar ventas
+   * Buscar ventas
    * por id, cliente, fechas
    */
   public function searchSales()
   {
-    return Sale::with(['user', 'order'])
+    return Sale::with(['user' => function ($query) {
+      $query->withTrashed();
+    }, 'order'])
       ->when(
         $this->search_sale,
         function ($query) {
           $query->where('id', '=', $this->search_sale)
             ->orWhereHas('user', function ($query) {
-              $query->role('cliente')
-                ->where('user.name', 'like', '%' . $this->search_sale . '%')
-                ->orWhere('user.email', 'like', '%' . $this->search_sale . '%');
+              $query->withTrashed()
+                ->role('cliente')
+                ->where('name', 'like', '%' . $this->search_sale . '%')
+                ->orWhere('email', 'like', '%' . $this->search_sale . '%');
             });
         }
       )
       ->when(
         $this->search_start_at && $this->search_end_at,
         function ($query) {
-          $query->where('sold_on', '>=', $this->search_start_at . ' 00:00:00')
-            ->where('sold_on', '<=', $this->search_end_at . ' 23:59:59');
+          $query->whereBetween('sold_on', [
+            $this->search_start_at . ' 00:00:00',
+            $this->search_end_at . ' 23:59:59'
+          ]);
         }
       )
       ->when(
