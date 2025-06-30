@@ -7,6 +7,7 @@ use App\Models\Recipe;
 use App\Models\Tag;
 use App\Models\Stock;
 use App\Models\StockMovement;
+use App\Services\Product\ProductService;
 use App\Services\Stock\StockService;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
@@ -48,7 +49,7 @@ class ListProducts extends Component
 
       $this->dispatch('toast-event', toast_data: [
         'event_type' => 'info',
-        'title_toast' => toastTitle('',true),
+        'title_toast' => toastTitle('', true),
         'descr_toast' => 'El producto no tiene recetas'
       ]);
 
@@ -68,7 +69,7 @@ class ListProducts extends Component
     // validar si eligio receta
     $this->validate([
       'selected_recipe' => ['required']
-    ],[
+    ], [
       'selected_recipe' => 'debe seleccionar una receta'
     ]);
 
@@ -95,22 +96,19 @@ class ListProducts extends Component
         'title_toast' => toastTitle('exitosa'),
         'descr_toast' => 'El producto fue elaborado correctamente.'
       ]);
-
     } catch (\Exception $e) {
 
       // Notificar error
       $this->dispatch('toast-event', toast_data: [
         'event_type' => 'info',
-        'title_toast' => toastTitle('',true),
+        'title_toast' => toastTitle('', true),
         'descr_toast' => $e->getMessage()
       ]);
-
     } finally {
 
       // Siempre cerrar el modal y limpiar la seleccion
       $this->show_elaboration_modal = false;
       $this->reset(['selected_recipe']);
-
     }
   }
 
@@ -122,7 +120,43 @@ class ListProducts extends Component
    */
   public function delete(Product $product): void
   {
-    // todo: si hay pedidos pendientes, no borrar
+    $product_service = new ProductService();
+
+    // si tiene stock, no borrar
+    if ($product->getTotalStockAttribute() > 0) {
+
+      $this->dispatch('toast-event', toast_data: [
+        'event_type'  =>  'info',
+        'title_toast' =>  toastTitle('', true),
+        'descr_toast' =>  'No puede eliminar el producto, tiene stock disponible.'
+      ]);
+
+      return;
+    }
+
+    // si tiene ventas asociadas, no borrar
+    if ($product_service->isOnSales($product)) {
+
+      $this->dispatch('toast-event', toast_data: [
+        'event_type'  =>  'info',
+        'title_toast' =>  toastTitle('', true),
+        'descr_toast' =>  'No puede eliminar el producto, tiene ventas asociadas.'
+      ]);
+
+      return;
+    }
+
+    // si tiene pedidos asociados, no borrar
+    if ($product_service->isOnOrders($product)) {
+
+      $this->dispatch('toast-event', toast_data: [
+        'event_type'  =>  'info',
+        'title_toast' =>  toastTitle('', true),
+        'descr_toast' =>  'No puede eliminar el producto, tiene pedidos asociadas.'
+      ]);
+
+      return;
+    }
 
     // retirar de la tienda
     $product->product_in_store = false;

@@ -24,7 +24,6 @@ class EditProduct extends Component
   // datos del producto
   public $product_name;
   public $product_short_description;
-  public $product_price;
   public $product_expires_in;
   public $product_in_store;
   public $product_image_path;
@@ -55,7 +54,6 @@ class EditProduct extends Component
 
     $this->product_name              = $this->product->product_name;
     $this->product_short_description = $this->product->product_short_description;
-    $this->product_price             = $this->product->product_price;
     $this->product_expires_in        = $this->product->product_expires_in;
     $this->product_in_store          = $this->product->product_in_store;
     $this->product_image_path        = $this->product->product_image_path;
@@ -127,7 +125,6 @@ class EditProduct extends Component
         'max:50'
       ],
       'product_short_description' => ['required', 'regex:/^[a-zA-ZáéíóúñÁÉÍÓÚÑ0-9\s,\.]+$/u', 'min:15', 'max:150'],
-      'product_price'             => ['required', 'numeric', 'regex:/^\d{1,6}(\.\d{1,2})?$/', 'min:1'],
       'product_expires_in'        => ['required'],
       'product_in_store'          => ['required'],
       'product_image_path'        => ['required'],
@@ -141,10 +138,6 @@ class EditProduct extends Component
       'product_short_description.regex' => ':attribute solo puede tener, letras y numeros',
       'product_short_description.min'   => ':attribute debe ser de una longitud minima de :min',
       'product_short_description.max'   => ':attribute debe ser de una longitud maxima de :max',
-      'product_price.required'    => ':attribute es obligatorio',
-      'product_price.numeric'     => ':attribute es debe ser un número',
-      'product_price.min'         => ':attribute puede ser de minimo $1',
-      'product_price.regex'       => ':attribute puede ser de hasta $999999.99',
       'product_in_store.required' => 'indique si desea publicar en la tienda este producto',
       'tags_list.required'        => 'elija al menos una etiqueta que describa el producto',
       'product_expires_in.required'   => 'indique la cantidad de :attribute',
@@ -154,7 +147,6 @@ class EditProduct extends Component
     ], [
       'product_name'              => 'nombre del producto',
       'product_short_description' => 'descripcion corta',
-      'product_price'             => 'precio del producto',
       'tags_list'                 => 'etiquetas de clasificacion',
       'product_expires_in'        => 'dias de vencimiento',
       'product_in_store'          => 'publicar en tienda',
@@ -177,7 +169,6 @@ class EditProduct extends Component
 
       $this->product->product_name              = $validated['product_name'];
       $this->product->product_short_description = $validated['product_short_description'];
-      $this->product->product_price             = $validated['product_price'];
       $this->product->product_expires_in        = $validated['product_expires_in'];
       $this->product->product_in_store          = $validated['product_in_store'];
       $this->product->product_image_path        = $validated['product_image_path'];

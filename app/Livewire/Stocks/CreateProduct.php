@@ -226,7 +226,6 @@ class CreateProduct extends Component
 
     try {
 
-
       $product_image_path = $this->product_image->store('productos', 'public');
       $validated['product_image_path'] = $product_image_path;
 

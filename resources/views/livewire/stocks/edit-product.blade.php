@@ -13,7 +13,7 @@
       <x-slot:content class="flex-col">
 
         {{-- formulario del producto --}}
-        <form class="w-full flex flex-col gap-1">
+        <form class="flex flex-col w-full gap-1">
 
           <x-div-toggle x-data="{ open: true }" title="detalles del producto" class="w-full p-2">
 
@@ -28,17 +28,17 @@
               </x-slot:messages>
             @enderror
 
-            <div class="flex justify-start items-stretch gap-4">
+            <div class="flex items-stretch justify-start gap-4">
 
-              <div class="flex flex-col gap-4 w-1/2">
+              <div class="flex flex-col w-1/2 gap-4">
                 <div class="flex gap-4">
                   {{-- nombre del producto --}}
-                  <div class="flex flex-col gap-1 min-h-fit w-full">
+                  <div class="flex flex-col w-full gap-1 min-h-fit">
                     <span>
                       <label for="product_name">nombre del producto</label>
                       <span class="text-red-600">*</span>
                     </span>
-                    @error('product_name')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
+                    @error('product_name')<span class="text-xs text-red-400">{{ $message }}</span>@enderror
                     <input
                       name="product_name"
                       id="product_name"
@@ -47,32 +47,16 @@
                       class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
                     />
                   </div>
-                  {{-- precio --}}
-                  <div class="flex flex-col gap-1 min-h-fit w-full">
-                    <span>
-                      <label for="product_price">$&nbsp;precio del producto</label>
-                      <span class="text-red-600">*</span>
-                    </span>
-                    @error('product_price')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
-                    <input
-                      name="product_price"
-                      id="product_price"
-                      wire:model="product_price"
-                      type="text"
-                      placeholder="$"
-                      class="p-1 text-sm text-right border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
-                    />
-                  </div>
                 </div>
                 <div class="flex gap-4">
                   {{-- vencimiento luego de elaboracion  --}}
-                  <div class="flex flex-col gap-1 min-h-fit w-full">
+                  <div class="flex flex-col w-full gap-1 min-h-fit">
                     <span>
                       <label for="product_expires_in">Vencimiento despúes de elaborarse</label>
                       <x-quest-icon title="Una vez que se prepare este producto, ¿cuántos dias se mantiene fresco para la venta?"/>
                       <span class="text-red-600">*</span>
                     </span>
-                    @error('product_expires_in')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
+                    @error('product_expires_in')<span class="text-xs text-red-400">{{ $message }}</span>@enderror
                     <input
                       name="product_expires_in"
                       id="product_expires_in"
@@ -83,12 +67,12 @@
                     />
                   </div>
                   {{-- publicar en tienda --}}
-                  <div class="flex flex-col gap-1 min-h-fit w-full">
+                  <div class="flex flex-col w-full gap-1 min-h-fit">
                     <span>
                       <label for="product_in_store">publicar este producto en la tienda?</label>
                       <span class="text-red-600">*</span>
                     </span>
-                    @error('product_in_store')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
+                    @error('product_in_store')<span class="text-xs text-red-400">{{ $message }}</span>@enderror
                     <select
                       name="product_in_store"
                       wire:model="product_in_store"
@@ -100,33 +84,33 @@
                   </div>
                 </div>
                 {{-- decripcion corta --}}
-                <div class="flex flex-col gap-1 min-h-fit w-full">
+                <div class="flex flex-col w-full gap-1 min-h-fit">
                   <span>
                     <label for="product_short_description">descripción corta del producto</label>
                     <span class="text-red-600">*</span>
                   </span>
-                  @error('product_short_description')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
+                  @error('product_short_description')<span class="text-xs text-red-400">{{ $message }}</span>@enderror
                   <textarea
                     wire:model="product_short_description"
                     name="product_short_description"
                     rows="3"
                     cols="10"
-                    class="p-1 text-sm w-full border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
+                    class="w-full p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
                   </textarea>
                 </div>
                 {{-- etiquetas --}}
-                <div class="flex flex-col gap-1 min-h-fit w-full">
+                <div class="flex flex-col w-full gap-1 min-h-fit">
                   <span>
                     <label for="">etiquetas de clasificacion</label>
                     <span class="text-red-600">*</span>
                   </span>
-                  @error('tags_list')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
+                  @error('tags_list')<span class="text-xs text-red-400">{{ $message }}</span>@enderror
                   {{-- elegir etiquetas --}}
-                  <div class="flex justify-start items-center gap-1">
+                  <div class="flex items-center justify-start gap-1">
                     <select
                       name="selected_id_tag"
                       wire:model="selected_id_tag"
-                      class="grow p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
+                      class="p-1 text-sm border grow border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
                       <option value="">seleccione ...</option>
                       @foreach ($tags as $tag)
                         <option value="{{ $tag->id }}">{{ $tag->tag_name }}</option>
@@ -142,11 +126,11 @@
                     </x-a-button>
                   </div>
                   {{-- visualizar etiquetas --}}
-                  <div class="flex justify-start items-center gap-2 flex-wrap p-1 min-h-8 border border-dashed border-neutral-200 leading-none overflow-y-auto overflow-x-auto">
+                  <div class="flex flex-wrap items-center justify-start gap-2 p-1 overflow-x-auto overflow-y-auto leading-none border border-dashed min-h-8 border-neutral-200">
                     @forelse ($tags_list as $key => $tag)
-                      <div class="flex items-center justify-start gap-1 border border-blue-300 bg-blue-200 py-px px-1 rounded-lg">
-                        <span class="text-sm text-neutral-600 lowercase">{{ $tag['tag']->tag_name }}</span>
-                        <span wire:click="removeTagFromList({{ $key }})" class="text-lg leading-none cursor-pointer text-red-400 hover:text-red-600 hover:font-semibold" title="">&times;</span>
+                      <div class="flex items-center justify-start gap-1 px-1 py-px bg-blue-200 border border-blue-300 rounded-lg">
+                        <span class="text-sm lowercase text-neutral-600">{{ $tag['tag']->tag_name }}</span>
+                        <span wire:click="removeTagFromList({{ $key }})" class="text-lg leading-none text-red-400 cursor-pointer hover:text-red-600 hover:font-semibold" title="">&times;</span>
                       </div>
                     @empty
                       <span>¡no ha elegido ninguna etiqueta!</span>
@@ -154,25 +138,25 @@
                   </div>
                 </div>
               </div>
-              <div class="flex flex-col gap-4 w-1/2">
+              <div class="flex flex-col w-1/2 gap-4">
                 {{-- imagen del producto --}}
-                <div class="flex flex-col gap-1 min-h-fit w-full">
+                <div class="flex flex-col w-full gap-1 min-h-fit">
                   <span>
                     <label for="new_product_image">imagen del producto</label>
                     <span class="text-red-600">*</span>
                   </span>
                   <span>puede seleccionar otro archivo para reemplazar la imagen existente</span>
-                  @error('new_product_image')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
+                  @error('new_product_image')<span class="text-xs text-red-400">{{ $message }}</span>@enderror
                   <input
                     type="file"
                     wire:model="new_product_image"
                     id="new_product_image"
                     accept="image/*"
-                    class="p-1 text-sm w-full border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                    class="w-full p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
                   />
                 </div>
                 {{-- vista previa de la imagen actual--}}
-                <div class="flex flex-col gap-1 min-h-fit w-full">
+                <div class="flex flex-col w-full gap-1 min-h-fit">
                   @if ($new_product_image)
                     <img
                       src="{{ $new_product_image->temporaryUrl() }}"
@@ -199,7 +183,7 @@
 
       <x-slot:footer class="mt-2">
         <!-- botones del formulario -->
-        <div class="flex justify-end my-2 gap-2">
+        <div class="flex justify-end gap-2 my-2">
 
           <x-a-button
             wire:navigate

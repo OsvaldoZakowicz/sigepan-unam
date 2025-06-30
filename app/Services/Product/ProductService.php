@@ -60,4 +60,43 @@ class ProductService
       return $product;
     });
   }
+
+  /**
+   * actualizar precios, eliminando los antiguos
+   */
+  public function updateProductPrices(Product $product, array $pricesList): void
+  {
+    // eliminar precios existentes
+    $product->prices()->delete();
+
+    // erear nuevos precios
+    foreach ($pricesList as $priceData) {
+      $product->prices()->create([
+        'quantity' => $priceData['quantity'],
+        'price' => $priceData['price'],
+        'description' => $priceData['description'],
+        'is_default' => $priceData['is_default'],
+      ]);
+    }
+  }
+
+  /**
+   * el producto esta asociado a ventas?
+   */
+  public function isOnSales(Product $product): bool
+  {
+    $count_on_sales = $product->sales()->count();
+
+    return ($count_on_sales > 0) ? true : false;
+  }
+
+  /**
+   * el producto esta asociado a ordenes?
+   */
+  public function isOnOrders(Product $product): bool
+  {
+    $count_on_orders = $product->orders()->count();
+
+    return ($count_on_orders > 0) ? true : false;
+  }
 }
