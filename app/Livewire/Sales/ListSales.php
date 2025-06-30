@@ -393,7 +393,8 @@ class ListSales extends Component
   {
     return Product::with(['stocks', 'prices'])
       ->whereHas('stocks', function ($query) {
-        $query->where('quantity_left', '>', 0);
+        $query->where('quantity_left', '>', 0)
+          ->where('expired_at', '>', now()->format('Y-m-d H:i:s'));
       })
       ->when($this->search_product, function ($query) {
         $query->where('product_name', 'like', '%' . $this->search_product . '%');
@@ -453,6 +454,7 @@ class ListSales extends Component
       $totalQuantityToSell = $selectedPrice->quantity * $product_for_sale['sale_quantity'];
 
       // Obtener stock disponible
+      // siempre contando no vencidos.
       $availableStock = $product->getTotalStockAttribute();
 
       if ($totalQuantityToSell > $availableStock) {

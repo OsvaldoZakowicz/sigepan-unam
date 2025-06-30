@@ -47,12 +47,14 @@ class Product extends Model
 
   /**
    * Calcular el stock total disponible de este producto
-   * sumatoria de cantidad restante
+   * sumatoria de cantidad restante, siempre que no esten vencidos
    * $product->total_stock
    */
   public function getTotalStockAttribute()
   {
-    return $this->stocks()->sum('quantity_left');
+    return $this->stocks()
+      ->where('expired_at', '>', now()->format('Y-m-d H:i:s'))
+      ->sum('quantity_left');
   }
 
   //* un producto tiene muchos tags de producto
