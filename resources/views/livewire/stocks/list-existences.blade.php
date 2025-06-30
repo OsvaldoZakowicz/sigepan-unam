@@ -10,12 +10,11 @@
     <x-content-section>
 
       <x-slot:header class="">
-
         {{-- busqueda --}}
-        <div class="flex gap-1 justify-start items-start grow">
+        <div class="flex items-end justify-start gap-1">
 
           {{-- termino de busqueda --}}
-          <div class="flex flex-col justify-end w-1/4">
+          <div class="flex flex-col justify-end w-56">
             <label for="">buscar categoria</label>
             <input
               type="text"
@@ -23,24 +22,20 @@
               wire:model.live="search_category"
               wire:click="resetPagination()"
               placeholder="ingrese un id, o termino de busqueda"
-              class="text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+              class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
             />
           </div>
 
-        </div>
-
-        {{-- limpiar campos de busqueda --}}
-        <div class="flex flex-col self-start h-full">
+          {{-- limpiar campos de busqueda --}}
           <x-a-button
             href="#"
             wire:click="resetSearchInputs()"
             bg_color="neutral-200"
             border_color="neutral-300"
             text_color="neutral-600"
-            >limpiar
+            >limpiar filtros
           </x-a-button>
         </div>
-
       </x-slot:header>
 
       <x-slot:content>
@@ -48,7 +43,7 @@
         <x-table-base>
           <x-slot:tablehead>
             <tr class="border bg-neutral-100">
-              <x-table-th class="text-end w-12">
+              <x-table-th class="w-12 text-end">
                 id
               </x-table-th>
               <x-table-th class="text-start">
@@ -61,7 +56,7 @@
                 existencias totales
                 <x-quest-icon title="kilogramos (kg), gramos (g), litros (L), mililitros (ml), metros (m), centimetros (cm)  o unidades (u)" />
               </x-table-th>
-              <x-table-th class="text-start w-48">
+              <x-table-th class="w-48 text-start">
                 acciones
               </x-table-th>
             </tr>
@@ -104,10 +99,10 @@
 
         {{-- modal de detalles --}}
         @if($show_details_modal)
-          <div class="fixed inset-0 z-50 bg-neutral-400 bg-opacity-20 overflow-y-auto h-full w-full flex items-center justify-center">
-            <div class="bg-white p-5 border rounded-md shadow-lg w-3/4">
+          <div class="fixed inset-0 z-50 flex items-center justify-center w-full h-full overflow-y-auto bg-neutral-400 bg-opacity-20">
+            <div class="w-3/4 p-5 bg-white border rounded-md shadow-lg">
               <!-- encabezado del modal -->
-              <div class="flex justify-between items-center mb-4">
+              <div class="flex items-center justify-between mb-4">
                 <div>
                   <h3 class="text-lg font-semibold text-neutral-800">
                     Detalle de movimientos sobre existencias:
@@ -119,11 +114,11 @@
                 </div>
               </div>
               {{-- cuerpo del modal --}}
-              <div class="mt-4 max-h-72 overflow-y-auto overflow-x-auto">
+              <div class="mt-4 overflow-x-auto overflow-y-auto max-h-72">
                 <x-table-base>
                   <x-slot:tablehead>
                     <tr class="border bg-neutral-100">
-                      <x-table-th class="text-end w-12">
+                      <x-table-th class="w-12 text-end">
                         id
                       </x-table-th>
                       <x-table-th class="text-start">
@@ -193,11 +188,11 @@
                       </tr>
                       @if ($loop->last)
                         <tr>
-                          <x-table-td colspan="4" class="text-end font-semibold capitalize">
+                          <x-table-td colspan="4" class="font-semibold capitalize text-end">
                             Total:
                             <x-quest-icon title="sumatoria de todos los movimientos de la categoría" />
                           </x-table-td>
-                          <x-table-td class="text-end font-semibold">
+                          <x-table-td class="font-semibold text-end">
                             {{ convert_measure($total_amount, $selected_category->measure) }}
                           </x-table-td>
                         </tr>

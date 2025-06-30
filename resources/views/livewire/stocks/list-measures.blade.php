@@ -9,12 +9,11 @@
     {{-- cuerpo --}}
     <x-content-section>
 
-      <x-slot:header>
+      <x-slot:header class="hidden">
         {{-- busqueda --}}
-        <div class="grow">
-          <div class="flex flex-col justify-start items-start">
+        {{-- <div class="grow">
+          <div class="flex flex-col items-start justify-start">
             <label for="search" class="text-sm capitalize">buscar unidad:</label>
-            {{-- termino de busqueda --}}
             <input
               type="text"
               name="search"
@@ -22,11 +21,11 @@
               wire:model.live="search"
               wire:click="resetPagination()"
               placeholder="ingrese un id, o termino de busqueda"
-              class="w-1/4 shrink text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+              class="w-1/4 p-1 text-sm border shrink border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
             />
           </div>
 
-        </div>
+        </div> --}}
       </x-slot:header>
 
       <x-slot:content>
@@ -34,7 +33,7 @@
         <x-table-base>
           <x-slot:tablehead>
             <tr class="border bg-neutral-100">
-              <x-table-th class="text-end w-12">id</x-table-th>
+              <x-table-th class="w-12 text-end">id</x-table-th>
               <x-table-th class="text-start">medida</x-table-th>
               <x-table-th class="text-end">cantidad base</x-table-th>
               <x-table-th class="text-start">conversion</x-table-th>
@@ -49,7 +48,7 @@
                 <x-table-td class="text-end">
                   {{ $measure->id }}
                 </x-table-td>
-                <x-table-td class="text-start capitalize">
+                <x-table-td class="capitalize text-start">
                   {{ $measure->unit_name }}&nbsp;({{ $measure->unit_symbol }})
                 </x-table-td>
                 <x-table-td class="text-end">

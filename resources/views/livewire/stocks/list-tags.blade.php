@@ -13,10 +13,9 @@
       <x-slot:header>
 
         {{-- busqueda --}}
-        <div class="grow">
-
+        <div class="flex items-end justify-start gap-1">
           {{-- termino de busqueda --}}
-          <div class="flex flex-col">
+          <div class="flex flex-col w-56">
             <label for="search_input">buscar etiqueta</label>
             <input
               type="text"
@@ -24,10 +23,18 @@
               wire:model.live="search_input"
               wire:click="resetPagination"
               placeholder="ingrese un id, o nombre ..."
-              class="w-1/4 shrink text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+              class="p-1 text-sm border shrink border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
             />
           </div>
-
+          {{-- limpiar campos de busqueda --}}
+          <x-a-button
+            href="#"
+            wire:click="resetSearchInputs()"
+            bg_color="neutral-200"
+            border_color="neutral-300"
+            text_color="neutral-600"
+            >limpiar filtros
+          </x-a-button>
         </div>
 
       </x-slot:header>
@@ -37,10 +44,10 @@
         <x-table-base>
           <x-slot:tablehead>
             <tr class="border bg-neutral-100">
-              <x-table-th class="text-end w-12">id</x-table-th>
+              <x-table-th class="w-12 text-end">id</x-table-th>
               <x-table-th class="text-start">etiqueta</x-table-th>
               <x-table-th class="text-end">fecha de creación</x-table-th>
-              <x-table-th class="text-start w-24">acciones</x-table-th>
+              <x-table-th class="w-24 text-start">acciones</x-table-th>
             </tr>
           </x-slot:tablehead>
           <x-slot:tablebody>

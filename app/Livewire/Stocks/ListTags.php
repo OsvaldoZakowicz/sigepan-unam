@@ -28,6 +28,24 @@ class ListTags extends Component
   }
 
   /**
+   * limpiar campos de busqueda
+   * @return void
+   */
+  public function resetSearchInputs(): void
+  {
+    $this->reset(['search_input']);
+  }
+
+  /**
+   * resetear la paginacion
+   * @return void
+   */
+  public function resetPagination(): void
+  {
+    $this->resetPage();
+  }
+
+  /**
    * Editar una etiqueta
    * @param Tag $tag Etiqueta a editar
    * @return void
