@@ -108,8 +108,8 @@
                       </x-a-button>
                     @else
                       <x-a-button
-                        href="#"
-                        wire:click=''
+                        href="{{ route('stocks-recipes-edit', $recipe->id) }}"
+                        wire:navigate
                         bg_color="neutral-100"
                         border_color="neutral-200"
                         text_color="neutral-600"

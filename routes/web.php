@@ -299,10 +299,6 @@ Route::middleware(['auth', 'verified', 'can:presupuestos'])->group(function () {
 //* modulo de stock
 Route::middleware(['auth', 'verified', 'can:stock'])->group(function () {
 
-  // ! ruta sin uso
-  Route::get('stocks', [StockController::class, 'stocks_index'])
-    ->name('stocks-stocks-index');
-
   Route::get('stocks/measures', [StockController::class, 'measures_index'])
     ->name('stocks-measures-index');
 
@@ -314,6 +310,9 @@ Route::middleware(['auth', 'verified', 'can:stock'])->group(function () {
 
   Route::get('stocks/recipes/create', [StockController::class, 'recipes_create'])
     ->name('stocks-recipes-create');
+
+  Route::get('stocks/recipes/edit/{id}', [StockController::class, 'recipes_edit'])
+    ->name('stocks-recipes-edit');
 
   Route::get('stocks/recipes/show/{id}', [StockController::class, 'recipes_show'])
     ->name('stocks-recipes-show');

@@ -171,7 +171,7 @@ new class extends Component {
 
       {{-- stock --}}
       @can('stock')
-      <x-responsive-nav-link :href="route('stocks-stocks-index')" :active="request()->routeIs('stocks-*')"
+      <x-responsive-nav-link :href="route('stocks-products-index')" :active="request()->routeIs('stocks-*')"
         wire:navigate>
         Stock
       </x-responsive-nav-link>

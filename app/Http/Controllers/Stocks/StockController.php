@@ -8,13 +8,6 @@ use Illuminate\View\View;
 
 class StockController extends Controller
 {
-  //* lista de stock de productos
-  // ! funcion sin uso
-  public function stocks_index(): View
-  {
-    return view('stocks.stocks-index');
-  }
-
   //* lista de unidades de medida
   public function measures_index(): View
   {
@@ -37,6 +30,12 @@ class StockController extends Controller
   public function recipes_create(): View
   {
     return view('stocks.recipes-create');
+  }
+
+  //* editar receta
+  public function recipes_edit(int $id): View
+  {
+    return view('stocks.recipes-edit', ['id' => $id]);
   }
 
   //* ver receta
