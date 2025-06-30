@@ -1,64 +1,64 @@
-<div wire:poll class="mt-20 pt-5 bg-gradient-to-r from-orange-100 via-amber-200 to-orange-900 h-screen">
+<div wire:poll class="h-screen pt-5 mt-20 bg-gradient-to-r from-orange-100 via-amber-200 to-orange-900">
   {{-- componente vista de las compras del cliente --}}
-  <div class="bg-white rounded-lg flex justify-between gap-8 items-start w-full max-w-6xl mx-auto p-6 h-4/5">
+  <div class="flex items-start justify-between w-full max-w-6xl gap-8 p-6 mx-auto bg-white rounded-lg h-4/5">
 
     <div class="w-full">
       {{-- cabecera --}}
-      <div class="flex justify-start items-center mb-4 gap-2">
+      <div class="flex items-center justify-start gap-2 mb-4">
         {{-- titulo de seccion --}}
-        <h2 class="text-xl text-neutral-700 font-semibold">Mis compras</h2>
+        <h2 class="text-xl font-semibold text-neutral-700">Mis compras</h2>
       </div>
 
       {{-- seccion de busqueda --}}
-      <div class="flex flex-col md:flex-row gap-4 mb-4">
+      <div class="flex flex-col gap-4 mb-4 md:flex-row">
         <div class="w-full md:w-1/2">
-          <label for="search_purchase" class="block text-sm font-medium text-neutral-700 mb-1">
+          <label for="search_purchase" class="block mb-1 text-sm font-medium text-neutral-700">
             Buscar por ID, tipo de compra, forma de pago o código de orden
           </label>
           <input
             type="text"
             id="search_purchase"
             wire:model.live="search_purchase"
-            class="rounded-md w-full py-1 px-2 text-sm bg-orange-100 text-orange-800 font-light border-orange-600 focus:ring-orange-800 focus:border-orange-800 focus:outline-none"
+            class="w-full px-2 py-1 text-sm font-light text-orange-800 bg-orange-100 border-orange-600 rounded-md focus:ring-orange-800 focus:border-orange-800 focus:outline-none"
             placeholder="Buscar..."
           />
         </div>
 
         <div class="w-full md:w-1/2">
-          <label for="search_purchase_date" class="block text-sm font-medium text-neutral-700 mb-1">
+          <label for="search_purchase_date" class="block mb-1 text-sm font-medium text-neutral-700">
             Buscar por fecha de compra
           </label>
           <input
             type="date"
             id="search_purchase_date"
             wire:model.live="search_purchase_date"
-            class="rounded-md w-full py-1 px-2 text-sm bg-orange-100 text-orange-800 font-light border-orange-600 focus:ring-orange-800 focus:border-orange-800 focus:outline-none"
+            class="w-full px-2 py-1 text-sm font-light text-orange-800 bg-orange-100 border-orange-600 rounded-md focus:ring-orange-800 focus:border-orange-800 focus:outline-none"
           />
         </div>
       </div>
 
       {{-- tabla de pedidos --}}
-      <div class="w-full max-h-72 overflow-y-auto overflow-x-auto">
+      <div class="w-full overflow-x-auto overflow-y-auto max-h-72">
         <table class="w-full border border-collapse">
           <thead class="bg-orange-100">
-            <tr class="text-neutral-800 capitalize">
-              <th class="border p-1 text-left">
+            <tr class="capitalize text-neutral-800">
+              <th class="p-1 text-left border">
                 id
               </th>
-              <th class="border p-1 text-left">
+              <th class="p-1 text-left border">
                 tipo de compra
                 <x-quest-icon title="indica si fue una compra mediante un pedido online o presencial en el local" />
               </th>
-              <th class="border p-1 text-left">
+              <th class="p-1 text-left border">
                 forma de pago
               </th>
-              <th class="border p-1 text-right">
+              <th class="p-1 text-right border">
                 $&nbsp;total
               </th>
-              <th class="border p-1 text-right">
+              <th class="p-1 text-right border">
                 fecha de compra
               </th>
-              <th class="border p-1 text-left">
+              <th class="p-1 text-left border">
                 acciones
               </th>
             </tr>
@@ -66,36 +66,36 @@
           <tbody>
             @forelse ($sales as $sale)
               <tr wire:key="{{ $sale->id}}" class="text-neutral-600">
-                <td class="border p-1 text-left">
+                <td class="p-1 text-left border">
                   {{ $sale->id }}
                 </td>
-                <td class="border p-1 text-left">
+                <td class="p-1 text-left border">
                   {{ $sale->sale_type }}
                   @if ($sale->order()->exists())
                     <span class="text-xs uppercase">({{ $sale->order->order_code }})</span>
                   @endif
                 </td>
-                <td class="border p-1 text-left">
+                <td class="p-1 text-left border">
                   {{ $sale->payment_type }}
                 </td>
-                <td class="border p-1 text-right">
+                <td class="p-1 text-right border">
                   ${{ number_format($sale->total_price, 2) }}
                 </td>
-                <td class="border p-1 text-right">
+                <td class="p-1 text-right border">
                   {{ $sale->sold_on->format('d-m-Y H:i') }} hs.
                 </td>
-                <td class="border p-1 text-left">
+                <td class="p-1 text-left border">
                   <button
                     type="button"
                     wire:click="showPayment({{ $sale->id }})"
-                    class="inline-flex justify-between items-center text-xs py-1 px-2 rounded border-2 border-orange-950 bg-orange-200 text-orange-800"
+                    class="inline-flex items-center justify-between px-2 py-1 text-xs text-orange-800 bg-orange-200 border-2 rounded border-orange-950"
                     >ver comprobante
                   </button>
                 </td>
               </tr>
             @empty
               <tr class="">
-                <td colspan="6" class="border p-1 text-left text-neutral-600 capitalize">¡sin registros!</td>
+                <td colspan="6" class="p-1 text-left capitalize border text-neutral-600">¡sin registros!</td>
               </tr>
             @endforelse
           </tbody>
@@ -112,12 +112,12 @@
         <div class="fixed inset-0 z-50 overflow-y-auto">
           <div class="flex items-center justify-center min-h-screen px-4">
             <div class="fixed inset-0 bg-neutral-950 opacity-40"></div> {{-- fondo negro --}}
-            <div class="relative bg-white rounded-lg w-full max-w-3xl p-6">
-              <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl text-neutral-700 font-semibold">detalles del pago:</h2>
+            <div class="relative w-full max-w-3xl p-6 bg-white rounded-lg">
+              <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-semibold text-neutral-700">detalles del pago:</h2>
                 <button
                   wire:click="closePayment()"
-                  class="inline-flex justify-between items-center mt-auto py-1 px-2 text-sm rounded border-2 border-orange-950 bg-orange-200 text-orange-800"
+                  class="inline-flex items-center justify-between px-2 py-1 mt-auto text-sm text-orange-800 bg-orange-200 border-2 rounded border-orange-950"
                   >cerrar
                 </button>
               </div>
@@ -129,7 +129,7 @@
                 {{-- si se trata de comprobante de mercado pago --}}
                 @if (count($sale_payment_data['mp']) !== 0)
                   <div class="space-y-4">
-                    <div class="flex flex-col justify-start items-start gap-1">
+                    <div class="flex flex-col items-start justify-start gap-1">
                       <span>
                         <span class="font-semibold">Orden:&nbsp;</span>
                         <span class="text-sm uppercase">{{ $selected_sale->order->order_code }}</span>
@@ -162,8 +162,8 @@
               @if ($selected_sale->sale_type === $sale_type_presencial)
                 <div class="w-full text-start">
                   {{-- encabezado --}}
-                  <header class="border border-neutral-100 p-1 mb-2">
-                    <div class="flex justify-between items-center">
+                  <header class="p-1 mb-2 border border-neutral-100">
+                    <div class="flex items-center justify-between">
                       <h3 class="text-lg font-semibold">Comprobante de venta</h3>
                       @if ($selected_sale->sale_pdf_path)
                         <x-a-button
@@ -205,11 +205,11 @@
                     </div>
                   </header>
                   {{-- cuerpo con detalle y total --}}
-                  <section class="w-full max-h-56 overflow-y-auto overflow-x-auto mb-1">
+                  <section class="w-full mb-1 overflow-x-auto overflow-y-auto max-h-56">
                     <x-table-base>
                       <x-slot:tablehead>
                         <tr class="border bg-neutral-100">
-                          <x-table-th class="text-end w-12">
+                          <x-table-th class="w-12 text-end">
                             #
                           </x-table-th>
                           <x-table-th class="text-start">
@@ -232,7 +232,7 @@
                       <x-slot:tablebody>
                         @foreach ($selected_sale->products as $key => $product_sale)
                         <tr class="border" wire:key="{{ $key }}">
-                          <x-table-td class="text-end w-12">
+                          <x-table-td class="w-12 text-end">
                             {{ $key+1 }}
                           </x-table-td>
                           <x-table-td class="text-start">
@@ -253,15 +253,15 @@
                         </tr>
                         @endforeach
                         <tr class="border">
-                          <x-table-td class="text-end font-semibold capitalize" colspan="5">$total:</x-table-td>
-                          <x-table-td class="text-end font-semibold">${{ number_format($selected_sale->total_price, 2) }}</x-table-td>
+                          <x-table-td class="font-semibold capitalize text-end" colspan="5">$total:</x-table-td>
+                          <x-table-td class="font-semibold text-end">${{ number_format($selected_sale->total_price, 2) }}</x-table-td>
                         </tr>
                       </x-slot:tablebody>
                     </x-table-base>
                   </section>
                   {{-- pie con datos extra --}}
-                  <footer class="w-full border border-neutral-100 p-1 mb-2">
-                    <div class="w-full flex justify-end">
+                  <footer class="w-full p-1 mb-2 border border-neutral-100">
+                    <div class="flex justify-end w-full">
                       {{-- nada --}}
                     </div>
                   </footer>
@@ -281,9 +281,9 @@
 
     /* evento: abrir pdf en nueva pestaña para visualizar */
     document.addEventListener('livewire:initialized', () => {
-        Livewire.on('openPdfInNewTab', ({ url }) => {
-            window.open(url, '_blank');
-        });
+      Livewire.on('openPdfInNewTab', ({ url }) => {       
+        window.open(url, '_blank');
+      });
     });
 
   </script>
