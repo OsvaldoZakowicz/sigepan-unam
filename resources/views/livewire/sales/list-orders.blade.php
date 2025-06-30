@@ -240,25 +240,18 @@
                   </x-a-button>
                 </div>
                 {{-- cliente --}}
-                <div class="flex flex-col items-start justify-start gap-1 mb-2">
+                <div class="flex flex-col gap-1 mb-2">
                   <span>
-                    <span class="font-semibold">Cliente:&nbsp;</span>
-                    <span class="capitalize">usuario:&nbsp;{{ $details_user['username'] }}, </span>
-                    <span class="capitalize">nombre completo:&nbsp;{{ $details_user['full_name'] }}</span>
-                    <span> - DNI: {{ $details_user['dni'] }} </span>
+                    <span class="font-semibold">Cliente: </span>
+                    {{ $details_user['usuario'] }}
                   </span>
                   <span>
-                    <span class="font-semibold">Contacto:&nbsp;</span>
-                    <span>Tel:  {{ $details_user['contact'] }} </span>
-                    <span>Email: {{ $details_user['email'] }} </span>
+                    <span class="font-semibold">Perfil: </span>
+                    {{ $details_user['perfil'] }}
                   </span>
                   <span>
-                    <span class="font-semibold">Dirección:&nbsp;</span>
-                    <span>{{ $details_user['full_address'] }}</span>
-                  </span>
-                  <span>
-                    <span class="font-semibold">cuenta del usuario: </span>
-                    <span>{{ $details_user['account_status'] }}</span>
+                    <span class="font-semibold">Direccion: </span>
+                    {{ $details_user['direccion'] }}
                   </span>
                 </div>
                 {{-- pedido --}}

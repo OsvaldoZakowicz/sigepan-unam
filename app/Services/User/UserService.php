@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Address;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Builder;
 
 class UserService
 {
@@ -155,5 +156,110 @@ class UserService
     $user->syncRoles($internal_user_data['user_role']);
 
     return $user;
+  }
+  /**
+   * Obtiene los datos del usuario, perfil y dirección incluyendo soft deletes
+   * 
+   * @param int $userId
+   * @return array
+   */
+  public function getUserData(int $userId): array
+  {
+    // Cargar usuario con soft deletes
+    $user = User::withTrashed()->find($userId);
+
+    if (!$user) {
+      return [
+        'usuario' => '',
+        'perfil' => '',
+        'direccion' => ''
+      ];
+    }
+
+    // Cargar relaciones con soft deletes
+    $user->load([
+      'profile' => function ($query) {
+        $query->withTrashed();
+      }
+    ]);
+
+    if ($user->profile) {
+      $user->profile->load([
+        'gender:id,gender',
+        'address' => function ($query) {
+          $query->withTrashed();
+        }
+      ]);
+    }
+
+    return [
+      'usuario' => $this->formatUserData($user),
+      'perfil' => $this->formatProfileData($user?->profile),
+      'direccion' => $this->formatAddressData($user?->profile?->address)
+    ];
+  }
+
+  /**
+   * Formatea los datos del usuario
+   * 
+   * @param User|null $user
+   * @return string
+   */
+  private function formatUserData(?User $user): string
+  {
+    if (!$user) {
+      return '';
+    }
+
+    return sprintf(
+      '%s (%s)',
+      $user->name,
+      $user->email
+    );
+  }
+
+  /**
+   * Formatea los datos del perfil
+   * 
+   * @param \App\Models\Profile|null $profile
+   * @return string
+   */
+  private function formatProfileData($profile): string
+  {
+    if (!$profile) {
+      return '-';
+    }
+
+    $parts = array_filter([
+      $profile->first_name,
+      $profile->last_name,
+      $profile->dni,
+      $profile->phone_number,
+      $profile->gender?->gender
+    ]);
+
+    return implode(' - ', $parts);
+  }
+
+  /**
+   * Formatea los datos de la dirección
+   * 
+   * @param \App\Models\Address|null $address
+   * @return string
+   */
+  private function formatAddressData($address): string
+  {
+    if (!$address) {
+      return '-';
+    }
+
+    $parts = array_filter([
+      $address->street,
+      $address->number,
+      $address->postal_code,
+      $address->city
+    ]);
+
+    return implode(', ', $parts);
   }
 }

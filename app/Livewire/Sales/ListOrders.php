@@ -2,10 +2,12 @@
 
 namespace App\Livewire\Sales;
 
+use App\Models\DatoNegocio;
 use App\Models\Order;
 use App\Models\OrderStatus;
 use App\Services\Sale\OrderService;
 use App\Models\Sale;
+use App\Services\User\UserService;
 use Illuminate\View\View;
 use Livewire\WithPagination;
 use Livewire\Attributes\Url;
@@ -104,47 +106,20 @@ class ListOrders extends Component
             }
           ]);
       }
-    ])
-      ->findOrFail($id);
-
+    ])->findOrFail($id);
 
     if ($this->details_order->user) {
-      $usr = $this->details_order->user;
-      $username = $usr->name;
-      $email = $usr->email;
-    } else {
-      $username = '-';
-      $email = '-';
-    }
 
-    if ($this->details_order->user->profile) {
-      $pr = $this->details_order->user->profile;
-      $fullname = $pr->first_name . ', ' . $pr->last_name;
-      $dni = $pr->dni;
-      $contact = $pr->phone_number;
+      $user_service = new UserService();
+      $this->details_user = $user_service->getUserData($this->details_order->user->id);
     } else {
-      $fullname = '-';
-      $contact = '-';
-      $dni = '-';
-    }
 
-    if ($this->details_order->user->profile->address) {
-      $adr = $this->details_order->user->profile->address;
-      $full_address = $adr->street . ', numero ' . $adr->number . ', ciudad: '
-        . $adr->city . ', CP' . $adr->postal_code;
-    } else {
-      $full_address = '-';
+      $this->details_user = [
+        'usuario'   => 'cliente no registrado',
+        'perfil'    => '-',
+        'direccion' => '-'
+      ];
     }
-
-    $this->details_user = [
-      'username'        =>  $username,
-      'email'           =>  $email,
-      'full_name'       =>  $fullname,
-      'contact'         =>  $contact,
-      'dni'             =>  $dni,
-      'full_address'    =>  $full_address,
-      'account_status'  =>  $this->details_order->user->trashed() ? 'cuenta borrada' : 'usuario activo'
-    ];
 
     $this->show_details_modal = true;
   }
@@ -157,6 +132,7 @@ class ListOrders extends Component
   {
     $this->show_details_modal = false;
     $this->details_order = null;
+    $this->details_user = null;
   }
 
   /**

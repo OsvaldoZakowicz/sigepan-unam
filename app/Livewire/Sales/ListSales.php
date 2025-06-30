@@ -3,16 +3,18 @@
 namespace App\Livewire\Sales;
 
 use App\Models\Sale;
-use App\Models\Product;
-use App\Services\Sale\SaleService;
 use App\Models\User;
-use App\Services\Pdf\PdfService;
-use App\Models\OrderStatus;
-use Illuminate\Support\Collection;
-use Illuminate\View\View;
-use Livewire\WithPagination;
-use Livewire\Attributes\Url;
+use App\Models\Product;
 use Livewire\Component;
+use Illuminate\View\View;
+use App\Models\DatoNegocio;
+use App\Models\OrderStatus;
+use Livewire\Attributes\Url;
+use Livewire\WithPagination;
+use App\Services\Pdf\PdfService;
+use App\Services\Sale\SaleService;
+use App\Services\User\UserService;
+use Illuminate\Support\Collection;
 
 class ListSales extends Component
 {
@@ -51,6 +53,7 @@ class ListSales extends Component
   public bool $show_sale_modal = false;
   public $selected_sale = null;
   public $details_user = null;
+  public $details_store = null;
 
   // * modal comprobante de venta (o pago)
   public bool $show_payment_modal = false;
@@ -300,43 +303,20 @@ class ListSales extends Component
 
     $this->selected_sale = $selected_sale;
 
-    if ($this->selected_sale->user) {
-      $usr = $this->selected_sale->user;
-      $username = $usr->name;
-      $email = $usr->email;
+    if ($selected_sale->user) {
+
+      $user_service = new UserService();
+      $this->details_user = $user_service->getUserData($selected_sale->user->id);
     } else {
-      $username = '-';
-      $email = '-';
+
+      $this->details_user = [
+        'usuario'   => 'cliente no registrado',
+        'perfil'    => '-',
+        'direccion' => '-'
+      ];
     }
 
-    if ($this->selected_sale->user->profile) {
-      $pr = $this->selected_sale->user->profile;
-      $fullname = $pr->first_name . ', ' . $pr->last_name;
-      $dni = $pr->dni;
-      $contact = $pr->phone_number;
-    } else {
-      $fullname = '-';
-      $contact = '-';
-      $dni = '-';
-    }
-
-    if ($this->selected_sale->user->profile->address) {
-      $adr = $this->selected_sale->user->profile->address;
-      $full_address = $adr->street . ', numero ' . $adr->number . ', ciudad: '
-        . $adr->city . ', CP' . $adr->postal_code;
-    } else {
-      $full_address = '-';
-    }
-
-    $this->details_user = [
-      'username'        =>  $username,
-      'email'           =>  $email,
-      'full_name'       =>  $fullname,
-      'contact'         =>  $contact,
-      'dni'             =>  $dni,
-      'full_address'    =>  $full_address,
-      'account_status'  =>  $this->selected_sale->user->trashed() ? 'cuenta borrada' : 'usuario activo'
-    ];
+    $this->details_store = DatoNegocio::obtenerTodos();
 
     $this->show_sale_modal = true;
   }
@@ -349,6 +329,7 @@ class ListSales extends Component
   {
     $this->show_sale_modal = false;
     $this->selected_sale = null;
+    $this->details_user = null;
   }
 
   /**

@@ -535,29 +535,31 @@
                     </span>
                     <span>
                       <span class="font-semibold">Establecimiento:</span>
-                      {{-- todo: info panaderia --}}
+                      <span>
+                        <span>{{ $details_store['razon_social'] }} - </span>
+                        <span>CUIT: {{ $details_store['cuit'] }}.</span>
+                      </span>
                     </span>
-                    <div class="flex flex-col items-start justify-start gap-1 mb-2">
+                    <span>
+                      <span class="font-semibold">Contacto:</span>
                       <span>
-                        <span class="font-semibold">Cliente:&nbsp;</span>
-                        <span class="capitalize">usuario:&nbsp;{{ $details_user['username'] }}, </span>
-                        <span class="capitalize">nombre completo:&nbsp;{{ $details_user['full_name'] }}</span>
-                        <span> - DNI: {{ $details_user['dni'] }} </span>
+                        <span>tel: {{ $details_store['telefono'] }} - </span>
+                        <span>correo: {{ $details_store['email'] }}</span>
                       </span>
-                      <span>
-                        <span class="font-semibold">Contacto:&nbsp;</span>
-                        <span>Tel:  {{ $details_user['contact'] }} </span>
-                        <span>Email: {{ $details_user['email'] }} </span>
-                      </span>
-                      <span>
-                        <span class="font-semibold">Dirección:&nbsp;</span>
-                        <span>{{ $details_user['full_address'] }}</span>
-                      </span>
-                      <span>
-                        <span class="font-semibold">cuenta del usuario: </span>
-                        <span>{{ $details_user['account_status'] }}</span>
-                      </span>
-                    </div>
+                    </span>
+                    {{-- cliente --}}
+                    <span>
+                      <span class="font-semibold">Cliente: </span>
+                      {{ $details_user['usuario'] }}
+                    </span>
+                    <span>
+                      <span class="font-semibold">Perfil: </span>
+                      {{ $details_user['perfil'] }}
+                    </span>
+                    <span>
+                      <span class="font-semibold">Direccion: </span>
+                      {{ $details_user['direccion'] }}
+                    </span>
                     <span>
                       <span class="font-semibold">Forma de pago:</span>
                       {{ $selected_sale->payment_type }}
