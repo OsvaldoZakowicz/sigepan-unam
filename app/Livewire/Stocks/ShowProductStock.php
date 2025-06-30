@@ -101,7 +101,12 @@ class ShowProductStock extends Component
   private function searchProductStock()
   {
     return $this->product->stocks()
-      ->with(['stock_movements', 'recipe'])
+      ->with([
+        'stock_movements',
+        'recipe' => function ($query) {
+          $query->withTrashed();
+        },
+      ])
       ->when($this->search_stock, function ($query) {
         $query->where('id', 'like', '%' . $this->search_stock . '%')
           ->orWhere('lote_code', 'like', '%' . $this->search_stock . '%');

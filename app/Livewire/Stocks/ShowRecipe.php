@@ -18,8 +18,9 @@ class ShowRecipe extends Component
    */
   public function mount($id): void
   {
-    $this->recipe = Recipe::findOrFail($id)->load(['provision_categories', 'product']);
-    //dd($this->recipe);
+    $this->recipe = Recipe::withTrashed()
+      ->findOrFail($id)
+      ->load(['provision_categories', 'product']);
   }
 
   /**

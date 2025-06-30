@@ -27,19 +27,24 @@
         <div class="flex justify-start gap-4">
 
           {{-- producto --}}
-          <div class="flex flex-col gap-4 p-2 w-1/3">
+          <div class="flex flex-col w-1/3 gap-4 p-2">
             {{-- datos del prodcuto --}}
             <div class="text-left">
               <h2 class="text-lg font-bold">
                 <span class="font-semibold">Nombre:</span>
                 {{ $recipe->recipe_title }}
+                @if ($recipe->deleted_at)
+                  <x-text-tag color="red">borrada</x-text-tag>
+                @else
+                  <x-text-tag color="emerald">activa</x-text-tag>
+                @endif
               </h2>
               <p class="mt-2 text-md">
                 <span class="font-semibold">Producto:</span>
                 <a
                   wire:navigate
                   href="{{ route('stocks-products-show', $recipe->product->id) }}"
-                  class="cursor-pointer underline text-blue-500"
+                  class="text-blue-500 underline cursor-pointer"
                   >{{ $recipe->product->product_name }}
                 </a>
               </p>
@@ -63,12 +68,12 @@
           </div>
 
           {{-- ingredientes --}}
-          <div class="flex flex-col gap-4 p-2 w-1/3">
+          <div class="flex flex-col w-1/3 gap-4 p-2">
             <div class="text-left">
               <h2 class="text-lg font-semibold">Ingredientes y suministros necesarios:</h2>
             </div>
             <div class="space-y-1">
-              <div class="mb-1 flex justify-between items-center">
+              <div class="flex items-center justify-between mb-1">
                 <span class="font-semibold">
                   Nombre
                 </span>
@@ -78,7 +83,7 @@
                 </span>
               </div>
               @foreach ($recipe->provision_categories as $category)
-                <div class="mb-1 flex justify-between items-center border-b-2 border-neutral-400 border-dotted">
+                <div class="flex items-center justify-between mb-1 border-b-2 border-dotted border-neutral-400">
                   <span>{{ $category->provision_category_name }}</span>
                   <span>{{ convert_measure($category->pivot->quantity, $category->measure) }}</span>
                 </div>
@@ -87,7 +92,7 @@
           </div>
 
           {{-- instrucciones --}}
-          <div class="flex flex-col gap-4 p-2 w-1/3">
+          <div class="flex flex-col w-1/3 gap-4 p-2">
             <div class="text-left">
               <h2 class="text-lg font-semibold">Instrucciones de preparación:</h2>
             </div>

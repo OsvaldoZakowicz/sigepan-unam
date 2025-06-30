@@ -10,7 +10,35 @@
     {{-- cuerpo --}}
     <x-content-section>
 
-      <x-slot:header class="hidden">
+      <x-slot:header class="">
+
+      {{-- busqueda --}}
+        <div class="flex items-end justify-start gap-1">
+
+          {{-- termino de busqueda --}}
+          <div class="flex flex-col justify-end w-56">
+            <label for="">buscar receta</label>
+            <input
+              type="text"
+              name="search_recipe"
+              wire:model.live="search_recipe"
+              wire:click="resetPagination()"
+              placeholder="ingrese un id, o termino de busqueda"
+              class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+            />
+          </div>
+
+          {{-- limpiar campos de busqueda --}}
+          <x-a-button
+            href="#"
+            wire:click="resetSearchInputs()"
+            bg_color="neutral-200"
+            border_color="neutral-300"
+            text_color="neutral-600"
+            >limpiar filtros
+          </x-a-button>
+        </div>
+
       </x-slot:header>
 
       <x-slot:content>
@@ -18,7 +46,7 @@
         <x-table-base>
           <x-slot:tablehead>
             <tr class="border bg-neutral-100">
-              <x-table-th class="text-end w-12">
+              <x-table-th class="w-12 text-end">
                 id
               </x-table-th>
               <x-table-th class="text-start">
@@ -33,7 +61,7 @@
               <x-table-th class="text-end">
                 fecha de creación
               </x-table-th>
-              <x-table-th class="text-start w-48">
+              <x-table-th class="w-48 text-start">
                 acciones
               </x-table-th>
             </tr>
@@ -68,20 +96,37 @@
                       >ver
                     </x-a-button>
 
-                    {{-- <x-a-button
-                      wire:navigate
-                      href="#"
-                      bg_color="neutral-100"
-                      border_color="neutral-200"
-                      text_color="neutral-600"
-                      >editar
-                    </x-a-button> --}}
+                    @if ($recipe->deleted_at)
+                      <x-a-button
+                        href="#"
+                        wire:click='restore({{ $recipe->id }})'
+                        wire:confirm='¿Recuperar receta?'
+                        bg_color="neutral-100"
+                        border_color="neutral-200"
+                        text_color="neutral-600"
+                        >restaurar
+                      </x-a-button>
+                    @else
+                      <x-a-button
+                        href="#"
+                        wire:click=''
+                        bg_color="neutral-100"
+                        border_color="neutral-200"
+                        text_color="neutral-600"
+                        >editar
+                      </x-a-button>
 
-                    {{-- <x-btn-button
-                      btn_type="button"
-                      color="red"
-                      >eliminar
-                    </x-btn-button> --}}
+                      <x-a-button
+                        href="#"
+                        wire:click='delete({{ $recipe->id }})'
+                        wire:confirm='¿Eliminar receta?, la misma no podrá usarse para elaborar productos'
+                        bg_color="red-600"
+                        border_color="red-600"
+                        text_color="neutral-100"
+                        >eliminar
+                      </x-a-button>
+                    @endif
+
 
                   </div>
                 </x-table-td>
