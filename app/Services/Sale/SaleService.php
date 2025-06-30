@@ -2,15 +2,16 @@
 
 namespace App\Services\Sale;
 
-use App\Models\DatoNegocio;
 use App\Models\Sale;
 use App\Models\Order;
-use App\Models\Stock;
-use App\Models\StockMovement;
-use App\Services\Stock\StockService;
 use App\Models\Price;
+use App\Models\Stock;
+use App\Models\DatoNegocio;
 use Illuminate\Http\Request;
+use App\Models\StockMovement;
+use App\Services\User\UserService;
 use Illuminate\Support\Facades\DB;
+use App\Services\Stock\StockService;
 
 class SaleService
 {
@@ -196,42 +197,16 @@ class SaleService
     }])->first();
 
     if ($sale->user) {
-      $usr = $sale->user;
-      $username = $usr->name;
-      $email = $usr->email;
-    } else {
-      $username = '-';
-      $email = '-';
-    }
 
-    if ($sale->user->profile) {
-      $pr = $sale->user->profile;
-      $fullname = $pr->first_name . ', ' . $pr->last_name;
-      $dni = $pr->dni;
-      $contact = $pr->phone_number;
+      $user_service = new UserService();
+      $client = $user_service->getUserData($sale->user->id);
     } else {
-      $fullname = '-';
-      $contact = '-';
-      $dni = '-';
+      $client = [
+        'usuario'   => 'cliente no registrado',
+        'perfil'    => '-',
+        'direccion' => '-'
+      ];
     }
-
-    if ($sale->user->profile->address) {
-      $adr = $sale->user->profile->address;
-      $full_address = $adr->street . ', numero ' . $adr->number . ', ciudad: '
-        . $adr->city . ', CP' . $adr->postal_code;
-    } else {
-      $full_address = '-';
-    }
-
-    $client = [
-      'username'        =>  $username,
-      'email'           =>  $email,
-      'full_name'       =>  $fullname,
-      'contact'         =>  $contact,
-      'dni'             =>  $dni,
-      'full_address'    =>  $full_address,
-      'account_status'  =>  $sale->user->trashed() ? 'cuenta borrada' : 'usuario activo'
-    ];
 
     $sale_data = [
       'id'              => $sale->id,

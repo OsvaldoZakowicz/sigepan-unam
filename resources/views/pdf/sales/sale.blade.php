@@ -31,26 +31,14 @@
       <p class="renglon">
         <span class="meta">Cliente:</span>
         <span class="dato">
-          <span class="capitalize">usuario:&nbsp;{{ $sale_data['header']['cliente']['username'] }}, </span>
-          <span class="capitalize">nombre completo:&nbsp;{{ $sale_data['header']['cliente']['full_name'] }}</span>
-          <span> - DNI: {{ $sale_data['header']['cliente']['dni'] }} </span>
-        </span>
-      </p>
-      <p class="renglon">
-        <span class="meta">Estado de la cuenta:</span>
-        <span class="dato">{{ $sale_data['header']['cliente']['account_status'] }}</span>
-      </p>
-      <p class="renglon">
-        <span class="meta">Contacto:&nbsp;</span>
-        <span class="dato">
-          <span>Tel:  {{ $sale_data['header']['cliente']['contact'] }} </span>
-          <span>Email: {{ $sale_data['header']['cliente']['email'] }} </span>
+          <span class="capitalize">usuario:&nbsp;{{ $sale_data['header']['cliente']['usuario'] }}, </span>
+          <span class="capitalize">perfil:&nbsp;{{ $sale_data['header']['cliente']['perfil'] }}</span>
         </span>
       </p>
       <p class="renglon">
         <span class="meta">Dirección:&nbsp;</span>
         <span class="dato">
-          <span>{{ $sale_data['header']['cliente']['full_address'] }}</span>
+          <span>{{ $sale_data['header']['cliente']['direccion'] }}</span>
         </span>
       </p>
       <p class="renglon">
