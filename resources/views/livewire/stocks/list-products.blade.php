@@ -18,10 +18,10 @@
       <x-slot:header class="">
 
         {{-- busqueda --}}
-        <div class="flex gap-1 justify-start items-start grow">
+        <div class="flex items-end justify-start gap-1">
 
           {{-- termino de busqueda --}}
-          <div class="flex flex-col justify-end w-1/4">
+          <div class="flex flex-col justify-end w-56">
             <label for="">buscar producto</label>
             <input
               type="text"
@@ -29,21 +29,18 @@
               wire:model.live="search_product"
               wire:click="resetPagination()"
               placeholder="ingrese un id, o termino de busqueda"
-              class="text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+              class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
             />
           </div>
 
-        </div>
-
-        {{-- limpiar campos de busqueda --}}
-        <div class="flex flex-col self-start h-full">
+          {{-- limpiar campos de busqueda --}}
           <x-a-button
             href="#"
             wire:click="resetSearchInputs()"
             bg_color="neutral-200"
             border_color="neutral-300"
             text_color="neutral-600"
-            >limpiar
+            >limpiar filtros
           </x-a-button>
         </div>
 
@@ -54,7 +51,7 @@
         <x-table-base>
           <x-slot:tablehead>
             <tr class="border bg-neutral-100">
-              <x-table-th class="text-end w-12">
+              <x-table-th class="w-12 text-end">
                 id
               </x-table-th>
               <x-table-th class="text-start">
@@ -71,10 +68,10 @@
                 <span>publicado</span>
                 <x-quest-icon title="indica si el producto aparece en la tienda para la venta"/>
               </x-table-th>
-              <x-table-th class="text-start w-24">
+              <x-table-th class="w-24 text-start">
                 estado
               </x-table-th>
-              <x-table-th class="text-start w-48">
+              <x-table-th class="w-48 text-start">
                 acciones
               </x-table-th>
             </tr>
@@ -178,10 +175,10 @@
 
                   {{-- modal de elaboracion --}}
                   @if($show_elaboration_modal)
-                    <div class="fixed inset-0 bg-neutral-400 bg-opacity-20 overflow-y-auto h-full w-full flex items-center justify-center" id="elaborationModal">
-                      <div class="bg-white p-5 border rounded-md shadow-lg w-96 transform transition-all">
+                    <div class="fixed inset-0 flex items-center justify-center w-full h-full overflow-y-auto bg-neutral-400 bg-opacity-20" id="elaborationModal">
+                      <div class="p-5 transition-all transform bg-white border rounded-md shadow-lg w-96">
                         <div class="text-start">
-                          <h3 class="text-lg leading-6 capitalize font-medium text-neutral-800">Elaborar Producto</h3>
+                          <h3 class="text-lg font-medium leading-6 capitalize text-neutral-800">Elaborar Producto</h3>
                           <div class="mt-4">
                             <p class="text-sm text-start text-neutral-600">
                               Para elaborar <span class="font-semibold">{{ $selected_product->product_name }}</span>, elija una receta.
@@ -192,7 +189,7 @@
                               @enderror
                               <select
                                 wire:model="selected_recipe"
-                                class="w-full mt-2 text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
+                                class="w-full p-1 mt-2 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
                                 <option value="">Seleccione una receta...</option>
                                 @forelse ($selected_product->recipes as $recipe)
                                   <option value="{{ $recipe->id }}">{{ $recipe->recipe_title }}</option>

@@ -21,10 +21,10 @@
       <x-slot:header class="">
 
         {{-- busqueda --}}
-        <div class="flex gap-1 justify-start items-start grow">
+        <div class="flex items-end justify-start gap-1">
 
           {{-- termino de busqueda --}}
-          <div class="flex flex-col justify-end w-1/4">
+          <div class="flex flex-col justify-end w-56">
             <label for="">buscar stock</label>
             <input
               type="text"
@@ -32,19 +32,19 @@
               wire:model.live="search_stock"
               wire:click="resetPagination()"
               placeholder="ingrese un id o lote"
-              class="text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+              class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
             />
           </div>
 
           {{-- ordenamiento --}}
-          <div class="flex flex-col justify-end w-1/4">
+          <div class="flex flex-col justify-end w-56">
             <label for="">ordenar lotes</label>
             <select
               name="order_stock"
               id="order_stock"
               wire:model.live="order_stock"
               wire:click="resetPagination()"
-              class="text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+              class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
               >
               <option value="">seleccione...</option>
               <option value="expired_at">proximos vencimientos</option>
@@ -52,19 +52,17 @@
             </select>
           </div>
 
-        </div>
-
-        {{-- limpiar campos de busqueda --}}
-        <div class="flex flex-col self-start h-full">
+          {{-- limpiar campos de busqueda --}}
           <x-a-button
             href="#"
             wire:click="resetSearchInputs()"
             bg_color="neutral-200"
             border_color="neutral-300"
             text_color="neutral-600"
-            >limpiar
+            >limpiar filtros
           </x-a-button>
         </div>
+
 
       </x-slot:header>
 
@@ -73,7 +71,7 @@
         <x-table-base>
           <x-slot:tablehead>
             <tr class="border bg-neutral-100">
-              <x-table-th class="text-end w-12">
+              <x-table-th class="w-12 text-end">
                 id
               </x-table-th>
               <x-table-th class="text-start">
@@ -83,11 +81,11 @@
                 receta
               </x-table-th>
               <x-table-th class="text-end">
-                cantidad elaborada
+                elaborado
                 <x-quest-icon title="total elaborado en el lote"/>
               </x-table-th>
               <x-table-th class="text-end">
-                cantidad disponible
+                disponible
                 <x-quest-icon title="cantidad actual en el lote"/>
               </x-table-th>
               <x-table-th class="text-start">
@@ -98,7 +96,7 @@
                 vencimiento
                 <x-quest-icon title="fecha de vencimiento del lote"/>
               </x-table-th>
-              <x-table-th class="text-start w-48">
+              <x-table-th class="w-48 text-start">
                 acciones
               </x-table-th>
             </tr>
@@ -153,40 +151,39 @@
 
         {{-- modal de movimientos del stock --}}
         @if($show_movements_modal && $selected_stock)
-          <div class="fixed inset-0 bg-neutral-400 bg-opacity-20 overflow-y-auto h-full w-full flex items-center justify-center">
-            <div class="bg-white p-5 border rounded-md shadow-lg w-3/4 transform transition-all">
+          <div class="fixed inset-0 flex items-center justify-center w-full h-full overflow-y-auto bg-neutral-400 bg-opacity-20">
+            <div class="w-3/4 p-5 transition-all transform bg-white border rounded-md shadow-lg">
               <div class="text-start">
                 <div>
-                  <h3 class="text-lg leading-6 capitalize font-medium text-neutral-800">
+                  <h3 class="text-lg font-medium leading-6 capitalize text-neutral-800">
                     Movimientos del Lote:
                   </h3>
                   <span>
-                    <span class="capitalize font-semibold">Producto:</span>
+                    <span class="font-semibold capitalize">Producto:</span>
                     <span>{{ $selected_stock->product->product_name }}</span>
                   </span>
                   <span>
-                    <span class="capitalize font-semibold">Lote:</span>
-                    <span class="uppercase text-xs">{{ $selected_stock->lote_code }}</span>
+                    <span class="font-semibold capitalize">Lote:</span>
+                    <span class="text-xs uppercase">{{ $selected_stock->lote_code }}</span>
                   </span>
                   <span>
-                    <span class="capitalize font-semibold">Cantidad elaborada:</span>
+                    <span class="font-semibold capitalize">Cantidad elaborada:</span>
                     <span class="">{{ $selected_stock->quantity_total }}</span>
                   </span>
                   <span>
-                    <span class="capitalize font-semibold">Cantidad disponible:</span>
+                    <span class="font-semibold capitalize">Cantidad disponible:</span>
                     <span class="">{{ $selected_stock->quantity_left }}</span>
                   </span>
                 </div>
-                <div class="mt-4 max-h-72 overflow-y-auto overflow-x-auto">
+                <div class="mt-4 overflow-x-auto overflow-y-auto max-h-72">
                   <x-table-base>
                     <x-slot:tablehead>
                       <tr class="border bg-neutral-100">
-                        <x-table-th class="text-end w-12">
+                        <x-table-th class="w-12 text-end">
                           id
                         </x-table-th>
                         <x-table-th class="text-start">
                           tipo
-                          {{-- todo: tipos restantes --}}
                           <x-quest-icon title="movimiento positivo (+) para elboracion y negativo (-) para ventas"/>
                         </x-table-th>
                         <x-table-th class="text-end">
@@ -212,6 +209,13 @@
                               <span class="text-red-600">
                                 &minus;{{ $movement->movement_type }}
                               </span>
+                              <a
+                                href="#"
+                                wire:navigate
+                                wire:click="goToSale({{ $movement->id }})"
+                                class="text-blue-600 underline"
+                                >ver
+                              </a>
                             @endif
                           </x-table-td>
                           <x-table-td class="text-end">
@@ -253,9 +257,9 @@
 
       </x-slot:content>
 
-      <x-slot:footer class="py-2 justify-between">
+      <x-slot:footer class="justify-between py-2">
         {{-- total actual --}}
-        <span class="text-md font-semibold">total disponible para venta:&nbsp;{{ $product->total_stock }}</span>
+        <span class="font-semibold text-md">total disponible para venta:&nbsp;{{ $product->total_stock }}</span>
         {{ $product_stocks->links() }}
       </x-slot:footer>
 
