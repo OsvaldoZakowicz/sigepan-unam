@@ -42,7 +42,7 @@ class Stock extends Model
    */
   public function getIsExpiredAttribute()
   {
-    return $this->expired_at->isPast();
+    return $this->expired_at->toDateString() <= now()->toDateString();
   }
 
   // * un stock pertenece a un producto
