@@ -209,13 +209,15 @@
                               <span class="text-red-600">
                                 &minus;{{ $movement->movement_type }}
                               </span>
-                              <a
-                                href="#"
-                                wire:navigate
-                                wire:click="goToSale({{ $movement->id }})"
-                                class="text-blue-600 underline"
-                                >ver
-                              </a>
+                              @if ($movement->movement_type === 'venta')
+                                <a
+                                  href="#"
+                                  wire:navigate
+                                  wire:click="goToSale({{ $movement->id }})"
+                                  class="text-blue-600 underline"
+                                  >ver
+                                </a>
+                              @endif
                             @endif
                           </x-table-td>
                           <x-table-td class="text-end">

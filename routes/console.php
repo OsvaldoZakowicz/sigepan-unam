@@ -1,23 +1,27 @@
 <?php
 
-use App\Jobs\ClosePreOrderPeriodJob;
-use App\Jobs\CloseQuotationPeriodJob;
-use App\Jobs\NotifySuppliersRequestForPreOrderClosedJob;
-use App\Jobs\NotifySuppliersRequestForPreOrderReceivedJob;
-use App\Jobs\NotifySuppliersRequestForQuotationClosedJob;
-use App\Jobs\NotifySuppliersRequestForQuotationReceivedJob;
-use App\Jobs\OpenPreOrderPeriodJob;
-use App\Jobs\OpenQuotationPeriodJob;
+use App\Models\User;
 use App\Jobs\SendEmailJob;
-use App\Jobs\UpdateSuppliersPricesJob;
-use App\Mail\CantClosePreOrderPeriod;
 use App\Mail\ClosePreOrderPeriod;
 use App\Mail\CloseQuotationPeriod;
-use App\Services\Supplier\QuotationPeriodService;
-use App\Services\Supplier\PreOrderPeriodService;
-use App\Models\User;
-use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
+use App\Jobs\OpenPreOrderPeriodJob;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Log;
+use App\Jobs\ClosePreOrderPeriodJob;
+use App\Jobs\OpenQuotationPeriodJob;
+use App\Jobs\CloseQuotationPeriodJob;
+use App\Mail\CantClosePreOrderPeriod;
+use App\Jobs\UpdateSuppliersPricesJob;
+use Illuminate\Support\Facades\Artisan;
+use App\Services\Supplier\PreOrderPeriodService;
+use App\Services\Supplier\QuotationPeriodService;
+use App\Jobs\NotifySuppliersRequestForPreOrderClosedJob;
+use App\Jobs\NotifySuppliersRequestForQuotationClosedJob;
+use App\Jobs\NotifySuppliersRequestForPreOrderReceivedJob;
+use App\Jobs\NotifySuppliersRequestForQuotationReceivedJob;
+use App\Models\StockMovement;
+use App\Services\Stock\StockService;
 
 /**
  * * clousure commands.
@@ -146,3 +150,75 @@ Artisan::command('preorder-periods:close', function (PreOrderPeriodService $preo
   }
 })->purpose('cerrar periodos de solicitud de pre orden')
   ->dailyAt('19:00');
+
+/**
+ * command: retirar productos vencidos.
+ * @param string $signature
+ * @param \Closure $callback
+ */
+Artisan::command('products-expired:remove', function () {
+
+  $this->info('Iniciando proceso de remoción de productos vencidos...');
+
+  $stock_service = new StockService();
+  $movement_vencimiento = StockMovement::MOVEMENT_TYPE_VENCIMIENTO();
+  $day = now();
+  $processedCount = 0;
+
+  try {
+
+    DB::transaction(function () use ($stock_service, $movement_vencimiento, $day, &$processedCount) {
+
+      // Todos con fecha menor o igual a la actual
+      $expired_stocks = $stock_service->getStocksToExpire();
+
+      if ($expired_stocks->isEmpty()) {
+        $this->info('No se encontraron productos vencidos.');
+        return;
+      }
+
+      $this->info("Procesando {$expired_stocks->count()} productos vencidos...");
+
+      // Por cada stock, generar un movimiento negativo de vencimiento por la cantidad restante
+      foreach ($expired_stocks as $expired_stock) {
+        // Solo procesar si tiene cantidad restante
+        if ($expired_stock->quantity_left > 0) {
+
+          $expired_stock->stock_movements()->create([
+            'quantity' => -$expired_stock->quantity_left,
+            'movement_type' => $movement_vencimiento,
+            'registered_at' => $day,
+          ]);
+
+          $this->line("Stock ID {$expired_stock->id}: {$expired_stock->quantity_left} unidades vencidas");
+
+          $expired_stock->quantity_left = 0;
+          $expired_stock->save();
+
+          $processedCount++;
+        }
+      }
+    });
+
+    $this->info("Se procesaron {$processedCount} productos vencidos exitosamente.");
+
+    Log::info('Productos vencidos removidos', [
+      'count' => $processedCount,
+      'executed_at' => $day,
+      'command' => 'products-expired:remove'
+    ]);
+
+    return 0;
+  } catch (\Exception $e) {
+    $this->error('Error al procesar productos vencidos: ' . $e->getMessage());
+
+    Log::error('Error en command products-expired:remove', [
+      'error' => $e->getMessage(),
+      'trace' => $e->getTraceAsString(),
+      'executed_at' => $day
+    ]);
+
+    return 1;
+  }
+})->purpose('quitar productos de un stock cuando alcanzaron su fecha de vencimiento')
+  ->dailyAt('08:00');

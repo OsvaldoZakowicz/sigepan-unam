@@ -244,4 +244,17 @@ class StockService
       }
     });
   }
+
+  /**
+   * Obtener stocks que deben vencer,
+   * consultar solo por los que tienen cantidad.
+   * @return Collection $stocks
+   */
+  public function getStocksToExpire()
+  {
+    return  Stock::whereDate('expired_at', '<=', now()->toDateString())
+      ->whereNotNull('expired_at')
+      ->where('quantity_left', '>', 0)
+      ->get();
+  }
 }
