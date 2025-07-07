@@ -13,7 +13,7 @@
       <x-slot:content class="flex-col">
 
         {{-- formulario del periodo --}}
-        <form class="w-full flex flex-col gap-1">
+        <form class="flex flex-col w-full gap-1">
 
           <x-div-toggle x-data="{ open: true }" title="detalles de la receta" class="w-full p-2">
 
@@ -28,24 +28,25 @@
               </x-slot:messages>
             @enderror
 
-            <div class="flex justify-start items-start gap-4">
+            <div class="flex items-start justify-start gap-4">
+
               {{-- columna de inputs 1 --}}
-              <div class="flex flex-col gap-4 w-1/2">
+              <div class="flex flex-col w-1/2 gap-4">
 
                 <div class="flex gap-4 min-h-fit">
                   {{-- producto de la receta --}}
-                  <div class="flex flex-col gap-1 min-h-fit w-full md:w-1/2">
+                  <div class="flex flex-col w-full gap-1 min-h-fit md:w-1/2">
                     <span>
-                      <label for="">producto de la receta</label>
+                      <label for="product_id">producto de la receta</label>
                       <span class="text-red-600">*</span>
                     </span>
                     @error('product_id')
-                    <span class="text-red-400 text-xs">{{ $message }}</span>
+                      <span class="text-xs text-red-400">{{ $message }}</span>
                     @enderror
                     <select
                       id="product_id"
                       name="product_id"
-                      wire:model="product_id"
+                      wire:model.live="product_id"
                       class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
                       >
                       <option value="">seleccione un producto ...</option>
@@ -55,105 +56,97 @@
                     </select>
                   </div>
                   {{-- titulo de la receta --}}
-                  <div class="flex flex-col gap-1 min-h-fit w-full md:w-1/2">
+                  <div class="flex flex-col w-full gap-1 min-h-fit md:w-1/2">
                     <span>
                       <label for="recipe_title">titulo de la receta</label>
-                      <span class="text-red-600">*</span>
                       <x-quest-icon title="generado de forma automática" />
                     </span>
-                    @error('recipe_title')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
+                    @error('recipe_title')
+                      <span class="text-xs text-red-400">{{ $message }}</span>
+                    @enderror
                     <input
                       name="recipe_title"
                       id="recipe_title"
-                      wire:model="recipe_title"
+                      value="{{ $recipe_title }}"
+                      @readonly(true)
                       type="text"
-                      class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                      class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300 bg-neutral-200"
                     />
                   </div>
                 </div>
 
                 <div class="flex gap-4 min-h-fil">
                   {{-- rendimiento en unidades de la receta --}}
-                  <div class="flex flex-col gap-1 min-h-fit w-full md:w-1/2">
+                  <div class="flex flex-col w-full gap-1 min-h-fit md:w-1/2">
                     <span>
                       <label for="recipe_yields">rendimiento en unidades</label>
                       <span class="text-red-600">*</span>
                       <x-quest-icon title="cantidad de productos que resultan de preparar la receta" />
                     </span>
-                    @error('recipe_yields')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
+                    @error('recipe_yields')<span class="text-xs text-red-400">{{ $message }}</span>@enderror
                     <input
                       name="recipe_yields"
                       id="recipe_yields"
                       wire:model="recipe_yields"
                       type="text"
-                      class="p-1 text-sm w-full border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                      class="w-full p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
                     />
                   </div>
                   {{-- rendimiento en porciones de la receta --}}
-                  <div class="flex flex-col gap-1 min-h-fit w-full md:w-1/2">
+                  <div class="flex flex-col w-full gap-1 min-h-fit md:w-1/2">
                     <span>
                       <label for="recipe_portions">porciones por unidad</label>
                       <span class="text-red-600">*</span>
                       <x-quest-icon title="cantidad de porciones por cada producto elaborado" />
                     </span>
-                    @error('recipe_portions')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
+                    @error('recipe_portions')<span class="text-xs text-red-400">{{ $message }}</span>@enderror
                     <input
                       type="text"
                       wire:model="recipe_portions"
                       name="recipe_portions"
                       id="recipe_portions"
-                      class="p-1 text-sm w-full border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                      class="w-full p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
                     />
                   </div>
                 </div>
 
                 <div class="flex gap-4 min-h-fil">
                   {{-- tiempo de preparacion de la receta --}}
-                  <div class="flex flex-col gap-1 min-h-fit w-full md:w-1/2">
+                  <div class="flex flex-col w-full gap-1 min-h-fit md:w-1/2">
                     <span>
-                      <label for="">tiempo de preparación, horas y minutos</label>
+                      <label for="time">tiempo de preparación, horas y minutos (HH:MM)</label>
                       <span class="text-red-600">*</span>
                     </span>
-                    @error('time_h')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
-                    @error('time_m')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
-                    <div class="flex gap-4 items-center justify-start">
-                      {{-- horas --}}
+                    @error('time')<span class="text-xs text-red-400">{{ $message }}</span>@enderror
+                    {{-- horas --}}
+                    <div class="flex items-end justify-start gap-1">
                       <input
-                        type="number"
-                        wire:model.live="time_h"
-                        min="0"
-                        max="23"
-                        step="1"
-                        placeholder="HH"
-                        class="w-1/2 p-1 text-sm text-right border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                        type="text"
+                        name="time"
+                        wire:model.live="time"
+                        placeholder="HH:MM"
+                        class="w-full p-1 text-sm text-right border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
                       />
-                      {{-- minutos --}}
-                      <input
-                        type="number"
-                        wire:model.live="time_m"
-                        min="1"
-                        max="59"
-                        step="1"
-                        placeholder="mm"
-                        class="w-1/2 p-1 text-sm text-right border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
-                      />
+                      <span>hrs</span>
                     </div>
                   </div>
                 </div>
               </div>
               {{-- columna de inputs 2 --}}
-              <div class="flex flex-col gap-4 w-1/2">
+              <div class="flex flex-col w-1/2 gap-4">
+
                 <div class="flex min-h-fit">
                   {{-- instrucciones de preparacion corta --}}
-                  <div class="flex flex-col gap-1 min-h-fit w-full">
+                  <div class="flex flex-col w-full gap-1 min-h-fit">
                     <span>
                       <label for="recipe_instructions">instrucciones de preparación</label>
                       <span class="text-red-600">*</span>
                     </span>
-                    @error('recipe_instructions')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
-                    <textarea wire:model="recipe_instructions" name="recipe_instructions" rows="5" cols="10" class="p-1 text-sm w-full border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"></textarea>
+                    @error('recipe_instructions')<span class="text-xs text-red-400">{{ $message }}</span>@enderror
+                    <textarea wire:model="recipe_instructions" name="recipe_instructions" id="recipe_instructions" rows="5" cols="10" class="w-full p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"></textarea>
                   </div>
                 </div>
+
               </div>
             </div>
 
@@ -176,7 +169,7 @@
             @livewire('stocks.search-provision-recipe', ['recipe_id' => null, 'is_editing' => false])
 
             {{-- lista de suministros para la rceta --}}
-            <div class="flex flex-col gap-1 w-full">
+            <div class="flex flex-col w-full gap-1">
 
               {{-- leyenda --}}
               <div class="py-1">
@@ -184,11 +177,11 @@
                 @error('provision_categories')<span class="text-red-400">{{ $message }}</span>@enderror
               </div>
 
-              <div class="max-h-60 overflow-y-auto overflow-x-hidden">
+              <div class="overflow-x-hidden overflow-y-auto max-h-60">
                 <x-table-base>
                   <x-slot:tablehead>
                     <tr class="border bg-neutral-100">
-                      <x-table-th class="text-end w-12">
+                      <x-table-th class="w-12 text-end">
                         id
                       </x-table-th>
                       <x-table-th class="text-start">
@@ -201,7 +194,7 @@
                         <span>cantidad necesaria</span>
                         <x-quest-icon title="kilogramos (kg), gramos (g), litros (L), mililitros (ml), metros (m), centimetros (cm)  o unidades (un)"/>
                       </x-table-th>
-                      <x-table-th class="text-start w-16">
+                      <x-table-th class="w-16 text-start">
                         quitar
                       </x-table-th>
                     </tr>
@@ -222,9 +215,9 @@
                         <x-table-td class="text-end">
                           {{-- cantidad --}}
                           @error('provision_categories.'.$key.'.quantity')
-                            <span class="text-red-400 text-xs">{{ $message }}</span>
+                            <span class="text-xs text-red-400">{{ $message }}</span>
                           @enderror
-                          <div class="flex gap-2 items-center justify-end">
+                          <div class="flex items-center justify-end gap-2">
                             <input
                               type="text"
                               id="provision_categories_{{ $key }}_quantity"
@@ -241,11 +234,11 @@
                         {{-- acciones --}}
                         <x-table-td class="text-start">
                           {{-- quitar item de la lista --}}
-                          <div class="w-full inline-flex gap-1 justify-start items-center">
+                          <div class="inline-flex items-center justify-start w-full gap-1">
                             <span
                               wire:click="removeItemFromList({{ $key }})"
                               title="quitar de la lista"
-                              class="font-bold leading-none text-center p-1 cursor-pointer bg-red-100 border border-red-200 rounded-sm"
+                              class="p-1 font-bold leading-none text-center bg-red-100 border border-red-200 rounded-sm cursor-pointer"
                               >&times;
                             </span>
                           </div>
@@ -260,7 +253,7 @@
                 </x-table-base>
               </div>
               {{-- acciones de lista --}}
-              <div class="w-full flex justify-end items-center gap-2 mt-2">
+              <div class="flex items-center justify-end w-full gap-2 mt-2">
                 <x-a-button
                   href="#"
                   bg_color="neutral-100"
@@ -280,7 +273,7 @@
 
       <x-slot:footer class="mt-2">
         <!-- botones del formulario -->
-        <div class="flex justify-end my-2 gap-2">
+        <div class="flex justify-end gap-2 my-2">
 
           <x-a-button
             wire:navigate

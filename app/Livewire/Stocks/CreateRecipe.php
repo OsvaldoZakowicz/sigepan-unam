@@ -9,6 +9,7 @@ use App\Models\ProvisionCategory;
 use Illuminate\Support\Carbon;
 use Livewire\Attributes\On;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class CreateRecipe extends Component
@@ -18,15 +19,12 @@ class CreateRecipe extends Component
 
   // datos generales de la receta
   public $product_id;
-  public $recipe_title;
-  public $recipe_yields;    // rendimiento en unidades
-  public $recipe_portions;  // rendimiento en porciones por unidad
+  public $recipe_title = '';        // se define a partir de otros inputs
+  public $recipe_yields;            // rendimiento en unidades
+  public $recipe_portions;          // rendimiento en porciones por unidad
   public $recipe_instructions;
   public $recipe_short_description;
-
-  // tiempo de preparacion
-  public $time_h; // horas
-  public $time_m; // minutos
+  public $time;
 
   // lista de categoria de suministros
   public Collection $provision_categories;
@@ -107,62 +105,91 @@ class CreateRecipe extends Component
     $this->provision_categories = collect();
   }
 
+  /**
+   * al elegir un producto, crear titulo de receta
+   * @param $value es el id de producto seleccionado
+   */
+  public function updatedProductId($value)
+  {
+    if ($value) {
+      $product = collect($this->products)->firstWhere('id', $value);
+      if ($product) {
+        $this->recipe_title = "receta de " . $product->product_name;
+      }
+    } else {
+      $this->recipe_title = '';
+    }
+  }
+
+
+
   //* guardar receta
   public function save()
   {
     $validated = $this->validate([
       'product_id'           =>  ['required', 'integer', 'exists:products,id'],
-      'recipe_title'         =>  ['required', 'unique:recipes,recipe_title', 'regex:/^[\p{L}\s0-9]+$/', 'min:5', 'max:50'],
       'recipe_yields'        =>  ['required', 'numeric', 'min:1', 'max:99'],
       'recipe_portions'      =>  ['required', 'numeric', 'min:1', 'max:99'],
-      'time_h'               =>  ['required', 'numeric', 'min:0', 'max:23'],
-      'time_m'               =>  ['required', 'numeric', 'min:1', 'max:59'],
+      'time'                 =>  ['required', 'regex:/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/'],
       'recipe_instructions'  =>  ['required'],
       'provision_categories'            =>  ['required'],
       'provision_categories.*.quantity' =>  ['required', 'numeric', 'min:0.01', 'max:99.99'],
     ], [
-      'product_id.required' => ':attribute es obligatorio',
       'product_id.required' => 'Debe seleccionar un producto',
       'product_id.integer'  => 'El producto seleccionado no es válido',
       'product_id.exists'   => 'El producto seleccionado no existe',
-      'recipe_title.unique' => 'Ya existe una receta con el mismo titulo',
-      'recipe_title.regex'  => ':attribute solo puede tener, letras y numeros',
-      'recipe_title.min'    => ':attribute debe ser de 5 o mas caracteres',
-      'recipe_title.max'    => ':attribute puede ser de hasta 50 caracteres',
-      'provision_categories.required'            => ':attribute debe tener al menos un suministro',
-      'provision_categories.*.quantity.required' => ':attribute es obligatorio',
-      'provision_categories.*.quantity.numeric'  => ':attribute debe ser un numero',
-      'provision_categories.*.quantity.min'      => ':attribute debe ser minimo :min',
-      'provision_categories.*.quantity.max'      => ':attribute debe ser maximo :max',
+      'recipe_yields.required' => 'El :attribute es obligatorio',
+      'recipe_yields.numeric' => 'El :attribute debe ser un numero',
+      'recipe_yields.min' => 'El :attribute debe ser minimo 1',
+      'recipe_yields.max' => 'El :attribute debe ser maximo 99',
+      'recipe_portions.required' => 'Las :attribute son obligatorias',
+      'recipe_portions.numeric' => 'Las :attribute deben ser un numero',
+      'recipe_portions.min' => 'Las :attribute deben ser minimo 1',
+      'recipe_portions.max' => 'Las :attribute deben ser maximo 99',
+      'time.required' => 'El :attribute es obligatirio',
+      'time.regex' => 'El :attribute debe ser hh:mm (horas y minutos), ejemplo: 02:30',
+      'recipe_instructions.required' => 'Las :attribute son obligatorias',
+      'provision_categories.required'            => 'La :attribute debe tener al menos un suministro',
+      'provision_categories.*.quantity.required' => 'La :attribute es obligatorio',
+      'provision_categories.*.quantity.numeric'  => 'La :attribute debe ser un numero',
+      'provision_categories.*.quantity.min'      => 'La :attribute debe ser minimo :min',
+      'provision_categories.*.quantity.max'      => 'La :attribute debe ser maximo :max',
     ], [
       'product_id'           => 'producto de la receta',
-      'recipe_title'         => 'titulo',
       'recipe_yields'        => 'rendimiento',
       'recipe_portions'      => 'porciones',
-      'time_h'               => 'horas',
-      'time_m'               => 'minutos',
-      'recipe_instructions'  => 'instrucciones',
+      'time'                 => 'tiempo de preparacion',
+      'recipe_instructions'  => 'instrucciones de preparacion',
       'provision_categories' => 'lista de suministros',
       'provision_categories.*.quantity' => 'cantidad requerida',
     ]);
 
     try {
 
-      $hours    = str_pad((int) $validated['time_h'], 2, '0', STR_PAD_LEFT);
-      $minutes  = str_pad((int) $validated['time_m'], 2, '0', STR_PAD_LEFT);
-
-      $recipe = Recipe::create([
-        'recipe_title'            => $validated['recipe_title'],
-        'recipe_yields'           => $validated['recipe_yields'],
-        'recipe_portions'         => $validated['recipe_portions'],
-        'recipe_preparation_time' => "{$hours}:{$minutes}:00",
-        'recipe_instructions'     => $validated['recipe_instructions'],
-        'product_id'              => $validated['product_id'],
-      ]);
-
-      foreach ($validated['provision_categories'] as $item) {
-        $recipe->provision_categories()->attach($item['category']->id, ['quantity' => $item['quantity']]);
+      $title = $this->recipe_title . ' por ' . $validated['recipe_yields'];
+      if (Recipe::where('recipe_title', $title)->exists()) {
+        
+        $this->addError('recipe_title', 'Ya existe una receta con este título y rendimiento');
+        return;
       }
+
+      DB::transaction(function () use ($validated, $title) {
+
+        $recipe = Recipe::create([
+          'recipe_title'            => $title,
+          'recipe_yields'           => $validated['recipe_yields'],
+          'recipe_portions'         => $validated['recipe_portions'],
+          'recipe_preparation_time' => $validated['time'],
+          'recipe_instructions'     => $validated['recipe_instructions'],
+          'product_id'              => $validated['product_id'],
+        ]);
+  
+        foreach ($validated['provision_categories'] as $item) {
+          $recipe->provision_categories()->attach($item['category']->id, ['quantity' => $item['quantity']]);
+        }
+          
+      });
+
 
       session()->flash('operation-success', toastSuccessBody('receta', 'creada'));
       $this->redirectRoute('stocks-recipes-index');
