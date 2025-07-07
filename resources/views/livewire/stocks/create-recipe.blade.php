@@ -277,7 +277,7 @@
 
           <x-a-button
             wire:navigate
-            href="{{ route('suppliers-budgets-periods-index') }}"
+            href="{{ route('stocks-recipes-index') }}"
             bg_color="neutral-600"
             border_color="neutral-600"
             >cancelar
