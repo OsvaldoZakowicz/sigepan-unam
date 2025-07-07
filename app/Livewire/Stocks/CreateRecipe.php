@@ -73,7 +73,7 @@ class CreateRecipe extends Component
       $this->dispatch('toast-event', toast_data: [
         'event_type' => 'info',
         'title_toast' => toastTitle('', true),
-        'descr_toast' => 'este categoria de suministros ya fue elegida'
+        'descr_toast' => 'este suministro ya fue elegido para la receta'
       ]);
 
       return;
@@ -122,7 +122,6 @@ class CreateRecipe extends Component
   }
 
 
-
   //* guardar receta
   public function save()
   {
@@ -169,7 +168,7 @@ class CreateRecipe extends Component
       $title = $this->recipe_title . ' por ' . $validated['recipe_yields'];
       if (Recipe::where('recipe_title', $title)->exists()) {
         
-        $this->addError('recipe_title', 'Ya existe una receta con este título y rendimiento');
+        $this->addError('recipe_title', 'Ya existe una receta con este título y rendimiento para el producto');
         return;
       }
 

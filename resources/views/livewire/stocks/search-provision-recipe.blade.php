@@ -8,16 +8,16 @@
     </x-slot:subtitle>
 
     {{-- seccion de acciones --}}
-    <div class="absolute -top-2 right-1 flex w-1/2 justify-end items-center gap-1"></div>
+    <div class="absolute flex items-center justify-end w-1/2 gap-1 -top-2 right-1"></div>
 
     {{-- suministros --}}
-    <div class="flex flex-col gap-1 w-full">
+    <div class="flex flex-col w-full gap-1">
 
       {{-- busqueda --}}
-      <div class="flex w-full gap-1 bg-neutral-100 p-1 border border-neutral-200">
+      <div class="flex items-end justify-start w-full gap-1 p-1 border bg-neutral-100 border-neutral-200">
 
         {{-- termino de busqueda --}}
-        <div class="flex flex-col w-full justify-end">
+        <div class="flex flex-col justify-end w-56">
           <x-input-label>buscar suministros</x-input-label>
           <x-text-input
             wire:model.live="search"
@@ -28,7 +28,7 @@
         </div>
 
         {{-- filtrar por tipo --}}
-        <div class="flex flex-col w-full justify-end">
+        <div class="flex flex-col justify-end w-56">
           <select
             name="search_ty"
             id="search_ty"
@@ -48,7 +48,7 @@
         </div>
 
         {{-- elegir tamaño de paginacion --}}
-        <div class="flex flex-col w-full justify-end">
+        <div class="flex flex-col justify-end w-56">
           <select
             name="paginas"
             id="paginas"
@@ -63,21 +63,30 @@
           </select>
         </div>
 
+        <x-a-button
+          href="#"
+          wire:click="clearFilters()"
+          bg_color="neutral-200"
+          border_color="neutral-200"
+          text_color="neutral-600"
+          >limpiar filtros
+        </x-a-button>
+
       </div>
 
       {{-- seleccion de resultado --}}
-      <div class="flex flex-col gap-1 w-full border-neutral-200">
+      <div class="flex flex-col w-full gap-1 border-neutral-200">
         <x-table-base>
           <x-slot:tablehead>
             <tr class="border bg-neutral-100">
-              <x-table-th class="text-end w-12">id</x-table-th>
+              <x-table-th class="w-12 text-end">id</x-table-th>
               <x-table-th class="text-start">nombre</x-table-th>
               <x-table-th class="text-start">tipo</x-table-th>
               <x-table-th class="text-end">
                 <span>unidad de medida</span>
                 <x-quest-icon title="indica la unidad de medida del suministro"/>
               </x-table-th>
-              <x-table-th class="text-start w-16">elegir</x-table-th>
+              <x-table-th class="w-16 text-start">elegir</x-table-th>
             </tr>
           </x-slot:tablehead>
           <x-slot:tablebody>
@@ -101,11 +110,11 @@
                 </x-table-td>
                 {{-- acciones --}}
                 <x-table-td class="text-start">
-                  <div class="w-full inline-flex gap-1 justify-start items-center">
+                  <div class="inline-flex items-center justify-start w-full gap-1">
                     <span
                       wire:click="addProvisionCategory({{ $pc->id }})"
                       title="elegir y agregar a la lista"
-                      class="font-bold leading-none text-center p-1 cursor-pointer bg-neutral-100 border border-neutral-200 rounded-sm"
+                      class="p-1 font-bold leading-none text-center border rounded-sm cursor-pointer bg-neutral-100 border-neutral-200"
                       >&plus;
                     </span>
                   </div>
@@ -119,7 +128,7 @@
           </x-slot:tablebody>
         </x-table-base>
 
-        <div class="w-full flex justify-end items-center gap 1">
+        <div class="flex items-center justify-end w-full gap 1">
           {{ $provisions_categories->links() }}
         </div>
 

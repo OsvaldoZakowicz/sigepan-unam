@@ -58,6 +58,15 @@ class SearchProvisionRecipe extends Component
   }
 
   /**
+   * limpiar filtros de busqueda
+   * @return void
+   */
+  public function clearFilters(): void
+  {
+    $this->reset(['search', 'search_ty', 'paginas']);
+  }
+
+  /**
    * enviar la categoria elegida mediante un evento
    * notifica al componente livewire CreateRecipe::class
    * @param int $id id de la categoria
