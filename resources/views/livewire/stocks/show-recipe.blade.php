@@ -54,7 +54,7 @@
               </p>
               <p class="mt-2 text-md">
                 <span class="font-semibold">tiempo de preparación:</span>
-                  {{ \Carbon\Carbon::createFromFormat('H:i:s', $recipe->recipe_preparation_time)->format('G \h\o\r\a\s \y i \m\i\n\u\t\o\s') }}
+                  {{ \Carbon\Carbon::createFromFormat('H:i', $recipe->recipe_preparation_time)->format('G \h\o\r\a\s \y i \m\i\n\u\t\o\s') }}
               </p>
             </div>
             {{-- imagen --}}
