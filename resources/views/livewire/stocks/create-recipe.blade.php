@@ -29,7 +29,6 @@
             @enderror
 
             <div class="flex items-start justify-start gap-4">
-
               {{-- columna de inputs 1 --}}
               <div class="flex flex-col w-1/2 gap-4">
 
@@ -166,7 +165,7 @@
             @enderror
 
             {{-- componente de busqueda de suministros para las recetas --}}
-            @livewire('stocks.search-provision-recipe', ['recipe_id' => null, 'is_editing' => false])
+            @livewire('stocks.search-provision-recipe')
 
             {{-- lista de suministros para la rceta --}}
             <div class="flex flex-col w-full gap-1">
@@ -286,6 +285,7 @@
           <x-btn-button
             type="button"
             wire:click="save()"
+            wire:confirm="¿Crear receta?"
             >guardar
           </x-btn-button>
 

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\TimeWithoutSeconds;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
@@ -32,6 +33,7 @@ class Recipe extends Model implements Auditable
   protected $casts = [
     'recipe_yields'   => 'integer',
     'recipe_portions' => 'integer',
+    'recipe_preparation_time' => TimeWithoutSeconds::class,
   ];
 
   //* una receta pertenece a un producto
