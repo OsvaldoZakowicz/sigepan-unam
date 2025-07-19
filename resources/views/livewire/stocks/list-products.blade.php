@@ -140,8 +140,7 @@
 
                       <x-a-button
                         wire:navigate
-                        href="#"
-                        wire:click="edit({{ $product->id }})"
+                        href="{{ route('stocks-products-edit', $product->id) }}"
                         bg_color="neutral-100"
                         border_color="neutral-200"
                         text_color="neutral-600"

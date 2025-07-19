@@ -188,19 +188,6 @@ class ListProducts extends Component
   }
 
   /**
-   * editar un producto
-   * solo cuando no tenga pedidos pendientes
-   * @param Product $product
-   * @return void
-   */
-  public function edit(Product $product): void
-  {
-    // todo: si hay pedidos pendientes, no editar
-
-    $this->redirectRoute('stocks-products-edit', $product->id, true, true);
-  }
-
-  /**
    * buscar productos
    * @return mixed
    */
