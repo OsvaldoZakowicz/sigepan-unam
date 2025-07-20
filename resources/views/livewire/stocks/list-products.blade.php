@@ -109,6 +109,15 @@
                 <x-table-td class="text-start">
                   <div class="flex justify-start gap-1">
 
+                    <x-a-button
+                      wire:navigate
+                      href="{{ route('stocks-products-show', $product->id) }}"
+                      bg_color="neutral-100"
+                      border_color="neutral-200"
+                      text_color="neutral-600"
+                      >ver
+                    </x-a-button>
+
                     @if ($product->deleted_at === 'activo')
 
                       <x-a-button
@@ -127,15 +136,6 @@
                         border_color="neutral-200"
                         text_color="neutral-600"
                         >stock
-                      </x-a-button>
-
-                      <x-a-button
-                        wire:navigate
-                        href="{{ route('stocks-products-show', $product->id) }}"
-                        bg_color="neutral-100"
-                        border_color="neutral-200"
-                        text_color="neutral-600"
-                        >ver
                       </x-a-button>
 
                       <x-a-button

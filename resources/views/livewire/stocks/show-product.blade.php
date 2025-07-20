@@ -38,6 +38,9 @@
             <h2 class="text-xl font-bold">
               {{ $product->product_name }}
             </h2>
+            @if ($product->deleted_at === 'borrado')
+              <x-text-tag>borrado</x-text-tag>
+            @endif
             <p class="mt-2 text-md">
               <span class="font-semibold">Precios en tienda:</span>
               <ul class="list-disc list-inside">
@@ -47,23 +50,26 @@
                     <span>({{ $price->quantity }}) unidades, a $</span>
                     <span>{{ $price->price }}, </span>
                     @if ($price->is_default)
-                      <x-text-tag color="emerald">por defecto</x-text-tag>
+                      <x-text-tag color="emerald">destacado</x-text-tag>
                     @endif
                   </li>
                 @endforeach   
               </ul>
             </p>
-            <p class="mt-2">
-              <x-a-button
-                href="#"
-                wire:click='openEditPricesModal()'
-                bg_color="neutral-100"
-                border_color="neutral-200"
-                text_color="neutral-600"
-                >editar precios
-                <x-quest-icon title="los nuevos precios serán usados en las nuevas ordenes y ventas"/>
-              </x-a-button>
-            </p>
+            {{-- si esta borrado no puedo editar precios --}}
+            @if ($product->deleted_at === "activo")
+              <p class="mt-2">
+                <x-a-button
+                  href="#"
+                  wire:click='openEditPricesModal()'
+                  bg_color="neutral-100"
+                  border_color="neutral-200"
+                  text_color="neutral-600"
+                  >editar precios
+                  <x-quest-icon title="los nuevos precios serán usados en las nuevas ordenes y ventas"/>
+                </x-a-button>
+              </p>
+            @endif
             <p class="mt-2 text-md">
               <span class="font-semibold">Vencimiento después de elaborarse:</span>
               &nbsp;{{ $product->product_expires_in }}&nbsp;días.
@@ -92,7 +98,7 @@
             <p class="mt-2 text-md">
               <span class="font-semibold">Recetas:</span>
             </p>
-            {{-- ver etiquetas --}}
+            {{-- ver recetas --}}
             <div class="flex flex-wrap items-center justify-start gap-2 p-1 leading-none min-h-8">
               @forelse ($product->recipes as $recipe)
                 <div class="flex items-center justify-start gap-1 px-1 py-px bg-blue-200 border border-blue-300 rounded-lg">
@@ -106,14 +112,17 @@
               @empty
                 <span>¡este producto no tiene recetas!</span>
               @endforelse
-              <x-a-button
-                wire:navigate
-                href="{{ route('stocks-recipes-create') }}"
-                bg_color="neutral-100"
-                border_color="neutral-200"
-                text_color="neutral-600"
-                >agregar receta
-              </x-a-button>
+              {{-- si esta borrado no puedo agregar recetas --}}
+              @if ($product->deleted_at === 'activo')
+                <x-a-button
+                  wire:navigate
+                  href="{{ route('stocks-recipes-create') }}"
+                  bg_color="neutral-100"
+                  border_color="neutral-200"
+                  text_color="neutral-600"
+                  >agregar receta
+                </x-a-button>
+              @endif
             </div>
           </div>
         </div>

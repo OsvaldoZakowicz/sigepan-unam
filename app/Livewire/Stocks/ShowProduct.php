@@ -25,7 +25,7 @@ class ShowProduct extends Component
    */
   public function mount(int $id): void
   {
-    $this->product = Product::findOrFail($id);
+    $this->product = Product::withTrashed()->findOrFail($id);
   }
 
   // editar precios

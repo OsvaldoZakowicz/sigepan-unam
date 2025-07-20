@@ -175,17 +175,6 @@ class EditProduct extends Component
       $product_service = new ProductService();
       $updated_product = $product_service->updateProduct($validated, $this->product);
 
-      /* $this->product->product_name              = $validated['product_name'];
-      $this->product->product_short_description = $validated['product_short_description'];
-      $this->product->product_expires_in        = $validated['product_expires_in'];
-      $this->product->product_in_store          = $validated['product_in_store'];
-      $this->product->product_image_path        = $validated['product_image_path'];
-      $this->product->save(); */
-
-      // sincronizar tags
-      /* $tags_to_sync = Arr::map($validated['tags_list'], function ($tag) { return $tag['tag']->id; });
-      $this->product->tags()->sync($tags_to_sync); */
-
       $this->reset();
 
       session()->flash('operation-success', toastSuccessBody('producto', 'actualizado'));
