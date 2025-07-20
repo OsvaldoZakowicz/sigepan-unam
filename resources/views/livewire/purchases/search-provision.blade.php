@@ -8,10 +8,10 @@
     </x-slot:subtitle>
 
     {{-- seccion de acciones --}}
-    <div class="absolute -top-2 right-1 flex w-1/2 justify-end items-center gap-1">
+    <div class="absolute flex items-center justify-end w-1/2 gap-1 -top-2 right-1">
 
       {{-- boton para cambiar entre buscar suministros individuales o packs --}}
-      <div class="inline-flex items-center gap-1 p-1 border border-neutral-200 bg-neutral-100 rounded-md cursor-pointer">
+      <div class="inline-flex items-center gap-1 p-1 border rounded-md cursor-pointer border-neutral-200 bg-neutral-100">
         <label for="toggle">buscar packs</label>
         <input
           type="checkbox"
@@ -27,13 +27,13 @@
     @if ($toggle)
       {{-- mostrar busqueda depacks --}}
       {{-- packs --}}
-      <div class="flex flex-col gap-1 w-full">
+      <div class="flex flex-col w-full gap-1">
 
         {{-- busqueda --}}
-        <div class="flex items-end w-full gap-1 bg-neutral-100 p-1 border border-neutral-200">
+        <div class="flex items-end w-full gap-1 p-1 border bg-neutral-100 border-neutral-200">
 
           {{-- termino de busqueda --}}
-          <div class="flex flex-col w-1/4 justify-end">
+          <div class="flex flex-col justify-end w-1/4">
             <x-input-label>buscar packs</x-input-label>
             <x-text-input
               wire:model.live="search_pack"
@@ -112,12 +112,12 @@
         </div>
 
         {{-- seleccion del resultado --}}
-        <div class="flex flex-col gap-1 w-full border-neutral-200">
+        <div class="flex flex-col w-full gap-1 border-neutral-200">
 
           <x-table-base>
             <x-slot:tablehead>
               <tr class="border bg-neutral-100">
-                <x-table-th class="text-end w-12">
+                <x-table-th class="w-12 text-end">
                   id
                 </x-table-th>
                 <x-table-th class="text-start">
@@ -130,12 +130,12 @@
                   tipo
                 </x-table-th>
                 <x-table-th class="text-end">
-                  cantidad
+                  volumen
                   <x-quest-icon
                     title="kilogramos (kg), gramos (g), litros (l), mililitros (ml), metro (m), centimetro (cm), unidad (u)"
                   />
                 </x-table-th>
-                <x-table-th class="text-start w-16">
+                <x-table-th class="w-16 text-start">
                   elegir
                 </x-table-th>
               </tr>
@@ -160,11 +160,11 @@
                     {{ convert_measure($pack->pack_quantity, $pack->provision->measure) }}
                   </x-table-td>
                   <x-table-td class="text-start">
-                    <div class="w-full inline-flex gap-1 justify-start items-center">
+                    <div class="inline-flex items-center justify-start w-full gap-1">
                       <span
                         wire:click="addPack({{ $pack }})"
                         title="elegir y agregar a la lista"
-                        class="font-bold leading-none text-center p-1 cursor-pointer bg-neutral-100 border border-neutral-200 rounded-sm"
+                        class="p-1 font-bold leading-none text-center border rounded-sm cursor-pointer bg-neutral-100 border-neutral-200"
                         >&plus;
                       </span>
                     </div>
@@ -178,7 +178,7 @@
             </x-slot:tablebody>
           </x-table-base>
 
-          <div class="w-full flex justify-end items-center gap 1">
+          <div class="flex items-center justify-end w-full gap 1">
             {{-- paginacion de packs --}}
             {{ $packs->links() }}
           </div>
@@ -189,10 +189,10 @@
     @else
       {{-- mostrar busqueda de suministros --}}
       {{-- suministros --}}
-      <div class="flex flex-col gap-1 w-full">
+      <div class="flex flex-col w-full gap-1">
 
         {{-- busqueda --}}
-        <div class="flex items-end w-full gap-1 bg-neutral-100 p-1 border border-neutral-200">
+        <div class="flex items-end w-full gap-1 p-1 border bg-neutral-100 border-neutral-200">
 
           {{-- termino de busqueda --}}
           <div class="flex flex-col justify-end w-1/4">
@@ -276,12 +276,12 @@
         </div>
 
         {{-- seleccion de resultado --}}
-        <div class="flex flex-col gap-1 w-full border-neutral-200">
+        <div class="flex flex-col w-full gap-1 border-neutral-200">
 
           <x-table-base>
             <x-slot:tablehead>
               <tr class="border bg-neutral-100">
-                <x-table-th class="text-end w-12">
+                <x-table-th class="w-12 text-end">
                   id
                 </x-table-th>
                 <x-table-th class="text-start">
@@ -294,12 +294,12 @@
                   tipo
                 </x-table-th>
                 <x-table-th class="text-end">
-                  cantidad
+                  volumen
                   <x-quest-icon
                     title="kilogramos (kg), gramos (g), litros (l), mililitros (ml), metro (m), centimetro (cm), unidad (u)"
                   />
                 </x-table-th>
-                <x-table-th class="text-start w-16">
+                <x-table-th class="w-16 text-start">
                   elegir
                 </x-table-th>
               </tr>
@@ -325,11 +325,11 @@
                     {{ convert_measure($provision->provision_quantity, $provision->measure) }}
                   </x-table-td>
                   <x-table-td class="text-start">
-                    <div class="w-full inline-flex gap-1 justify-start items-center">
+                    <div class="inline-flex items-center justify-start w-full gap-1">
                       <span
                         wire:click="addProvision({{ $provision }})"
                         title="elegir y agregar a la lista"
-                        class="font-bold leading-none text-center p-1 cursor-pointer bg-neutral-100 border border-neutral-200 rounded-sm"
+                        class="p-1 font-bold leading-none text-center border rounded-sm cursor-pointer bg-neutral-100 border-neutral-200"
                         >&plus;
                       </span>
                     </div>
@@ -343,7 +343,7 @@
             </x-slot:tablebody>
           </x-table-base>
 
-          <div class="w-full flex justify-end items-center gap 1">
+          <div class="flex items-center justify-end w-full gap 1">
             {{ $provisions->links() }}
           </div>
 

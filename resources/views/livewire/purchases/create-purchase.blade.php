@@ -13,22 +13,22 @@
       <x-slot:content class="flex-col">
 
         {{-- formulario de la compra --}}
-        <form class="w-full flex flex-col gap-1">
+        <form class="flex flex-col w-full gap-1">
 
           {{-- datos de la compra --}}
           <x-fieldset-base tema="registrar compra" class="w-full p-2">
-            <div class="w-full flex justify-start items-start gap-4">
+            <div class="flex items-start justify-start w-full gap-4">
               {{-- columna de inputs 1 --}}
-              <div class="flex flex-col gap-4 w-1/2">
+              <div class="flex flex-col w-1/2 gap-4">
                 <div class="flex gap-4 min-h-fit">
                   {{-- proveedor --}}
-                  <div class="flex flex-col gap-1 min-h-fit w-full md:w-1/2">
+                  <div class="flex flex-col w-full gap-1 min-h-fit md:w-1/2">
                     <span>
                       <label for="formdt_supplier_id">proveedor</label>
                       <span class="text-red-600">*</span>
                     </span>
                     @error('formdt_supplier_id')
-                      <span class="text-red-400 text-xs">{{ $message }}</span>
+                      <span class="text-xs text-red-400">{{ $message }}</span>
                     @enderror
                     {{-- con preorden, obtenemos el proveedor --}}
                     {{-- sin preorden, listamos proveedores para elegirlos --}}
@@ -37,19 +37,19 @@
                         type="text"
                         value="{{ $order_data['supplier']->company_name }}"
                         readonly
-                        class="p-1 w-full text-sm bg-neutral-100 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                        class="w-full p-1 text-sm border bg-neutral-100 border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
                       />
                     @else
                       <select
                         id="formdt_supplier_id"
                         name="formdt_supplier_id"
-                        wire:model="formdt_supplier_id"
+                        wire:model.live="formdt_supplier_id"
+                        wire:change="getProvisionsAndPacksForSupplier()"
                         class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
                         >
                         <option value="">seleccione un proveedor ...</option>
                         @forelse ($suppliers as $supplier)
                           <option
-                            wire:click="getProvisionsAndPacksForSupplier()"
                             value="{{ $supplier->id }}"
                             >{{ $supplier->company_name }}
                           </option>
@@ -63,13 +63,13 @@
                   {{-- fecha de compra --}}
                   {{-- con preorden, la fecha de compra no debe ser anterior a la fecha de preorden --}}
                   {{-- sin preorden, la fecha de compra puede ser cualquiera --}}
-                  <div class="flex flex-col gap-1 min-h-fit w-full md:w-1/2">
+                  <div class="flex flex-col w-full gap-1 min-h-fit md:w-1/2">
                     <span>
                       <label for="formdt_purchase_date">fecha de compra</label>
                       <span class="text-red-600">*</span>
                     </span>
                     @error('formdt_purchase_date')
-                      <span class="text-red-400 text-xs">{{ $message }}</span>
+                      <span class="text-xs text-red-400">{{ $message }}</span>
                     @enderror
                     <input
                       type="date"
@@ -78,42 +78,42 @@
                       name="formdt_purchase_date"
                       min="{{ $date_min }}"
                       max="{{ $date_max }}"
-                      class="p-1 w-full text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                      class="w-full p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
                     />
                   </div>
                 </div>
                 @if ($with_preorder)
                   <div class="flex gap-4 min-h-fit">
                     {{-- orden de compra relacionada --}}
-                    <div class="flex flex-col gap-1 min-h-fit w-full md:w-1/2">
+                    <div class="flex flex-col w-full gap-1 min-h-fit md:w-1/2">
                       <span>
                         <label for="formdt_order_code">orden de compra asociada</label>
                       </span>
                       @error('formdt_order_code')
-                        <span class="text-red-400 text-xs">{{ $message }}</span>
+                        <span class="text-xs text-red-400">{{ $message }}</span>
                       @enderror
                       {{-- codigo de preorden asociado --}}
                       <input
                         type="text"
                         value="{{ $order_data['order_code'] }}"
                         readonly
-                        class="p-1 w-full text-sm bg-neutral-100 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                        class="w-full p-1 text-sm border bg-neutral-100 border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
                       />
                     </div>
                     {{-- fecha de la orden de compra relacionada --}}
-                    <div class="flex flex-col gap-1 min-h-fit w-full md:w-1/2">
+                    <div class="flex flex-col w-full gap-1 min-h-fit md:w-1/2">
                       <span>
                         <label for="formdt_order_date">fecha de la orden</label>
                       </span>
                       @error('formdt_order_date')
-                        <span class="text-red-400 text-xs">{{ $message }}</span>
+                        <span class="text-xs text-red-400">{{ $message }}</span>
                       @enderror
                       {{-- codigo de preorden asociado --}}
                         <input
                           type="text"
                           value="{{ $order_data['order_date'] }}"
                           readonly
-                          class="p-1 w-full text-sm bg-neutral-100 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                          class="w-full p-1 text-sm border bg-neutral-100 border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
                         />
                     </div>
                   </div>
@@ -121,10 +121,10 @@
               </div>
 
               {{-- columna de inputs 2 --}}
-              <div class="flex flex-col gap-4 w-1/2">
+              <div class="flex flex-col w-1/2 gap-4">
                 <div class="flex gap-4 min-h-fit">
                   {{-- subir algun comprobante? --}}
-                  <div class="flex flex-col gap-1 min-h-fit w-full md:w-1/2">
+                  <div class="flex flex-col w-full gap-1 min-h-fit md:w-1/2">
                     {{-- todo --}}
                   </div>
                   {{-- preview comprobante? --}}
@@ -155,7 +155,7 @@
             {{-- si existe preorden, listar suministros y packs de la pre orden, y el total --}}
             {{-- si no existe preorden, buscar y elegir suministros y/o packs --}}
             @if ($with_preorder)
-              <div class="max-h-72 overflow-x-auto overflow-y-auto">
+              <div class="overflow-x-auto overflow-y-auto max-h-72">
                 <x-table-base>
                   <x-slot:tablehead>
                     <tr class="border bg-neutral-100">
@@ -215,7 +215,7 @@
                     </tr>
                     @if ($loop->last)
                       <tr class="border">
-                        <x-table-td colspan="6" class="font-semibold text-end capitalize">total</x-table-td>
+                        <x-table-td colspan="6" class="font-semibold capitalize text-end">total</x-table-td>
                         <x-table-td class="font-semibold text-end">${{ toMoneyFormat((float) $order_data['total_price']) }}</x-table-td>
                       </tr>
                     @endif
@@ -236,10 +236,10 @@
                 @error('formdt_purchase_items*')
                   <span class="text-red-400">{{ $message }}</span>
                 @enderror
-                <div class="max-h-72 overflow-x-auto overflow-y-auto">
+                <div class="overflow-x-auto overflow-y-auto max-h-72">
                   <x-table-base>
                     <x-slot:tablehead>
-                      <tr class="bg-neutral-100 border">
+                      <tr class="border bg-neutral-100">
                         <x-table-th class="text-end">
                           #
                         </x-table-th>
@@ -292,7 +292,7 @@
                               step="1"
                               wire:model.live="formdt_purchase_items.{{ $key }}.item_count"
                               wire:change="updateItemQuantity({{ $key }}, $event.target.value)"
-                              class="w-20 px-2 py-1 text-right text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                              class="w-20 px-2 py-1 text-sm text-right border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
                             />
                           </x-table-td>
                           <x-table-td class="text-end">
@@ -310,7 +310,7 @@
                               wire:model.live="formdt_purchase_items.{{ $key }}.subtotal_price"
                               wire:change="formatItemSubtotal({{ $key }}, $event.target.value)"
                               pattern="[0-9.,]*" {{-- solo numeros con . y , --}}
-                              class="w-36 px-2 py-1 text-right text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                              class="px-2 py-1 text-sm text-right border w-36 border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
                             />
                           </x-table-td>
                           <x-table-td class="text-start">
@@ -318,14 +318,14 @@
                             <span
                               title="quitar de la lista."
                               wire:click="removeItem({{ $key }})"
-                              class="font-semibold cursor-pointer leading-none p-1 bg-red-200 text-neutral-600 border-red-300 rounded-sm"
+                              class="p-1 font-semibold leading-none bg-red-200 border-red-300 rounded-sm cursor-pointer text-neutral-600"
                               >&times;
                             </span>
                           </x-table-td>
                         </tr>
                         @if ($loop->last)
                           <tr class="border">
-                            <x-table-td class="font-semibold text-end capitalize" colspan="6">Total</x-table-td>
+                            <x-table-td class="font-semibold capitalize text-end" colspan="6">Total</x-table-td>
                             <x-table-td class="font-semibold text-end">${{ toMoneyFormat($total) }}</x-table-td>
                             <x-table-td></x-table-td>
                           </tr>
@@ -337,7 +337,7 @@
                       @endforelse
                     </x-slot:tablebody>
                   </x-table-base>
-                  <div class="w-full flex justify-end items-center mt-2">
+                  <div class="flex items-center justify-end w-full mt-2">
                     <x-a-button
                       href="#"
                       wire:click="resetList()"
@@ -360,7 +360,7 @@
 
       <x-slot:footer class="mt-2">
         <!-- botones del formulario -->
-        <div class="flex justify-end my-2 gap-2">
+        <div class="flex justify-end gap-2 my-2">
 
           <x-a-button
             wire:navigate
