@@ -20,7 +20,7 @@
       <x-slot:header>
 
         {{-- busqueda --}}
-        <div class="w-full flex justify-start items-end gap-1">
+        <div class="flex items-end justify-start w-full gap-1">
 
           {{-- termino de busqueda --}}
           <div class="flex flex-col justify-end w-1/4">
@@ -31,7 +31,7 @@
               wire:model.live="search"
               wire:click="resetPagination()"
               placeholder="ingrese un id, o termino de busqueda"
-              class="text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+              class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
             />
           </div>
 
@@ -43,7 +43,7 @@
               id="trademark_filter"
               wire:model.live="trademark_filter"
               wire:click="resetPagination()"
-              class="text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
+              class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
 
               <option value="">seleccione una marca ...</option>
 
@@ -65,7 +65,7 @@
               id="type_filter"
               wire:model.live="type_filter"
               wire:click="resetPagination()"
-              class="text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
+              class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
 
               <option value="">seleccione un tipo ...</option>
 
@@ -97,20 +97,20 @@
         <x-table-base>
           <x-slot:tablehead>
             <tr class="border bg-neutral-100">
-              <x-table-th class="text-end w-12">id</x-table-th>
+              <x-table-th class="w-12 text-end">id</x-table-th>
               <x-table-th class="text-start">nombre</x-table-th>
               <x-table-th class="text-start">marca</x-table-th>
               <x-table-th class="text-start">tipo</x-table-th>
               <x-table-th class="text-end">
                 <span>volumen</span>
-                <x-quest-icon title="kilogramos (kg), litros (lts) o unidades (un)"/>
+                <x-quest-icon title="kilogramos (kg), gramos (g), litros (lts), mililitros (ml), metros (m), centímetros (cm), o unidades (un)"/>
               </x-table-th>
               <x-table-th class="text-start">
                 <span>packs disponibles</span>
                 <x-quest-icon title="packs en los que se puede encontrar el suministro" />
               </x-table-th>
-              <x-table-th class="text-start w-24">estado</x-table-th>
-              <x-table-th class="text-start w-24">acciones</x-table-th>
+              <x-table-th class="w-24 text-start">estado</x-table-th>
+              <x-table-th class="w-24 text-start">acciones</x-table-th>
             </tr>
           </x-slot:tablehead>
           <x-slot:tablebody>
@@ -140,7 +140,7 @@
                   @if (count($packs) > 0)
                     @foreach ($packs as $pack)
                     <div
-                      class="inline-flex items-center lowercase justify-start gap-1 border border-blue-300 bg-blue-200 px-1 rounded-lg cursor-pointer"
+                      class="inline-flex items-center justify-start gap-1 px-1 lowercase bg-blue-200 border border-blue-300 rounded-lg cursor-pointer"
                       title="cantidad total:&nbsp;{{ convert_measure($pack->pack_quantity, $pack->provision->measure) }}">
                       <span>&times;{{ $pack->pack_units }}</span>
                     </div>
@@ -157,7 +157,7 @@
                   @endif
                 </x-table-td>
                 <x-table-td class="text-start">
-                  <div class="w-full inline-flex gap-1 justify-start items-center">
+                  <div class="inline-flex items-center justify-start w-full gap-1">
                     @if ($provision->deleted_at === 'activo')
 
                       <x-a-button
