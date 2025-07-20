@@ -13,7 +13,7 @@
       <x-slot:content class="flex-col">
 
         {{-- formulario del producto --}}
-        <form class="w-full flex flex-col gap-1">
+        <form class="flex flex-col w-full gap-1">
 
           <x-div-toggle x-data="{ open: true }" title="detalles del producto" class="w-full p-2">
 
@@ -28,18 +28,18 @@
               </x-slot:messages>
             @enderror
 
-            <div class="flex justify-start items-stretch gap-4">
+            <div class="flex items-stretch justify-start gap-4">
 
               {{-- columna 1 --}}
-              <div class="flex flex-col gap-4 w-1/2">
+              <div class="flex flex-col w-1/2 gap-4">
                 <div class="flex gap-4">
                   {{-- nombre del producto --}}
-                  <div class="flex flex-col gap-1 min-h-fit w-full">
+                  <div class="flex flex-col w-full gap-1 min-h-fit">
                     <span>
                       <label for="product_name">nombre del producto</label>
                       <span class="text-red-600">*</span>
                     </span>
-                    @error('product_name')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
+                    @error('product_name')<span class="text-xs text-red-400">{{ $message }}</span>@enderror
                     <input
                       name="product_name"
                       id="product_name"
@@ -51,13 +51,13 @@
                 </div>
                 <div class="flex gap-4">
                   {{-- vencimiento luego de elaboracion  --}}
-                  <div class="flex flex-col gap-1 min-h-fit w-full">
+                  <div class="flex flex-col w-full gap-1 min-h-fit">
                     <span>
                       <label for="product_expires_in">Vencimiento despúes de elaborarse</label>
                       <x-quest-icon title="Una vez que se prepare este producto, ¿cuántos dias se mantiene fresco para la venta?"/>
                       <span class="text-red-600">*</span>
                     </span>
-                    @error('product_expires_in')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
+                    @error('product_expires_in')<span class="text-xs text-red-400">{{ $message }}</span>@enderror
                     <input
                       name="product_expires_in"
                       id="product_expires_in"
@@ -68,12 +68,13 @@
                     />
                   </div>
                   {{-- publicar en tienda --}}
-                  <div class="flex flex-col gap-1 min-h-fit w-full">
+                  <div class="flex flex-col w-full gap-1 min-h-fit">
                     <span>
                       <label for="product_in_store">publicar este producto en la tienda?</label>
                       <span class="text-red-600">*</span>
+                      <x-quest-icon title="publicar hará que el producto aparezca en la tienda para el cliente"/>
                     </span>
-                    @error('product_in_store')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
+                    @error('product_in_store')<span class="text-xs text-red-400">{{ $message }}</span>@enderror
                     <select
                       name="product_in_store"
                       wire:model="product_in_store"
@@ -85,33 +86,34 @@
                   </div>
                 </div>
                 {{-- decripcion corta --}}
-                <div class="flex flex-col gap-1 min-h-fit w-full">
+                <div class="flex flex-col w-full gap-1 min-h-fit">
                   <span>
                     <label for="product_short_description">descripción corta del producto</label>
                     <span class="text-red-600">*</span>
                   </span>
-                  @error('product_short_description')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
+                  @error('product_short_description')<span class="text-xs text-red-400">{{ $message }}</span>@enderror
                   <textarea
                     wire:model="product_short_description"
                     name="product_short_description"
                     rows="3"
                     cols="10"
-                    class="p-1 text-sm w-full border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
+                    class="w-full p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
                   </textarea>
                 </div>
                 {{-- etiquetas --}}
-                <div class="flex flex-col gap-1 min-h-fit w-full">
+                <div class="flex flex-col w-full gap-1 min-h-fit">
                   <span>
                     <label for="">etiquetas de clasificacion</label>
                     <span class="text-red-600">*</span>
+                    <x-quest-icon title="para una mejor descripcion y búsqueda del producto en la tienda"/>
                   </span>
-                  @error('tags_list')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
+                  @error('tags_list')<span class="text-xs text-red-400">{{ $message }}</span>@enderror
                   {{-- elegir etiquetas --}}
-                  <div class="flex justify-start items-center gap-1">
+                  <div class="flex items-center justify-start gap-1">
                     <select
                       name="selected_id_tag"
                       wire:model="selected_id_tag"
-                      class="grow p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
+                      class="p-1 text-sm border grow border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
                       <option value="">seleccione ...</option>
                       @foreach ($tags as $tag)
                         <option value="{{ $tag->id }}">{{ $tag->tag_name }}</option>
@@ -127,11 +129,11 @@
                     </x-a-button>
                   </div>
                   {{-- visualizar etiquetas --}}
-                  <div class="flex justify-start items-center gap-2 flex-wrap p-1 min-h-8 border border-dashed border-neutral-200 leading-none overflow-y-auto overflow-x-auto">
+                  <div class="flex flex-wrap items-center justify-start gap-2 p-1 overflow-x-auto overflow-y-auto leading-none border border-dashed min-h-8 border-neutral-200">
                     @forelse ($tags_list as $key => $tag)
-                      <div class="flex items-center justify-start gap-1 border border-blue-300 bg-blue-200 py-px px-1 rounded-lg">
-                        <span class="text-sm text-neutral-600 lowercase">{{ $tag['tag']->tag_name }}</span>
-                        <span wire:click="removeTagFromList({{ $key }})" class="text-lg leading-none cursor-pointer text-red-400 hover:text-red-600 hover:font-semibold" title="">&times;</span>
+                      <div class="flex items-center justify-start gap-1 px-1 py-px bg-blue-200 border border-blue-300 rounded-lg">
+                        <span class="text-sm lowercase text-neutral-600">{{ $tag['tag']->tag_name }}</span>
+                        <span wire:click="removeTagFromList({{ $key }})" class="text-lg leading-none text-red-400 cursor-pointer hover:text-red-600 hover:font-semibold" title="">&times;</span>
                       </div>
                     @empty
                       <span>¡no ha elegido ninguna etiqueta!</span>
@@ -141,25 +143,25 @@
               </div>
 
               {{-- columna 2 --}}
-              <div class="flex flex-col gap-4 w-1/2">
+              <div class="flex flex-col w-1/2 gap-4">
                 {{-- imagen del producto --}}
-                <div class="flex flex-col gap-1 min-h-fit w-full">
+                <div class="flex flex-col w-full gap-1 min-h-fit">
                   <span>
                     <label for="product_image">imagen del producto</label>
                     <span class="text-red-600">*</span>
                   </span>
-                  @error('product_image')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
+                  @error('product_image')<span class="text-xs text-red-400">{{ $message }}</span>@enderror
                   <input
                     type="file"
                     wire:model="product_image"
                     id="product_image"
                     accept="image/*"
-                    class="p-1 text-sm w-full border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                    class="w-full p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
                     >
                 </div>
                 {{-- vista previa de la imagen --}}
                 @if ($product_image)
-                  <div class="flex flex-col gap-1 min-h-fit w-full">
+                  <div class="flex flex-col w-full gap-1 min-h-fit">
                     <img src="{{ $product_image->temporaryUrl() }}" class="max-w-xs border-2 border-dashed border-neutral-300">
                   </div>
                 @endif
@@ -183,7 +185,7 @@
             @enderror
 
             {{-- formulario para agregar precio --}}
-            <div class="flex gap-2 mb-2 items-end w-full">
+            <div class="flex items-end w-full gap-2 mb-2">
 
               {{-- cantidad del producto --}}
               <div class="flex flex-col">
@@ -191,7 +193,7 @@
                   <label for="quantity">Cantidad del producto</label>
                   <span class="text-red-600">*</span>
                 </span>
-                @error('quantity')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
+                @error('quantity')<span class="text-xs text-red-400">{{ $message }}</span>@enderror
                 <input
                   type="number"
                   wire:model="quantity"
@@ -206,7 +208,7 @@
                   <label for="price">Precio</label>
                   <span class="text-red-600">*</span>
                 </span>
-                @error('price')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
+                @error('price')<span class="text-xs text-red-400">{{ $message }}</span>@enderror
                 <input
                   type="number"
                   wire:model="price"
@@ -223,7 +225,7 @@
                   <label for="price_description">Descripción del precio</label>
                   <span class="text-red-600">*</span>
                 </span>
-                @error('price_description')<span class="text-red-400 text-xs">{{ $message }}</span>@enderror
+                @error('price_description')<span class="text-xs text-red-400">{{ $message }}</span>@enderror
                 <input
                   type="text"
                   wire:model="price_description"
@@ -240,14 +242,15 @@
                   id="is_default"
                   class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
                 />
-                <label for="is_default">Precio predeterminado</label>
+                <label for="is_default">Precio destacado</label>
+                <x-quest-icon title="precio u oferta principal para el producto"/>
               </div>
 
               {{-- boton agregar --}}
               <button
                 type="button"
                 wire:click="addPrice"
-                class="ml-auto px-4 py-1 bg-neutral-100 border border-neutral-300 text-neutral-600 rounded text-xs uppercase">
+                class="px-4 py-1 ml-auto text-xs uppercase border rounded bg-neutral-100 border-neutral-300 text-neutral-600">
                 Agregar precio
               </button>
             </div>
@@ -255,7 +258,7 @@
             {{-- lista de precios --}}
             <x-table-base class="w-full">
               <x-slot:tablehead>
-                <tr class="bg-neutral-100 border">
+                <tr class="border bg-neutral-100">
                   <x-table-th class="text-start">
                     Cantidad
                   </x-table-th>
@@ -266,7 +269,7 @@
                     Descripción
                   </x-table-th>
                   <x-table-th class="text-start">
-                    Predeterminado
+                    Destacado
                   </x-table-th>
                   <x-table-th class="text-start">
                     Acciones
@@ -292,7 +295,7 @@
                       <button
                         type="button"
                         wire:click="removePrice({{ $index }})"
-                        class="px-4 py-1 bg-red-100 border border-red-300 text-neutral-600 rounded text-xs uppercase">
+                        class="px-4 py-1 text-xs uppercase bg-red-100 border border-red-300 rounded text-neutral-600">
                           Eliminar
                       </button>
                     </x-table-td>
@@ -315,7 +318,7 @@
 
       <x-slot:footer class="mt-2">
         <!-- botones del formulario -->
-        <div class="flex justify-end my-2 gap-2">
+        <div class="flex justify-end gap-2 my-2">
 
           <x-a-button
             wire:navigate
@@ -328,6 +331,7 @@
           <x-btn-button
             type="button"
             wire:click="save()"
+            wire:confirm="¿Crear producto?"
             >guardar
           </x-btn-button>
 

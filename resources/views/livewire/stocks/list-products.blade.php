@@ -62,7 +62,7 @@
               </x-table-th>
               <x-table-th class="text-end">
                 $&nbsp;precio
-                <x-quest-icon title="precio predeterminado" />
+                <x-quest-icon title="precio destacado" />
               </x-table-th>
               <x-table-th class="text-start">
                 <span>publicado</span>

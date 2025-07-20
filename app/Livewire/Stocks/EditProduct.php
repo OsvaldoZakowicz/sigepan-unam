@@ -4,6 +4,7 @@ namespace App\Livewire\Stocks;
 
 use App\Models\Product;
 use App\Models\Tag;
+use App\Services\Product\ProductService;
 use Illuminate\Auth\Events\Validated;
 use Illuminate\View\View;
 use Illuminate\Support\Collection;
@@ -35,6 +36,9 @@ class EditProduct extends Component
   public $selected_id_tag = '';
   public Collection $tags_list;
 
+  // edicion
+  public $can_edit = true;
+
   /**
    * boot de datos constantes
    * @return void
@@ -51,6 +55,10 @@ class EditProduct extends Component
   public function mount(int $id): void
   {
     $this->product = Product::findOrFail($id);
+
+    // verificar si puedo editar el producto
+    $product_service = new ProductService();
+    $this->can_edit = $product_service->isProductEditable($this->product);
 
     $this->product_name              = $this->product->product_name;
     $this->product_short_description = $this->product->product_short_description;
@@ -157,26 +165,26 @@ class EditProduct extends Component
 
       // nueva imagen de producto
       if ($validated['new_product_image']) {
-
         // eliminar imagen anterior
         Storage::delete($this->product->product_image_path);
-
         // almacenar imagen nueva
         $product_image_path = $this->new_product_image->store('productos', 'public');
         $validated['product_image_path'] = $product_image_path;
-
       }
 
-      $this->product->product_name              = $validated['product_name'];
+      $product_service = new ProductService();
+      $updated_product = $product_service->updateProduct($validated, $this->product);
+
+      /* $this->product->product_name              = $validated['product_name'];
       $this->product->product_short_description = $validated['product_short_description'];
       $this->product->product_expires_in        = $validated['product_expires_in'];
       $this->product->product_in_store          = $validated['product_in_store'];
       $this->product->product_image_path        = $validated['product_image_path'];
-      $this->product->save();
+      $this->product->save(); */
 
       // sincronizar tags
-      $tags_to_sync = Arr::map($validated['tags_list'], function ($tag) { return $tag['tag']->id; });
-      $this->product->tags()->sync($tags_to_sync);
+      /* $tags_to_sync = Arr::map($validated['tags_list'], function ($tag) { return $tag['tag']->id; });
+      $this->product->tags()->sync($tags_to_sync); */
 
       $this->reset();
 

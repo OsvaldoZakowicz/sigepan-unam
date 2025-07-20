@@ -39,12 +39,16 @@
                       <span class="text-red-600">*</span>
                     </span>
                     @error('product_name')<span class="text-xs text-red-400">{{ $message }}</span>@enderror
+                    @if (!$can_edit)
+                      <span class="text-xs text-neutral-600">no puede cambiar el nombre del producto si tiene ventas, ordenes y/o stock asociado</span>
+                    @endif
                     <input
                       name="product_name"
                       id="product_name"
                       wire:model="product_name"
                       type="text"
-                      class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+                      @readonly(!$can_edit)
+                      class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300 @if (!$can_edit) bg-neutral-200 @endif"
                     />
                   </div>
                 </div>
@@ -71,6 +75,7 @@
                     <span>
                       <label for="product_in_store">publicar este producto en la tienda?</label>
                       <span class="text-red-600">*</span>
+                      <x-quest-icon title="indique si desea mostrar el producto en la tienda 'publicandolo' o no"/>
                     </span>
                     @error('product_in_store')<span class="text-xs text-red-400">{{ $message }}</span>@enderror
                     <select
