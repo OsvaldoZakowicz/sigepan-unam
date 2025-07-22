@@ -2,7 +2,7 @@
   {{-- componente de auditoria individual de registro --}}
   <article class="m-2 border rounded-sm border-neutral-200">
 
-    <x-title-section title="ver registro de auditoría">
+    <x-title-section title="ver cambio del registro de auditoría">
 
       {{-- volver --}}
       <x-a-button
@@ -151,7 +151,6 @@
 
               @endforeach
             </article>
-
           </div>
         </div>
 
