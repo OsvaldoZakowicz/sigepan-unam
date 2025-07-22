@@ -89,8 +89,8 @@
                     {{-- lado izquierdo --}}
                     <section class="flex flex-col w-1/4 border rounded-sm border-neutral-200">
                       @php
-                        $user_resp = $audit->user;
                         $audit_metadata = $audit->getMetadata();
+                        $user_resp = $this->getResponsibleUser($audit_metadata['user_id']);
                       @endphp
                       <header class="w-full p-1 bg-neutral-100">
                         <span class="font-semibold capitalize">detalle de auditoría:</span>
@@ -111,15 +111,15 @@
                           <span class="font-semibold capitalize">responsable del cambio:</span>
                           <span class="ml-2">
                             <span class="font-semibold">usuario:&nbsp;</span>
-                            <span>{{ $user_resp->name ?? '' }}</span>
+                            <span>{{ $user_resp['name'] }}</span>
                           </span>
                           <span class="ml-2">
                             <span class="font-semibold">rol:&nbsp;</span>
-                            <span>{{ ($user_resp) ? $user_resp->getRolenames()->first() : '' }}</span>
+                            <span>{{ $user_resp['role'] }}</span>
                           </span>
                           <span class="ml-2">
                             <span class="font-semibold">email:&nbsp;</span>
-                            <span>{{ $user_resp->email ?? ''}}</span>
+                            <span>{{ $user_resp['email'] }}</span>
                           </span>
                         </div>
 

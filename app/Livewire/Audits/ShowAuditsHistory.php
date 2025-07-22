@@ -23,6 +23,16 @@ class ShowAuditsHistory extends Component
   // eventos
   public $events;
 
+  private AuditService $audit_service;
+    
+  /**
+   * boot de datos constantes
+   */
+  public function boot()
+  {
+    $this->audit_service = new AuditService();
+  }
+
   /**
    * montar datos
    * @param int $id id del registro de auditoria
@@ -39,9 +49,19 @@ class ShowAuditsHistory extends Component
       ->orderBy('created_at', 'desc')
       ->get();
 
-    $audit_service = new AuditService();
-    $this->events = $audit_service->getAuditEvents();
-    $this->model = $audit_service->getModelInfo($this->audit->auditable_type);
+    $this->events = $this->audit_service->getAuditEvents();
+    $this->model = $this->audit_service->getModelInfo($this->audit->auditable_type);
+  }
+
+  /**
+   * obtener el usuario responsable al iterar los registros de auditoria
+   * 
+   * @param int $user_id id de usuario a traves de los metadatos de auditoria
+   * @return array <string, string> usuario, email, rol
+   */
+  public function getResponsibleUser(int $user_id)
+  {
+    return $this->audit_service->getResponsibleUser($user_id);
   }
 
   /**

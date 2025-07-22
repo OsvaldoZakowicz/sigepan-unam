@@ -42,10 +42,9 @@ class ShowAudits extends Component
     $this->audit_metadata = $this->audit->getMetadata();
     $this->audit_modified_properties = $this->audit->getModified();
 
-    // responsable del cambio que disparo el registro de auditoria
-    $this->user_resp = $this->audit->user;
-
     $audit_service = new AuditService();
+
+    $this->user_resp = $audit_service->getResponsibleUser($this->audit_metadata['user_id']);
     $this->event = $audit_service->getEventTranslation($this->audit->event);
     $this->model = $audit_service->getModelInfo($this->audit->auditable_type);
 

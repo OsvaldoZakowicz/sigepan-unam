@@ -2,6 +2,9 @@
 
 namespace App\Services\Audits;
 
+use OwenIt\Auditing\Models\Audit;
+use App\Models\User;
+
 class AuditService
 {
     /**
@@ -23,16 +26,37 @@ class AuditService
             'table' => 'usuarios',
             'model' => 'Usuario',
             'attributes' => [
+                'id' => 'id',
                 'name' => 'Nombre',
                 'email' => 'Correo Electrónico',
                 'email_verified_at' => 'Email Verificado',
                 'password' => 'Contraseña',
                 'remember_token' => 'Token de Recordatorio',
+                'is_first_login' => 'Inició sesión por primera vez',
                 'created_at' => 'Fecha de Creación',
                 'updated_at' => 'Fecha de Actualización',
             ]
         ],
     ];
+
+    /**
+     * a partir de un registro de auditoria obtener usuario responsable
+     * junto a su rol. Incluso si el usuario esta borrado.
+     * 
+     * @param int $user_id id del usuario desde los metadatos de auditoria
+     * @return array <string, string> usuario responsable, email, rol.
+     */
+    public function getResponsibleUser(int $user_id): array
+    {
+        $user = User::withTrashed()->findOrFail($user_id);
+        $role = $user->getRolenames()->first();
+
+        return [
+            'name' => $user->name,
+            'email' => $user->email,
+            'role' => $role,
+        ];
+    }
 
     /**
      * obtiene todos los tipos de eventos
