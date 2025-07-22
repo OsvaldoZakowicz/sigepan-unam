@@ -61,7 +61,7 @@
 
               <div class="">
                 <span class="font-semibold capitalize">evento:</span>
-                <span>{{ __( $audit_metadata['audit_event'] ) }}</span>
+                <x-text-tag color="neutral">{{ $event }}</x-text-tag>
               </div>
 
               <div class="">
@@ -72,6 +72,11 @@
               <div class="">
                 <span class="font-semibold capitalize">ip de origen:</span>
                 <span>{{ $audit_metadata['audit_ip_address'] }}</span>
+              </div>
+
+              <div class="">
+                <span class="font-semibold capitalize">navegador usado:</span>
+                <span>{{ $audit_metadata['audit_user_agent'] }}</span>
               </div>
 
               <div class="flex flex-col">
@@ -101,7 +106,7 @@
               {{-- tabla y id del registro --}}
               <span>
                 <span class="font-semibold capitalize">tabla involucrada:&nbsp;</span>
-                <span>{{ __( englishPluralFromPath($audit->auditable_type)->value ) }},&nbsp;</span>
+                <span>{{ $model['table'] }},&nbsp;</span>
               </span>
               <span>
                 <span class="font-semibold capitalize">id de registro:</span>
@@ -117,13 +122,9 @@
                 <div class="flex flex-col gap-1 p-2 border rounded-sm border-neutral-200">
                   <span>
                     <span class="font-medium text-md">propiedad afectada:</span>
-                    <span class="italic">
-                      {{-- propiedad sin traducir --}}
-                      {{ $property_name }}
+                    <span class="italic lowercase">
                       {{-- propiedad traducida --}}
-                      <span>&nbsp;({{__( $property_name )}})&nbsp;</span>
-
-                      {{-- @if ($property_name !== 'email') {{ __( $property_name ) }} @else correo electronico @endif --}}
+                      {{ $model['attributes'][$property_name] }}
                     </span>
                   </span>
 

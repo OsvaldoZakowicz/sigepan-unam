@@ -5,6 +5,7 @@ namespace App\Livewire\Audits;
 use Livewire\Component;
 use OwenIt\Auditing\Models\Audit;
 use Illuminate\View\View;
+use App\Services\Audits\AuditService;
 
 /**
  * Class ShowAudits
@@ -14,12 +15,21 @@ class ShowAudits extends Component
 {
   // registro auditado
   public $audit;
+
   // metadatos de auditoria
   public $audit_metadata;
+
   // propiedades que cambiaron
   public $audit_modified_properties;
+
   // responsable del cambio
   public $user_resp;
+
+  // datos para traduccion de evento
+  public $event;
+
+  // datos para traduccion del registro
+  public $model;
 
   /**
    * montar datos
@@ -34,6 +44,11 @@ class ShowAudits extends Component
 
     // responsable del cambio que disparo el registro de auditoria
     $this->user_resp = $this->audit->user;
+
+    $audit_service = new AuditService();
+    $this->event = $audit_service->getEventTranslation($this->audit->event);
+    $this->model = $audit_service->getModelInfo($this->audit->auditable_type);
+
   }
 
   /**

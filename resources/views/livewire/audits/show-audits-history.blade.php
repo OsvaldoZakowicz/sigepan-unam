@@ -38,7 +38,7 @@
                 {{-- tabla y id del registro --}}
                 <span>
                   <span class="font-semibold capitalize">tabla involucrada:&nbsp;</span>
-                  <span>{{ __( englishPluralFromPath($audit->auditable_type)->value ) }},&nbsp;</span>
+                  <span>{{ $model['table'] }},&nbsp;</span>
                 </span>
                 <span>
                   <span class="font-semibold capitalize">id de registro:</span>
@@ -75,8 +75,8 @@
                   {{-- subtitulo del desplegable --}}
                   <x-slot:subtitle class="font-normal">
                     <span class="font-semibold capitalize">evento:&nbsp;</span>
-                    <span>{{ __( $audit->event ) }},&nbsp;</span>
-                    <span class="font-semibold capitalize">fecha:&nbsp;</span>
+                    <x-text-tag color="neutral">{{ $events[$audit->event ] }}</x-text-tag>
+                    <span class="font-semibold capitalize">,&nbsp;fecha:&nbsp;</span>
                     <span>{{ Date::parse($audit->created_at)->format('d-m-Y H:i:s') }}hs.</span>
                     {{-- primera iteracion, mostrar "ultimo cambio" --}}
                     @if ($loop->first)
@@ -158,10 +158,8 @@
                             <span>
                               <span class="font-medium text-md">propiedad afectada:</span>
                               <span class="italic">
-                                {{-- propiedad sin traducir --}}
-                                {{ $property_name }}
                                 {{-- propiedad traducida --}}
-                                <span>,&nbsp;{{ __( $property_name ) }}&nbsp;</span>
+                                {{ $model['attributes'][$property_name] }}
                               </span>
                             </span>
 

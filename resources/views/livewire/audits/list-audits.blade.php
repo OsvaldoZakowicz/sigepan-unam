@@ -33,9 +33,9 @@
               class="p-1 text-sm border shrink border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
             >
               <option value="" selected>seleccione ...</option>
-              <option value="created">creado</option>
-              <option value="updated">actualizado</option>
-              <option value="deleted">borrado</option>
+              @foreach ($events as $key => $name)
+                <option value="{{ $key }}">{{ $name }}</option>
+              @endforeach
             </select>
           </div>
           {{-- tabla --}}
@@ -49,8 +49,8 @@
               class="p-1 text-sm border shrink border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
               >
               <option value="" selected>seleccione ...</option>
-              @foreach ($tables as $table)
-                <option value="{{ $table }}">{{ __( $table ) }}</option>
+              @foreach ($models as $keymodel => $model)
+                <option value="{{ $keymodel }}">{{ $model['table'] }}</option>
               @endforeach
             </select>
           </div>
@@ -124,10 +124,12 @@
                   {{ $audit->id }}
                 </x-table-td>
                 <x-table-td class="text-start">
-                  {{ __( $audit->event ) }}
+                  {{-- uso el evento de auditoria como key para obtener el evento traducido --}}
+                  {{ $events[$audit->event] }}
                 </x-table-td>
                 <x-table-td class="text-start">
-                  {{ __( englishPluralFromPath($audit->auditable_type)->value ) }}
+                  {{-- uso el tipo auditado (ruta de modelo) para obtener nombre de tabla --}}
+                  {{ $models[$audit->auditable_type]['table'] }}
                 </x-table-td>
                 <x-table-td class="text-start">
                   {{ $audit->auditable_id }}

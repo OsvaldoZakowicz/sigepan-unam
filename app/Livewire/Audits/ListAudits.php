@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Audits;
 
+use App\Services\Audits\AuditService;
 use Livewire\Component;
 use OwenIt\Auditing\Models\Audit;
 use Illuminate\Support\Facades\DB;
@@ -29,8 +30,12 @@ class ListAudits extends Component
   #[Url]
   public $search_end_at = '';
 
-  // lista de tablas
-  public $tables = [];
+  // lista de modelos auditados
+  // modelo, tabla, atributos, con sus traducciones
+  public $models = [];
+
+  // lista de eventos;
+  public $events = [];
 
   /**
    * montar datos
@@ -39,25 +44,10 @@ class ListAudits extends Component
   */
   public function mount(): void
   {
-    $this->getTableNames();
-  }
+    $audit_service = new AuditService();
 
-  /**
-   * obtener columna auditable_type de la tabla audits, usando el facade DB.
-   * luego, obtener el nombre de la tabla de la columna auditable_type, para ello
-   * se usa en cada registro el helper classBasename. Retornar un array con los nombres de las tablas.
-   * @return void
-  */
-  public function getTableNames()
-  {
-    $this->tables = DB::table('audits')
-      ->select('auditable_type')
-      ->distinct()
-      ->get()
-      ->map(function ($audit) {
-        return (string) englishPluralFromPath($audit->auditable_type);
-      })
-      ->toArray();
+    $this->events = $audit_service->getAuditEvents();
+    $this->models = $audit_service->getAuditableModels();
   }
 
   /**
@@ -75,7 +65,7 @@ class ListAudits extends Component
         $query->where('event', $this->event);
       })
       ->when($this->table, function ($query) {
-        $query->where('auditable_type', modelPathFromPlural($this->table));
+        $query->where('auditable_type', $this->table);
       })
       ->when(
         $this->search_start_at || $this->search_end_at,
