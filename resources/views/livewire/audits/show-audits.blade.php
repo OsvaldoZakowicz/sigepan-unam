@@ -2,7 +2,7 @@
   {{-- componente de auditoria individual de registro --}}
   <article class="m-2 border rounded-sm border-neutral-200">
 
-    <x-title-section title="auditoria individual">
+    <x-title-section title="ver registro de auditoría">
 
       {{-- volver --}}
       <x-a-button
@@ -24,13 +24,18 @@
         text_color="neutral-600"
         class="mr-2"
         >ver historial
+        <x-quest-icon title="ver todos los cambios del registro desde su creación"/>
       </x-a-button>
 
       {{-- nueva pestaña con reporte --}}
       <x-a-button
         target="_blank"
         href="{{ route('audits-audits-report', $audit->id) }}"
-        >generar reporte
+        bg_color="neutral-100"
+        border_color="neutral-300"
+        text_color="neutral-600"
+        >obtener PDF
+        <x-svg-pdf-paper/>
       </x-a-button>
 
     </x-title-section>
@@ -41,16 +46,13 @@
 
       <x-slot:content>
 
-        <div class="flex w-full gap-1 lowercase text-md border border-neutral-200 rounded-sm">
-
+        <div class="flex w-full gap-1">
           {{-- detalle de auditoria --}}
-          <div class="flex flex-col w-1/4">
-
+          <div class="flex flex-col w-1/4 border rounded-sm border-neutral-200">
             <header class="w-full p-1 bg-neutral-100">
-              <span class="capitalize font-semibold">detalle de auditoría:</span>
+              <span class="font-semibold capitalize">detalle de auditoría:</span>
             </header>
-
-            <article class="flex flex-col flex-wrap justify-start items-start p-2">
+            <article class="flex flex-col flex-wrap items-start justify-start p-2">
 
               <div class="">
                 <span class="font-semibold capitalize">registro de auditoría:</span>
@@ -64,7 +66,7 @@
 
               <div class="">
                 <span class="font-semibold capitalize">fecha del evento:</span>
-                <span>{{ Date::parse($audit_metadata['audit_created_at'])->format('d-m-Y H:i:s') }}hs.</span>
+                <span>{{ Date::parse($audit_metadata['audit_created_at'])->format('d-m-Y H:i:s') }} hs.</span>
               </div>
 
               <div class="">
@@ -89,14 +91,12 @@
               </div>
             </article>
           </div>
-
           {{-- cambios de cada propiedad --}}
-          <div class="flex flex-col w-3/4 h-96">
-
-            <header class="flex gap-1 justify-start items-center w-full p-1 bg-neutral-100">
+          <div class="flex flex-col w-3/4 border rounded-sm h-96 border-neutral-200">
+            <header class="flex items-center justify-start w-full gap-1 p-1 bg-neutral-100">
 
               {{-- titulo --}}
-              <span class="capitalize font-semibold">registro de cambios:&nbsp;</span>
+              <span class="font-semibold capitalize">registro de cambios:&nbsp;</span>
 
               {{-- tabla y id del registro --}}
               <span>
@@ -109,15 +109,14 @@
               </span>
 
             </header>
-
-            <article class="flex flex-col gap-1 p-2 overflow-y-auto overflow-x-hidden">
+            <article class="flex flex-col gap-1 p-2 overflow-x-hidden overflow-y-auto">
 
               @foreach ($audit_modified_properties as $property_name => $property_changes)
 
                 {{-- vista del nombre con traduccion de una propiedad modificada --}}
-                <div class="flex flex-col gap-1 p-2 border border-neutral-200 rounded-sm">
+                <div class="flex flex-col gap-1 p-2 border rounded-sm border-neutral-200">
                   <span>
-                    <span class="text-md font-medium">propiedad afectada:</span>
+                    <span class="font-medium text-md">propiedad afectada:</span>
                     <span class="italic">
                       {{-- propiedad sin traducir --}}
                       {{ $property_name }}
@@ -134,12 +133,12 @@
                     @foreach ($property_changes as $status => $value)
 
                       @if ($status === 'new')
-                        <span class="ml-2 p-1 border border-dashed rounded-sm border-emerald-400 bg-emerald-100">
+                        <span class="p-1 ml-2 border border-dashed rounded-sm border-emerald-400 bg-emerald-100">
                           <span class="font-medium">&plus;&nbsp;valor nuevo:</span>
                           <span>{{ $value }}</span>
                         </span>
                       @else
-                        <span class="ml-2 p-1 border border-dashed rounded-sm border-red-400 bg-red-100">
+                        <span class="p-1 ml-2 bg-red-100 border border-red-400 border-dashed rounded-sm">
                           <span class="font-medium">&minus;&nbsp;valor anterior:</span>
                           <span>{{ $value }}</span>
                         </span>
@@ -154,8 +153,8 @@
             </article>
 
           </div>
-
         </div>
+
       </x-slot:content>
 
       <x-slot:footer class="mt-2"></x-slot:footer>
