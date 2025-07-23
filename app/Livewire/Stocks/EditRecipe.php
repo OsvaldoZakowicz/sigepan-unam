@@ -116,7 +116,7 @@ class EditRecipe extends Component
       'recipe_yields'        =>  ['required', 'numeric', 'min:1', 'max:99'],
       'recipe_portions'      =>  ['required', 'numeric', 'min:1', 'max:99'],
       'time'                 =>  ['required', 'regex:/^([0-1][0-9]|2[0-3]):[0-5][0-9]$/'],
-      'recipe_instructions'  =>  ['required'],
+      'recipe_instructions'  =>  ['required', 'max:2000'],
       'provision_categories'            =>  ['required'],
       'provision_categories.*.quantity' =>  ['required', 'numeric', 'min:0.01', 'max:99.99'],
     ], [
@@ -131,6 +131,7 @@ class EditRecipe extends Component
       'time.required' => 'El :attribute es obligatirio',
       'time.regex' => 'El :attribute debe ser hh:mm (horas y minutos), ejemplo: 02:30',
       'recipe_instructions.required' => 'Las :attribute son obligatorias',
+      'recipe_instructions.max' => 'Las :attribute pueden ser de hasta :max caracteres',
       'provision_categories.required'            => 'La :attribute debe tener al menos un suministro',
       'provision_categories.*.quantity.required' => 'La :attribute es obligatorio',
       'provision_categories.*.quantity.numeric'  => 'La :attribute debe ser un numero',

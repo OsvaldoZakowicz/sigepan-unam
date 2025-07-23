@@ -133,6 +133,7 @@
                     <span>
                       <label for="recipe_instructions">instrucciones de preparación</label>
                       <span class="text-red-600">*</span>
+                      <x-quest-icon title="hasta 2000 caracteres"/>
                     </span>
                     @error('recipe_instructions')<span class="text-xs text-red-400">{{ $message }}</span>@enderror
                     <textarea

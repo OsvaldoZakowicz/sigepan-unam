@@ -7,5 +7,5 @@
 @endsection
 
 @section('view_content')
-  @livewire('stocks.create-recipe')
+  @livewire('stocks.create-recipe', ['id' => $id])
 @endsection

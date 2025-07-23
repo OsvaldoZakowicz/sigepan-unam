@@ -116,7 +116,7 @@
               @if ($product->getStatusAttribute() === 'activo')
                 <x-a-button
                   wire:navigate
-                  href="{{ route('stocks-recipes-create') }}"
+                  href="{{ route('stocks-recipes-create', $product->id) }}"
                   bg_color="neutral-100"
                   border_color="neutral-200"
                   text_color="neutral-600"

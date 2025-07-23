@@ -27,9 +27,9 @@ class StockController extends Controller
   }
 
   //* crear receta
-  public function recipes_create(): View
+  public function recipes_create(?int $id = null): View
   {
-    return view('stocks.recipes-create');
+    return view('stocks.recipes-create', ['id' => $id]);
   }
 
   //* editar receta

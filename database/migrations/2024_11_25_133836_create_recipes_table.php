@@ -17,7 +17,7 @@ return new class extends Migration
       $table->integer('recipe_yields', false, true)->default(1);
       $table->integer('recipe_portions', false, true)->default(1);
       $table->time('recipe_preparation_time');
-      $table->string('recipe_instructions', 250);
+      $table->text('recipe_instructions');
       $table->timestamps();
       $table->softDeletes();
     });
