@@ -92,6 +92,33 @@ class AuditService
                 'deleted_at' => 'Fecha de Eliminación'
             ]
         ],
+        'App\Models\Recipe' => [
+            'table' => 'recetas',
+            'model' => 'Receta',
+            'attributes' => [
+                'id' => 'id',
+                'recipe_title' => 'titulo de receta',
+                'recipe_yields' => 'rendimiento de receta',
+                'recipe_portions' => 'porciones de receta',
+                'recipe_preparation_time' => 'tiempo de preparacion',
+                'recipe_instructions' => 'instrucciones de preparacion',
+                'product_id' => 'id de producto',
+                'created_at' => 'Fecha de Creación',
+                'updated_at' => 'Fecha de Actualización',
+                'deleted_at' => 'Fecha de Eliminación'
+            ]
+        ],
+        'App\Models\Tag' => [
+            'table' => 'etiquetas',
+            'model' => 'Etiqueta',
+            'attributes' => [
+                'id' => 'id',
+                'tag_name' => 'nombre',
+                'created_at' => 'Fecha de Creación',
+                'updated_at' => 'Fecha de Actualización',
+                'deleted_at' => 'Fecha de Eliminación'
+            ]
+        ],
         'App\Models\Stock' => [
             'table' => 'stocks',
             'model' => 'Stock',
@@ -120,33 +147,6 @@ class AuditService
                 'registered_at' => 'fecha de registro',
                 'movement_reference_id'   => 'id de referencia del movimiento',
                 'movement_reference_type' => 'modelo de referencia del movimiento',
-                'created_at' => 'Fecha de Creación',
-                'updated_at' => 'Fecha de Actualización',
-                'deleted_at' => 'Fecha de Eliminación'
-            ]
-        ],
-        'App\Models\Recipe' => [
-            'table' => 'recetas',
-            'model' => 'Receta',
-            'attributes' => [
-                'id' => 'id',
-                'recipe_title' => 'titulo de receta',
-                'recipe_yields' => 'rendimiento de receta',
-                'recipe_portions' => 'porciones de receta',
-                'recipe_preparation_time' => 'tiempo de preparacion',
-                'recipe_instructions' => 'instrucciones de preparacion',
-                'product_id' => 'id de producto',
-                'created_at' => 'Fecha de Creación',
-                'updated_at' => 'Fecha de Actualización',
-                'deleted_at' => 'Fecha de Eliminación'
-            ]
-        ],
-        'App\Models\Tag' => [
-            'table' => 'etiquetas',
-            'model' => 'Etiqueta',
-            'attributes' => [
-                'id' => 'id',
-                'tag_name' => 'nombre',
                 'created_at' => 'Fecha de Creación',
                 'updated_at' => 'Fecha de Actualización',
                 'deleted_at' => 'Fecha de Eliminación'

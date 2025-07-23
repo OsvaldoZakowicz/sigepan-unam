@@ -101,7 +101,9 @@ class ProductService
   public function updateProductPrices(Product $product, array $pricesList): void
   {
     // eliminar precios existentes
-    $product->prices()->delete();
+    foreach ($product->prices as $price) {
+      $price->delete();
+    }
 
     // erear nuevos precios
     foreach ($pricesList as $priceData) {

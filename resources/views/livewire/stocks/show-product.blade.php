@@ -38,7 +38,7 @@
             <h2 class="text-xl font-bold">
               {{ $product->product_name }}
             </h2>
-            @if ($product->deleted_at === 'borrado')
+            @if ($product->getStatusAttribute() === 'borrado')
               <x-text-tag>borrado</x-text-tag>
             @endif
             <p class="mt-2 text-md">
@@ -57,7 +57,7 @@
               </ul>
             </p>
             {{-- si esta borrado no puedo editar precios --}}
-            @if ($product->deleted_at === "activo")
+            @if ($product->getStatusAttribute() === "activo")
               <p class="mt-2">
                 <x-a-button
                   href="#"
@@ -113,7 +113,7 @@
                 <span>¡este producto no tiene recetas!</span>
               @endforelse
               {{-- si esta borrado no puedo agregar recetas --}}
-              @if ($product->deleted_at === 'activo')
+              @if ($product->getStatusAttribute() === 'activo')
                 <x-a-button
                   wire:navigate
                   href="{{ route('stocks-recipes-create') }}"
@@ -151,7 +151,7 @@
 
                 @error('prices_list')
                   <x-slot:messages class="my-2">
-                    <span class="text-red-400">¡Debe agregar al menos un precio al producto!</span>
+                    <span class="text-red-400">{{ $message }}</span>
                   </x-slot:messages>
                 @enderror
 
@@ -213,7 +213,7 @@
                       id="is_default"
                       class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
                     />
-                    <label for="is_default">Precio predeterminado</label>
+                    <label for="is_default">Precio destacado</label>
                   </div>
 
                   {{-- boton agregar --}}
@@ -239,7 +239,7 @@
                         Descripción
                       </x-table-th>
                       <x-table-th class="text-start">
-                        Predeterminado
+                        destacado
                       </x-table-th>
                       <x-table-th class="text-start">
                         Acciones

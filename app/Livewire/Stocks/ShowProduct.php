@@ -146,6 +146,8 @@ class ShowProduct extends Component
    */
   public function save()
   {
+    //dd($this->prices_list);
+
     $validated = $this->validate([
       'prices_list' => ['required', 'array', 'min:1'],
     ]);
@@ -156,7 +158,7 @@ class ShowProduct extends Component
     })->count();
 
     if ($defaultPrices !== 1) {
-      $this->addError('prices_list', 'Debe haber exactamente un precio predeterminado');
+      $this->addError('prices_list', 'Debe haber exactamente un precio destacado');
       return;
     }
 
@@ -174,6 +176,7 @@ class ShowProduct extends Component
 
       // Notificar éxito
       session()->flash('operation-success', 'Precios actualizados correctamente');
+      $this->dispatch('$refresh');
     } catch (\Exception $e) {
       session()->flash('operation-error', 'Error: ' . $e->getMessage() . ' Contacte al Administrador.');
     }
