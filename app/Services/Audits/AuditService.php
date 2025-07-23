@@ -2,11 +2,15 @@
 
 namespace App\Services\Audits;
 
-use OwenIt\Auditing\Models\Audit;
 use App\Models\User;
+use App\Traits\ManualAuditTrait;
 
 class AuditService
 {
+
+    // especificamente cuando necesito crear registros de auditoria manualmente
+    use ManualAuditTrait;
+
     /**
      * tipos de eventos auditados con sus traducciones
      */
@@ -35,6 +39,7 @@ class AuditService
                 'is_first_login' => 'Inició sesión por primera vez',
                 'created_at' => 'Fecha de Creación',
                 'updated_at' => 'Fecha de Actualización',
+                'deleted_at' => 'Fecha de Eliminación'
             ]
         ],
         'App\Models\Supplier' => [
@@ -51,7 +56,10 @@ class AuditService
                 'status_description' => 'descripcion del estado',
                 'status_date' => 'fecha del estado registrado',
                 'user_id' => 'id de usuario',
-                'address_id' => 'id de direccion'
+                'address_id' => 'id de direccion',
+                'created_at' => 'Fecha de Creación',
+                'updated_at' => 'Fecha de Actualización',
+                'deleted_at' => 'Fecha de Eliminación'
             ]
         ],
         'App\Models\Product' => [
@@ -64,6 +72,9 @@ class AuditService
                 'product_expires_in' => 'vencimiento despues de elaborarse',
                 'product_in_store' => 'publicar este producto en la tienda',
                 'product_image_path' => 'imagen del producto',
+                'created_at' => 'Fecha de Creación',
+                'updated_at' => 'Fecha de Actualización',
+                'deleted_at' => 'Fecha de Eliminación'
             ]
         ],
         'App\Models\Price' => [
@@ -76,10 +87,13 @@ class AuditService
                 'price' => 'precio',
                 'description' => 'descripcion del precio',
                 'is_default' => 'precio destacado',
+                'created_at' => 'Fecha de Creación',
+                'updated_at' => 'Fecha de Actualización',
+                'deleted_at' => 'Fecha de Eliminación'
             ]
         ],
         'App\Models\Stock' => [
-            'table' => 'elaboraciones',
+            'table' => 'stocks',
             'model' => 'Stock',
             'attributes' => [
                 'id'            => 'id',
@@ -90,6 +104,9 @@ class AuditService
                 'quantity_left'  => 'cantidad restante',
                 'expired_at'     => 'fecha de vencimiento',
                 'elaborated_at'  => 'fecha de elaboracion',
+                'created_at' => 'Fecha de Creación',
+                'updated_at' => 'Fecha de Actualización',
+                'deleted_at' => 'Fecha de Eliminación'
             ]
         ],
         'App\Models\StockMovement' => [
@@ -103,6 +120,9 @@ class AuditService
                 'registered_at' => 'fecha de registro',
                 'movement_reference_id'   => 'id de referencia del movimiento',
                 'movement_reference_type' => 'modelo de referencia del movimiento',
+                'created_at' => 'Fecha de Creación',
+                'updated_at' => 'Fecha de Actualización',
+                'deleted_at' => 'Fecha de Eliminación'
             ]
         ],
         'App\Models\Recipe' => [
@@ -116,6 +136,9 @@ class AuditService
                 'recipe_preparation_time' => 'tiempo de preparacion',
                 'recipe_instructions' => 'instrucciones de preparacion',
                 'product_id' => 'id de producto',
+                'created_at' => 'Fecha de Creación',
+                'updated_at' => 'Fecha de Actualización',
+                'deleted_at' => 'Fecha de Eliminación'
             ]
         ],
         'App\Models\Tag' => [
@@ -123,7 +146,10 @@ class AuditService
             'model' => 'Etiqueta',
             'attributes' => [
                 'id' => 'id',
-                'tag_name' => 'nombre'
+                'tag_name' => 'nombre',
+                'created_at' => 'Fecha de Creación',
+                'updated_at' => 'Fecha de Actualización',
+                'deleted_at' => 'Fecha de Eliminación'
             ]
         ],
         'App\Models\Existence' => [
@@ -137,6 +163,9 @@ class AuditService
                 'movement_type' => 'tipo de movimiento',
                 'registered_at' => 'fecha de registro',
                 'quantity_amount' => 'cantidad',
+                'created_at' => 'Fecha de Creación',
+                'updated_at' => 'Fecha de Actualización',
+                'deleted_at' => 'Fecha de Eliminación'
             ]
         ],
     ];

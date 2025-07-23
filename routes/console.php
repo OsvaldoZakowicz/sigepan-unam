@@ -21,7 +21,9 @@ use App\Jobs\NotifySuppliersRequestForQuotationClosedJob;
 use App\Jobs\NotifySuppliersRequestForPreOrderReceivedJob;
 use App\Jobs\NotifySuppliersRequestForQuotationReceivedJob;
 use App\Models\StockMovement;
+use App\Services\Audits\AuditService;
 use App\Services\Stock\StockService;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * * clousure commands.
@@ -162,48 +164,82 @@ Artisan::command('products-expired:remove', function () {
 
   $stock_service = new StockService();
   $movement_vencimiento = StockMovement::MOVEMENT_TYPE_VENCIMIENTO();
+
   $day = now();
-  $processedCount = 0;
+  $processed_count = 0;
+
+  // log in de usuario sistema como responsable de operaciones automaticas
+  $system_user = User::where('email', 'sistema@sistema.com')->first();
+  if ($system_user) {
+    Auth::login($system_user);
+  }
+
+  // servicio de auditoria
+  $audit_service = new AuditService();
 
   try {
 
-    DB::transaction(function () use ($stock_service, $movement_vencimiento, $day, &$processedCount) {
+    $expired_stocks = $stock_service->getStocksToExpire();
 
-      // Todos con fecha menor o igual a la actual
-      $expired_stocks = $stock_service->getStocksToExpire();
+    if ($expired_stocks->isEmpty()) {
+      $this->info('No se encontraron productos vencidos.');
+      return;
+    }
 
-      if ($expired_stocks->isEmpty()) {
-        $this->info('No se encontraron productos vencidos.');
-        return;
-      }
+    $this->info("Procesando {$expired_stocks->count()} productos vencidos...");
 
-      $this->info("Procesando {$expired_stocks->count()} productos vencidos...");
+    // por cada stock
+    foreach ($expired_stocks as $expired_stock) {
 
-      // Por cada stock, generar un movimiento negativo de vencimiento por la cantidad restante
-      foreach ($expired_stocks as $expired_stock) {
-        // Solo procesar si tiene cantidad restante
-        if ($expired_stock->quantity_left > 0) {
+      // solo procesar si tiene cantidad restante
+      if ($expired_stock->quantity_left > 0) {
 
-          $expired_stock->stock_movements()->create([
-            'quantity' => -$expired_stock->quantity_left,
+        $original_quantity = $expired_stock->quantity_left;
+        $original_stock_attributes = $expired_stock->getAttributes();
+
+        DB::transaction(function () use ($expired_stock, $movement_vencimiento, $day, $original_quantity, $original_stock_attributes, $system_user, $audit_service) {
+          
+          // movimiento
+          $stock_movement = StockMovement::create([
+            'stock_id' => $expired_stock->id,
+            'quantity' => -$original_quantity,
             'movement_type' => $movement_vencimiento,
             'registered_at' => $day,
           ]);
 
-          $this->line("Stock ID {$expired_stock->id}: {$expired_stock->quantity_left} unidades vencidas");
+          $audit_service->auditModelCreated(
+            model: $stock_movement,
+            user: $system_user,
+            additional_info: [
+              'command' => 'products-expired:remove',
+              'reason' => 'vencimiento_automatico',
+            ]
+          );
+          
+          // actualizacion de stock
+          $expired_stock->update(['quantity_left' => 0]);
 
-          $expired_stock->quantity_left = 0;
-          $expired_stock->save();
-
-          $processedCount++;
-        }
+          $audit_service->auditModelUpdated(
+            model: $expired_stock,
+            original_attributes: $original_stock_attributes,
+            user: $system_user,
+            additional_info: [
+              'command' => 'products-expired:remove',
+              'reason' => 'vencimiento_automatico',
+            ]
+          );
+          
+        });
+        
+        $this->line("Stock ID {$expired_stock->id}: {$original_quantity} unidades vencidas");
+        $processed_count++;
       }
-    });
+    }
 
-    $this->info("Se procesaron {$processedCount} productos vencidos exitosamente.");
+    $this->info("Se procesaron {$processed_count} productos vencidos exitosamente.");
 
     Log::info('Productos vencidos removidos', [
-      'count' => $processedCount,
+      'count' => $processed_count,
       'executed_at' => $day,
       'command' => 'products-expired:remove'
     ]);
