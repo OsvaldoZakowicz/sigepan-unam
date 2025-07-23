@@ -14,6 +14,15 @@ class Existence extends Model implements Auditable
   use \OwenIt\Auditing\Auditable;
 
   /**
+   * Eventos que deben ser auditados
+   */
+  protected $auditEvents = [
+    'created',
+    'updated', 
+    'deleted',
+  ];
+
+  /**
    * Tipos de movimientos disponibles
    * * movement_type
    * compra - (suma existencias)

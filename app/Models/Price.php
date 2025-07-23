@@ -14,6 +14,15 @@ class Price extends Model implements Auditable
   use \OwenIt\Auditing\Auditable;
 
   /**
+   * Eventos que deben ser auditados
+   */
+  protected $auditEvents = [
+    'created',
+    'updated', 
+    'deleted',
+  ];
+
+  /**
    * Los atributos que son asignables masivamente.
    *
    * @var array<int, string>

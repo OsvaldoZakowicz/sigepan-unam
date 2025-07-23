@@ -178,13 +178,23 @@ class ListProducts extends Component
    */
   public function restore(int $id): void
   {
-    Product::withTrashed()->where('id', $id)->restore();
-
-    $this->dispatch('toast-event', toast_data: [
-      'event_type'  =>  'success',
-      'title_toast' =>  toastTitle('exitosa'),
-      'descr_toast' =>  'El producto fue restaurado.'
-    ]);
+    try {
+      $product = Product::withTrashed()->findOrFail($id);
+      $product->restore();
+  
+      $this->dispatch('toast-event', toast_data: [
+        'event_type'  =>  'success',
+        'title_toast' =>  toastTitle('exitosa'),
+        'descr_toast' =>  'El producto fue restaurado.'
+      ]);
+    } catch (\Exception $e) {
+      
+      $this->dispatch('toast-event', toast_data: [
+        'event_type'  =>  'error',
+        'title_toast' =>  toastTitle('fallida'),
+        'descr_toast' =>  'El producto no pudo recuperarse debido a: ' . $e->getMessage() . ' contacte al administrador.'
+      ]);
+    }
   }
 
   /**

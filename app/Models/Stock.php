@@ -16,6 +16,15 @@ class Stock extends Model implements Auditable
   use HasFactory;
   use \OwenIt\Auditing\Auditable;
 
+  /**
+   * Eventos que deben ser auditados
+   */
+  protected $auditEvents = [
+    'created',
+    'updated', 
+    'deleted',
+  ];
+
   protected $fillable = [
     'product_id',     // producto asociado
     'recipe_id',      // receta de elaboracion asociada

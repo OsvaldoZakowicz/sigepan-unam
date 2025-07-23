@@ -17,6 +17,16 @@ class Recipe extends Model implements Auditable
   use \OwenIt\Auditing\Auditable;
   use SoftDeletes;
 
+  /**
+   * Eventos que deben ser auditados
+   */
+  protected $auditEvents = [
+    'created',
+    'updated', 
+    'deleted',
+    'restored',
+  ];
+
   protected $fillable = [
     'recipe_title',
     'recipe_yields',

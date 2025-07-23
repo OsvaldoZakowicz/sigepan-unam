@@ -12,6 +12,15 @@ class Tag extends Model implements Auditable
   use HasFactory;
   use \OwenIt\Auditing\Auditable;
 
+  /**
+   * Eventos que deben ser auditados
+   */
+  protected $auditEvents = [
+    'created',
+    'updated', 
+    'deleted',
+  ];
+
   protected $fillable = [
     'tag_name',
   ];

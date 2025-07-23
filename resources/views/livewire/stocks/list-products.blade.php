@@ -100,10 +100,10 @@
                   @endif
                 </x-table-td>
                 <x-table-td class="text-start">
-                  @if ($product->deleted_at === 'borrado')
-                    <x-text-tag color="neutral" >{{ $product->deleted_at }}</x-text-tag>
+                  @if ($product->getStatusAttribute() === 'borrado')
+                    <x-text-tag color="neutral" >borrado</x-text-tag>
                   @else
-                    <x-text-tag color="emerald">{{ $product->deleted_at }}</x-text-tag>
+                    <x-text-tag color="emerald">activo</x-text-tag>
                   @endif
                 </x-table-td>
                 <x-table-td class="text-start">
@@ -118,7 +118,7 @@
                       >ver
                     </x-a-button>
 
-                    @if ($product->deleted_at === 'activo')
+                    @if ($product->getStatusAttribute() === 'activo')
 
                       <x-a-button
                         wire:click="openElaborationModal({{ $product->id }})"

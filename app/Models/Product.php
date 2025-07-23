@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -13,8 +12,18 @@ use OwenIt\Auditing\Contracts\Auditable;
 class Product extends Model implements Auditable
 {
   use HasFactory;
-  use SoftDeletes;
   use \OwenIt\Auditing\Auditable;
+  use SoftDeletes;
+
+  /**
+   * Eventos que deben ser auditados
+   */
+  protected $auditEvents = [
+    'created',
+    'updated', 
+    'deleted',
+    'restored',
+  ];
 
   protected $fillable = [
     'product_name',
@@ -37,14 +46,11 @@ class Product extends Model implements Auditable
   ];
 
   /**
-   * obtener atributo deleted_at, y presentarlo
-   * deleted_at es una fecha o null, cuando tiene una fecha indica el borrado
+   * obtiene el estado del producto como string para presentacion
    */
-  protected function deletedAt(): Attribute
+  public function getStatusAttribute(): string
   {
-    return Attribute::make(
-      get: fn(string|null $value) => $value ? 'borrado' : 'activo'
-    );
+    return $this->deleted_at ? 'borrado' : 'activo';
   }
 
   /**

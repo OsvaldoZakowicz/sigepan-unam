@@ -16,6 +16,15 @@ class StockMovement extends Model implements Auditable
   use \OwenIt\Auditing\Auditable;
 
   /**
+   * Eventos que deben ser auditados
+   */
+  protected $auditEvents = [
+    'created',
+    'updated', 
+    'deleted',
+  ];
+
+  /**
    * * tipos de movimientos
    * elaboracion: incremento del stock por elaborar el producto.
    * venta: disminucion del stock por venta.
