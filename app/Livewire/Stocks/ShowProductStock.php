@@ -82,20 +82,6 @@ class ShowProductStock extends Component
   }
 
   /**
-   * ir a la vista de compra realizada
-   */
-  public function goToSale(int $id)
-  {
-    $movement = StockMovement::findOrFail($id);
-
-    if ($movement) {
-      // almacenar el ID en la sesion para mantenerlo despues del redirect
-      session()->flash('pending_sale_id', $movement->movement_reference_id);
-      return redirect()->route('sales-sales-index');
-    }
-  }
-
-  /**
    * buscar stock especifico
    */
   private function searchProductStock()

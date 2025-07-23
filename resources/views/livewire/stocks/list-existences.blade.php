@@ -123,7 +123,7 @@
                       </x-table-th>
                       <x-table-th class="text-start">
                         movimiento
-                        <x-quest-icon title="movimiento positivo (+) para compras y negativo (-) en elaboración o pérdida" />
+                        <x-quest-icon title="movimiento positivo (+) para compras y negativo (-) en elaboración" />
                       </x-table-th>
                       <x-table-th class="text-start">
                         suministro
@@ -145,27 +145,11 @@
                         </x-table-td>
                         <x-table-td class="text-start">
                           @if ($detail->movement_type === $tipo_compra)
-                            <span class="text-emerald-600">
-                              &plus;{{ $detail->movement_type }}
-                            </span>
-                            <a
-                              href="#"
-                              wire:navigate
-                              wire:click="goToPurchase({{ $detail->purchase_id }})"
-                              class="text-blue-600 underline"
-                              >ver
-                            </a>
+                            <span class="text-emerald-600">&plus;{{ $detail->movement_type }}</span>
+                            <span class="text-neutral-600">(id de compra: {{ $detail->purchase_id }})</span>
                             @else
-                            <span class="text-red-600">
-                              &minus;{{ $detail->movement_type }}
-                            </span>
-                            <a
-                              href="#"
-                              wire:navigate
-                              wire:click="goToStock({{ $detail->stock_id }})"
-                              class="text-blue-600 underline"
-                              >ver
-                            </a>
+                            <span class="text-red-600">&minus;{{ $detail->movement_type }}</span>
+                            <span class="text-neutral-600">(id de stock elaborado: {{ $detail->stock_id }})</span>
                           @endif
                         </x-table-td>
                         <x-table-td class="text-start">

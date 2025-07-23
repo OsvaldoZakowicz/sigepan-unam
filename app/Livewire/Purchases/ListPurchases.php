@@ -43,14 +43,6 @@ class ListPurchases extends Component
    */
   public function mount(): void
   {
-    // Verificar si hay un ID pendiente en la sesion
-    // en caso de que se llegue a esta vista por redireccion desde la lista de preordenes
-    if ($pending_purchase_id = session('pending_purchase_id')) {
-      $purchase = Purchase::find($pending_purchase_id);
-      if ($purchase) {
-        $this->openDetailsModal($purchase);
-      }
-    }
   }
 
   /**

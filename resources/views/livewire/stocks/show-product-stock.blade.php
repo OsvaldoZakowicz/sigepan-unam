@@ -19,7 +19,6 @@
     <x-content-section>
 
       <x-slot:header class="">
-
         {{-- busqueda --}}
         <div class="flex items-end justify-start gap-1">
 
@@ -62,8 +61,6 @@
             >limpiar filtros
           </x-a-button>
         </div>
-
-
       </x-slot:header>
 
       <x-slot:content>
@@ -154,9 +151,10 @@
           <div class="fixed inset-0 flex items-center justify-center w-full h-full overflow-y-auto bg-neutral-400 bg-opacity-20">
             <div class="w-3/4 p-5 transition-all transform bg-white border rounded-md shadow-lg">
               <div class="text-start">
+                {{-- cabecera del modal --}}
                 <div>
                   <h3 class="text-lg font-medium leading-6 capitalize text-neutral-800">
-                    Movimientos del Lote:
+                    Detalle de movimientos del Lote:
                   </h3>
                   <span>
                     <span class="font-semibold capitalize">Producto:</span>
@@ -175,6 +173,7 @@
                     <span class="">{{ $selected_stock->quantity_left }}</span>
                   </span>
                 </div>
+                {{-- cuerpo del modal --}}
                 <div class="mt-4 overflow-x-auto overflow-y-auto max-h-72">
                   <x-table-base>
                     <x-slot:tablehead>
@@ -210,13 +209,7 @@
                                 &minus;{{ $movement->movement_type }}
                               </span>
                               @if ($movement->movement_type === 'venta')
-                                <a
-                                  href="#"
-                                  wire:navigate
-                                  wire:click="goToSale({{ $movement->id }})"
-                                  class="text-blue-600 underline"
-                                  >ver
-                                </a>
+                                <span class="text-neutral-600">(id de venta: {{ $movement->movement_reference_id }})</span>
                               @endif
                             @endif
                           </x-table-td>

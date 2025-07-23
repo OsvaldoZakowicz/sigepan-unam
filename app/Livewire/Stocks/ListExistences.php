@@ -40,37 +40,6 @@ class ListExistences extends Component
   }
 
   /**
-   * ir a la vista de compra realizada
-   */
-  public function goToPurchase($purchase_id)
-  {
-    $purchase = Purchase::find((int) $purchase_id);
-
-    if ($purchase) {
-      // almacenar el ID en la sesion para mantenerlo despues del redirect
-      session()->flash('pending_purchase_id', $purchase->id);
-      return redirect()->route('purchases-purchases-index');
-    }
-  }
-
-  /**
-   * ir a la vista de elaboracion realizada
-   * la ruta requiere redirigir a traves del producto
-   */
-  public function goToStock($stock_id)
-  {
-    $stock = Stock::find((int) $stock_id)
-      ->with('product')
-      ->first();
-
-    if ($stock) {
-      // almacenar el ID en la sesion para mantenerlo despues del redirect
-      session()->flash('pending_stock_id', $stock->id);
-      return redirect()->route('stocks-products-product-stock', $stock->product->id);
-    }
-  }
-
-  /**
    * obtiene detalles de existencias por categoria
    * @param array $provision_category
    * @return void

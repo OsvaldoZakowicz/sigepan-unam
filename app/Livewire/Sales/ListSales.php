@@ -82,13 +82,6 @@ class ListSales extends Component
 
     $this->sale_type_web = Sale::SALE_TYPE_WEB();
     $this->sale_type_presencial = Sale::SALE_TYPE_PRESENCIAL();
-
-    if ($pending_sale_id = session('pending_sale_id')) {
-      $sale = Sale::find($pending_sale_id);
-      if ($sale) {
-        $this->openShowSaleModal($sale);
-      }
-    }
   }
 
   /**
