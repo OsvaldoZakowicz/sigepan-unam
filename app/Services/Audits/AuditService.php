@@ -26,7 +26,7 @@ class AuditService
             'table' => 'usuarios',
             'model' => 'Usuario',
             'attributes' => [
-                'id' => 'id',
+                'id'=> 'id',
                 'name' => 'Nombre',
                 'email' => 'Correo Electrónico',
                 'email_verified_at' => 'Email Verificado',
@@ -35,6 +35,108 @@ class AuditService
                 'is_first_login' => 'Inició sesión por primera vez',
                 'created_at' => 'Fecha de Creación',
                 'updated_at' => 'Fecha de Actualización',
+            ]
+        ],
+        'App\Models\Supplier' => [
+            'table' => 'proveedores',
+            'model' => 'Proveedor',
+            'attributes' => [
+                'id' => 'id',
+                'company_name' => 'razon social',
+                'company_cuit' => 'cuit',
+                'iva_condition' => 'condicion frente al iva',
+                'phone_number' => 'telefono',
+                'short_description' => 'descripcion del proveedor',
+                'status_is_active' => 'estado',
+                'status_description' => 'descripcion del estado',
+                'status_date' => 'fecha del estado registrado',
+                'user_id' => 'id de usuario',
+                'address_id' => 'id de direccion'
+            ]
+        ],
+        'App\Models\Product' => [
+            'table' => 'productos',
+            'model' => 'Producto',
+            'attributes' => [
+                'id' => 'id',
+                'product_name' => 'nombre de producto',
+                'product_short_description' => 'descripcion corta del producto',
+                'product_expires_in' => 'vencimiento despues de elaborarse',
+                'product_in_store' => 'publicar este producto en la tienda',
+                'product_image_path' => 'imagen del producto',
+            ]
+        ],
+        'App\Models\Price' => [
+            'table' => 'precios',
+            'model' => 'Precio',
+            'attributes' => [
+                'id' => 'id',
+                'product_id' => 'id de producto',
+                'quantity' => 'cantidad del producto',
+                'price' => 'precio',
+                'description' => 'descripcion del precio',
+                'is_default' => 'precio destacado',
+            ]
+        ],
+        'App\Models\Stock' => [
+            'table' => 'elaboraciones',
+            'model' => 'Stock',
+            'attributes' => [
+                'id'            => 'id',
+                'product_id'    => 'id de producto',
+                'recipe_id'     => 'id de receta',
+                'lote_code'     => 'codigo de lote',
+                'quantity_total' => 'cantidad total',
+                'quantity_left'  => 'cantidad restante',
+                'expired_at'     => 'fecha de vencimiento',
+                'elaborated_at'  => 'fecha de elaboracion',
+            ]
+        ],
+        'App\Models\StockMovement' => [
+            'table' => 'movimientos',
+            'model' => 'StockMovement',
+            'attributes' => [
+                'id'            => 'id',
+                'stock_id'      => 'id de stock',
+                'quantity'      => 'cantidad movida',
+                'movement_type' => 'tipo de movimiento',
+                'registered_at' => 'fecha de registro',
+                'movement_reference_id'   => 'id de referencia del movimiento',
+                'movement_reference_type' => 'modelo de referencia del movimiento',
+            ]
+        ],
+        'App\Models\Recipe' => [
+            'table' => 'recetas',
+            'model' => 'Receta',
+            'attributes' => [
+                'id' => 'id',
+                'recipe_title' => 'titulo de receta',
+                'recipe_yields' => 'rendimiento de receta',
+                'recipe_portions' => 'porciones de receta',
+                'recipe_preparation_time' => 'tiempo de preparacion',
+                'recipe_instructions' => 'instrucciones de preparacion',
+                'product_id' => 'id de producto',
+            ]
+        ],
+        'App\Models\Tag' => [
+            'table' => 'etiquetas',
+            'model' => 'Etiqueta',
+            'attributes' => [
+                'id' => 'id',
+                'tag_name' => 'nombre'
+            ]
+        ],
+        'App\Models\Existence' => [
+            'table' => 'existencias',
+            'model' => 'Existencia',
+            'attributes' => [
+                'id'            => 'id',
+                'provision_id'  => 'id de suministro',
+                'purchase_id'   => 'id de compra',
+                'stock_id'      => 'id de stock',
+                'movement_type' => 'tipo de movimiento',
+                'registered_at' => 'fecha de registro',
+                'quantity_amount' => 'cantidad',
             ]
         ],
     ];

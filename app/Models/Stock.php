@@ -6,13 +6,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use OwenIt\Auditing\Contracts\Auditable;
 
 /**
  * * modelo stock de productos elaborados
  */
-class Stock extends Model
+class Stock extends Model implements Auditable
 {
   use HasFactory;
+  use \OwenIt\Auditing\Auditable;
 
   protected $fillable = [
     'product_id',     // producto asociado
