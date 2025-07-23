@@ -15,6 +15,16 @@ class UserSeeder extends Seeder
    */
   public function run(): void
   {
+    // * sistema (operaciones automatizadas)
+    // * administrador
+    User::create([
+      'name' => 'sistema',
+      'email' => 'sistema@sistema.com',
+      'email_verified_at' => now(env('APP_TIMEZONE')),
+      'password' => bcrypt(12345678),
+      'is_first_login' => false,
+    ])->assignRole('administrador');;
+
     // administrador
     User::create([
       'name' => 'osvaldo',
