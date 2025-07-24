@@ -43,16 +43,6 @@ class Pack extends Model implements Auditable
     'deleted_at' => 'datetime',
   ];
 
-  /**
-   * obtener atributo deleted_at, y presentarlo
-   * deleted_at es una fecha o null, cuando tiene una fecha indica el borrado
-  */
-  protected function deletedAt(): Attribute
-  {
-    return Attribute::make(
-      get: fn (string|null $value) => $value ? 'borrado' : 'activo'
-    );
-  }
 
   // * un pack pertenece a un suministro
   // o un pack se forma con unidades de un mismo suministro

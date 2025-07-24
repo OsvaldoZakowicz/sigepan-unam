@@ -49,15 +49,12 @@ class Provision extends Model implements Auditable
     'deleted_at' => 'datetime',
   ];
 
-  /**
-   * obtener atributo deleted_at, y presentarlo
-   * deleted_at es una fecha o null, cuando tiene una fecha indica el borrado
-  */
-  protected function deletedAt(): Attribute
+   /**
+   * obtiene el estado del suministro como string para presentacion
+   */
+  public function getStatusAttribute(): string
   {
-    return Attribute::make(
-      get: fn (string|null $value) => $value ? 'borrado' : 'activo'
-    );
+    return $this->deleted_at ? 'borrado' : 'activo';
   }
 
   // * un suministro pertenece a una marca

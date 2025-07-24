@@ -97,10 +97,18 @@
         <x-table-base>
           <x-slot:tablehead>
             <tr class="border bg-neutral-100">
-              <x-table-th class="w-12 text-end">id</x-table-th>
-              <x-table-th class="text-start">nombre</x-table-th>
-              <x-table-th class="text-start">marca</x-table-th>
-              <x-table-th class="text-start">tipo</x-table-th>
+              <x-table-th class="w-12 text-end">
+                id
+              </x-table-th>
+              <x-table-th class="text-start">
+                nombre
+              </x-table-th>
+              <x-table-th class="text-start">
+                marca
+              </x-table-th>
+              <x-table-th class="text-start">
+                tipo
+              </x-table-th>
               <x-table-th class="text-end">
                 <span>volumen</span>
                 <x-quest-icon title="kilogramos (kg), gramos (g), litros (lts), mililitros (ml), metros (m), centímetros (cm), o unidades (un)"/>
@@ -109,13 +117,18 @@
                 <span>packs disponibles</span>
                 <x-quest-icon title="packs en los que se puede encontrar el suministro" />
               </x-table-th>
-              <x-table-th class="w-24 text-start">estado</x-table-th>
-              <x-table-th class="w-24 text-start">acciones</x-table-th>
+              <x-table-th class="w-24 text-start">
+                estado
+                <x-quest-icon title="indica si el suministro esta activo o fue borrado" />
+              </x-table-th>
+              <x-table-th class="w-24 text-start">
+                acciones
+              </x-table-th>
             </tr>
           </x-slot:tablehead>
           <x-slot:tablebody>
             @forelse ($provisions as $provision)
-              <tr wire:key="{{$provision->id}}" class="border @if ($provision->deleted_at === 'borrado') text-neutral-400 @endif">
+              <tr wire:key="{{$provision->id}}" class="border">
                 <x-table-td class="text-end">
                   {{ $provision->id }}
                 </x-table-td>
@@ -150,15 +163,15 @@
                   @endif
                 </x-table-td>
                 <x-table-td class="text-start text-neutral-700">
-                  @if ($provision->deleted_at === 'borrado')
-                    <x-text-tag color="neutral">{{ $provision->deleted_at }}</x-text-tag>
+                  @if ($provision->getStatusAttribute() === 'borrado')
+                    <x-text-tag color="neutral">borrado</x-text-tag>
                     @else
-                    <x-text-tag color="emerald">{{ $provision->deleted_at }}</x-text-tag>
+                    <x-text-tag color="emerald">activo</x-text-tag>
                   @endif
                 </x-table-td>
                 <x-table-td class="text-start">
                   <div class="inline-flex items-center justify-start w-full gap-1">
-                    @if ($provision->deleted_at === 'activo')
+                    @if ($provision->getStatusAttribute() === 'activo')
 
                       <x-a-button
                         wire:click="edit({{ $provision->id }})"

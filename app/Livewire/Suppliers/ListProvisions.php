@@ -119,7 +119,7 @@ class ListProvisions extends Component
     $this->dispatch('toast-event', toast_data: [
       'event_type'  =>  'info',
       'title_toast' =>  toastTitle('', true),
-      'descr_toast' =>  'El suministro fue borrado con exito, aparcerá al final de la lista, puede restaurarlo de ser necesario',
+      'descr_toast' =>  'El suministro fue borrado con exito.',
     ]);
 
   }
@@ -131,7 +131,8 @@ class ListProvisions extends Component
   */
   public function restore(int $id): void
   {
-    Provision::withTrashed()->where('id', $id)->restore();
+    $provision = Provision::withTrashed()->findOrFail($id);
+    $provision->restore();
 
     $this->dispatch('toast-event', toast_data: [
       'event_type'  =>  'success',

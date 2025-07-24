@@ -12,12 +12,12 @@
 
       <x-slot:content class="flex-col">
 
-        <form wire:submit="save" class="w-full flex flex-col gap-2">
+        <form wire:submit="save" class="flex flex-col w-full gap-2" wire:confirm="¿Crear suministro?">
 
           <x-fieldset-base tema="suministro individual" class="w-full">
 
             {{-- categoria --}}
-            <div class="flex flex-col gap-1 p-2 w-full md:w-1/2 lg:w-1/4">
+            <div class="flex flex-col w-full gap-1 p-2 md:w-1/2 lg:w-1/4">
               <span>
                 <x-input-label
                   for="provision_category_id"
@@ -27,7 +27,10 @@
                 <span class="text-red-600">*</span>
               </span>
               @error('provision_category_id')
-                <span class="text-red-400 text-xs">{{ $message }}</span>
+                <span class="text-xs text-red-400">{{ $message }}</span>
+              @enderror
+              @error('provision_unique')
+                <span class="text-xs text-red-400">{{ $message }}</span>
               @enderror
               <select
                 name="provision_category_id"
@@ -47,7 +50,7 @@
             </div>
 
             {{-- marca --}}
-            <div class="flex flex-col gap-1 p-2 w-full md:w-1/2 lg:w-1/4">
+            <div class="flex flex-col w-full gap-1 p-2 md:w-1/2 lg:w-1/4">
               <span>
                 <x-input-label
                   for="provision_trademark_id"
@@ -57,7 +60,7 @@
                 <span class="text-red-600">*</span>
               </span>
               @error('provision_trademark_id')
-                <span class="text-red-400 text-xs">{{ $message }}</span>
+                <span class="text-xs text-red-400">{{ $message }}</span>
               @enderror
               <select
                 name="provision_trademark_id"
@@ -75,7 +78,7 @@
             </div>
 
             {{-- tipo --}}
-            <div class="flex flex-col gap-1 p-2 w-full md:w-1/2 lg:w-1/4">
+            <div class="flex flex-col w-full gap-1 p-2 md:w-1/2 lg:w-1/4">
               <span>
                 <x-input-label
                   for="provision_type"
@@ -85,7 +88,7 @@
                 <span class="text-red-600">*</span>
               </span>
               @error('provision_type')
-                <span class="text-red-400 text-xs">{{ $message }}</span>
+                <span class="text-xs text-red-400">{{ $message }}</span>
               @enderror
               <input
                 type="text"
@@ -97,7 +100,7 @@
             </div>
 
             {{-- unidad de medida --}}
-            <div class="flex flex-col gap-1 p-2 w-full md:w-1/2 lg:w-1/4">
+            <div class="flex flex-col w-full gap-1 p-2 md:w-1/2 lg:w-1/4">
               <span>
                 <x-input-label
                   for="measure"
@@ -107,7 +110,7 @@
                 <span class="text-red-600">*</span>
               </span>
               @error('measure')
-                <span class="text-red-400 text-xs">{{ $message }}</span>
+                <span class="text-xs text-red-400">{{ $message }}</span>
               @enderror
               <input
                 type="text"
@@ -119,17 +122,18 @@
             </div>
 
             {{-- cantidad --}}
-            <div class="flex flex-col gap-1 p-2 w-full md:w-1/2 lg:w-1/4">
+            <div class="flex flex-col w-full gap-1 p-2 md:w-1/2 lg:w-1/4">
               <span>
                 <x-input-label
                   for="provision_quantity"
                   class="font-normal"
-                  >cantidad
+                  >volumen
                 </x-input-label>
                 <span class="text-red-600">*</span>
+                <x-quest-icon title="Kilogramos (kg), gramos (g), litros (L), mililitros (mL), metros (M), centimetros (cm), unidad (U)"/>
               </span>
               @error('provision_quantity')
-                <span class="text-red-400 text-xs">{{ $message }}</span>
+                <span class="text-xs text-red-400">{{ $message }}</span>
               @enderror
               @if ($measure === 'unidad')
                 <x-text-input
@@ -137,7 +141,7 @@
                   name="provision_quantity"
                   value="1"
                   placeholder="1"
-                  class="p-1 text-end text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300 bg-neutral-200"
+                  class="p-1 text-sm text-right border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300 bg-neutral-200"
                   readonly
                 />
               @else
@@ -151,7 +155,7 @@
             </div>
 
             {{-- descripcion --}}
-            <div class="flex flex-col gap-1 p-2 w-full md:w-1/2 lg:grow">
+            <div class="flex flex-col w-full gap-1 p-2 md:w-1/2 lg:grow">
               <span>
                 <x-input-label
                   for="provision_short_description"
@@ -159,7 +163,7 @@
                   >descripcion
                 </x-input-label>
                 @error('provision_short_description')
-                  <span class="text-red-400 text-xs">{{ $message }}</span>
+                  <span class="text-xs text-red-400">{{ $message }}</span>
                 @enderror
               </span>
               <x-text-input wire:model="provision_short_description" name="provision_short_description" />
@@ -170,7 +174,7 @@
           <x-fieldset-base tema="packs del suministro" class="w-full">
 
             {{-- pack --}}
-            <div class="flex justify-start items-end p-2 w-full">
+            <div class="flex items-end justify-start w-full p-2">
 
               {{-- indicar cantidad del pack --}}
               <div class="flex flex-col gap-1 pr-2">
@@ -180,7 +184,7 @@
                     id="pack_units"
                     name="pack_units"
                     wire:model="pack_units"
-                    class="grow p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
+                    class="p-1 text-sm border grow border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300">
                     <option value="">indique un pack a crear ...</option>
                     <option value="6">pack de 6</option>
                     <option value="8">pack de 8</option>
@@ -205,12 +209,12 @@
               {{-- mostrar packs a crear --}}
               <div class="flex flex-col md:w-1/2 lg:grow">
                 <span class="ml-2">lista de packs</span>
-                <div class="flex justify-start items-center gap-1 ml-2 p-1 h-8 border border-dashed border-neutral-200 leading-none">
+                <div class="flex items-center justify-start h-8 gap-1 p-1 ml-2 leading-none border border-dashed border-neutral-200">
                   @forelse ($packs as $key => $pack)
-                    <div class="flex items-center justify-start gap-1 border border-blue-300 bg-blue-200 py-px px-1 rounded-lg">
-                      <span class="text-xs uppercase font-semibold">crear</span>
-                      <span class="text-sm text-neutral-600 lowercase">pack de {{ $pack }}</span>
-                      <span wire:click="removePackUnits({{ $key }})" class="text-lg leading-none cursor-pointer text-red-400 hover:text-red-600 hover:font-semibold" title="cancelar creación">&times;</span>
+                    <div class="flex items-center justify-start gap-1 px-1 py-px bg-blue-200 border border-blue-300 rounded-lg">
+                      <span class="text-xs font-semibold uppercase">crear</span>
+                      <span class="text-sm lowercase text-neutral-600">pack de {{ $pack }}</span>
+                      <span wire:click="removePackUnits({{ $key }})" class="text-lg leading-none text-red-400 cursor-pointer hover:text-red-600 hover:font-semibold" title="cancelar creación">&times;</span>
                     </div>
                   @empty
                     <span class="text-sm text-neutral-600">no se crearán packs de este suministro ...</span>
@@ -223,7 +227,7 @@
           </x-fieldset-base>
 
           <!-- botones del formulario -->
-          <div class="flex justify-end my-2 gap-2">
+          <div class="flex justify-end gap-2 my-2">
 
             <x-a-button
               wire:navigate
@@ -233,7 +237,9 @@
               >cancelar
             </x-a-button>
 
-            <x-btn-button>guardar</x-btn-button>
+            <x-btn-button
+              >guardar
+            </x-btn-button>
 
           </div>
 

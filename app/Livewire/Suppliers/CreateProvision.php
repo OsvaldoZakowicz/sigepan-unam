@@ -54,8 +54,8 @@ class CreateProvision extends Component
 
       $category = ProvisionCategory::findOrFail($this->provision_category_id);
 
-      $this->measure                    = $category->measure->unit_name;
-      $this->provision_type             = $category->provision_type->provision_type_name;
+      $this->measure = $category->measure->unit_name;
+      $this->provision_type = $category->provision_type->provision_type_name;
 
       // Si la medida es 'unidad', asignar 1 a provision_quantity
       if ($category->measure->unit_name === 'unidad') {
@@ -123,7 +123,7 @@ class CreateProvision extends Component
       'provision_category_id'       =>  ['required'],
       'provision_trademark_id'      =>  ['required'],
       'provision_quantity'          =>  ['required', 'numeric', 'min:0.1', 'max:99'],
-      'provision_short_description' =>  ['nullable', 'regex:/^[\p{L}\s0-9]+$/', 'min:15', 'max:150'],
+      'provision_short_description' =>  ['nullable', 'string', 'min:15', 'max:250'],
     ],[
       'provision_category_id.required'  => 'elija una :attribute para el suministro',
       'provision_trademark_id.required' => 'elija una :attribute para el suministro',
@@ -131,7 +131,7 @@ class CreateProvision extends Component
       'provision_quantity.numeric'      => 'la :attribute debe ser un numero',
       'provision_quantity.min'          => 'la :attribute puede ser de minimo :min',
       'provision_quantity.max'          => 'la :attribute puede ser de maximo :max',
-      'provision_short_description.regex' => 'la :attribute solo puede tener, letras y numeros',
+      'provision_short_description.string' => 'la :attribute solo puede ser texto',
       'provision_short_description.min' => 'la :attribute debe tener como minimo :min caracteres',
       'provision_short_description.max' => 'la :attribute debe tener como maximo :max caracteres',
     ],[
@@ -146,9 +146,21 @@ class CreateProvision extends Component
       $category  = ProvisionCategory::findOrFail($validated['provision_category_id']);
       $trademark = ProvisionTrademark::findOrFail($validated['provision_trademark_id']);
 
+      // si ya existe un suministro (incluso borrado) con la categoria, marca y volumen indicado, no se puede crear
+      $exist_provision = Provision::withTrashed()
+        ->where('provision_category_id', $category->id)
+        ->where('provision_trademark_id', $trademark->id)
+        ->where('provision_quantity', $validated['provision_quantity'])
+        ->first();
+
+      if ($exist_provision) {
+        $this->addError('provision_unique', 'Ya existe un suministro con la categoria, marca y volumen ingresado.');
+        return;
+      }
+
       $validated['provision_type_id'] = $category->provision_type->id;
       $validated['measure_id']        = $category->measure->id;
-      $validated['provision_name']    = $category->provision_category_name . ' - ' . $trademark->provision_trademark_name;
+      $validated['provision_name']    = $category->provision_category_name;
 
       // suministro
       $provision = Provision::create($validated);

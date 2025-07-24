@@ -43,7 +43,7 @@ class ListSuppliers extends Component
       $this->dispatch('toast-event', toast_data: [
         'event_type'  => 'info',
         'title_toast' => toastTitle('', true),
-        'descr_toast' => 'No se puede eliminar el proveedor porque tiene suministros o packs asociados'
+        'descr_toast' => 'No se puede eliminar el proveedor porque tiene suministros o packs asociados en su lista de precios'
       ]);
 
       return;

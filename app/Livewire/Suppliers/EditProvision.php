@@ -267,14 +267,14 @@ class EditProvision extends Component
     $validated = $this->validate([
       'provision_trademark_id'      =>  ['required'],
       'provision_quantity'          =>  ['required', 'numeric', 'min:0.1', 'max:99'],
-      'provision_short_description' =>  ['nullable', 'regex:/^[\p{L}\s0-9]+$/', 'min:15', 'max:150'],
+      'provision_short_description' =>  ['nullable', 'string', 'min:15', 'max:250'],
     ],[
       'provision_trademark_id.required'   => 'elija una :attribute para el suministro',
       'provision_quantity.required'       => 'la :attribute es obligatoria',
       'provision_quantity.numeric'        => 'la :attribute debe ser un numero',
       'provision_quantity.min'            => 'la :attribute puede ser de minimo :min',
       'provision_quantity.max'            => 'la :attribute puede ser de maximo :max',
-      'provision_short_description.regex' => 'la :attribute solo puede tener, letras y numeros',
+      'provision_short_description.string' => 'la :attribute solo puede ser texto',
       'provision_short_description.min'   => 'la :attribute debe tener como minimo :min caracteres',
       'provision_short_description.max'   => 'la :attribute debe tener como maximo :max caracteres',
     ],[
@@ -294,16 +294,27 @@ class EditProvision extends Component
 
       // * si la marca cambio, obtener nueva marca y construir nombre del suministro
       if ($validated['provision_trademark_id'] !== $this->provision->provision_trademark_id) {
-        $trademark      = ProvisionTrademark::findOrFail($validated['provision_trademark_id']);
-        $provision_name = $this->provision->provision_category->provision_category_name . ' - ' . $trademark->provision_trademark_name;
-
-        $this->provision->provision_name         = $provision_name;
         $this->provision->provision_trademark_id = $validated['provision_trademark_id'];
       }
 
       // * si la cantidad cambio
       if ($validated['provision_quantity'] !== $this->provision->provision_quantity) {
         $this->provision->provision_quantity = $validated['provision_quantity'];
+      }
+
+      $category  = ProvisionCategory::findOrFail($this->provision_category_id);
+      $trademark = ProvisionTrademark::findOrFail($validated['provision_trademark_id']);
+      // si ya existe un suministro (ademas del presente e incluso borrado) con la categoria, marca y volumen indicado igual, no se puede actualizar
+      $exist_provision = Provision::withTrashed()
+        ->where('provision_category_id', $category->id)
+        ->where('provision_trademark_id', $trademark->id)
+        ->where('provision_quantity', $validated['provision_quantity'])
+        ->where('id', '!=', $this->provision->id)
+        ->first();
+
+      if ($exist_provision) {
+        $this->addError('provision_unique', 'Ya existe un suministro con la categoria, marca y volumen ingresado.');
+        return;
       }
 
       $this->provision->provision_short_description = $validated['provision_short_description'];
