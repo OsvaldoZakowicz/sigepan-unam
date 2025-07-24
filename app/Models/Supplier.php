@@ -15,15 +15,18 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Supplier extends Model implements Auditable
 {
   use HasFactory;
-  // paquete de auditoria
+  use SoftDeletes;
   use \OwenIt\Auditing\Auditable;
 
-  use SoftDeletes;
-
   /**
-   * NOTAS:
-   * - Proveedor no tiene acceso al formulario para completar perfil.
+   * Eventos que deben ser auditados
    */
+  protected $auditEvents = [
+    'created',
+    'updated', 
+    'deleted',
+    'restored',
+  ];
 
   protected $fillable = [
     'company_name',
@@ -39,7 +42,10 @@ class Supplier extends Model implements Auditable
   ];
 
   protected $casts = [
-    'status_date' => 'date'
+    'status_date' => 'date',
+    'created_at' => 'datetime',
+    'updated_at' => 'datetime',
+    'deleted_at' => 'datetime',
   ];
 
   //* a un proveedor le pertenece un usuario

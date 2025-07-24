@@ -7,10 +7,25 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class ProvisionCategory extends Model
+class ProvisionCategory extends Model implements Auditable
 {
   use HasFactory;
+  use \OwenIt\Auditing\Auditable;
+
+  /**
+   * Eventos que deben ser auditados
+   */
+  protected $auditEvents = [
+    'created',
+    'updated', 
+    'deleted',
+  ];
+
+  protected $auditExclude = [
+    'provision_category_is_editable',
+  ];
 
   protected $fillable = [
     'provision_category_name',

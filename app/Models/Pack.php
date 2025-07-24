@@ -9,17 +9,38 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class Pack extends Model
+class Pack extends Model implements Auditable
 {
   use HasFactory;
   use SoftDeletes;
+  use \OwenIt\Auditing\Auditable;
+
+  /**
+   * Eventos que deben ser auditados
+   */
+  protected $auditEvents = [
+    'created',
+    'updated', 
+    'deleted',
+    'restored'
+  ];
 
   protected $fillable = [
     'pack_name',
     'pack_units',
     'pack_quantity',
     'provision_id'
+  ];
+
+  /**
+   * atributos que deben convertise
+   */
+  protected $casts = [
+    'created_at' => 'datetime',
+    'updated_at' => 'datetime',
+    'deleted_at' => 'datetime',
   ];
 
   /**

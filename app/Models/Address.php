@@ -13,16 +13,30 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Address extends Model implements Auditable
 {
   use HasFactory;
-  // paquete de auditoria
+  use SoftDeletes;
   use \OwenIt\Auditing\Auditable;
 
-  use SoftDeletes;
+   /**
+   * Eventos que deben ser auditados
+   */
+  protected $auditEvents = [
+    'created',
+    'updated', 
+    'deleted',
+    'restored',
+  ];
 
   protected $fillable = [
     'street',
     'number',
     'postal_code',
     'city',
+  ];
+
+  protected $casts = [
+    'created_at' => 'datetime',
+    'updated_at' => 'datetime',
+    'deleted_at' => 'datetime',
   ];
 
   //* una direccion tiene un perfil asociado

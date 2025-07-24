@@ -9,11 +9,23 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class Provision extends Model
+class Provision extends Model implements Auditable
 {
   use HasFactory;
   use SoftDeletes;
+  use \OwenIt\Auditing\Auditable;
+
+  /**
+   * Eventos que deben ser auditados
+   */
+  protected $auditEvents = [
+    'created',
+    'updated', 
+    'deleted',
+    'restored'
+  ];
 
   protected $fillable = [
     'provision_name',
@@ -29,9 +41,12 @@ class Provision extends Model
    * atributos que deben convertise
    */
   protected $casts = [
-    'provision_name'              => 'string',
-    'provision_quantity'          => 'decimal:2',
-    'provision_short_description' => 'string'
+    'provision_name' => 'string',
+    'provision_quantity' => 'decimal:2',
+    'provision_short_description' => 'string',
+    'created_at' => 'datetime',
+    'updated_at' => 'datetime',
+    'deleted_at' => 'datetime',
   ];
 
   /**

@@ -42,6 +42,21 @@ class AuditService
                 'deleted_at' => 'Fecha de Eliminación'
             ]
         ],
+        'App\Models\Address' => [
+            'table' => 'direcciones',
+            'model' => 'Direccion',
+            'attributes' => [
+                'id'=> 'id',
+                'street' => 'calle',
+                'number' => 'numero de calle',
+                'postal_code' => 'codigo postal',
+                'city' => 'ciudad',
+                'created_at' => 'Fecha de Creación',
+                'updated_at' => 'Fecha de Actualización',
+                'deleted_at' => 'Fecha de Eliminación'
+            ]
+        ],
+        // modulo de proveedores
         'App\Models\Supplier' => [
             'table' => 'proveedores',
             'model' => 'Proveedor',
@@ -50,8 +65,8 @@ class AuditService
                 'company_name' => 'razon social',
                 'company_cuit' => 'cuit',
                 'iva_condition' => 'condicion frente al iva',
-                'phone_number' => 'telefono',
-                'short_description' => 'descripcion del proveedor',
+                'phone_number' => 'telefono de contacto',
+                'short_description' => 'descripcion corta',
                 'status_is_active' => 'estado',
                 'status_description' => 'descripcion del estado',
                 'status_date' => 'fecha del estado registrado',
@@ -62,6 +77,58 @@ class AuditService
                 'deleted_at' => 'Fecha de Eliminación'
             ]
         ],
+        'App\Models\ProvisionTrademark' => [
+            'table' => 'marcas',
+            'model' => 'Marca',
+            'attributes' => [
+                'id' => 'id',
+                'provision_trademark_name' => 'Nombre',
+                'created_at' => 'Fecha de Creación',
+                'updated_at' => 'Fecha de Actualización',
+            ]
+        ],
+        'App\Models\ProvisionCategory' => [
+            'table' => 'categorias',
+            'model' => 'Categoria',
+            'attributes' => [
+                'id' => 'id',
+                'provision_category_name' => 'Nombre',
+                'measure_id' => 'Medida de la categoria',
+                'provision_type_id' => 'Tipo de la categoria',
+                'created_at' => 'Fecha de Creación',
+                'updated_at' => 'Fecha de Actualización',
+            ]
+        ],
+        'App\Models\Provision' => [
+            'table' => 'suministros',
+            'model' => 'Suministro',
+            'attributes' => [
+                'id' => 'id',
+                'provision_name' => 'Nombre del suministro',
+                'provision_quantity' => 'Volumen',
+                'provision_short_description' => 'Descripcion',
+                'provision_trademark_id' => 'Marca',
+                'provision_category_id' => 'Categoria',
+                'provision_type_id' => 'Tipo',
+                'measure_id' => 'Unidad de medida',
+                'created_at' => 'Fecha de Creación',
+                'updated_at' => 'Fecha de Actualización',
+            ]
+        ],
+        'App\Models\Pack' => [
+            'table' => 'packs',
+            'model' => 'Pack',
+            'attributes' => [
+                'id' => 'id',
+                'pack_name' => 'nombre del pack',
+                'pack_units' => 'unidades',
+                'pack_quantity' => 'volumen',
+                'provision_id' => 'id de suministro',
+                'created_at' => 'Fecha de Creación',
+                'updated_at' => 'Fecha de Actualización',
+            ]
+        ],
+        // modulo de stock
         'App\Models\Product' => [
             'table' => 'productos',
             'model' => 'Producto',
