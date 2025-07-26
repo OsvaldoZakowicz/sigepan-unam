@@ -97,23 +97,23 @@
               <span class="font-semibold uppercase text-md text-neutral-500">de:</span>
               <span>
                 <span class="font-semibold">Proveedor:</span>
-                <span>{{ $quotation->supplier->company_name }}</span>
+                <span>{{ $preorder->supplier->company_name }}</span>
               </span>
               <span>
                 <span class="font-semibold">CUIT:</span>
-                <span>{{ $quotation->supplier->company_cuit }}</span>
+                <span>{{ $preorder->supplier->company_cuit }}</span>
               </span>
               <span>
                 <span class="font-semibold">Teléfono:</span>
-                <span>{{ $quotation->supplier->phone_number }}</span>
+                <span>{{ $preorder->supplier->phone_number }}</span>
               </span>
               <span>
                 <span class="font-semibold">Correo:</span>
-                <span>{{ $quotation->supplier->user->email }}</span>
+                <span>{{ $preorder->supplier->user->email }}</span>
               </span>
               <span>
                 <span class="font-semibold">Dirección:</span>
-                <span>{{ $quotation->supplier->full_address }}</span>
+                <span>{{ $preorder->supplier->full_address }}</span>
               </span>
             </div>
             {{-- panaderia --}}
