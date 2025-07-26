@@ -152,6 +152,33 @@ class AuditService
                 'updated_at' => 'Fecha de Actualización',
             ]
         ],
+        'App\Models\RequestForQuotationPeriod' => [
+            'table' => 'periodos presupuestarios',
+            'model' => 'Periodo Presupuestario',
+            'attributes' => [
+                'id' => 'id',
+                'period_code' => 'codigo de periodo',
+                'period_start_at' => 'fecha de inicio',
+                'period_end_at' => 'fecha de fin',
+                'period_short_description' => 'descripcion corta',
+                'period_status_id' => 'id de estado',
+                'created_at' => 'Fecha de Creación',
+                'updated_at' => 'Fecha de Actualización',
+            ]
+        ],
+        'App\Models\Quotation' => [
+            'table' => 'presupuestos',
+            'model' => 'Presupuesto',
+            'attributes' => [
+                'id' => 'id',
+                'quotation_code' => 'codigo de presupuesto',
+                'is_completed' => 'estado de completitud',
+                'period_id' => 'id de periodo presupuestario',
+                'supplier_id' => 'id de proveedor',
+                'created_at' => 'Fecha de Creación',
+                'updated_at' => 'Fecha de Actualización',
+            ]
+        ],
         // modulo de stock
         'App\Models\Product' => [
             'table' => 'productos',

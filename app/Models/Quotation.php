@@ -6,18 +6,32 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use OwenIt\Auditing\Contracts\Auditable;
 
-// todo: auditar
-
-class Quotation extends Model
+class Quotation extends Model implements Auditable
 {
   use HasFactory;
+  use \OwenIt\Auditing\Auditable;
+
+  /**
+   * Eventos que deben ser auditados
+   */
+  protected $auditEvents = [
+    'created',
+    'updated', 
+    'deleted',
+  ];
 
   protected $fillable = [
     'quotation_code',
     'is_completed',
     'period_id',
     'supplier_id',
+  ];
+
+  protected $casts = [
+    'created_at' => 'datetime',
+    'updated_at' => 'datetime'
   ];
 
   //* un presupuesto pertenece a un periodo de peticion de presupuesto.

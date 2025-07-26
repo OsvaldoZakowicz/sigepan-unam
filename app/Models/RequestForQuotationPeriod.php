@@ -8,11 +8,21 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use OwenIt\Auditing\Contracts\Auditable;
 
-// todo: auditar
-class RequestForQuotationPeriod extends Model
+class RequestForQuotationPeriod extends Model implements Auditable
 {
   use HasFactory;
+  use \OwenIt\Auditing\Auditable;
+
+  /**
+   * Eventos que deben ser auditados
+   */
+  protected $auditEvents = [
+    'created',
+    'updated', 
+    'deleted',
+  ];
 
   protected $fillable = [
     'period_code',
@@ -22,17 +32,13 @@ class RequestForQuotationPeriod extends Model
     'period_status_id'
   ];
 
-  /**
-   * Get the attributes that should be cast.
-   * @return array<string, string>
-   */
-  protected function casts(): array
-  {
-    return [
-      'period_start_at' => 'datetime:d-m-Y',
-      'period_end_at' => 'datetime:d-m-Y',
-    ];
-  }
+  protected $casts = [
+    'period_start_at' => 'date:d-m-Y',
+    'period_end_at' => 'date:d-m-Y',
+    'created_at' => 'datetime',
+    'updated_at' => 'datetime'
+  ];
+
 
   //* un periodo de peticion de presupuestos tiene un estado
   public function status(): BelongsTo
