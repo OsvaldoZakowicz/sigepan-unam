@@ -6,10 +6,21 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class PreOrderPeriod extends Model
+class PreOrderPeriod extends Model implements Auditable
 {
   use HasFactory;
+  use \OwenIt\Auditing\Auditable;
+
+  /**
+   * Eventos que deben ser auditados
+   */
+  protected $auditEvents = [
+    'created',
+    'updated', 
+    'deleted',
+  ];
 
   protected $fillable = [
     'quotation_period_id',
@@ -18,7 +29,12 @@ class PreOrderPeriod extends Model
     'period_end_at',
     'period_short_description',
     'period_status_id',
-    'period_preorders_data', // json, datos de pre ordenes
+    'period_preorders_data',
+  ];
+
+   protected $casts = [
+    'created_at' => 'datetime',
+    'updated_at' => 'datetime',
   ];
 
   //* un periodo de pre ordenes tiene un estado

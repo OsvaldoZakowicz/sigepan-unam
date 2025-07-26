@@ -233,6 +233,75 @@ class AuditService
                 'updated_at' => 'Fecha de Actualización',
             ]
         ],
+        'App\Models\PreOrderPeriod' => [
+            'table' => 'periodos de preordenes',
+            'model' => 'Periodo Preorden',
+            'attributes' => [
+                'id' => 'id',
+                'quotation_period_id' => 'id de periodo presupuestario asociado',
+                'period_code' => 'codigo de periodo',
+                'period_start_at' => 'fecha de inicio',
+                'period_end_at' => 'fecha de fin',
+                'period_short_description' => 'descripcion',
+                'period_status_id' => 'id de estado',
+                'period_preorders_data' => 'datos de suministros y packs para preordenes',
+                'created_at' => 'Fecha de Creación',
+                'updated_at' => 'Fecha de Actualización',
+            ]
+        ],
+        'App\Models\PreOrder' => [
+            'table' => 'preordenes',
+            'model' => 'Preorden',
+            'attributes' => [
+                'id' => 'id',
+                'pre_order_period_id' => 'id de periodo de preordenes',
+                'supplier_id' => 'id de proveedor contactado',
+                'pre_order_code' => 'codigo de preorden',
+                'quotation_reference' => 'presupuesto de referencia',
+                'status' => 'estado de preorden',
+                'is_completed' => 'estado de completitud',
+                'is_approved_by_supplier' => 'aprobacion del proveedor',
+                'is_approved_by_buyer' => 'aprobacion del comprador',
+                'details' => 'detalles de anexo',
+                'order' => 'datos de orden final',
+                'order_pdf' => 'ruta a pdf de orden final',
+                'is_sended_to_supplier' => 'estado de contacto con el proveedor',
+                'created_at' => 'Fecha de Creación',
+                'updated_at' => 'Fecha de Actualización',
+            ]
+        ],
+        'App\Models\PreOrderProvision' => [
+            'table' => 'suministros de preorden',
+            'model' => 'Suministro Preorden',
+            'attributes' => [
+                'id' => 'id',
+                'pre_order_id' => 'id de preorden asociada',
+                'provision_id' => 'id de suministro asociado',
+                'has_stock' => 'tiene stock',
+                'quantity' => 'cantidad',
+                'alternative_quantity' => 'cantidad alternativa',
+                'unit_price' => 'precio unitario',
+                'total_price' => 'precio subtotal',
+                'created_at' => 'Fecha de Creación',
+                'updated_at' => 'Fecha de Actualización',
+            ]
+        ],
+        'App\Models\PreOrderPack' => [
+            'table' => 'packs de preorden',
+            'model' => 'Pack Preorden',
+            'attributes' => [
+                'id' => 'id',
+                'pre_order_id' => 'id de preorden asociada',
+                'pack_id' => 'id de pack asociado',
+                'has_stock' => 'tiene stock',
+                'quantity' => 'cantidad',
+                'alternative_quantity' => 'cantidad alternativa',
+                'unit_price' => 'precio unitario',
+                'total_price' => 'precio subtotal',
+                'created_at' => 'Fecha de Creación',
+                'updated_at' => 'Fecha de Actualización',
+            ]
+        ],
         // modulo de stock
         'App\Models\Product' => [
             'table' => 'productos',

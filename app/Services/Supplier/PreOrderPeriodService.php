@@ -217,24 +217,6 @@ class PreOrderPeriodService
    */
   public function generatePreOrdersFromScratch(int $pre_order_period_id)
   {
-    /**
-     * [
-     *  'provisions' => [
-     *    [
-     *      'provision' => App\Models\Provision,
-     *      'supplier'  => App\Models\Supplier,
-     *      'quantity'  => 'number...'
-     *    ], ...
-     *  ],
-     *  'packs' => [
-     *    [
-     *      'pack'      => App\Models\Pack,
-     *      'supplier'  => App\Models\Supplier,
-     *      'quantity'  => 'number...'
-     *    ], ...
-     *  ]
-     * ]
-     */
     $provisions_and_packs = $this->getProvisionAndPacksData($pre_order_period_id);
 
     // agrupar suministros y packs por proveedor
@@ -281,26 +263,6 @@ class PreOrderPeriodService
         'quantity' => $pack_data['quantity']
       ];
     }
-
-    /**
-     * formato de supplier_items:
-      [
-        'supplier1' => [
-          'supplier' => App\Models\Supplier,
-          'provisions' => [
-            ['provision' => App\Models\Provision, 'quantity' => number],
-            // ...más suministros
-          ],
-          'packs' => [
-            ['pack' => App\Models\Pack, 'quantity' => number],
-            // ...más packs
-          ]
-        ],
-        'supplier2' => [
-          // ...misma estructura
-        ]
-      ]
-     */
 
     // pre ordenes generadas
     $generated_pre_orders = [];
@@ -418,7 +380,7 @@ class PreOrderPeriodService
    * @param array $comparision_data datos de la comparativa de precios o ranking de presupuestos
    * @return array $best_prices
    */
-  private function groupBestPricesBySupplier(array $comparison_data): array
+  public function groupBestPricesBySupplier(array $comparison_data): array
   {
     $best_prices = [];
 
@@ -464,7 +426,7 @@ class PreOrderPeriodService
   /**
    * encuentra el mejor precio
    */
-  private function findBestPrice(array $supplier_prices): ?array
+  public function findBestPrice(array $supplier_prices): ?array
   {
     $valid_prices = array_filter(
       $supplier_prices,

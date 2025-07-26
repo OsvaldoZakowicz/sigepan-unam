@@ -84,6 +84,7 @@ class Pack extends Model implements Auditable
   public function pre_orders(): BelongsToMany
   {
     return $this->belongsToMany(PreOrder::class, 'pre_order_pack', 'pack_id', 'pre_order_id')
+      ->using(PreOrderPack::class)
       ->withPivot(['has_stock', 'quantity', 'alternative_quantity', 'unit_price', 'total_price'])
       ->withTimestamps();
   }

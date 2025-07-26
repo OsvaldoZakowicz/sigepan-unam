@@ -120,6 +120,7 @@ class Provision extends Model implements Auditable
   public function pre_orders(): BelongsToMany
   {
     return $this->belongsToMany(PreOrder::class, 'pre_order_provision', 'provision_id', 'pre_order_id')
+      ->using(PreOrderProvision::class)
       ->withPivot(['has_stock', 'quantity', 'alternative_quantity', 'unit_price', 'total_price'])
       ->withTimestamps();
   }
