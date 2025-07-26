@@ -166,6 +166,30 @@ class AuditService
                 'updated_at' => 'Fecha de Actualización',
             ]
         ],
+        'App\Models\PeriodProvision' => [
+            'table' => 'suministros de periodo presupuestario',
+            'model' => 'Suministro Periodo Presupuesto',
+            'attributes' => [
+                'id' => 'id',
+                'period_id' => 'id de periodo presupuestario',
+                'provision_id' => 'id de suministro',
+                'quantity' => 'cantidad solicitada',
+                'created_at' => 'Fecha de Creación',
+                'updated_at' => 'Fecha de Actualización',
+            ]
+        ],
+        'App\Models\PackPeriod' => [
+            'table' => 'packs de periodo presupuestario',
+            'model' => 'Pack Periodo Presupuesto',
+            'attributes' => [
+                'id' => 'id',
+                'period_id' => 'id de presupuesto',
+                'pack_id' => 'id de pack',
+                'quantity' => 'cantidad solicitada',
+                'created_at' => 'Fecha de Creación',
+                'updated_at' => 'Fecha de Actualización',
+            ]
+        ],
         'App\Models\Quotation' => [
             'table' => 'presupuestos',
             'model' => 'Presupuesto',

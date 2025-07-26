@@ -89,6 +89,7 @@ class Provision extends Model implements Auditable
   public function periods(): BelongsToMany
   {
     return $this->belongsToMany(RequestForQuotationPeriod::class, 'period_provision', 'provision_id', 'period_id')
+      ->using(PeriodProvision::class)
       ->withPivot('quantity')
       ->withTimestamps();
   }

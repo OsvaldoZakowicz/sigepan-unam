@@ -51,6 +51,7 @@ class RequestForQuotationPeriod extends Model implements Auditable
   public function provisions(): BelongsToMany
   {
     return $this->belongsToMany(Provision::class, 'period_provision', 'period_id', 'provision_id')
+      ->using(PeriodProvision::class)
       ->withPivot('quantity')
       ->withTimestamps();
   }
@@ -60,6 +61,7 @@ class RequestForQuotationPeriod extends Model implements Auditable
   public function packs(): BelongsToMany
   {
     return $this->belongsToMany(Pack::class, 'pack_period', 'period_id', 'pack_id')
+      ->using(PackPeriod::class)
       ->withPivot('quantity')
       ->withTimestamps();
   }

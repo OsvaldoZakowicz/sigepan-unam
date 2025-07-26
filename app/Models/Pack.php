@@ -66,6 +66,7 @@ class Pack extends Model implements Auditable
   public function periods(): BelongsToMany
   {
     return $this->belongsToMany(RequestForQuotationPeriod::class, 'pack_period', 'pack_id', 'period_id')
+      ->using(PackPeriod::class)
       ->withPivot('quantity')
       ->withTimestamps();
   }

@@ -2,11 +2,14 @@
 
 namespace App\Livewire\Suppliers;
 
-use Livewire\Component;
-use Livewire\WithPagination;
 use App\Models\RequestForQuotationPeriod;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\DB;
+use Livewire\Component;
+use Livewire\WithPagination;
 use Livewire\Attributes\Url;
+use App\Models\PeriodProvision;
+use App\Models\PackPeriod;
 
 /**
  * * listar periodos de peticion de presupuestos.
@@ -99,7 +102,21 @@ class ListBudgetPeriods extends Component
 
       try {
 
-        $period->delete();
+        DB::transaction(function () use ($period) {
+          
+         // eliminar relaciones period_provision (mantiene auditoría)
+          PeriodProvision::where('period_id', $period->id)->each(function ($pivotRecord) {
+              $pivotRecord->delete(); // Dispara eventos de auditoría
+          });
+
+          // eliminar relaciones pack_period (mantiene auditoría)  
+          PackPeriod::where('period_id', $period->id)->each(function ($pivotRecord) {
+              $pivotRecord->delete(); // Dispara eventos de auditoría
+          });
+
+          // Finalmente eliminar el período
+          $period->delete();
+        });
 
         $this->dispatch('toast-event', toast_data: [
           'event_type' => 'success',

@@ -16,6 +16,9 @@ use App\Jobs\OpenQuotationPeriodJob;
 use App\Models\RequestForQuotationPeriod;
 use App\Services\Supplier\QuotationPeriodService;
 use App\Jobs\NotifySuppliersRequestForQuotationReceivedJob;
+use App\Models\PackPeriod;
+use App\Models\PeriodProvision;
+use App\Services\Supplier\PeriodSyncService;
 
 class EditBudgetPeriod extends Component
 {
@@ -202,8 +205,9 @@ class EditBudgetPeriod extends Component
     );
 
     try {
+      $sync_service = new PeriodSyncService();
 
-      DB::transaction(function () use ($validated) {
+      DB::transaction(function () use ($validated, $sync_service) {
 
         // actualizar periodo
         $this->period->period_start_at          = $validated['period_start_at'];
@@ -211,7 +215,10 @@ class EditBudgetPeriod extends Component
         $this->period->period_short_description = $validated['period_short_description'];
         $this->period->save();
 
-        $this->syncProvisionsAndPacks();
+        // * sincronizar suministros y packs
+        // eliminar los no presentes (esto genera registro de auditoria deleted)
+        // actualizar existentes o agregar nuevos (esto genera registro de auditoria create o update)        
+        $sync_service->syncPeriodRelations($this->period, $this->provisions_and_packs);
 
         //$period->period_start_at formato string 'Y-m-d'
         if (Carbon::parse($this->period->period_start_at)->startOfDay()->eq(Carbon::now()->startOfDay())) {
@@ -224,36 +231,13 @@ class EditBudgetPeriod extends Component
 
       $this->reset();
 
-      session()->flash('operation-success', toastSuccessBody('periodo de solicitud', 'editado y re abierto'));
+      session()->flash('operation-success', toastSuccessBody('periodo de solicitud', 'editado'));
       $this->redirectRoute('suppliers-budgets-periods-index');
     } catch (\Exception $e) {
 
       session()->flash('operation-error', 'error: ' . $e->getMessage() . ', contacte al Administrador');
       $this->redirectRoute('suppliers-budgets-periods-index');
     }
-  }
-
-  // metodo para sincronizar provisions y packs (elimina items no presentes)
-  public function syncProvisionsAndPacks()
-  {
-    // Separar items por tipo y preparar datos para sync
-    $provisionsData = [];
-    $packsData = [];
-
-    $this->provisions_and_packs->each(function ($item) use (&$provisionsData, &$packsData) {
-      $pivotData = ['quantity' => $item['item_quantity']];
-
-      if ($item['item_type'] === 'suministro') {
-        $provisionsData[$item['item_object']->id] = $pivotData;
-      } elseif ($item['item_type'] === 'pack') {
-        $packsData[$item['item_object']->id] = $pivotData;
-      }
-    });
-
-    // Usar sync() para eliminar registros no presentes
-    // Si el array está vacío, se eliminarán TODOS los registros de la relación
-    $this->period->provisions()->sync($provisionsData);
-    $this->period->packs()->sync($packsData);
   }
 
   /**
