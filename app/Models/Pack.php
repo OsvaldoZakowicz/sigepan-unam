@@ -55,8 +55,10 @@ class Pack extends Model implements Auditable
   // packs n : n suppliers
   public function suppliers(): BelongsToMany
   {
-    return $this->belongsToMany(Supplier::class)
-      ->withPivot('price')->withTimestamps();
+    return $this->belongsToMany(Supplier::class, 'pack_supplier')
+      ->using(PackSupplier::class)
+      ->withPivot('id', 'price')
+      ->withTimestamps();
   }
 
   //* un pack participa en muchas solicitudes de presupuesto

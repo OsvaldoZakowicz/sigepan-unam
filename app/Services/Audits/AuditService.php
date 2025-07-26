@@ -115,6 +115,18 @@ class AuditService
                 'updated_at' => 'Fecha de Actualización',
             ]
         ],
+        'App\Models\ProvisionSupplier' => [
+            'table' => 'precio suministro',
+            'model' => 'Suministro Proveedor',
+            'attributes' => [
+                'id' => 'id',
+                'supplier_id' => 'id de proveedor',
+                'provision_id' => 'id de suministro',
+                'price' => 'precio',
+                'created_at' => 'Fecha de Creación',
+                'updated_at' => 'Fecha de Actualización',
+            ]
+        ],
         'App\Models\Pack' => [
             'table' => 'packs',
             'model' => 'Pack',
@@ -124,6 +136,18 @@ class AuditService
                 'pack_units' => 'unidades',
                 'pack_quantity' => 'volumen',
                 'provision_id' => 'id de suministro',
+                'created_at' => 'Fecha de Creación',
+                'updated_at' => 'Fecha de Actualización',
+            ]
+        ],
+        'App\Models\PackSupplier' => [
+            'table' => 'precio pack',
+            'model' => 'Pack Proveedor',
+            'attributes' => [
+                'id' => 'id',
+                'supplier_id' => 'id de proveedor',
+                'pack_id' => 'id de pack',
+                'price' => 'precio',
                 'created_at' => 'Fecha de Creación',
                 'updated_at' => 'Fecha de Actualización',
             ]
