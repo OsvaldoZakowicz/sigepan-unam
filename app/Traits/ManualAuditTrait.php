@@ -2,9 +2,10 @@
 
 namespace App\Traits;
 
-use OwenIt\Auditing\Models\Audit;
-use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
+use OwenIt\Auditing\Models\Audit;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * Trait para manejar auditorías manuales en comandos y procesos automáticos
@@ -21,25 +22,52 @@ trait ManualAuditTrait
         array $old_values = [],
         array $new_values = [],
         array $additional_info = []
-    ): Audit {
+    ): ?Audit {
         
-        $audit_data = [
-            'user_type' => $user ? get_class($user) : null,
-            'user_id' => $user?->id,
-            'event' => $event,
-            'auditable_type' => get_class($model),
-            'auditable_id' => $model->id,
-            'old_values' => !empty($old_values) ? $old_values : [],
-            'new_values' => !empty($new_values) ? $new_values : [],
-            'url' => $this->getCurrentUrl(),
-            'ip_address' => $this->getCurrentIpAddress(),
-            'user_agent' => $this->getCurrentUserAgent(),
-            'tags' => $this->getAuditTags($additional_info),
-            'created_at' => now(),
-            'updated_at' => now(),
-        ];
-        
-        return Audit::create($audit_data);
+        try {
+            $audit_data = [
+                'user_type' => $user ? get_class($user) : null,
+                'user_id' => $user?->id,
+                'event' => $event,
+                'auditable_type' => get_class($model),
+                'auditable_id' => $model->id,
+                'old_values' => !empty($old_values) ? $old_values : [],
+                'new_values' => !empty($new_values) ? $new_values : [],
+                'url' => $this->getCurrentUrl(),
+                'ip_address' => $this->getCurrentIpAddress(),
+                'user_agent' => $this->getCurrentUserAgent(),
+                'tags' => $this->getAuditTags($additional_info),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+            
+            // Log para debugging
+            Log::info('Creating manual audit', [
+                'model_type' => get_class($model),
+                'model_id' => $model->id,
+                'event' => $event,
+                'user_id' => $user?->id,
+                'audit_data' => $audit_data
+            ]);
+            
+            $audit = Audit::create($audit_data);
+            
+            Log::info('Manual audit created successfully', [
+                'audit_id' => $audit->id
+            ]);
+            
+            return $audit;
+            
+        } catch (\Exception $e) {
+            Log::error('Error creating manual audit', [
+                'error' => $e->getMessage(),
+                'model_type' => get_class($model),
+                'model_id' => $model->id,
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return null;
+        }
     }
     
     /**
@@ -49,7 +77,7 @@ trait ManualAuditTrait
         Model $model,
         ?User $user = null,
         array $additional_info = []
-    ): Audit {
+    ): ?Audit {
         return $this->createManualAudit(
             model: $model,
             event: 'created',
@@ -68,7 +96,7 @@ trait ManualAuditTrait
         array $original_attributes,
         ?User $user = null,
         array $additional_info = []
-    ): Audit {
+    ): ?Audit {
         $changed_attributes = [];
         $old_values = [];
         
@@ -94,7 +122,7 @@ trait ManualAuditTrait
         Model $model,
         ?User $user = null,
         array $additional_info = []
-    ): Audit {
+    ): ?Audit {
         return $this->createManualAudit(
             model: $model,
             event: 'deleted',
@@ -114,7 +142,11 @@ trait ManualAuditTrait
             return null;
         }
         
-        return request()->fullUrl();
+        try {
+            return request()->fullUrl();
+        } catch (\Exception $e) {
+            return null;
+        }
     }
     
     /**
@@ -126,7 +158,11 @@ trait ManualAuditTrait
             return '127.0.0.1';
         }
         
-        return request()->ip() ?? '127.0.0.1';
+        try {
+            return request()->ip() ?? '127.0.0.1';
+        } catch (\Exception $e) {
+            return '127.0.0.1';
+        }
     }
     
     /**
@@ -139,7 +175,11 @@ trait ManualAuditTrait
             return "Laravel Command: {$command}";
         }
         
-        return request()->userAgent() ?? 'Unknown';
+        try {
+            return request()->userAgent() ?? 'Laravel Queue Job';
+        } catch (\Exception $e) {
+            return 'Laravel Queue Job';
+        }
     }
     
     /**
@@ -160,6 +200,10 @@ trait ManualAuditTrait
         // Agregar tags adicionales basados en la información
         if (isset($additional_info['reason'])) {
             $tags[] = $additional_info['reason'];
+        }
+        
+        if (isset($additional_info['job'])) {
+            $tags[] = str_replace('-', '_', $additional_info['job']);
         }
         
         if (isset($additional_info['command'])) {
