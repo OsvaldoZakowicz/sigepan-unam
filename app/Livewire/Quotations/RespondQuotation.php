@@ -8,6 +8,8 @@ use App\Models\Provision;
 use App\Models\Quotation;
 use Illuminate\View\View;
 use App\Models\DatoNegocio;
+use App\Models\PackQuotation;
+use App\Models\ProvisionQuotation;
 use Illuminate\Support\Arr;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Collection;
@@ -243,24 +245,29 @@ class RespondQuotation extends Component
         // suministros
         if ($input['item_type'] === 'suministro') {
 
-          $this->quotation->provisions()->updateExistingPivot(
-            $input['item_id'],
-            [
-              'has_stock'   => $input['item_has_stock'],
-              'unit_price'  => $input['item_unit_price'],
-              'total_price' => $input['item_total_price'],
-            ]
-          );
+          $provision_quotation = ProvisionQuotation::where('provision_id', $input['item_id'])
+            ->where('quotation_id', $this->quotation->id)
+            ->first();
+
+          $provision_quotation->update([
+            'has_stock'   => $input['item_has_stock'],
+            'unit_price'  => $input['item_unit_price'],
+            'total_price' => $input['item_total_price'],
+          ]);
+
+
         } else {
+          
           // packs
-          $this->quotation->packs()->updateExistingPivot(
-            $input['item_id'],
-            [
-              'has_stock'   => $input['item_has_stock'],
-              'unit_price'  => $input['item_unit_price'],
-              'total_price' => $input['item_total_price'],
-            ]
-          );
+          $pack_quotation = PackQuotation::where('pack_id', $input['item_id'])
+            ->where('quotation_id', $this->quotation->id)
+            ->first();
+
+          $pack_quotation->update([
+            'has_stock'   => $input['item_has_stock'],
+            'unit_price'  => $input['item_unit_price'],
+            'total_price' => $input['item_total_price'],
+          ]);
         }
       }
 
