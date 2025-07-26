@@ -179,6 +179,36 @@ class AuditService
                 'updated_at' => 'Fecha de Actualización',
             ]
         ],
+        'App\Models\ProvisionQuotation' => [
+            'table' => 'suministros de presupuestos',
+            'model' => 'Suministro Presupuesto',
+            'attributes' => [
+                'id' => 'id',
+                'quotation_id' => 'id de presupuesto',
+                'provision_id' => 'id de suministro',
+                'has_stock' => 'tiene stock',
+                'quantity' => 'cantidad solicitada',
+                'unit_price' => 'precio unitario',
+                'total_price' => 'precio subtotal',
+                'created_at' => 'Fecha de Creación',
+                'updated_at' => 'Fecha de Actualización',
+            ]
+        ],
+        'App\Models\PackQuotation' => [
+            'table' => 'packs de presupuestos',
+            'model' => 'Pack Presupuesto',
+            'attributes' => [
+                'id' => 'id',
+                'quotation_id' => 'id de presupuesto',
+                'pack_id' => 'id de pack',
+                'has_stock' => 'tiene stock',
+                'quantity' => 'cantidad solicitada',
+                'unit_price' => 'precio unitario',
+                'total_price' => 'precio subtotal',
+                'created_at' => 'Fecha de Creación',
+                'updated_at' => 'Fecha de Actualización',
+            ]
+        ],
         // modulo de stock
         'App\Models\Product' => [
             'table' => 'productos',

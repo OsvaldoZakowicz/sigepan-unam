@@ -96,7 +96,8 @@ class Provision extends Model implements Auditable
   //* un suministro esta en muchos presupuestos (quotations).
   public function quotations(): BelongsToMany
   {
-    return $this->belongsToMany(Quotation::class)
+    return $this->belongsToMany(Quotation::class, 'provision_quotation')
+      ->using(ProvisionQuotation::class)
       ->withPivot(['has_stock', 'quantity', 'unit_price', 'total_price'])
       ->withTimestamps();
   }

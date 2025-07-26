@@ -49,7 +49,8 @@ class Quotation extends Model implements Auditable
   //* un presupuesto tiene muchos suministros.
   public function provisions(): BelongsToMany
   {
-    return $this->belongsToMany(Provision::class)
+    return $this->belongsToMany(Provision::class, 'provision_quotation')
+      ->using(ProvisionQuotation::class)
       ->withPivot(['has_stock', 'quantity', 'unit_price', 'total_price'])
       ->withTimestamps();
   }
@@ -57,7 +58,8 @@ class Quotation extends Model implements Auditable
   //* un presupuesto tiene muchos packs
   public function packs(): BelongsToMany
   {
-    return $this->belongsToMany(Pack::class)
+    return $this->belongsToMany(Pack::class, 'pack_quotation')
+      ->using(PackQuotation::class)
       ->withPivot(['has_stock', 'quantity', 'unit_price', 'total_price'])
       ->withTimestamps();
   }

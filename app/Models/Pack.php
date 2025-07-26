@@ -73,7 +73,8 @@ class Pack extends Model implements Auditable
   //* un pack esta en muchos presupuestos (quotations).
   public function quotations(): BelongsToMany
   {
-    return $this->belongsToMany(Quotation::class)
+    return $this->belongsToMany(Quotation::class, 'pack_quotation')
+      ->using(PackQuotation::class)
       ->withPivot(['has_stock', 'quantity', 'unit_price', 'total_price'])
       ->withTimestamps();
   }

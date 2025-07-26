@@ -4,6 +4,8 @@ namespace App\Jobs;
 
 use App\Models\User;
 use App\Models\Quotation;
+use App\Models\ProvisionQuotation;
+use App\Models\PackQuotation;
 use App\Models\RequestForQuotationPeriod;
 use App\Models\Supplier;
 use App\Services\Supplier\QuotationPeriodService;
@@ -168,21 +170,65 @@ class OpenQuotationPeriodJob implements ShouldQueue
 
         // por cada suministro solicitado al proveedor
         foreach ($supplier['provisions'] as $provision) {
-          $quotation->provisions()->attach($provision['id'], [
-            'has_stock'   => false,
-            'quantity'    => $provision['quantity'],
-            'unit_price'  => 0,
-            'total_price' => 0,
+          // crear directamente el modelo pivot
+          $provision_quotation = ProvisionQuotation::create([
+            'quotation_id' => $quotation->id,
+            'provision_id' => $provision['id'],
+            'has_stock'    => false,
+            'quantity'     => $provision['quantity'],
+            'unit_price'   => 0,
+            'total_price'  => 0,
+          ]);
+
+          // auditar la creacion del modelo pivot
+          $audit_service->auditModelCreated(
+            model: $provision_quotation,
+            user: $system_user,
+            additional_info: [
+              'job' => 'open-quotation-periods-job',
+              'reason' => 'provision-quotation-creation',
+              'quotation_id' => $quotation->id,
+              'provision_id' => $provision['id'],
+              'provision_name' => $provision['name']
+            ]
+          );
+
+          Log::info('ProvisionQuotation created and audited', [
+            'provision_quotation_id' => $provision_quotation->id,
+            'quotation_id' => $quotation->id,
+            'provision_id' => $provision['id']
           ]);
         }
 
         // por cada pack solicitado al proveedor
         foreach ($supplier['packs'] as $pack) {
-          $quotation->packs()->attach($pack['id'], [
-            'has_stock'   => false,
-            'quantity'    => $pack['quantity'],
-            'unit_price'  => 0,
-            'total_price' => 0,
+          // crear directamente el modelo pivot
+          $pack_quotation = PackQuotation::create([
+            'quotation_id' => $quotation->id,
+            'pack_id'      => $pack['id'],
+            'has_stock'    => false,
+            'quantity'     => $pack['quantity'],
+            'unit_price'   => 0,
+            'total_price'  => 0,
+          ]);
+
+          // auditar la creación del modelo pivot
+          $audit_service->auditModelCreated(
+            model: $pack_quotation,
+            user: $system_user,
+            additional_info: [
+              'job' => 'open-quotation-periods-job',
+              'reason' => 'pack-quotation-creation',
+              'quotation_id' => $quotation->id,
+              'pack_id' => $pack['id'],
+              'pack_name' => $pack['name']
+            ]
+          );
+
+          Log::info('PackQuotation created and audited', [
+            'pack_quotation_id' => $pack_quotation->id,
+            'quotation_id' => $quotation->id,
+            'pack_id' => $pack['id']
           ]);
         }
       }
