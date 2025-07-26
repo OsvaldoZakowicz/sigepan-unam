@@ -140,15 +140,24 @@ class SupplierService
     }
 
     DB::transaction(function () use ($supplier) {
-      // restaurar dependencias usando los IDs directamente
-      User::withTrashed()->where('id', $supplier->user_id)->restore();
-      Address::withTrashed()->where('id', $supplier->address_id)->restore();
 
-      $supplier->restore();
-      $supplier = $supplier->refresh();
-      $supplier->status_is_active = true;
-      $supplier->status_description = 'Proveedor activo';
-      $supplier->save();
+      $user = User::withTrashed()->find($supplier->user_id);
+        if ($user && $user->trashed()) {
+          $user->restore();
+        }
+
+        $address = Address::withTrashed()->find($supplier->address_id);
+        if ($address && $address->trashed()) {
+          $address->restore();
+        }
+
+        $supplier->restore();
+        
+        // actualizar estado del proveedor
+        $supplier->update([
+          'status_is_active' => true,
+          'status_description' => 'Proveedor activo'
+        ]);
     });
   }
 

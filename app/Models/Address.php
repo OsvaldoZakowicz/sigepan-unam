@@ -16,7 +16,7 @@ class Address extends Model implements Auditable
   use SoftDeletes;
   use \OwenIt\Auditing\Auditable;
 
-   /**
+  /**
    * Eventos que deben ser auditados
    */
   protected $auditEvents = [

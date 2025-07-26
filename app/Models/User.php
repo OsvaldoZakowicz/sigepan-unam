@@ -18,19 +18,19 @@ class User extends Authenticatable implements MustVerifyEmail, Auditable
 {
   use HasFactory;
   use Notifiable;
-
-  /** paquete de roles y permisos, incluye la relacion entre modelos y tablas
-   * la relacion es polimorfica entre:
-   * users n:n model_has_roles
-   * users n:n model_has_permissions
-   */
   use HasRoles;
-
-  /** paquete de auditoria
-   */
+  use SoftDeletes;
   use \OwenIt\Auditing\Auditable;
 
-  use SoftDeletes;
+  /**
+   * Eventos que deben ser auditados
+   */
+  protected $auditEvents = [
+    'created',
+    'updated', 
+    'deleted',
+    'restored',
+  ];
 
   /**
    * * excluir de auditoria
@@ -62,19 +62,25 @@ class User extends Authenticatable implements MustVerifyEmail, Auditable
     'remember_token',
   ];
 
+  protected $casts = [
+    'email_verified_at' => 'datetime',
+    'password' => 'hashed',
+    'created_at' => 'datetime',
+    'updated_at' => 'datetime',
+    'deleted_at' => 'datetime',
+  ];
+
   /**
    * Get the attributes that should be cast.
    *
    * @return array<string, string>
    */
-  protected function casts(): array
+  /* protected function casts(): array
   {
     return [
-      'email_verified_at' => 'datetime',
-      'password' => 'hashed',
-      'deleted_at' => 'datetime',
+      
     ];
-  }
+  } */
 
   /**
    * Scope para obtener solo usuarios activos (no eliminados)
