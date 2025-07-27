@@ -1,17 +1,17 @@
-<div class="mt-20 pt-5 bg-gradient-to-r from-orange-100 via-amber-200 to-orange-900 h-screen">
+<div class="h-screen pt-5 mt-20 bg-gradient-to-r from-orange-100 via-amber-200 to-orange-900">
   {{-- componente de pedido realizado --}}
-	<div class="bg-white rounded-lg flex justify-between gap-8 items-start w-full max-w-7xl mx-auto p-6 h-4/5">
+	<div class="flex items-start justify-between w-full gap-8 p-6 mx-auto bg-white rounded-lg max-w-7xl h-4/5">
     {{-- vista del pedido --}}
     <div class="w-5/6 pr-2 border-r border-neutral-200">
       {{-- cabecera --}}
-      <div class="flex justify-between items-center mb-2">
+      <div class="flex items-center justify-between mb-2">
         {{-- titulo de seccion --}}
-        <h2 class="text-xl text-neutral-700 font-semibold">Su pedido</h2>
+        <h2 class="text-xl font-semibold text-neutral-700">Su pedido</h2>
         {{-- boton para volver --}}
         <a
           wire:navigate
           href="{{ route('store-store-index') }}"
-          class="inline-flex justify-between items-center mt-auto py-1 px-2 text-md rounded border-2 border-orange-950 bg-orange-200 text-orange-800"
+          class="inline-flex items-center justify-between px-2 py-1 mt-auto text-orange-800 bg-orange-200 border-2 rounded text-md border-orange-950"
           >volver a la tienda
           <span class="text-orange-800">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -21,7 +21,7 @@
         </a>
       </div>
       {{-- detalles --}}
-      <div class="flex flex-col justify-start items-start gap-1 mb-1">
+      <div class="flex flex-col items-start justify-start gap-1 mb-1">
         <span>
           <span class="font-semibold">Codigo de pedido:&nbsp;</span>
           <span class="text-sm uppercase">{{ $order->order_code }}</span>
@@ -36,18 +36,18 @@
         </span>
       </div>
       {{-- vista de productos --}}
-      <div class="space-y-4 max-h-72 p-3 overflow-y-auto overflow-x-hidden">
+      <div class="p-3 space-y-4 overflow-x-hidden overflow-y-auto max-h-72">
         @foreach($order->products as $key => $product)
           {{-- item del carrito --}}
-          <div wire:key="{{ $key }}" class="flex flex-col items-center justify-between border-b pb-2">
+          <div wire:key="{{ $key }}" class="flex flex-col items-center justify-between pb-2 border-b">
             {{-- item --}}
-            <div class="w-full flex justify-between items-center">
+            <div class="flex items-center justify-between w-full">
               {{-- imagen, nombre y stock --}}
               <div class="flex items-center gap-2">
                 <img
                   src="{{ Storage::url($product->product_image_path) }}"
                   alt="{{ $product->product_name }}"
-                  class="w-12 h-12 object-cover rounded"
+                  class="object-cover w-12 h-12 rounded"
                 />
                 <div>
                   <h3 class="font-semibold capitalize">{{ $product->product_name }}</h3>
@@ -73,14 +73,14 @@
         @endforeach
       </div>
       {{-- total --}}
-      <div class="flex justify-end items-center w-full p-6">
+      <div class="flex items-center justify-end w-full p-6">
         <span class="text-2xl font-bold text-orange-800 capitalize">total:&nbsp;$&nbsp;{{ number_format($order->total_price, 2) }}</span>
       </div>
     </div>
     {{-- espacio para pagar el pedido --}}
     <div class="max-w-72">
       {{-- titulo de seccion --}}
-      <h3 class="text-lg text-neutral-700 font-semibold">¡Listo, registramos su pedido!</h3>
+      <h3 class="text-lg font-semibold text-neutral-700">¡Listo, registramos su pedido!</h3>
       <p class="text-lg text-neutral-700">puede realizar el pago del mismo a continuacion!</p>
       {{-- * boton MP --}}
       <div id="wallet_container"></div>
