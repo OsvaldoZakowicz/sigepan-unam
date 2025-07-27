@@ -185,7 +185,7 @@
                       <x-btn-button
                         type="button"
                         wire:click="delete({{ $provision->id }})"
-                        wire:confirm="¿Desea borrar el registro?, eliminar un suministro hará que no este disponible para asignar a ningún proveedor o crear packs."
+                        wire:confirm="¿eliminar el suministro?, eliminar un suministro hará que no este disponible para asignar a ningún proveedor o crear packs."
                         color="red"
                         >eliminar
                       </x-btn-button>
@@ -199,7 +199,7 @@
                         border_color="neutral-200"
                         text_color="neutral-600"
                         title="revertir el borrado de este suministro."
-                        wire:confirm="¿Desea restaurar el registro?, el mismo volverá a estar disponible para proveedores y packs."
+                        wire:confirm="¿restaurar el suministro?, el mismo volverá a estar disponible para proveedores y packs."
                         >restaurar
                       </x-a-button>
 

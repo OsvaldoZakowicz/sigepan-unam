@@ -169,7 +169,7 @@
                         btn_type="button"
                         color="red"
                         wire:click="delete({{ $period->id }})"
-                        wire:confirm="¿Desea borrar el registro? esta accion es irreversible, solo puede borrar periodos en estado programado."
+                        wire:confirm="¿eliminar el periodo? esta accion es irreversible."
                         >eliminar
                       </x-btn-button>
                     @endif

@@ -11,26 +11,26 @@
 
       <x-slot:content class="flex-col">
 
-        <form  wire:submit="save" class="w-full flex flex-col gap-2">
+        <form  wire:submit="save" wire:confirm="¿crear categoría?" class="flex flex-col w-full gap-2">
 
           <x-fieldset-base tema="categoria de suministros" class="w-full lg:flex-nowrap">
 
             {{-- nombre de la categoria --}}
-            <div class="flex flex-col gap-1 p-2 w-full md:w-1/3">
+            <div class="flex flex-col w-full gap-1 p-2 md:w-1/3">
               <span>
                 <x-input-label for="provision_category_name" class="font-normal">nombre</x-input-label>
                 <span class="text-red-600">*</span>
               </span>
-              @error('provision_category_name') <span class="text-red-400 text-xs">{{ $message }}</span> @enderror
+              @error('provision_category_name') <span class="text-xs text-red-400">{{ $message }}</span> @enderror
               <x-text-input wire:model="provision_category_name" name="provision_category_name" id="provision_category_name" />
             </div>
 
-            <div class="flex flex-col gap-1 p-2 w-full md:w-1/3">
+            <div class="flex flex-col w-full gap-1 p-2 md:w-1/3">
               <span>
                 <x-input-label for="measure_id" class="font-normal">medida de la categoría</x-input-label>
                 <span class="text-red-600">*</span>
               </span>
-              @error('measure_id') <span class="text-red-400 text-xs">{{ $message }}</span> @enderror
+              @error('measure_id') <span class="text-xs text-red-400">{{ $message }}</span> @enderror
               <select
                 wire:model="measure_id"
                 name="measure_id"
@@ -45,12 +45,12 @@
               </select>
             </div>
 
-            <div class="flex flex-col gap-1 p-2 w-full md:w-1/3">
+            <div class="flex flex-col w-full gap-1 p-2 md:w-1/3">
               <span>
                 <x-input-label for="provision_type_id" class="font-normal">tipo de la categoría</x-input-label>
                 <span class="text-red-600">*</span>
               </span>
-              @error('provision_type_id') <span class="text-red-400 text-xs">{{ $message }}</span> @enderror
+              @error('provision_type_id') <span class="text-xs text-red-400">{{ $message }}</span> @enderror
               <select
                 wire:model="provision_type_id"
                 name="provision_type_id"
@@ -68,7 +68,7 @@
           </x-fieldset-base>
 
           <!-- botones del formulario -->
-          <div class="flex justify-end my-2 gap-2">
+          <div class="flex justify-end gap-2 my-2">
 
             <x-a-button
               wire:navigate

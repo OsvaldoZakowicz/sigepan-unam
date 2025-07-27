@@ -264,7 +264,7 @@
           <x-btn-button
             type="button"
             wire:click="save()"
-            wire:confirm="¿Editar el periodo?"
+            wire:confirm="¿Editar el periodo. Si la fecha de inicio es el dia de hoy, el periodo abrira inmediatamente y se contactará a los proveedores activos.?"
             >guardar
           </x-btn-button>
 

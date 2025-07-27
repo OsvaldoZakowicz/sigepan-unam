@@ -125,7 +125,7 @@
                         border_color="neutral-200"
                         text_color="neutral-600"
                         wire:click="restore({{ $supplier->id }})"
-                        wire:confirm="¿desea restaurar el proveedor?"
+                        wire:confirm="¿restaurar proveedor?"
                         >restaurar
                       </x-a-button>
                     @else
@@ -142,7 +142,7 @@
                         btn_type="button"
                         color="red"
                         wire:click="delete({{ $supplier->id }})"
-                        wire:confirm="¿desea borrar el proveedor?. Si no desea trabajar con un proveedor registrado, puede editarlo para desactivarlo. Los provedores eliminados no serán contactados para presupuestos y pre orenes de compra"
+                        wire:confirm="¿eliminar el proveedor?. Si no desea trabajar con un proveedor registrado, puede editarlo para desactivarlo. Los provedores eliminados no serán contactados para presupuestos y pre orenes de compra"
                         >eliminar
                       </x-btn-button>
                     @endif

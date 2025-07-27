@@ -17,8 +17,6 @@
         bg_color="neutral-100" border_color="neutral-200" text_color="neutral-600">volver al periodo
       </x-a-button>
 
-      {{-- todo: boton imprimir para obtener este presupuesto en pdf --}}
-
     </x-title-section>
 
     {{-- cuerpo --}}

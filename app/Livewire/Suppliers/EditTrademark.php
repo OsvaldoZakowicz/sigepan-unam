@@ -71,7 +71,7 @@ class EditTrademark extends Component
 
       $this->reset();
 
-      session()->flash('operation-success', toastSuccessBody('marca', 'creada'));
+      session()->flash('operation-success', toastSuccessBody('marca', 'editada'));
       $this->redirectRoute('suppliers-trademarks-index');
     } catch (\Exception $e) {
 

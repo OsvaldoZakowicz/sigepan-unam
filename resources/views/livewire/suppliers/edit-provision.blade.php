@@ -16,7 +16,7 @@
           <span class="mb-1">El suministro esta asociado a proveedores, solo puede editar la descripcion o los packs</span>
         @endif
 
-        <form wire:submit="save" wire:confirm="¿Editar este suministro?" class="flex flex-col w-full gap-2">
+        <form wire:submit="save" wire:confirm="¿editar suministro?" class="flex flex-col w-full gap-2">
 
           <x-fieldset-base tema="suministro individual" class="w-full">
 

@@ -240,7 +240,7 @@
           </x-a-button>
 
           <x-btn-button type="button" wire:click="save()"
-            wire:confirm="¿Crear periodo?, una vez creado no podrá modificarlo. Si la fecha de inicio es el dia de hoy, el periodo abrira inmediatamente y se contactará a los proveedores activos.">
+            wire:confirm="¿Crear periodo?, Si la fecha de inicio es el dia de hoy, el periodo abrira inmediatamente y se contactará a los proveedores activos.">
             guardar
           </x-btn-button>
 

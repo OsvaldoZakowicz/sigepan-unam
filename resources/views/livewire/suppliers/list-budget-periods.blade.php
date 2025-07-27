@@ -143,7 +143,7 @@
                     </x-a-button>
                     <x-a-button
                       wire:click='deletePeriod({{ $period->id }})'
-                      wire:confirm='¿Desa borrar el registro?, esta accion es irreversible.'
+                      wire:confirm='¿eliminar el periodo?, esta accion es irreversible.'
                       href="#"
                       bg_color="red-600"
                       border_color="red-600"
