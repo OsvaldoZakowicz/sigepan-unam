@@ -507,6 +507,7 @@
 
                   <x-btn-button
                     wire:click="save()"
+                    wire:confirm="¿realizar venta?"
                     >Vender
                   </x-btn-button>
                 </div>
