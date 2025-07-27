@@ -7,10 +7,21 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class Order extends Model
+class Order extends Model implements Auditable
 {
   use HasFactory;
+  use \OwenIt\Auditing\Auditable;
+
+  /**
+   * Eventos que deben ser auditados
+   */
+  protected $auditEvents = [
+    'created',
+    'updated', 
+    'deleted',
+  ];
 
   protected static $ORDER_PAYMENT_STATUS_APROBADO = 'aprobado';
   protected static $ORDER_PAYMENT_STATUS_RECHAZADO = 'rechazado';
@@ -38,6 +49,8 @@ class Order extends Model
     'ordered_at'   => 'datetime',
     'delivered_at' => 'datetime',
     'payment_status' => 'string',
+    'updated_at' => 'datetime',
+    'deleted_at' => 'datetime',
   ];
 
   /**
@@ -74,6 +87,7 @@ class Order extends Model
   public function products(): BelongsToMany
   {
     return $this->belongsToMany(Product::class, 'order_product')
+      ->using(OrderProduct::class)
       ->withPivot('order_quantity', 'unit_price', 'subtotal_price', 'details')
       ->withTimestamps();
   }

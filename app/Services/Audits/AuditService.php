@@ -475,6 +475,37 @@ class AuditService
                 'updated_at' => 'Fecha de Actualización',
             ]
         ],
+        'App\Models\Order' => [
+            'table' => 'pedidos',
+            'model' => 'Pedido',
+            'attributes' => [
+                'id' => 'id',
+                'order_code' => 'codigo de pedido',        // codigo de la orden
+                'order_status_id' => 'estado del pedido',  // estado de la orden (respecto a los productos)
+                'user_id' => 'id de usuario cliente',      // usuario que ordena
+                'total_price' => 'costo total',            // costo total de la orden
+                'ordered_at' => 'fecha de pedido',         // fecha de orden del pedido
+                'delivered_at' => 'fecha de entrega',      // fecha de entrega del pedido
+                'payment_status' => 'estado del pago',     // estado del pago
+                'created_at' => 'Fecha de Creación',
+                'updated_at' => 'Fecha de Actualización',
+            ]
+        ],
+        'App\Models\OrderProduct' => [
+            'table' => 'productos de pedidos',
+            'model' => 'Producto Pedido',
+            'attributes' => [
+                'id' => 'id',
+                'order_id' => 'id de pedido',
+                'product_id' => 'id de producto',
+                'order_quantity' => 'cantidad vendida',
+                'unit_price' => 'costo unitario',
+                'subtotal_price' => 'costo subtotal',
+                'details' => 'detalles de linea',
+                'created_at' => 'Fecha de Creación',
+                'updated_at' => 'Fecha de Actualización',
+            ]
+        ],
 
     ];
 

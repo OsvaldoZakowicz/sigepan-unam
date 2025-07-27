@@ -82,6 +82,7 @@ class Product extends Model implements Auditable
   public function orders(): BelongsToMany
   {
     return $this->belongsToMany(Order::class, 'order_product')
+      ->using(OrderProduct::class)
       ->withPivot('order_quantity', 'unit_price', 'subtotal_price', 'details')
       ->withTimestamps();
   }
