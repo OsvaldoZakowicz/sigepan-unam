@@ -5,10 +5,10 @@
     <div class="p-4">
       <div class="flex items-center justify-between w-full gap-1 pb-2 mb-4 border-b border-neutral-20">
         <h2 class="text-lg font-bold text-neutral-800">Mi tienda</h2>
-        @role('gerente')
+        @hasanyrole('gerente|vendedor')
         <x-a-button href="#" wire:click="abrirModal">completar
         </x-a-button>
-        @endrole
+        @endhasanyrole
       </div>
 
       @if(count($datosTienda) > 0)
