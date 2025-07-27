@@ -437,6 +437,44 @@ class AuditService
                 'updated_at' => 'Fecha de Actualización',
             ]
         ],
+        // modulo de ventas
+        'App\Models\Sale' => [
+            'table' => 'ventas',
+            'model' => 'Venta',
+            'attributes' => [
+                'id' => 'id',
+                'order_id' => 'id de pedido',               // id de la orden o pedido de compra (nullable)
+                'user_id' => 'id de usuario cliente',       // id del usuario que compra (nullable)
+                'client_type' => 'tipo de cliente',         // tipo de cliente: registrado o no registrado
+                'sale_type' => 'tipo de venta',             // tipo de venta: web o presencial
+                'sold_on' => 'fecha de venta',              // fecha de la venta
+                'payment_type' => 'tipo de pago',           // tipo de pago: efectivo, mercado pago, tarjeta, etc
+                'payment_id' => 'identificado de pago',     // !numero de transaccion (null)
+                'status' => 'estado de pago',               // !estado del pago MP (null)
+                'external_reference' => 'referencia externa', // !referencia externa al pago MP (null)
+                'merchant_order_id' => '',                    // !MP (null)
+                'total_price' => 'costo total',               // precio total de la venta
+                'full_response' => 'respuesta completa del medio de pago externo',  // ?respuesta completa de MP (u otro medio de pago) (null, completar solo esto)
+                'sale_pdf_path' => 'ruta de comprobante de pago',                   // ruta al pdf comprobante de venta
+                'created_at' => 'Fecha de Creación',
+                'updated_at' => 'Fecha de Actualización',
+            ]
+        ],
+        'App\Models\ProductSale' => [
+            'table' => 'productos de venta',
+            'model' => 'Producto Venta',
+            'attributes' => [
+                'id' => 'id',
+                'sale_id' => 'id de venta',
+                'product_id' => 'id de producto',
+                'sale_quantity' => 'cantidad vendida',
+                'unit_price' => 'costo unitario',
+                'subtotal_price' => 'costo subtotal',
+                'details' => 'detalles de linea',
+                'created_at' => 'Fecha de Creación',
+                'updated_at' => 'Fecha de Actualización',
+            ]
+        ],
 
     ];
 

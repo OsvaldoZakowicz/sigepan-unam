@@ -6,10 +6,28 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class Sale extends Model
+class Sale extends Model implements Auditable
 {
   use HasFactory;
+  use \OwenIt\Auditing\Auditable;
+
+  /**
+   * Eventos que deben ser auditados
+   */
+  protected $auditEvents = [
+    'created',
+    'updated', 
+    'deleted',
+  ];
+
+  /**
+   * excluir de auditoria
+   */
+  protected $auditExclude = [
+    'merchant_order_id',
+  ];
 
   /**
    * * sale_type
@@ -50,6 +68,8 @@ class Sale extends Model
   protected $casts = [
     'total_price' => 'decimal:2',
     'sold_on'     => 'datetime',
+    'created_at'         => 'datetime',
+    'updated_at'         => 'datetime',
   ];
 
   // retorna el tipo de venta web
@@ -92,6 +112,7 @@ class Sale extends Model
   public function products(): BelongsToMany
   {
     return $this->belongsToMany(Product::class, 'product_sale')
+      ->using(ProductSale::class)
       ->withPivot('sale_quantity', 'unit_price', 'subtotal_price', 'details')
       ->withTimestamps();
   }

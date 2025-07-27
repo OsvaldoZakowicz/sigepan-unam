@@ -96,6 +96,7 @@ class Product extends Model implements Auditable
   public function sales(): BelongsToMany
   {
     return $this->belongsToMany(Sale::class, 'product_sale')
+      ->using(ProductSale::class)
       ->withPivot('sale_quantity', 'unit_price', 'subtotal_price', 'details')
       ->withTimestamps();
   }
