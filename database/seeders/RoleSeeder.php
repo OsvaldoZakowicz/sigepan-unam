@@ -26,8 +26,9 @@ class RoleSeeder extends Seeder
     $auditor       = Role::create(Arr::add($tableAttributesInternRoles, 'name', 'auditor'));
 
     // permisos
+    // excepto tienda, usuarios
     $gerente->syncPermissions([
-      'panel','panel-perfil','usuarios','stock','proveedores','ventas','compras','estadisticas'
+      'panel','panel-perfil','stock','proveedores','ventas','compras','estadisticas'
     ]);
 
     $panadero->syncPermissions([
@@ -43,8 +44,10 @@ class RoleSeeder extends Seeder
     ]);
 
     // * todos los permisos
+    // excepto presupuestos y ordenes (solo proveedor ahi)
+    // excepto a tienda, auditoria
     $administrador->syncPermissions([
-      'panel','panel-perfil','usuarios','auditoria','stock','proveedores','ventas','compras','tienda','presupuestos','ordenes','estadisticas'
+      'panel','panel-perfil','usuarios','stock','proveedores','ventas','compras','estadisticas'
     ]);
 
     $auditor->syncPermissions([
