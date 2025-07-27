@@ -31,7 +31,7 @@ class ProductSeeder extends Seeder
         'product_short_description' => 'pan clasico ideal para acompañar las comidas',
         'product_expires_in'        => 4,
         'product_in_store'          => true,
-        'product_image_path'        => 'productos/pan-casero.jpg',
+        'product_image_path'        => 'productos/pan.jpg',
         'prices' => [
           'price1' => [
             'quantity'    => 1,
@@ -56,7 +56,7 @@ class ProductSeeder extends Seeder
         'product_short_description' => 'pan hecho con harina integral y semillas',
         'product_expires_in'        => 4,
         'product_in_store'          => true,
-        'product_image_path'        => 'productos/pan-semillas.jpg',
+        'product_image_path'        => 'productos/pan-salvado.jpg',
         'prices' => [
           'price1' => [
             'quantity'    => 1,
@@ -100,7 +100,7 @@ class ProductSeeder extends Seeder
         'product_short_description' => 'pan dulce relleno con abundante dulce de batata y cubierto de almibar',
         'product_expires_in'        => 4,
         'product_in_store'          => true,
-        'product_image_path'        => 'productos/pan-dulce-batata.jpg',
+        'product_image_path'        => 'productos/pan-batata.jpg',
         'prices' => [
           'price1' => [
             'quantity'    => 1,
@@ -125,7 +125,7 @@ class ProductSeeder extends Seeder
         'product_short_description' => 'bollos rellenos con membrillo y cubiertos de almibar',
         'product_expires_in'        => 4,
         'product_in_store'          => true,
-        'product_image_path'        => 'productos/pan-dulce-bollos.jpg',
+        'product_image_path'        => 'productos/bollo-membrillo.jpg',
         'prices' => [
           'price1' => [
             'quantity'    => 1,
@@ -156,7 +156,7 @@ class ProductSeeder extends Seeder
         'product_short_description' => 'bollos rellenos con dulce de batata y cubiertos de almibar',
         'product_expires_in'        => 4,
         'product_in_store'          => true,
-        'product_image_path'        => 'productos/pan-dulce-bollos.jpg',
+        'product_image_path'        => 'productos/bollo-batata.jpg',
         'prices' => [
           'price1' => [
             'quantity'    => 1,

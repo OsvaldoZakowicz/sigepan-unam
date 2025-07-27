@@ -39,6 +39,9 @@ class RecipeSeeder extends Seeder
     $bolsa_papel_10 = ProvisionCategory::where('provision_category_name', 'bolsa de papel numero 10')->first();
     $bolsa_plast_10 = ProvisionCategory::where('provision_category_name', 'bolsa plastica numero 10')->first();
 
+    // instruccion de preparacion
+    $recipe_instructions = 'Precalentar el horno a 180°C. Mezclar ingredientes secos en un bowl. En otro recipiente, batir huevos con líquidos y aceite. Incorporar mezcla húmeda a la seca sin sobrebatir. Verter en molde engrasado. Hornear 25-30 minutos hasta dorar. Verificar cocción con palillo. Enfriar antes de desmoldar.';
+
     // recetas por producto
     $recetas = [
       'receta1' => [
@@ -46,7 +49,7 @@ class RecipeSeeder extends Seeder
         'recipe_yields'           => 12,
         'recipe_portions'         => 3,
         'recipe_preparation_time' => '02:30:00',
-        'recipe_instructions'     => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit sed.',
+        'recipe_instructions'     => $recipe_instructions,
         'product_id'              => $products['product1']->id,
         'categorias' => [
           'categoria1' => ['id' => $harina_0000->id, 'cantidad'  => 3], // kg
@@ -61,7 +64,7 @@ class RecipeSeeder extends Seeder
         'recipe_yields'           => 12,
         'recipe_portions'         => 3,
         'recipe_preparation_time' => '02:30:00',
-        'recipe_instructions'     => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit sed.',
+        'recipe_instructions'     => $recipe_instructions,
         'product_id'              => $products['product2']->id,
         'categorias' => [
           'categoria1' => ['id' => $harina_000->id, 'cantidad'  => 3], // kg
@@ -76,7 +79,7 @@ class RecipeSeeder extends Seeder
         'recipe_yields'           => 12,
         'recipe_portions'         => 3,
         'recipe_preparation_time' => '02:30:00',
-        'recipe_instructions'     => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit sed.',
+        'recipe_instructions'     => $recipe_instructions,
         'product_id'              => $products['product3']->id,
         'categorias' => [
           'categoria1' => ['id' => $harina_0000->id, 'cantidad'  => 3], // kg
@@ -92,7 +95,7 @@ class RecipeSeeder extends Seeder
         'recipe_yields'           => 12,
         'recipe_portions'         => 3,
         'recipe_preparation_time' => '02:30:00',
-        'recipe_instructions'     => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit sed.',
+        'recipe_instructions'     => $recipe_instructions,
         'product_id'              => $products['product4']->id,
         'categorias' => [
           'categoria1' => ['id' => $harina_0000->id, 'cantidad'  => 3], // kg
@@ -108,7 +111,7 @@ class RecipeSeeder extends Seeder
         'recipe_yields'           => 48,
         'recipe_portions'         => 1,
         'recipe_preparation_time' => '04:30:00',
-        'recipe_instructions'     => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit sed.',
+        'recipe_instructions'     => $recipe_instructions,
         'product_id'              => $products['product5']->id,
         'categorias' => [
           'categoria1' => ['id' => $harina_0000->id, 'cantidad'  => 6], // kg
@@ -123,7 +126,7 @@ class RecipeSeeder extends Seeder
         'recipe_yields'           => 48,
         'recipe_portions'         => 1,
         'recipe_preparation_time' => '04:30:00',
-        'recipe_instructions'     => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit sed.',
+        'recipe_instructions'     => $recipe_instructions,
         'product_id'              => $products['product6']->id,
         'categorias' => [
           'categoria1' => ['id' => $harina_0000->id, 'cantidad'  => 6], // kg
