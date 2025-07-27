@@ -23,9 +23,8 @@ new class extends Component {
       <div class="flex">
         <!-- Logo -->
         <div class="flex items-center shrink-0">
-          <a href="{{ route('dashboard') }}" wire:navigate>
-            <x-application-logo class="block w-auto text-gray-800 fill-current h-9" />
-          </a>
+          <img src="{{ asset('images/sigepan-logo.png') }}" alt="Sigepan Logo" class="object-cover object-center w-10 h-10 rounded">
+          <span class="ml-2 font-semibold text-amber-700 text-md">SiGePAN</span>
         </div>
 
         <!-- Navigation Links -->
