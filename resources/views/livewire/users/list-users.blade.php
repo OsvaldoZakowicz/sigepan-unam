@@ -112,7 +112,7 @@
                         type="button"
                         wire:navigate
                         wire:click="delete({{$user->id}})"
-                        wire:confirm="¿Desea borrar el registro?"
+                        wire:confirm="¿eliminar usuario?"
                         color="red"
                         >eliminar
                       </x-btn-button>
@@ -120,6 +120,7 @@
                       <x-a-button
                         href="#"
                         wire:click='restore({{ $user->id }})'
+                        wire:confirm="¿restaurar usuario?"
                         bg_color="neutral-100"
                         border_color="neutral-200"
                         text_color="neutral-600"

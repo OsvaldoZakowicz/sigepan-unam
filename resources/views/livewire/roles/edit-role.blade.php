@@ -5,9 +5,9 @@
       <span class="text-sm capitalize">editar un rol interno</span>
       <div role="grupo-de-botones" class="flex"></div>
     </section>
-    <section class="flex flex-col pt-2 px-1 text-sm capitalize bg-white">
+    <section class="flex flex-col px-1 pt-2 text-sm capitalize bg-white">
       {{-- formulario --}}
-      <form wire:submit="update" wire:confirm="¿editar registro?, tenga en cuenta que cambiar los permisos de un rol cambiara el nivel de acceso de los usuarios con este rol" class="w-full">
+      <form wire:submit="update" wire:confirm="¿editar rol?, tenga en cuenta que cambiar los permisos de un rol cambiara el nivel de acceso de los usuarios con este rol" class="w-full">
         <!-- este es un grupo de inputs por tema -->
         <fieldset class="flex flex-col mb-2 border rounded border-neutral-200">
           <legend class="font-semibold">datos del rol</legend>
@@ -17,7 +17,7 @@
               <label for="role_name">nombre</label>
               <span class="text-red-600">*</span>
               @error('role_name')
-                <span class="text-red-400 text-xs">{{ $message }}</span>
+                <span class="text-xs text-red-400">{{ $message }}</span>
               @enderror
             </span>
             <input wire:model="role_name" type="text" name="role_name" class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300" />
@@ -28,10 +28,10 @@
               <label for="role_short_description">descripcion corta</label>
               <span class="text-red-600">*</span>
               @error('role_short_description')
-                <span class="text-red-400 text-xs">{{ $message }}</span>
+                <span class="text-xs text-red-400">{{ $message }}</span>
               @enderror
             </span>
-            <textarea wire:model="role_short_description" name="role_short_description" cols="10" rows="2" class="p-1 text-sm w-full border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"></textarea>
+            <textarea wire:model="role_short_description" name="role_short_description" cols="10" rows="2" class="w-full p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"></textarea>
           </div>
         </fieldset>
          <!-- este es un grupo de inputs por tema -->
@@ -42,14 +42,14 @@
               <label for="">seleccione los permisos</label>
               <span class="text-red-600">*</span>
               @error('role_permissions')
-                <span class="text-red-400 text-xs">{{ $message }}</span>
+                <span class="text-xs text-red-400">{{ $message }}</span>
               @enderror
             </span>
-            <div class="flex justify-start items-center gap-1 p-2 min-w-1/3 grow">
+            <div class="flex items-center justify-start gap-1 p-2 min-w-1/3 grow">
               {{-- permisos por defecto --}}
               @foreach ($permissions_default as $permission)
               <div
-                class="border rounded-sm p-1 mx-1 bg-neutral-200"
+                class="p-1 mx-1 border rounded-sm bg-neutral-200"
                 title="{{ $permission->short_description }}" >
                 <input
                   type="checkbox"
@@ -63,7 +63,7 @@
               {{-- permisos elegibles --}}
               @forelse ($permissions as $permission)
               <div
-                class="border rounded-sm p-1 mx-1"
+                class="p-1 mx-1 border rounded-sm"
                 title="{{ $permission->short_description }}" >
                 <input
                   wire:model="role_permissions"
@@ -83,9 +83,9 @@
 
         <!-- botones del formulario -->
         <div class="flex justify-end">
-          <a wire:navigate href="{{ route('users-roles-index') }}" class="flex justify-center items-center box-border w-fit h-6 m-2 p-1 border-solid border rounded border-neutral-600 bg-neutral-600 text-center text-neutral-100 uppercase text-xs">cancelar</a>
+          <a wire:navigate href="{{ route('users-roles-index') }}" class="box-border flex items-center justify-center h-6 p-1 m-2 text-xs text-center uppercase border border-solid rounded w-fit border-neutral-600 bg-neutral-600 text-neutral-100">cancelar</a>
           <!-- en un formulario, un boton de envio debe ser: <input> o <button> tipo submit -->
-          <button type="submit" class="flex justify-center items-center box-border w-fit h-6 m-2 p-1 border-solid border rounded border-emerald-600 bg-emerald-600 text-center text-neutral-100 uppercase text-xs">guardar</button>
+          <button type="submit" class="box-border flex items-center justify-center h-6 p-1 m-2 text-xs text-center uppercase border border-solid rounded w-fit border-emerald-600 bg-emerald-600 text-neutral-100">guardar</button>
         </div>
       </form>
     </section>

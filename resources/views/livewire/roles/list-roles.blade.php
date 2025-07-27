@@ -19,9 +19,9 @@
 
       <x-slot:header>
         {{-- formulario de busqueda --}}
-        <div class="w-full flex justify-start items-end gap-1">
+        <div class="flex items-end justify-start w-full gap-1">
           {{-- termino de busqueda --}}
-          <div class="flex flex-col gap-1 w-1/4">
+          <div class="flex flex-col w-1/4 gap-1">
             <label>Buscar rol</label>
             <input
               type="text"
@@ -29,32 +29,32 @@
               wire:model.live="search"
               wire:click="resetPagination()"
               placeholder="ingrese un id, o termino de busqueda"
-              class="text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+              class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
             />
           </div>
 
           {{-- es editable --}}
-          <div class="w-fit flex items-center gap-1 border rounded-sm p-1 mx-1">
+          <div class="flex items-center gap-1 p-1 mx-1 border rounded-sm w-fit">
             <input
               name="editable"
               id="editable"
               type="checkbox"
               wire:model.live="editable"
               wire:click="resetPagination()"
-              class="text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+              class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
               />
             <label for="editable">editables</label>
           </div>
 
           {{-- es interno? --}}
-          <div class="w-fit flex items-center gap-1 border rounded-sm p-1 mx-1">
+          <div class="flex items-center gap-1 p-1 mx-1 border rounded-sm w-fit">
             <input
               name="internal"
               id="internal"
               type="checkbox"
               wire:model.live="internal"
               wire:click="resetPagination()"
-              class="text-sm p-1 border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
+              class="p-1 text-sm border border-neutral-200 focus:outline-none focus:ring focus:ring-neutral-300"
               />
             <label for="internal">internos</label>
           </div>
@@ -77,14 +77,14 @@
         <x-table-base>
           <x-slot:tablehead>
             <tr class="border bg-neutral-100">
-              <x-table-th class="text-end w-12">id</x-table-th>
+              <x-table-th class="w-12 text-end">id</x-table-th>
               <x-table-th class="text-start">nombre</x-table-th>
               <x-table-th class="text-start">permisos</x-table-th>
               <x-table-th class="text-start">editable?</x-table-th>
               <x-table-th class="text-start">interno?</x-table-th>
               <x-table-th class="text-start">descripcion</x-table-th>
               <x-table-th class="text-end">fecha de creacion</x-table-th>
-              <x-table-th class="text-start w-48">acciones</x-table-th>
+              <x-table-th class="w-48 text-start">acciones</x-table-th>
             </tr>
           </x-slot:tablehead>
           <x-slot:tablebody>
@@ -112,7 +112,7 @@
                 {{Date::parse($role->created_at)->format('d-m-Y')}}
               </x-table-td>
               <x-table-td>
-                <div class="w-full inline-flex gap-2 justify-start items-center">
+                <div class="inline-flex items-center justify-start w-full gap-2">
 
                   <x-a-button
                     wire:navigate
@@ -127,7 +127,7 @@
                     type="button"
                     color="red"
                     wire:click="delete({{$role->id}})"
-                    wire:confirm="¿Desea borrar el registro?"
+                    wire:confirm="¿eliminar rol?, esta accion es irreversible."
                     >eliminar
                   </x-btn-button>
 
