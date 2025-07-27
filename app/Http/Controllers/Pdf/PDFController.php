@@ -14,6 +14,8 @@ use App\Services\Supplier\QuotationPeriodService;
 use Illuminate\Support\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use OwenIt\Auditing\Models\Audit;
+use App\Services\Audits\AuditService;
 
 /**
  * Controlador para la generacion de los diversos pdf
@@ -166,6 +168,40 @@ class PDFController extends Controller
 
     $codigo = 'estadistica_ventas_' . str_replace([' ', ':', '-'], [''], $fecha_emision);
     $pdf_name = $codigo . '.pdf';
+
+    // stream a una pestaña del navegador
+    return $pdf->stream($pdf_name);
+  }
+
+  /**
+   * vista de pdf de un registro de auditoria
+   * @param int $id id de registro de auditoria
+   * @return \Illuminate\Http\Response
+   */
+  public function audit_report_one(int $id)
+  {
+    $audit =  Audit::findOrFail($id);
+    $audit_metadata = $audit->getMetadata();
+    $audit_modified_properties = $audit->getModified();
+
+    $audit_service = new AuditService();
+
+    $user_resp = $audit_service->getResponsibleUser($audit_metadata['user_id']);
+    $event = $audit_service->getEventTranslation($audit->event);
+    $model = $audit_service->getModelInfo($audit->auditable_type);
+
+    $pdf = Pdf::loadView('pdf.audits.audit', [
+      'audit' => $audit,
+      'audit_metadata' => $audit_metadata,
+      'audit_modified_properties' => $audit_modified_properties,
+      'user_resp' => $user_resp,
+      'event' => $event,
+      'model' => $model
+    ])
+      ->setPaper('a4')
+      ->setOption('encoding', 'UTF-8');
+
+    $pdf_name = 'reporte-auditoria-'.$audit->id.'.pdf';
 
     // stream a una pestaña del navegador
     return $pdf->stream($pdf_name);

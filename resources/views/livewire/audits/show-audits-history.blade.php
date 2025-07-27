@@ -46,16 +46,15 @@
                 </span>
               </div>
 
-              <x-a-button
-                target="_blank"
-                href="{{ route('audits-audits-report', $audit->id) }}"
+              {{-- <x-a-button
+                href="#"
                 bg_color="neutral-100"
                 border_color="neutral-300"
                 text_color="neutral-600"
                 >obtener PDF
                 <x-quest-icon title="obtener un PDF de este historial de auditoria"/>
                 <x-svg-pdf-paper/>
-              </x-a-button>
+              </x-a-button> --}}
 
             </header>
 
@@ -135,15 +134,14 @@
 
                         <span class="font-semibold capitalize">registro de cambios:&nbsp;</span>
 
-                        {{-- nueva pestaña con reporte --}}
+                        {{-- nueva pestaña con PDF --}}
                         <x-a-button
-                          target="_blank"
-                          href="{{ route('audits-audits-report', $audit->id) }}"
+                          href="#"
+                          wire:click="openPdfReportOne()"
                           bg_color="neutral-100"
                           border_color="neutral-300"
                           text_color="neutral-600"
                           >obtener PDF
-                          <x-quest-icon title="obtener un PDF de este registro de auditoria"/>
                           <x-svg-pdf-paper/>
                         </x-a-button>
 
@@ -204,4 +202,16 @@
     </x-content-section>
 
   </article>
+
+  {{-- manejar eventos --}}
+  <script>
+
+    /* evento: abrir pdf en nueva pestaña para visualizar */
+    document.addEventListener('livewire:initialized', () => {
+        Livewire.on('openPdfInNewTab', ({ url }) => {
+            window.open(url, '_blank');
+        });
+    });
+
+  </script>
 </div>

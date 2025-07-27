@@ -51,6 +51,19 @@ class ShowAudits extends Component
   }
 
   /**
+   * abrir pdf en una nueva pestaña,
+   * para poder visualizar y descargar.
+   * @return void
+   */
+  public function openPdfReportOne(): void
+  {
+    // denerar URL para ver el pdf
+    $pdfUrl = route('open-pdf-audit-one', ['id' => $this->audit->id]);
+    // disparar evento para abrir el PDF en nueva pestaña
+    $this->dispatch('openPdfInNewTab', url: $pdfUrl);
+  }
+
+  /**
    * renderizar vista
    * @return View
    */

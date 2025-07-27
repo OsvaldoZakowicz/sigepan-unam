@@ -148,8 +148,8 @@ Route::middleware(['auth', 'verified', 'can:auditoria'])->group(function () {
   Route::get('audits/show/history/{id}', [AuditController::class, 'audits_show_history'])
     ->name('audits-audits-show-history');
 
-  Route::get('audits/report/one/{id}', [AuditController::class, 'audits_report_one'])
-    ->name('audits-audits-report');
+  Route::get('audits/report/one/stream/{id}', [PDFController::class, 'audit_report_one'])
+    ->name('open-pdf-audit-one');
 });
 
 //* modulo de proveedores
