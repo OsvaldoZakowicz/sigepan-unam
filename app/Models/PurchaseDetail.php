@@ -5,10 +5,21 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class PurchaseDetail extends Model
+class PurchaseDetail extends Model implements Auditable
 {
   use HasFactory;
+  use \OwenIt\Auditing\Auditable;
+
+  /**
+   * Eventos que deben ser auditados
+   */
+  protected $auditEvents = [
+    'created',
+    'updated', 
+    'deleted',
+  ];
 
   /**
    * atributos de un detalle
@@ -28,7 +39,9 @@ class PurchaseDetail extends Model
   protected $casts = [
     'item_count'     => 'integer',
     'unit_price'     => 'decimal:2',
-    'subtotal_price' => 'decimal:2'
+    'subtotal_price' => 'decimal:2',
+    'created_at'     => 'datetime',
+    'updated_at'     => 'datetime',
   ];
 
   //* un detalle de compra pertenece a una compra

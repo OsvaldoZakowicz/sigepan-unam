@@ -405,10 +405,39 @@ class AuditService
                 'registered_at' => 'fecha de registro',
                 'quantity_amount' => 'cantidad',
                 'created_at' => 'Fecha de Creación',
+                'updated_at' => 'Fecha de Actualización',            ]
+        ],
+        // modulo de compras
+        'App\Models\Purchase' => [
+            'table' => 'compras',
+            'model' => 'Compra',
+            'attributes' => [
+                'id' => 'id',
+                'supplier_id' => 'id de proveedor',
+                'purchase_date' => 'fecha de compra',
+                'total_price' => 'costo total',
+                'purchase_reference_id' => 'id de referencia a preorden',
+                'purchase_reference_type' => 'modelo de referencia de preorden',
+                'created_at' => 'Fecha de Creación',
                 'updated_at' => 'Fecha de Actualización',
-                'deleted_at' => 'Fecha de Eliminación'
             ]
         ],
+        'App\Models\PurchaseDetail' => [
+            'table' => 'detalle de compras',
+            'model' => 'Detalle Compra',
+            'attributes' => [
+                'id' => 'id',
+                'purchase_id' => ' id de compra asociada',
+                'provision_id' => 'id de suministro',
+                'pack_id' => 'id de pack',
+                'item_count' => 'total comprado',
+                'unit_price' => 'precio unitario',
+                'subtotal_price' => 'precio subtotal',
+                'created_at' => 'Fecha de Creación',
+                'updated_at' => 'Fecha de Actualización',
+            ]
+        ],
+
     ];
 
     /**
