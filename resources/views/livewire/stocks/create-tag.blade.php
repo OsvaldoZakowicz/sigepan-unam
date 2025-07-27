@@ -13,24 +13,24 @@
 
         <span class="mb-2 font-bold">formulario</span>
 
-        <form  wire:submit="save" class="w-full flex flex-col gap-2">
+        <form  wire:submit="save" wire:confirm="¿crear etiqueta?" class="flex flex-col w-full gap-2">
 
           <x-fieldset-base tema="etiqueta" class="w-full lg:flex-nowrap">
 
             {{-- nombre de la etiqueta --}}
-            <div class="flex flex-col gap-1 p-2 w-full md:w-1/2">
+            <div class="flex flex-col w-full gap-1 p-2 md:w-1/2">
               <span>
                 <x-input-label for="tag_name" class="font-normal">nombre</x-input-label>
                 <span class="text-red-600">*</span>
               </span>
-              @error('tag_name') <span class="text-red-400 text-xs">{{ $message }}</span> @enderror
+              @error('tag_name') <span class="text-xs text-red-400">{{ $message }}</span> @enderror
               <x-text-input wire:model="tag_name" name="tag_name" id="tag_name" />
             </div>
 
           </x-fieldset-base>
 
           <!-- botones del formulario -->
-          <div class="flex justify-end my-2 gap-2">
+          <div class="flex justify-end gap-2 my-2">
             <x-a-button
               wire:navigate
               href="{{ route('stocks-tags-index') }}"

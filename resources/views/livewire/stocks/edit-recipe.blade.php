@@ -286,7 +286,7 @@
           <x-btn-button
             type="button"
             wire:click="save()"
-            wire:confirm="¿Desea editar la receta?"
+            wire:confirm="¿editar la receta?"
             >guardar
           </x-btn-button>
 

@@ -201,6 +201,7 @@
           <x-btn-button
             type="button"
             wire:click="save()"
+            wire:confirm="¿editar producto?"
             >guardar
           </x-btn-button>
 

@@ -289,6 +289,7 @@
                 </x-btn-button>
                 <x-btn-button
                   wire:click="save()"
+                  wire:confirm="¿editar los precios para el producto?"
                   color="emerald"
                   >Confirmar
                 </x-btn-button>

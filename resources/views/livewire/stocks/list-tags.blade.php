@@ -70,7 +70,7 @@
                     <x-btn-button
                       type="button"
                       wire:click="delete({{ $tag->id }})"
-                      wire:confirm="¿Desea borrar el registro?, la etiqueta no estara disponible para usarse en productos"
+                      wire:confirm="¿eliminar etiqueta?, la etiqueta no estara disponible para usarse en productos"
                       color="red"
                       >eliminar
                     </x-btn-button>

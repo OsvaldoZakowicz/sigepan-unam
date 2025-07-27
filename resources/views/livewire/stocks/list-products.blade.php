@@ -151,7 +151,7 @@
                         btn_type="button"
                         color="red"
                         wire:click="delete({{ $product->id }})"
-                        wire:confirm="¿Desea borrar el registro? El producto no estará disponible para elaborar o vender."
+                        wire:confirm="¿eliminar producto? el producto no estará disponible para elaborar o vender."
                         >eliminar
                       </x-btn-button>
 
@@ -164,7 +164,7 @@
                         border_color="neutral-200"
                         text_color="neutral-600"
                         title="revertir el borrado de este suministro."
-                        wire:confirm="¿Desea restaurar el registro?, El producto volverá a estar disponible para elaborarse."
+                        wire:confirm="¿restaurar producto?, el producto volverá a estar disponible para elaborarse."
                         >restaurar
                       </x-a-button>
 
@@ -206,6 +206,7 @@
                             </x-btn-button>
                             <x-btn-button
                               wire:click="elaborate()"
+                              wire:confirm="¿elaborar este producto?"
                               color="emerald"
                               >Confirmar
                             </x-btn-button>
