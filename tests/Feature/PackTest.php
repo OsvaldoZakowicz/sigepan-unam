@@ -184,9 +184,12 @@ class PackTest extends TestCase
   }
 
   /**
-   * test crear un pack de suministros
+   * @testCase TC001.
+   * @purpose Crear un pack suministro.
+   * @expectedResult Se crea un pack suministro en el sistema.
+   * @observations Necesita una categoria, suministro, unidad de medida, marca y tipo de suministro.
    * @return void
-  */
+   */
   public function test_crear_pack()
   {
     $trademark      = $this->crearMarca();
@@ -202,8 +205,12 @@ class PackTest extends TestCase
   }
 
   /**
-   * test un pack pertenece a un suministro
-  */
+   * @testCase TC002.
+   * @purpose Un pack pertenece a un suministro.
+   * @expectedResult Se verifica que un pack pertenece a un suministro en el sistema.
+   * @observations Ninguna.
+   * @return void
+   */
   public function test_pack_es_de_un_suministro()
   {
     $trademark      = $this->crearMarca();
@@ -217,9 +224,13 @@ class PackTest extends TestCase
     $this->assertInstanceOf(BelongsTo::class, $pack->provision());
   }
 
-  /**
-   * test un suministro tiene muchos packs
-  */
+ /**
+   * @testCase TC003.
+   * @purpose Un suministro tiene muchos packs.
+   * @expectedResult Se verifica que un suministro tiene muchos packs en el sistema.
+   * @observations Ninguna.
+   * @return void
+   */
   public function test_un_suministro_tiene_muchos_packs()
   {
     $trademark      = $this->crearMarca();
@@ -234,8 +245,12 @@ class PackTest extends TestCase
   }
 
   /**
-   * test asignar pack a un proveedor
-  */
+   * @testCase TC004.
+   * @purpose Un pack pertenece a un proveedor.
+   * @expectedResult Se verifica que un pack pertenece a un proveedor, mediante un precio, en el sistema.
+   * @observations Ninguna.
+   * @return void
+   */
   public function test_asignar_pack_a_proveedor()
   {
     $trademark      = $this->crearMarca();

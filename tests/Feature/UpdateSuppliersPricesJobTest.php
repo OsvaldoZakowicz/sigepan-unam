@@ -197,7 +197,11 @@ class UpdateSuppliersPricesJobTest extends TestCase
   }
 
   /**
-   * A basic feature test example.
+   * @testCase TC001.
+   * @purpose Actualizar precios de proveedores mediante presupuestos obtenidos.
+   * @expectedResult Se ejecuta un job en el sistema que actualiza los precios luego de un periodo presupuestario.
+   * @observations Ninguna.
+   * @return void
    */
   public function test_trabajo_de_actualizacion_de_precios_mediante_presupuestos(): void
   {
@@ -244,7 +248,7 @@ class UpdateSuppliersPricesJobTest extends TestCase
     ]);
 
     // ejecutar el job
-    (new UpdateSuppliersPricesJob($period))->handle();
+    (new UpdateSuppliersPricesJob($period->id))->handle();
 
     // verificar que el precio de suministro del supplier se actualizo
     $this->assertEquals(150, $supplier->provisions()->find($provision->id)->pivot->price);

@@ -150,9 +150,12 @@ class ProvisionTest extends TestCase
   }
 
   /**
-   * crear suministro
+   * @testCase TC001.
+   * @purpose Crear un suministro.
+   * @expectedResult Se crea un suministro en el sistema.
+   * @observations Necesita una categoria, unidad de medida, marca y tipo de suministro.
    * @return void
-  */
+   */
   public function test_crear_suministro()
   {
     $trademark      = $this->crearMarca();
@@ -166,9 +169,12 @@ class ProvisionTest extends TestCase
   }
 
   /**
-   * eliminar suministro
+   * @testCase TC002.
+   * @purpose Elimiar un suministro.
+   * @expectedResult Se elimina un suministro en el sistema.
+   * @observations Ninguna.
    * @return void
-  */
+   */
   public function test_eliminar_suministro()
   {
     $trademark      = $this->crearMarca();
@@ -179,13 +185,16 @@ class ProvisionTest extends TestCase
 
     $provision->delete();
 
-    $this->assertDatabaseMissing('provisions', $provision->toArray());
+    $this->assertSoftDeleted($provision);
   }
 
   /**
-   * un suministro tiene una marca
+   * @testCase TC003.
+   * @purpose Asignar marca un suministro.
+   * @expectedResult Se asigna una marca a un suministro en el sistema.
+   * @observations Ninguna.
    * @return void
-  */
+   */
   public function test_un_suministro_tiene_una_marca()
   {
     $trademark      = $this->crearMarca();
@@ -200,9 +209,12 @@ class ProvisionTest extends TestCase
   }
 
   /**
-   * un suministro es de un tipo especifico
+   * @testCase TC004.
+   * @purpose Asignar un tipo a un suministro.
+   * @expectedResult Se asigna un tipo de suministro a un suministro en el sistema.
+   * @observations Ninguna.
    * @return void
-  */
+   */
   public function test_un_suministro_es_de_un_tipo()
   {
     $trademark      = $this->crearMarca();
@@ -215,9 +227,12 @@ class ProvisionTest extends TestCase
   }
 
   /**
-   * un suministro tiene una unidad de medida
+   * @testCase TC005.
+   * @purpose Asignar una unidad de medida a un suministro.
+   * @expectedResult Se asigna una unidad de medida a un suministro en el sistema.
+   * @observations Ninguna.
    * @return void
-  */
+   */
   public function test_un_suministro_tiene_una_unidad_de_medida()
   {
     $trademark      = $this->crearMarca();
@@ -230,9 +245,12 @@ class ProvisionTest extends TestCase
   }
 
   /**
-   * un suministro es de una categoria
+   * @testCase TC006.
+   * @purpose Asignar una categoria de suministro a un suministro.
+   * @expectedResult Se asigna una categoria de suministro a un suministro en el sistema.
+   * @observations Ninguna.
    * @return void
-  */
+   */
   public function test_un_suministro_tiene_una_categoria()
   {
     $trademark      = $this->crearMarca();
@@ -245,9 +263,12 @@ class ProvisionTest extends TestCase
   }
 
   /**
-   * asignar suministro a un proveedor
+   * @testCase TC006.
+   * @purpose Asignar un proveedor con un precio para un suministro.
+   * @expectedResult Se asigna un proveedor a un suministro mediante un precio en el sistema.
+   * @observations Ninguna.
    * @return void
-  */
+   */
   public function test_asignar_suministro_a_proveedor()
   {
     $trademark      = $this->crearMarca();

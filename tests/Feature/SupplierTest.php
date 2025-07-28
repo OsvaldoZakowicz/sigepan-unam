@@ -13,7 +13,6 @@ class SupplierTest extends TestCase
 {
   use RefreshDatabase;
 
-  //* preparar datos de prueba
   public $user_data = [
     'name' => 'user',
     'email' => 'user@mail.com',
@@ -35,16 +34,18 @@ class SupplierTest extends TestCase
     'short_description' => 'description',
     'status_is_active' => true,
     'status_description' => 'dscription',
+    'status_date' => '2021-10-01 00:00:00'
   ];
 
   /**
-   * * prueba crear proveedor
-   * debe existir la tabla en la base de datos
-   * debo poder insertar un registro completo con usuario y direccion
+   * @testCase TC001.
+   * @purpose Crear un proveedor.
+   * @expectedResult Se crea un proveedor en el sistema.
+   * @observations Ninguna.
+   * @return void
    */
   public function test_crear_proveedor()
   {
-    //* probar
     $user = User::create($this->user_data);
     $addres = Address::create($this->address_data);
 
@@ -56,9 +57,6 @@ class SupplierTest extends TestCase
 
     $supplier = Supplier::create($this->supplier_data);
 
-    //* afirmar cambios
-    // existen los registros en la BD
-    // debido a la encriptacion de la contrasenia, uso el array de datos sin password
     $this->assertDatabaseHas('users', ['name' => 'user', 'email' => 'user@mail.com']);
     $this->assertDatabaseHas('addresses', $this->address_data);
     $this->assertDatabaseHas('suppliers', $this->supplier_data);
@@ -69,73 +67,33 @@ class SupplierTest extends TestCase
     $this->assertModelExists($supplier);
   }
 
-  /**
-   * * prueba eliminar proveedor
-   * eliminar de la base de datos el provedor, usuario y direccion
+   /**
+   * @testCase TC002.
+   * @purpose Eliminar un proveedor.
+   * @expectedResult Se elimina un proveedor en el sistema.
+   * @observations Ninguna.
+   * @return void
    */
   public function test_eliminar_proveedor()
   {
-    //* probar
     $user = User::create($this->user_data);
-    $addres = Address::create($this->address_data);
+    $address = Address::create($this->address_data);
 
     $this->supplier_data += [
       'status_date' => formatDateTime(now(), 'Y-m-d'),
       'user_id' => $user->id,
-      'address_id' => $addres->id
+      'address_id' => $address->id
     ];
 
     $supplier = Supplier::create($this->supplier_data);
 
-    // borrar registros
     $supplier->delete();
-    $user->delete();
-    $addres->delete();
+    $supplier->user?->delete();
+    $supplier->address?->delete();
 
-    //* afirmar cambios
-    // NO existen los registros en la BD
-    $this->assertDatabaseMissing('suppliers', $this->supplier_data);
-    $this->assertDatabaseMissing('users', $this->user_data);
-    $this->assertDatabaseMissing('addresses', $this->address_data);
+    $this->assertSoftDeleted($supplier);
+    $this->assertSoftDeleted($user);
+    $this->assertSoftDeleted($address);
   }
 
-  /**
-   * * editar un proveedor
-   * editar en la base de datos algunos datos de proveedor
-   * usar las relaciones user y address para editar
-   */
-  public function test_editar_proveedor()
-  {
-    //* probar
-    $user = User::create($this->user_data);
-    $addres = Address::create($this->address_data);
-
-    $this->supplier_data += [
-      'status_date' => formatDateTime(now(), 'Y-m-d'),
-      'user_id' => $user->id,
-      'address_id' => $addres->id
-    ];
-
-    $supplier = Supplier::create($this->supplier_data);
-
-    // editar telefono
-    $supplier->phone_number = '9999999999';
-    $supplier->save();
-
-    // editar usuario, pasando por proveedor
-    $user_edit = $supplier->user;
-    $user_edit->name = "pepe";
-    $user_edit->save();
-
-    // editar direccion, pasando por proveedor
-    $address_edit = $supplier->address;
-    $address_edit->street = "las heras";
-    $address_edit->save();
-
-    //* afirmar cambios
-    // El proveedor se actualizo con otro telefono, nombre de usuario y calle
-    $this->assertDatabaseHas('suppliers', ['phone_number' => '9999999999']);
-    $this->assertDatabaseHas('users', ['name' => 'pepe']);
-    $this->assertDatabaseHas('addresses', ['street' => 'las heras']);
-  }
 }

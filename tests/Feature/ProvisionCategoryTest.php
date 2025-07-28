@@ -53,7 +53,10 @@ class ProvisionCategoryTest extends TestCase
   }
 
   /**
-   * test crear categoria
+   * @testCase TC001.
+   * @purpose Crear una categoria de suministro.
+   * @expectedResult Se crea una categoria de suministro en el sistema.
+   * @observations Necesita una unidad de medida, y tipo de suministro.
    * @return void
    */
   public function test_crear_categoria(): void
@@ -65,7 +68,10 @@ class ProvisionCategoryTest extends TestCase
   }
 
   /**
-   * test una categoria tiene una unidad de medida
+   * @testCase TC002.
+   * @purpose Una categoria tiene unidad de medida.
+   * @expectedResult Se verifica que una categoria de suministro tiene unidad de medida en el sistema.
+   * @observations Necesita una unidad de medida, y tipo de suministro.
    * @return void
    */
   public function test_una_categoria_tiene_unidad_de_medida(): void
@@ -75,8 +81,11 @@ class ProvisionCategoryTest extends TestCase
     $this->assertInstanceOf(BelongsTo::class, $category->measure());
   }
 
-  /**
-   * test una categoria tiene un tipo de suministro
+   /**
+   * @testCase TC003.
+   * @purpose Una categoria tiene tipo de suministro.
+   * @expectedResult Se verifica que una categoria de suministro tiene tipo de suministro en el sistema.
+   * @observations Ninguna.
    * @return void
    */
   public function test_una_categoria_tiene_tipo_de_suministro(): void
@@ -87,7 +96,10 @@ class ProvisionCategoryTest extends TestCase
   }
 
   /**
-   * test una categoria tiene muchos suministros asociados
+   * @testCase TC004.
+   * @purpose Una categoria tiene muchos suministros.
+   * @expectedResult Se verifica que una categoria de suministro tiene muchos suministros en el sistema.
+   * @observations Ninguna.
    * @return void
    */
   public function test_una_categoria_tiene_suministros(): void

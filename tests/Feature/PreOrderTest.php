@@ -191,7 +191,10 @@ class PreOrderTest extends TestCase
   }
 
   /**
-   * test crear pre orden de compra
+   * @testCase TC001.
+   * @purpose Crear una preorden.
+   * @expectedResult Se crea una preorden en el sistema.
+   * @observations Ninguna.
    * @return void
    */
   public function test_crear_pre_orden_de_compra(): void
@@ -219,7 +222,10 @@ class PreOrderTest extends TestCase
   }
 
   /**
-   * test una pre orden pertenece a un proveedor
+   * @testCase TC002.
+   * @purpose Una preorden se asocia a un proveedor.
+   * @expectedResult Se crea una preorden en el sistema asociada a un proveedor.
+   * @observations Ninguna.
    * @return void
    */
   public function test_una_pre_orden_pertenece_a_un_proveedor(): void
@@ -247,7 +253,10 @@ class PreOrderTest extends TestCase
   }
 
   /**
-   * test una pre orden tiene packs de suministros
+   * @testCase TC003.
+   * @purpose Una preorden se asocia a packs de suministros.
+   * @expectedResult Se crea una preorden en el sistema asociada a un pack de suministros.
+   * @observations Ninguna.
    * @return void
    */
   public function test_una_pre_orden_tiene_packs_de_suministros(): void
@@ -296,7 +305,10 @@ class PreOrderTest extends TestCase
   }
 
   /**
-   * test una pre orden tiene suministros
+   * @testCase TC004.
+   * @purpose Una preorden se asocia a suministros.
+   * @expectedResult Se crea una preorden en el sistema asociada a un suministro.
+   * @observations Ninguna.
    * @return void
    */
   public function test_una_pre_orden_tiene_suministros(): void
