@@ -2,6 +2,8 @@
 
 namespace App\Livewire\Suppliers;
 
+use App\Models\PreOrderPeriod;
+use App\Models\RequestForQuotationPeriod;
 use App\Models\Supplier;
 use Livewire\Component;
 use App\Services\Supplier\SupplierService;
@@ -52,7 +54,27 @@ class EditSupplier extends Component
    */
   public function mount(SupplierService $supplier_service, $id): void
   {
+
     $this->supplier = Supplier::findOrFail($id);
+
+    // no editar si existen periodos de presupuesto o preorden activos
+    if (RequestForQuotationPeriod::whereHas('status', function ($query) {
+      $query->whereIn('status_code', [0, 1]); // programado, abierto
+    })->count() > 0) {
+      
+      session()->flash('operation-info', 'No puede editar proveedores mientras existan periodos de presupuestos programados o abiertos');
+      $this->redirectRoute('suppliers-suppliers-index');
+    }
+
+    if (PreOrderPeriod::whereHas('status', function ($query) {
+      $query->whereIn('status_code', [0, 1]); // programado, abierto
+    })->count() > 0) {
+      
+      session()->flash('operation-info', 'No puede editar proveedores mientras existan periodos de preordenes programados o abiertos');
+      $this->redirectRoute('suppliers-suppliers-index');
+    }
+
+
     $this->iva_conditions = $supplier_service->getSuppilerIvaConditions();
 
     $this->company_name         =  $this->supplier->company_name;

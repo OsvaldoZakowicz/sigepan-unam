@@ -5,6 +5,8 @@ namespace App\Livewire\Suppliers;
 use App\Models\Supplier;
 use App\Models\Provision;
 use App\Models\Pack;
+use App\Models\RequestForQuotationPeriod;
+use App\Models\PreOrderPeriod;
 use Livewire\Component;
 use Livewire\Attributes\On;
 use Illuminate\Support\Collection;
@@ -46,6 +48,24 @@ class AddToPriceList extends Component
   public function mount(int $id): void
   {
     $this->supplier = Supplier::findOrFail($id);
+
+    // no agregar si existen periodos de presupuesto o preorden activos
+    if (RequestForQuotationPeriod::whereHas('status', function ($query) {
+      $query->whereIn('status_code', [0, 1]); // programado, abierto
+    })->count() > 0) {
+      
+      session()->flash('operation-info', 'No puede agregar precios mientras existan periodos de presupuestos programados o abiertos');
+      $this->redirectRoute('suppliers-suppliers-price-index', $this->supplier->id);
+    }
+
+    if (PreOrderPeriod::whereHas('status', function ($query) {
+      $query->whereIn('status_code', [0, 1]); // programado, abierto
+    })->count() > 0) {
+      
+      session()->flash('operation-info', 'No puede agregar precios mientras existan periodos de preordenes programados o abiertos');
+      $this->redirectRoute('suppliers-suppliers-price-index', $this->supplier->id);
+    }
+
     $this->setPricesList();
   }
 

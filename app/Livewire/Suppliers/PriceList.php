@@ -5,6 +5,8 @@ namespace App\Livewire\Suppliers;
 use App\Models\Supplier;
 use App\Models\ProvisionTrademark;
 use App\Models\ProvisionType;
+use App\Models\RequestForQuotationPeriod;
+use App\Models\PreOrderPeriod;
 use Illuminate\View\View;
 use Livewire\WithPagination;
 use Livewire\Attributes\Url;
@@ -138,6 +140,31 @@ class PriceList extends Component
    */
   public function deleteProvision(int $id): void
   {
+    // no eliminar si existen periodos de presupuesto o preorden activos
+    if (RequestForQuotationPeriod::whereHas('status', function ($query) {
+      $query->whereIn('status_code', [0, 1]); // programado, abierto
+    })->count() > 0) {
+      
+      $this->dispatch('toast-event', toast_data: [
+        'event_type'  =>  'info',
+        'title_toast' =>  toastTitle('',true),
+        'descr_toast' =>  'No puede eliminar precios mientras existan periodos de presupuestos programados o abiertos',
+      ]);
+      return;
+    }
+
+    if (PreOrderPeriod::whereHas('status', function ($query) {
+      $query->whereIn('status_code', [0, 1]); // programado, abierto
+    })->count() > 0) {
+      
+       $this->dispatch('toast-event', toast_data: [
+        'event_type'  =>  'info',
+        'title_toast' =>  toastTitle('',true),
+        'descr_toast' =>  'No puede eliminar precios mientras existan periodos de preordenes programados o abiertos',
+      ]);
+      return;
+    }
+
     try {
 
       $this->supplier->provisions()
