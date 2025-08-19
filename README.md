@@ -1,3 +1,7 @@
+<div>
+  <img src="public/images/sigepan-logo.png" alt="SIGEPAN Logo" width="200">
+</div>
+
 # SiGePan - Sistema de Gestión para Panaderías
 
 Proyecto Final de Carrera  Analista en Sistemas de Computación (ASC), Licenciatura en Sistemas de Información (LSI).
